@@ -296,6 +296,38 @@
         footer a:hover {
             text-decoration: underline;
         }
+
+        .footer-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin: 40px 0;
+            text-align: left;
+        }
+
+        .footer-section h4 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section li {
+            margin: 10px 0;
+        }
+
+        .footer-section a {
+            color: #95a5a6;
+            font-size: 0.95em;
+        }
+
+        .footer-section a:hover {
+            color: #3498db;
+        }
     </style>
 </head>
 <body>
@@ -678,11 +710,54 @@ Security Group: sg-0ab56571076bcff37 (port 22)
             <p style="font-size: 1.2em; margin-bottom: 20px;">
                 <strong>Built by defense contractors, for defense contractors.</strong>
             </p>
-            <p style="margin-bottom: 30px;">
-                <a href="https://github.com/guardian-nexus/auditkit">Free Version (Level 1)</a> · 
-                <a href="mailto:hello@auditkit.io">Contact Sales</a> · 
-                <a href="https://github.com/guardian-nexus/auditkit/blob/main/docs/">Documentation</a>
-            </p>
+
+            <div class="footer-nav">
+                <div class="footer-section">
+                    <h4>Getting Started</h4>
+                    <ul>
+                        <li><a href="../getting-started.md">Quick Start Guide</a></li>
+                        <li><a href="../installation.md">Installation</a></li>
+                        <li><a href="../cli-reference.md">CLI Reference</a></li>
+                        <li><a href="../faq.md">FAQ</a></li>
+                        <li><a href="../pricing.md">Pricing</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Frameworks</h4>
+                    <ul>
+                        <li><a href="../frameworks/cmmc.md">CMMC</a></li>
+                        <li><a href="../frameworks/soc2.md">SOC2</a></li>
+                        <li><a href="../frameworks/pci-dss.md">PCI-DSS</a></li>
+                        <li><a href="../frameworks/hipaa.md">HIPAA</a></li>
+                        <li><a href="../frameworks/nist-800-53.md">NIST 800-53</a></li>
+                        <li><a href="../frameworks/iso27001.md">ISO 27001</a></li>
+                        <li><a href="../frameworks/fedramp.md">FedRAMP</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Cloud Providers</h4>
+                    <ul>
+                        <li><a href="../setup/aws.md">AWS Setup</a></li>
+                        <li><a href="../setup/azure.md">Azure Setup</a></li>
+                        <li><a href="../setup/gcp.md">GCP Setup</a></li>
+                        <li><a href="../setup/m365.md">M365 Setup</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="../examples/">Examples</a></li>
+                        <li><a href="https://github.com/guardian-nexus/auditkit">Free Version</a></li>
+                        <li><a href="https://github.com/guardian-nexus/auditkit/issues">Report Bug</a></li>
+                        <li><a href="https://github.com/guardian-nexus/auditkit/discussions">Discussions</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Sales</a></li>
+                    </ul>
+                </div>
+            </div>
+
             <p style="font-size: 0.9em; opacity: 0.8;">
                 AuditKit Pro v0.7.0 • November 2025
             </p>

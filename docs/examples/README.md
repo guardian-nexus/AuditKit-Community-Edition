@@ -112,41 +112,10 @@ AuditKit Pro includes:
 
 ---
 
-## Documentation
-
-### Getting Started
-- **[Getting Started Guide](../getting-started.md)** - Your first scan in 5 minutes
-- **[Installation Guide](../installation.md)** - Complete installation instructions
-- **[CLI Reference](../cli-reference.md)** - All commands and options
-- **[FAQ](../faq.md)** - Common questions and troubleshooting
-- **[Pricing](../pricing.md)** - Free vs Pro comparison
-
-### Framework Guides
-- **[CMMC](../frameworks/cmmc.md)** - Defense contractor compliance (Level 1 free, Level 2 Pro)
-- **[SOC2](../frameworks/soc2.md)** - Trust service criteria
-- **[PCI-DSS](../frameworks/pci-dss.md)** - Payment card security
-- **[HIPAA](../frameworks/hipaa.md)** - Healthcare data protection
-- **[NIST 800-53](../frameworks/nist-800-53.md)** - Federal security controls
-- **[ISO 27001](../frameworks/iso27001.md)** - Information security management
-- **[FedRAMP](../frameworks/fedramp.md)** - Federal cloud security
-- **[CIS Benchmarks](../frameworks/cis-benchmarks.md)** - Industry best practices
-
-### Cloud Provider Setup
-- **[AWS Setup](../setup/aws.md)** - Configure AWS credentials and permissions
-- **[Azure Setup](../setup/azure.md)** - Configure Azure authentication
-- **[GCP Setup](../setup/gcp.md)** - Configure GCP service accounts
-- **[M365 Setup](../setup/m365.md)** - Configure Microsoft 365 access
-
-### Advanced Documentation
-- **[GitHub Repository](https://github.com/guardian-nexus/auditkit)** - Source code, issues, and contributions
-- **[AuditKit Pro Features](../pro/)** - Evidence packages, exceptions, daemon mode, drift detection
-
----
-
 ## Privacy Notice
 
 All examples in this directory are generated from synthetic test environments. No real production data, account IDs, or sensitive information is included. Where account IDs appear (e.g., `1234567890`), they are dummy values for demonstration purposes.
 
 ---
 
-**Questions?** Email [hello@auditkit.io](mailto:hello@auditkit.io)
+**Questions?** Email [hello@auditkit.io](mailto:hello@auditkit.io) • [Documentation](../) • [AuditKit Pro](../pro/)
