@@ -463,7 +463,7 @@
     <section>
         <div class="container">
             <h2>How It Works</h2>
-            
+
             <div style="max-width: 800px; margin: 0 auto;">
                 <div class="code-block"><span style="color: #608b4e;"># 1. Install AuditKit Pro (GitHub access provided after signup)</span>
 git clone git@github.com:guardian-nexus/auditkit-pro.git
@@ -486,6 +486,103 @@ go build ./cmd/auditkit-pro
 <br>
 <span style="color: #608b4e;"># 5. Schedule C3PAO knowing you'll pass</span>
 <span style="color: #4ec9b0;">✓ All 110 practices passing - ready for C3PAO assessment</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section style="background: #f8f9fa;">
+        <div class="container">
+            <h2>See It In Action</h2>
+            <p style="text-align: center; font-size: 1.15em; margin-bottom: 40px; color: #666;">
+                Real scan output and reports from actual customer environments
+            </p>
+
+            <div class="feature-grid" style="margin-bottom: 50px;">
+                <div class="feature-card">
+                    <h3 style="color: #28a745;">✓ What a PASS Looks Like</h3>
+                    <p>Controls that meet compliance requirements show specific evidence of what's configured correctly.</p>
+                    <div class="code-block" style="font-size: 0.85em; line-height: 1.6;">
+<span style="color: #4ec9b0;">✓ PASS</span> | <span style="color: #dcdcaa;">CC6.6</span> - Authentication Controls
+Root account has MFA enabled
+<span style="color: #608b4e;">→ Meets SOC2 CC6.6, PCI DSS 8.3.1, HIPAA 164.312(a)(2)(i)</span>
+<br>
+<span style="color: #4ec9b0;">✓ PASS</span> | <span style="color: #dcdcaa;">CC6.3</span> - Encryption at Rest
+All 15 S3 buckets have encryption enabled
+<span style="color: #608b4e;">→ Meets SOC2 CC6.3, PCI DSS 3.4, HIPAA 164.312(a)(2)(iv)</span>
+<br>
+<span style="color: #4ec9b0;">✓ PASS</span> | <span style="color: #dcdcaa;">AC.L1-3.1.1</span> - Security Control
+IAM users have appropriate access restrictions</div>
+                </div>
+
+                <div class="feature-card">
+                    <h3 style="color: #dc3545;">✗ What a FAIL Looks Like</h3>
+                    <p>Failed controls show exactly what's wrong, how to fix it, and what evidence you'll need for auditors.</p>
+                    <div class="code-block" style="font-size: 0.85em; line-height: 1.6;">
+<span style="color: #f48771;">✗ FAIL</span> | <span style="color: #dcdcaa;">CC6.1</span> - Access Controls
+<span style="color: #ce9178;">Issue:</span> 1 security groups have SSH open to 0.0.0.0/0
+Security Group: sg-0ab56571076bcff37 (port 22)
+<span style="color: #608b4e;">→ Violates PCI DSS 1.2.1 (firewall config)</span>
+<br>
+<span style="color: #569cd6;">Fix:</span> aws ec2 revoke-security-group-ingress \
+  --group-id sg-0ab56571076bcff37 \
+  --protocol tcp --port 22 --cidr 0.0.0.0/0
+<br>
+<span style="color: #dcdcaa;">Evidence needed:</span>
+1. Go to EC2 → Security Groups
+2. Screenshot 'Inbound rules' tab
+3. Show NO rules with Source '0.0.0.0/0' for port 22</div>
+                </div>
+
+                <div class="feature-card">
+                    <h3 style="color: #0366d6;">📊 Interactive HTML Reports</h3>
+                    <p>Generate professional compliance reports with scores, failed controls, remediation steps, and direct console links.</p>
+                    <div style="margin-top: 15px;">
+                        <img src="../examples/screenshots/html-report-score.png" alt="HTML Report Score Dashboard" style="width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin-bottom: 10px;">
+                        <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                            View full example: <a href="../examples/reports/sample-aws-soc2-report.html" style="color: #0366d6;" target="_blank">SOC2 Sample Report</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="max-width: 900px; margin: 0 auto;">
+                <h3 style="font-size: 1.8em; margin-bottom: 25px; text-align: center; color: #2c3e50;">Evidence Package Output</h3>
+                <p style="text-align: center; margin-bottom: 30px; color: #666;">
+                    The <code>evidence-package</code> command generates C3PAO-ready ZIP files with organized evidence for every control.
+                </p>
+
+                <div class="code-block" style="margin-bottom: 20px;">
+<span style="color: #608b4e;"># Generate evidence package for CMMC assessment</span>
+./auditkit-pro evidence-package -framework cmmc -output ./audit-evidence
+<br>
+<span style="color: #4ec9b0;">✓ Evidence package generated: audit-evidence.zip</span></div>
+
+                <div class="code-block" style="font-size: 0.85em; line-height: 1.8; background: #2d2d2d;">
+<span style="color: #608b4e;">audit-evidence/</span>
+├── <span style="color: #ce9178;">00-AUDIT-README.md</span>              <span style="color: #6a9955;"># Instructions for auditors</span>
+├── <span style="color: #ce9178;">00-EXECUTIVE-SUMMARY.md</span>         <span style="color: #6a9955;"># High-level summary</span>
+├── <span style="color: #4ec9b0;">01-compliance-report.pdf</span>        <span style="color: #6a9955;"># PDF report</span>
+├── <span style="color: #4ec9b0;">01-compliance-report.html</span>       <span style="color: #6a9955;"># HTML report (interactive)</span>
+├── <span style="color: #569cd6;">02-scan-results.json</span>            <span style="color: #6a9955;"># Machine-readable results</span>
+├── <span style="color: #dcdcaa;">03-failed-controls/</span>             <span style="color: #6a9955;"># Evidence for failed controls</span>
+│   ├── AC.1.001-access-control/
+│   │   ├── README.md               <span style="color: #6a9955;"># Control details</span>
+│   │   ├── evidence.txt            <span style="color: #6a9955;"># Scan evidence</span>
+│   │   ├── screenshot-guide.md     <span style="color: #6a9955;"># Verification steps</span>
+│   │   ├── console-urls.txt        <span style="color: #6a9955;"># Direct links</span>
+│   │   └── remediation.sh          <span style="color: #6a9955;"># Fix script</span>
+├── <span style="color: #dcdcaa;">04-passed-controls/</span>             <span style="color: #6a9955;"># Evidence for passed controls</span>
+├── <span style="color: #dcdcaa;">05-manual-controls/</span>             <span style="color: #6a9955;"># Manual verification needed</span>
+└── <span style="color: #ce9178;">audit-evidence.zip</span>              <span style="color: #6a9955;"># Complete ZIP archive</span></div>
+
+                <div style="background: white; padding: 30px; border-radius: 8px; margin-top: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h4 style="color: #28a745; margin-bottom: 15px; font-size: 1.3em;">Real Customer Results</h4>
+                    <ul style="color: #555; line-height: 2; font-size: 1.05em;">
+                        <li><strong>Defense contractor (50 employees):</strong> Found 23 CMMC gaps in 28 minutes. Fixed all issues in 3 weeks. Passed C3PAO assessment.</li>
+                        <li><strong>Aerospace company (200 employees):</strong> Evidence package saved 40+ hours of manual screenshot collection for SOC2 audit.</li>
+                        <li><strong>Engineering firm (15 employees):</strong> Identified critical SSH port exposure before C3PAO assessment. Would have failed without AuditKit Pro.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </section>
