@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuditKit CMMC Compliance Report Compliance Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f6f8fa;
+            color: #24292e;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0366d6 0%, #0256c7 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .header .subtitle {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .score-card {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            font-weight: bold;
+            border: 8px solid;
+        }
+        
+        .score-excellent {
+            border-color: #28a745;
+            color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+        
+        .score-good {
+            border-color: #ffc107;
+            color: #ffc107;
+            background: rgba(255, 193, 7, 0.1);
+        }
+        
+        .score-poor {
+            border-color: #dc3545;
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .stat-box {
+            padding: 20px;
+            background: #f6f8fa;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-box .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-box .label {
+            color: #586069;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .disclaimer-banner {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            border: 3px solid #ffc107;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .disclaimer-banner h3 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .disclaimer-banner p {
+            color: #533f03;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+        
+        .disclaimer-banner ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+        
+        .disclaimer-banner li {
+            color: #533f03;
+            margin: 8px 0;
+        }
+        
+        .disclaimer-banner strong {
+            color: #000;
+        }
+        
+        .disclaimer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .disclaimer-box {
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid;
+        }
+        
+        .disclaimer-box.automated {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        
+        .disclaimer-box.manual {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        
+        .disclaimer-box h4 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .disclaimer-box.automated h4 {
+            color: #155724;
+        }
+        
+        .disclaimer-box.manual h4 {
+            color: #721c24;
+        }
+        
+        .summary {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .summary h2 {
+            color: #24292e;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        
+        .summary p {
+            color: #586069;
+            font-size: 1.1em;
+            line-height: 1.8;
+        }
+        
+        .priority-actions {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .priority-actions h2 {
+            color: #24292e;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .action-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+        
+        .action-critical {
+            background: #fef2f2;
+            border-color: #dc3545;
+        }
+        
+        .action-high {
+            background: #fffbeb;
+            border-color: #ffc107;
+        }
+        
+        .action-medium {
+            background: #f0f9ff;
+            border-color: #0366d6;
+        }
+        
+        .controls-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .controls-section h2 {
+            color: #24292e;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .section-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e1e4e8;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            color: #586069;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            color: #0366d6;
+        }
+        
+        .tab.active {
+            color: #0366d6;
+            border-bottom-color: #0366d6;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .control-card {
+            background: #f6f8fa;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+        
+        .control-card.critical {
+            border-color: #dc3545;
+            background: #fef2f2;
+        }
+        
+        .control-card.high {
+            border-color: #ffc107;
+            background: #fffbeb;
+        }
+        
+        .control-card.pass {
+            border-color: #28a745;
+            background: #f0fdf4;
+        }
+        
+        .control-card.info {
+            border-color: #0366d6;
+            background: #f0f9ff;
+        }
+        
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+        
+        .control-title {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: #24292e;
+        }
+        
+        .control-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-fail {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .badge-pass {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-info {
+            background: #0366d6;
+            color: white;
+        }
+        
+        .control-issue {
+            color: #586069;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+        
+        .control-fix {
+            background: #24292e;
+            color: #f6f8fa;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        
+        .control-evidence {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e1e4e8;
+        }
+        
+        .evidence-title {
+            font-weight: 600;
+            color: #0366d6;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .evidence-steps {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .evidence-steps li {
+            padding: 6px 0;
+            color: #586069;
+        }
+        
+        .evidence-steps li:before {
+            content: "→ ";
+            color: #0366d6;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .console-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #0366d6;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        
+        .console-link:hover {
+            background: #0256c7;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #586069;
+            font-size: 0.9em;
+            background: white;
+            margin-top: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .footer a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                max-width: 100%;
+            }
+            .control-card {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CMMC Compliance Report</h1>
+            <div class="subtitle">Generated November 16, 2025 at 4:48 PM | Account: 405894844061</div>
+        </div>
+        
+        <div class="score-card">
+            <div class="score-circle score-good">
+                68%
+            </div>
+            <h2>Automated Check Score</h2>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="number">127</div>
+                    <div class="label">Total Controls</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number" style="color: #28a745;">28</div>
+                    <div class="label">Passed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number" style="color: #dc3545;">13</div>
+                    <div class="label">Failed</div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="disclaimer-banner">
+            <h3>⚠️ Important: Automated Technical Checks Only</h3>
+            <p>This report shows <strong>41 automated technical checks</strong> out of <strong>127 total controls</strong>. 
+               The 68.3% score represents automated infrastructure checks only.</p>
+            
+            <div class="disclaimer-grid">
+                <div class="disclaimer-box automated">
+                    <h4>✓ Automated Checks (41 controls)</h4>
+                    <ul>
+                        <li>Infrastructure configurations</li>
+                        <li>Access control policies</li>
+                        <li>Encryption settings</li>
+                        <li>Network security rules</li>
+                        <li>Logging and monitoring</li>
+                    </ul>
+                </div>
+                
+                <div class="disclaimer-box manual">
+                    <h4>✗ Manual Documentation Required (86 controls)</h4>
+                    <ul>
+                        <li>Organizational policies</li>
+                        <li>Training records</li>
+                        <li>Incident response plans</li>
+                        <li>Third-party assessments</li>
+                        <li>Business processes</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <p style="margin-top: 20px;"><strong>Full compliance requires:</strong></p>
+            <ul>
+                <li>Documentation of all 86 manual controls</li>
+                <li>Evidence collection with screenshots and artifacts</li>
+                <li>Organizational policies and procedures implementation</li>
+                <li>Formal assessment by C3PAO (Certified Third Party Assessor)</li>
+            </ul>
+            
+            <p style="margin-top: 15px; font-weight: 600; color: #721c24;">
+                ⚠️ THIS TOOL DOES NOT PROVIDE CERTIFICATION. 
+                Formal assessment by qualified auditor is required.
+            </p>
+        </div>
+    
+        
+        <div class="summary">
+            <h2>Executive Summary</h2>
+            <p>Your AWS environment needs improvement with a compliance score of 68.3%. Out of 127 controls evaluated, 28 passed and 13 failed. Immediate action is required on 0 critical issues to achieve compliance.</p>
+        </div>
+        
+        <div class="priority-actions">
+            <h2>Top Priority Actions</h2>
+            <div class="action-item action-medium">
+                <strong>1.</strong> Enable continuous compliance monitoring
+            </div>
+            <div class="action-item action-medium">
+                <strong>2.</strong> Document your security policies and procedures
+            </div>
+            <div class="action-item action-medium">
+                <strong>3.</strong> Set up automated alerting for security events
+            </div>
+            <div class="action-item action-medium">
+                <strong>4.</strong> Schedule quarterly access reviews
+            </div></div>
+        
+        <div class="controls-section">
+            <h2>Control Details</h2>
+            <div class="section-tabs">
+                <button class="tab active" onclick="showTab('failed')">Failed Controls (13)</button>
+                <button class="tab" onclick="showTab('passed')">Passed Controls (28)</button>
+                <button class="tab" onclick="showTab('info')">Manual Documentation (86)</button>
+            </div>
+            
+            <div id="failed" class="tab-content active">
+                
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">1. [AC.L1-3.1.2] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> No custom IAM policies - relying on AWS managed policies only
+                    </div>
+                    <div class="control-fix">$ Create custom IAM policies to restrict access appropriately</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → IAM → Policies → Create policy → Screenshot custom policies</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/policies" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">2. [IA.L1-3.5.2] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> Only 0/2 users have MFA enabled
+                    </div>
+                    <div class="control-fix">$ Enable MFA for all IAM users</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → IAM → Users → Security credentials → Screenshot MFA devices</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/users" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">3. [SC.L1-3.13.1] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> 1 security groups allow unrestricted access: sg-0ab56571076bcff37
+                    </div>
+                    <div class="control-fix">$ Restrict security group rules to specific IP ranges</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → VPC → Security Groups → Screenshot showing restricted inbound rules</li></ul>
+                        <a href="https://console.aws.amazon.com/vpc/home#SecurityGroups:" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">4. [AC.L2-3.1.3] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> No custom IAM policies to control information flow
+                    </div>
+                    <div class="control-fix">$ Create IAM policies that enforce information flow controls</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → IAM → Policies → Create policies → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/policies" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">5. [AU.L2-3.3.1] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> No CloudTrail trails configured
+                    </div>
+                    <div class="control-fix">$ Enable CloudTrail with multi-region trail</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → CloudTrail → Create trail → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/cloudtrail/home" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">6. [AU.L2-3.3.2] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> CloudTrail not configured to capture required audit content
+                    </div>
+                    <div class="control-fix">$ Enable CloudTrail with management events</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → CloudTrail → Event selectors → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/cloudtrail/home" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">7. [AU.L2-3.3.8] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> CloudTrail not configured with log file validation
+                    </div>
+                    <div class="control-fix">$ Enable CloudTrail log file integrity validation</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → CloudTrail → Log file validation → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/cloudtrail/home" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">8. [IA.L2-3.5.3] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> Only 0/2 users have MFA
+                    </div>
+                    <div class="control-fix">$ Require MFA for all user accounts</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → IAM → Users → Enable MFA → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/users" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">9. [IA.L2-3.5.7] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> No password policy configured
+                    </div>
+                    <div class="control-fix">$ Configure IAM password policy with 14+ characters and complexity requirements</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → IAM → Account settings → Set password policy → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/account_settings" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">10. [IA.L2-3.5.8] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> No password policy configured
+                    </div>
+                    <div class="control-fix">$ Configure IAM password policy to prevent reuse</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → IAM → Account settings → Password reuse prevention → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/account_settings" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">11. [IA.L2-3.5.9] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> No password policy configured
+                    </div>
+                    <div class="control-fix">$ Configure password expiration policy</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → IAM → Account settings → Password expiration → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/account_settings" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">12. [AU.L2-3.3.4] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> CloudTrail not configured with failure alerting
+                    </div>
+                    <div class="control-fix">$ Configure CloudWatch alarms for CloudTrail delivery failures</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → CloudWatch → Alarms → Screenshot CloudTrail failure alarms</li></ul>
+                        <a href="https://console.aws.amazon.com/cloudwatch/home#alarmsV2:" target="_blank" class="console-link">Open Console →</a></div></div>
+                <div class="control-card">
+                    <div class="control-header">
+                        <div class="control-title">13. [SC.L2-3.13.10] Security Control</div>
+                        <span class="control-badge badge-fail">FAIL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Issue:</strong> No KMS keys configured for cryptographic operations
+                    </div>
+                    <div class="control-fix">$ Create KMS keys for encryption at rest and in transit</div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → KMS → Create key → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/kms/home" target="_blank" class="console-link">Open Console →</a></div></div>
+            </div>
+            
+            <div id="passed" class="tab-content">
+                
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">1. [AC.L1-3.1.1] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">IAM access control configured with 2 users</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">2. [IA.L1-3.5.1] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">All 2 IAM users have unique identities</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">3. [SC.L1-3.13.16] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">All 1 S3 buckets have encryption enabled</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">4. [SC.L1-3.13.11] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS KMS uses FIPS 140-2 validated cryptographic modules</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">5. [AC.L2-3.1.6] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">Least privilege implemented (1 admin users)</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">6. [SC.L2-3.13.8] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS services use TLS 1.2+ for data in transit</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">7. [SC.L2-3.13.16] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS encryption services protect data at rest</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">8. [AC.L2-3.1.7] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">Separation of duties implemented with 2 users</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">9. [AC.L2-3.1.16] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">Access controls configured for remote/wireless access</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">10. [AC.L2-3.1.18] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">Network controls configured with 1 VPCs</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">11. [AC.L2-3.1.19] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS enforces encryption for data in transit and at rest</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">12. [AC.L2-3.1.20] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">External connections controlled via 2 security groups</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">13. [CM.L2-3.4.7] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">Configuration change restrictions configured via IAM (2 users)</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">14. [IA.L2-3.5.10] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS IAM stores passwords using cryptographic hashing</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">15. [IA.L2-3.5.11] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS IAM login feedback does not reveal sensitive information</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">16. [MP.L2-3.8.7] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">S3 enforces encryption in transit for 1 buckets</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">17. [MP.L2-3.8.8] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">All 1 S3 buckets have public access blocked</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">18. [SC.L2-3.13.16] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">Encryption at rest configured for 1 S3 buckets</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">19. [AC.L2-3.1.4] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">Network separation implemented with 2 security groups</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">20. [AC.L2-3.1.5] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">Least privilege principles implemented in IAM policies</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">21. [AC.L2-3.1.13] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS enforces TLS encryption for all remote access sessions</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">22. [AU.L2-3.3.10] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS automatically synchronizes system clocks using NTP</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">23. [IA.L2-3.5.4] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS IAM uses time-based tokens and nonces to prevent replay attacks</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">24. [SC.L2-3.13.2] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">Network segmentation implemented with 1 VPCs</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">25. [SC.L2-3.13.5] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS services use cryptographic mechanisms to prevent unauthorized disclosure during transmission</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">26. [SC.L2-3.13.9] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">Cryptographic session management configured with 0 KMS keys</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">27. [SC.L2-3.13.11] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS KMS and other AWS cryptographic services use FIPS 140-2 validated modules</div>
+                </div>
+                <div class="control-card pass">
+                    <div class="control-header">
+                        <div class="control-title">28. [SC.L2-3.13.15] Security Control</div>
+                        <span class="control-badge badge-pass">PASS</span>
+                    </div>
+                    <div class="control-issue">AWS services use digital signatures and TLS to protect communications authenticity</div>
+                </div>
+            </div>
+            
+            <div id="info" class="tab-content">
+                
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">1. [MP.L1-3.8.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document media sanitization procedures for EBS volumes and S3 objects
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot showing media sanitization procedures | AWS Console → S3 → Lifecycle rules</li></ul>
+                        <a href="https://console.aws.amazon.com/s3/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">2. [PE.L1-3.10.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: AWS data centers have physical controls (inherited control)
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Artifact → Screenshot SOC 2 report showing physical controls</li></ul>
+                        <a href="https://console.aws.amazon.com/artifact/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">3. [PE.L1-3.10.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: AWS data centers escort visitors (inherited control)
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Artifact → Screenshot showing visitor management procedures</li></ul>
+                        <a href="https://console.aws.amazon.com/artifact/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">4. [PE.L1-3.10.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: AWS maintains physical access logs (inherited control)
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Artifact → Screenshot showing physical access logging</li></ul>
+                        <a href="https://console.aws.amazon.com/artifact/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">5. [PE.L1-3.10.5] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: AWS controls physical access devices (inherited control)
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Artifact → Screenshot showing physical access device management</li></ul>
+                        <a href="https://console.aws.amazon.com/artifact/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">6. [PS.L1-3.9.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document personnel screening procedures for CUI access
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>HR Documentation → Screenshot showing personnel screening procedures and background check records</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/users" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">7. [PS.L1-3.9.2] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document authorization process for CUI access
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot showing CUI access authorization procedures and approval records</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/users" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">8. [SI.L1-3.14.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document flaw identification and remediation processes
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Systems Manager → Patch Manager → Screenshot compliance dashboard</li></ul>
+                        <a href="https://console.aws.amazon.com/systems-manager/patch-manager" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">9. [SI.L1-3.14.2] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document malicious code protection mechanisms
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → GuardDuty → Screenshot showing malware detection enabled</li></ul>
+                        <a href="https://console.aws.amazon.com/guardduty/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">10. [SI.L1-3.14.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document malicious code protection update procedures
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → GuardDuty → Settings → Screenshot showing automatic updates enabled</li></ul>
+                        <a href="https://console.aws.amazon.com/guardduty/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">11. [CM.L2-3.4.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document baseline configurations for AWS infrastructure
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Config → Rules → Screenshot baseline configuration rules</li></ul>
+                        <a href="https://console.aws.amazon.com/config/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">12. [IR.L2-3.6.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document incident response plan and procedures
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot incident response plan | AWS Security Hub → Screenshot incident management</li></ul>
+                        <a href="https://console.aws.amazon.com/securityhub/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">13. [MP.L2-3.8.9] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Verify backup encryption and access controls
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Backup → Vaults → Screenshot encryption enabled</li></ul>
+                        <a href="https://console.aws.amazon.com/backup/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">14. [RA.L2-3.11.2] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document vulnerability scanning procedures
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Inspector → Screenshot vulnerability scans</li></ul>
+                        <a href="https://console.aws.amazon.com/inspector/v2/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">15. [SI.L2-3.14.6] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Verify VPC Flow Logs and GuardDuty enabled
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → VPC → Flow Logs → Screenshot | GuardDuty → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/vpc/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">16. [SI.L2-3.14.7] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document unauthorized use detection mechanisms
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → GuardDuty → Screenshot findings | Security Hub → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/guardduty/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">17. [AC.L2-3.1.12] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Verify session timeout policies configured
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → IAM → Account settings → Screenshot session duration</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/account_settings" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">18. [AU.L2-3.3.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document audit log review procedures
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot audit review procedures | CloudTrail → Screenshot log analysis</li></ul>
+                        <a href="https://console.aws.amazon.com/cloudtrail/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">19. [AU.L2-3.3.5] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Verify audit record correlation across systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → CloudWatch → Insights → Screenshot log correlation</li></ul>
+                        <a href="https://console.aws.amazon.com/cloudwatch/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">20. [AU.L2-3.3.7] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document audit log reduction and analysis procedures
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → CloudWatch → Insights → Screenshot analysis tools</li></ul>
+                        <a href="https://console.aws.amazon.com/cloudwatch/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">21. [CM.L2-3.4.2] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Verify systems configured with least functionality
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Organizations → SCPs → Screenshot service restrictions</li></ul>
+                        <a href="https://console.aws.amazon.com/organizations/v2/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">22. [IR.L2-3.6.2] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document incident response training for personnel
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot training records | LMS → Screenshot completion certificates</li></ul>
+                        <a href="https://console.aws.amazon.com/securityhub/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">23. [IR.L2-3.6.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document incident response testing procedures
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot testing procedures | Test results → Screenshot exercise outcomes</li></ul>
+                        <a href="https://console.aws.amazon.com/securityhub/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">24. [MA.L2-3.7.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document system maintenance procedures
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Systems Manager → Maintenance windows → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/systems-manager/maintenance-windows" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">25. [MA.L2-3.7.5] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document maintenance tool controls
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Systems Manager → Session Manager → Screenshot access controls</li></ul>
+                        <a href="https://console.aws.amazon.com/systems-manager/session-manager" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">26. [SC.L2-3.13.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Verify VPC and security group boundary protection
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → VPC → Screenshot network architecture | Security groups → Screenshot boundary controls</li></ul>
+                        <a href="https://console.aws.amazon.com/vpc/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">27. [PS.L2-3.9.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document position risk designations for CUI access
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>HR Documentation → Screenshot position risk categories and CUI access levels</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">28. [PS.L2-3.9.2] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document formal sanctions process for security violations
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>HR Documentation → Screenshot sanctions policy and violation procedures</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">29. [PS.L2-3.9.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document access termination procedures
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>HR Documentation → Screenshot termination procedures | IAM → Screenshot user deactivation process</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">30. [PE.L2-3.10.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> AWS inherited control: AWS data centers limit physical access (verified via AWS Artifact)
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Artifact → Screenshot SOC 2 report physical security section</li></ul>
+                        <a href="https://console.aws.amazon.com/artifact/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">31. [PE.L2-3.10.2] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> AWS inherited control: Physical access protection implemented at AWS facilities
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Artifact → Screenshot physical protection controls documentation</li></ul>
+                        <a href="https://console.aws.amazon.com/artifact/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">32. [PE.L2-3.10.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> AWS inherited control: Visitor escort procedures at AWS data centers
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Artifact → Screenshot visitor escort procedures</li></ul>
+                        <a href="https://console.aws.amazon.com/artifact/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">33. [PE.L2-3.10.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> AWS inherited control: Physical access logs maintained at AWS facilities
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Artifact → Screenshot physical access logging documentation</li></ul>
+                        <a href="https://console.aws.amazon.com/artifact/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">34. [PE.L2-3.10.5] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> AWS inherited control: Physical access devices controlled at AWS facilities
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Artifact → Screenshot access device controls</li></ul>
+                        <a href="https://console.aws.amazon.com/artifact/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">35. [PE.L2-3.10.6] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> AWS inherited control: Physical safeguarding mechanisms at AWS facilities
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Artifact → Screenshot physical safeguarding mechanisms</li></ul>
+                        <a href="https://console.aws.amazon.com/artifact/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">36. [SI.L2-3.14.2] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Verify malicious code protection deployed
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → GuardDuty → Screenshot enabled | EC2 → Screenshot endpoint protection</li></ul>
+                        <a href="https://console.aws.amazon.com/guardduty/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">37. [SI.L2-3.14.5] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Verify spam protection configured for email systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Email system → Screenshot spam filtering configuration</li></ul>
+                        <a href="https://console.aws.amazon.com/ses/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">38. [AC.L2-3.1.8] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Configure account lockout after failed login attempts in authentication systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Directory Service/IdP → Account lockout policy → Screenshot showing 5 attempts / 30 min lockout</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/account_settings" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">39. [AC.L2-3.1.9] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Display appropriate privacy and security notices on systems processing CUI
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>EC2 Instances → Login banner configuration → Screenshot security notice | Documentation → Screenshot privacy policy</li></ul>
+                        <a href="https://console.aws.amazon.com/ec2/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">40. [AC.L2-3.1.10] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Implement session lock after 15 minutes of inactivity
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → IAM → Account settings → Screenshot session timeout | Workstations → Screenshot screen lock policy</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/account_settings" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">41. [AC.L2-3.1.11] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Automatically terminate network connections after defined conditions
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → IAM → Session policies → Screenshot termination rules | CloudWatch → Screenshot session monitoring</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/account_settings" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">42. [AC.L2-3.1.14] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Ensure all remote access routes through controlled access points (VPN/bastion hosts)
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → VPC → VPN connections → Screenshot managed access points | EC2 → Bastion hosts → Screenshot</li></ul>
+                        <a href="https://console.aws.amazon.com/vpc/home#VpnConnections:" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">43. [AC.L2-3.1.15] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document authorization for remote command/script execution on CUI systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot remote execution authorization policy | AWS Systems Manager → Screenshot Run Command logs</li></ul>
+                        <a href="https://console.aws.amazon.com/systems-manager/run-command" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">44. [AC.L2-3.1.17] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document authorization process for privileged functions and security-relevant information
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot privileged access authorization policy | IAM → Screenshot admin role assignments</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/roles" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">45. [AT.L2-3.2.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Provide security awareness training to all personnel with access to CUI
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>LMS/Training System → Screenshot training completion records | HR Documentation → Screenshot training policy</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">46. [AT.L2-3.2.2] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Provide training on recognizing and reporting security threats
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Training System → Screenshot threat awareness modules | Security Metrics → Screenshot phishing test results</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">47. [AT.L2-3.2.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Provide role-based security training before granting access to CUI systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Training System → Screenshot role-based training tracks | HR → Screenshot role-training matrix</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">48. [AT.L2-3.2.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Update security awareness training content annually or when threats change
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Training System → Screenshot content update history | Documentation → Screenshot training review schedule</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">49. [AT.L2-3.2.5] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Incorporate practical exercises in security awareness training
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Training System → Screenshot practical exercise modules | Security Metrics → Screenshot exercise participation rates</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">50. [AU.L2-3.3.6] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Use CloudWatch Logs Insights for audit record analysis and reporting
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → CloudWatch → Logs Insights → Screenshot query results | Dashboards → Screenshot audit metrics</li></ul>
+                        <a href="https://console.aws.amazon.com/cloudwatch/home#logsV2:logs-insights" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">51. [AU.L2-3.3.9] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Verify CloudTrail logs are protected from unauthorized access and modification
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → S3 → CloudTrail bucket → Object Lock → Screenshot | IAM → Screenshot restrictive bucket policies</li></ul>
+                        <a href="https://console.aws.amazon.com/s3/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">52. [CA.L2-3.12.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Conduct annual security control assessments of CUI systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot assessment schedule and results | AWS Audit Manager → Screenshot assessment framework</li></ul>
+                        <a href="https://console.aws.amazon.com/auditmanager/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">53. [CA.L2-3.12.2] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Maintain System Security Plans (SSP) for all systems processing CUI
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation Repository → Screenshot SSP documents | Compliance Platform → Screenshot SSP templates</li></ul>
+                        <a href="https://console.aws.amazon.com/systems-manager/documents" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">54. [CA.L2-3.12.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Maintain Plans of Action & Milestones (POA&M) for identified security weaknesses
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Project Management System → Screenshot POA&M tracking | Security Hub → Screenshot finding remediation status</li></ul>
+                        <a href="https://console.aws.amazon.com/securityhub/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">55. [CA.L2-3.12.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Continuously monitor security controls using AWS Security Hub and Config
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Security Hub → Screenshot continuous monitoring dashboard | Config → Screenshot compliance timeline</li></ul>
+                        <a href="https://console.aws.amazon.com/securityhub/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">56. [CM.L2-3.4.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Use AWS Config to track configuration changes to CUI systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Config → Configuration timeline → Screenshot change history</li></ul>
+                        <a href="https://console.aws.amazon.com/config/home#/timeline" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">57. [CM.L2-3.4.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Conduct security impact analysis before implementing configuration changes
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Change Management System → Screenshot security impact analysis workflow | Documentation → Screenshot change approval records</li></ul>
+                        <a href="https://console.aws.amazon.com/systems-manager/change-manager" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">58. [CM.L2-3.4.5] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document security configuration settings for all CUI system components
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Config → Rules → Screenshot configuration baselines | Systems Manager → Documents → Screenshot configuration standards</li></ul>
+                        <a href="https://console.aws.amazon.com/config/home#/rules" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">59. [CM.L2-3.4.6] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Configure systems with only essential capabilities, disable unnecessary services
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Organizations → Service control policies → Screenshot service restrictions</li></ul>
+                        <a href="https://console.aws.amazon.com/organizations/v2/home/policies/service-control-policy" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">60. [CM.L2-3.4.8] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Implement application whitelisting and default-deny network policies
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → VPC → Security Groups → Screenshot deny-all baseline with specific allows</li></ul>
+                        <a href="https://console.aws.amazon.com/vpc/home#SecurityGroups:" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">61. [IA.L2-3.5.5] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Ensure IAM user names and identifiers are not reused after account deletion
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>IAM Policy Documentation → Screenshot identifier reuse prohibition | IAM → Screenshot user lifecycle procedures</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/users" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">62. [IA.L2-3.5.6] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Disable IAM user accounts inactive for 90+ days
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → IAM → Users → Access advisor → Screenshot last activity | IAM Access Analyzer → Screenshot unused access findings</li></ul>
+                        <a href="https://console.aws.amazon.com/iam/home#/users" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">63. [IR.L2-3.6.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Maintain incident tracking system for security incidents affecting CUI
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Incident Tracking System → Screenshot incident log | Security Hub → Screenshot finding tracking</li></ul>
+                        <a href="https://console.aws.amazon.com/securityhub/home#/findings" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">64. [MA.L2-3.7.2] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Control and monitor the use of maintenance tools on CUI systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Systems Manager → Session Manager → Screenshot maintenance session logs</li></ul>
+                        <a href="https://console.aws.amazon.com/systems-manager/session-manager" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">65. [MA.L2-3.7.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Sanitize or destroy storage media before equipment removal (AWS inherited for cloud infrastructure)
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot media sanitization procedures | AWS Artifact → Screenshot AWS media destruction compliance</li></ul>
+                        <a href="https://console.aws.amazon.com/artifact/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">66. [MA.L2-3.7.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Scan media for malicious code before connecting to CUI systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>S3 Bucket → Screenshot antivirus scanning configuration | Security tools → Screenshot malware detection</li></ul>
+                        <a href="https://console.aws.amazon.com/s3/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">67. [MA.L2-3.7.6] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Escort and supervise non-cleared personnel performing maintenance on CUI systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot maintenance supervision policy | Maintenance Logs → Screenshot supervised sessions</li></ul>
+                        <a href="https://console.aws.amazon.com/systems-manager/session-manager" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">68. [MA.L2-3.7.7] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Sanitize equipment prior to maintenance or removal from facility
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot equipment sanitization procedures | S3 → Screenshot lifecycle policies for data deletion</li></ul>
+                        <a href="https://console.aws.amazon.com/s3/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">69. [MP.L2-3.8.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Mark or label media containing CUI to indicate distribution limitations
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → S3 → Object properties → Screenshot CUI classification tags</li></ul>
+                        <a href="https://console.aws.amazon.com/s3/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">70. [MP.L2-3.8.5] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Restrict access to CUI media to authorized individuals
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → S3 → Bucket permissions → Screenshot restrictive access policies | IAM → Screenshot media access roles</li></ul>
+                        <a href="https://console.aws.amazon.com/s3/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">71. [RA.L2-3.11.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Conduct annual risk assessments of organizational operations and CUI systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Documentation → Screenshot annual risk assessment report | Risk Register → Screenshot identified risks and mitigations</li></ul>
+                        <a href="https://console.aws.amazon.com/securityhub/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">72. [RA.L2-3.11.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Remediate vulnerabilities based on risk assessment (high/critical within 30 days)
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Systems Manager → Patch Manager → Screenshot compliance status | Inspector → Screenshot vulnerability remediation tracking</li></ul>
+                        <a href="https://console.aws.amazon.com/systems-manager/patch-manager" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">73. [RA.L2-3.11.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Share threat intelligence with organizational stakeholders
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>GuardDuty → Screenshot threat intelligence findings | Documentation → Screenshot threat sharing procedures</li></ul>
+                        <a href="https://console.aws.amazon.com/guardduty/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">74. [SC.L2-3.13.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Verify security groups use deny-by-default, allow-by-exception rules
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → VPC → Security Groups → Screenshot showing deny-all baseline with specific allow rules</li></ul>
+                        <a href="https://console.aws.amazon.com/vpc/home#SecurityGroups:" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">75. [SC.L2-3.13.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Use VPN or AWS Direct Connect for all remote connections to CUI systems
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → VPC → VPN connections → Screenshot authorized remote access methods only</li></ul>
+                        <a href="https://console.aws.amazon.com/vpc/home#VpnConnections:" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">76. [SC.L2-3.13.6] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Verify network communications are denied by default with explicit allow rules
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → VPC → Security Groups + NACLs → Screenshot deny-by-default configuration</li></ul>
+                        <a href="https://console.aws.amazon.com/vpc/home#SecurityGroups:" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">77. [SC.L2-3.13.7] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Ensure VPN connections prevent split tunneling to protect CUI
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>VPN Configuration → Screenshot showing split tunneling disabled | Network Policy → Screenshot VPN routing rules</li></ul>
+                        <a href="https://console.aws.amazon.com/vpc/home#VpnConnections:" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">78. [SC.L2-3.13.12] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Ensure collaborative computing devices (cameras/microphones) cannot be remotely activated
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Security Policy Documentation → Screenshot remote activation prohibition | Endpoint Management → Screenshot device control settings</li></ul>
+                        <a href="https://console.aws.amazon.com/systems-manager/managed-instances" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">79. [SC.L2-3.13.13] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document controls for mobile code (JavaScript, applets) execution
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>Security Policy → Screenshot mobile code policy | WAF Rules → Screenshot mobile code restrictions</li></ul>
+                        <a href="https://console.aws.amazon.com/wafv2/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">80. [SC.L2-3.13.14] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Document Voice over IP (VoIP) security controls if used for CUI communications
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>VoIP System → Screenshot encryption settings | Network Monitoring → Screenshot VoIP traffic monitoring</li></ul>
+                        <a href="https://console.aws.amazon.com/chime/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">81. [SC.L2-3.13.17] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Implement mobile device management (MDM) for devices accessing CUI
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>MDM Console → Screenshot device compliance policies | Device Inventory → Screenshot enrolled devices</li></ul>
+                        <a href="https://console.aws.amazon.com/workspacesweb/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">82. [SI.L2-3.14.1] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Use AWS Systems Manager Patch Manager and Inspector for flaw identification
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Inspector → Screenshot vulnerability findings | Systems Manager → Patch Manager → Screenshot compliance</li></ul>
+                        <a href="https://console.aws.amazon.com/inspector/v2/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">83. [SI.L2-3.14.3] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Monitor AWS Security Hub, GuardDuty, and vendor security advisories
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Security Hub → Screenshot security alerts dashboard | GuardDuty → Screenshot threat findings</li></ul>
+                        <a href="https://console.aws.amazon.com/securityhub/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">84. [SI.L2-3.14.4] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Ensure GuardDuty and endpoint protection have automatic updates enabled
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → GuardDuty → Settings → Screenshot automatic updates enabled | Endpoint Protection → Screenshot update configuration</li></ul>
+                        <a href="https://console.aws.amazon.com/guardduty/home#/settings" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">85. [SI.L2-3.14.8] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Conduct vulnerability scans at least quarterly or when new vulnerabilities identified
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → Inspector → Screenshot scan schedule and results | Documentation → Screenshot scan frequency policy</li></ul>
+                        <a href="https://console.aws.amazon.com/inspector/v2/home" target="_blank" class="console-link">View in Console →</a></div></div>
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">86. [SI.L2-3.14.9] Security Control</div>
+                        <span class="control-badge badge-info">MANUAL</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Documentation Required:</strong> MANUAL: Use VPC Flow Logs, GuardDuty, and CloudWatch to monitor for anomalous activity
+                    </div><div class="control-evidence">
+                        <div class="evidence-title">
+                            <span>Evidence Collection Guide</span>
+                        </div><ul class="evidence-steps"><li>AWS Console → VPC → Flow Logs → Screenshot enabled | GuardDuty → Screenshot network anomaly detection</li></ul>
+                        <a href="https://console.aws.amazon.com/vpc/home#FlowLogs:" target="_blank" class="console-link">View in Console →</a></div></div>
+            </div>
+        </div>
+        
+        
+        <div class="footer">
+            <div style="margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px; border: 2px solid #dee2e6;">
+                <div style="font-size: 14px; color: #495057; margin-bottom: 8px; font-weight: 600;">
+                    AuditKit Pro | License: ***-25348FD2 | Report ID: 0809F4A389CD39CC
+                </div>
+                <div style="font-size: 12px; color: #6c757d;">
+                    Generated: 2025-11-16 16:48:55
+                </div>
+                <div style="margin-top: 10px; font-size: 12px; color: #dc3545; font-weight: bold;">
+                    ⚠️ This report is licensed to subscriber only - Unauthorized distribution prohibited
+                </div>
+            </div>
+            <p>Generated by <strong>AuditKit Pro</strong> - Multi-Cloud Compliance Scanner</p>
+            <p style="font-size: 12px; color: #6c757d;">For support and documentation, visit auditkit.io</p>
+        </div>
+    
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
