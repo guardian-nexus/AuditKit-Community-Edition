@@ -89,9 +89,46 @@ AuditKit scans your cloud infrastructure for compliance gaps and security miscon
 | **GCP Advanced** | - | GKE + Vertex AI (32 checks) |
 | **Multi-Account** | - | AWS Orgs, Azure Mgmt, GCP Folders |
 | **CMMC Level 2** | - | 110 practices (CUI handling) |
+| **Desktop GUI** | - | Web dashboard at localhost:1337 |
 | **Support** | Community (GitHub Issues) | Priority email + 14-day trial |
 
 **[Compare Features →](./docs/pricing.md)** • **[Start Pro Trial →](https://auditkit.io/pro)**
+
+---
+
+## NEW: AuditKit Pro Desktop (v0.8.0)
+
+**Pro customers now get a beautiful web-based dashboard** that runs locally on your machine.
+
+![AuditKit Pro Desktop Dashboard](./docs/examples/screenshots/auditkitwebgui-dashboard.png)
+
+### Desktop Features
+- **Visual Dashboard** - Real-time compliance scores and trends
+- **Scan History** - Browse all past scans with search and filtering
+- **Findings Explorer** - Searchable table of all findings with severity filtering
+- **Evidence Packages** - Generate audit-ready ZIP files from the browser
+- **Exception Management** - Track waivers and compensating controls with full CRUD
+- **Drift Detection** - Visual comparison of scans to identify configuration changes
+- **Continuous Monitoring** - Schedule recurring scans with cron-style scheduling
+- **100% Offline** - Runs locally, no cloud dependencies, air-gap compatible
+
+### Screenshots
+
+| Dashboard | Findings | Scan History |
+|-----------|----------|--------------|
+| ![Dashboard](./docs/examples/screenshots/auditkitwebgui-dashboard.png) | ![Findings](./docs/examples/screenshots/auditkitwebgui-findings.png) | ![Scan History](./docs/examples/screenshots/auditkitwebgui-scanhistory.png) |
+
+### Quick Start (Pro Desktop)
+```bash
+# Set license and run
+export AUDITKIT_PRO_LICENSE="your-license-key"
+./auditkit-pro-desktop
+
+# Browser opens automatically to http://localhost:1337
+# Change port if needed: ./auditkit-pro-desktop --port 8080
+```
+
+**[Learn More About Pro →](https://auditkit.io/pro)** • **[Start 14-Day Trial →](https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01)**
 
 ---
 

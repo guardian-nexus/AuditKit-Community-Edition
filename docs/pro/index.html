@@ -492,6 +492,51 @@
         </div>
     </section>
 
+    <section style="background: #e8f5e9;">
+        <div class="container">
+            <h2>NEW: Desktop GUI (v0.8.0)</h2>
+            <p style="text-align: center; font-size: 1.15em; margin-bottom: 40px; color: #666;">
+                Beautiful web-based dashboard that runs locally. No cloud dependencies. Air-gap compatible.
+            </p>
+
+            <div style="max-width: 900px; margin: 0 auto;">
+                <img src="../examples/screenshots/auditkitwebgui-dashboard.png" alt="AuditKit Pro Desktop Dashboard" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); margin-bottom: 30px;">
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Visual Dashboard</h3>
+                    <p>Real-time compliance scores, trends, and critical findings at a glance. Track progress across all your cloud accounts.</p>
+                    <div class="code-example">./auditkit-pro-desktop --port 1337</div>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Scan History & Findings</h3>
+                    <p>Browse all past scans with search and filtering. Drill into findings by severity, framework, or provider. Export to PDF/HTML/CSV.</p>
+                    <img src="../examples/screenshots/auditkitwebgui-findings.png" alt="Findings View" style="width: 100%; border-radius: 6px; margin-top: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                </div>
+
+                <div class="feature-card">
+                    <h3>Everything in One Place</h3>
+                    <p>Evidence packages, exception management, drift detection, and scheduled scans - all accessible from your browser at localhost:1337.</p>
+                    <img src="../examples/screenshots/auditkitwebgui-scanhistory.png" alt="Scan History" style="width: 100%; border-radius: 6px; margin-top: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <div class="code-block" style="display: inline-block; text-align: left; max-width: 600px;">
+<span style="color: #608b4e;"># Run the Desktop GUI</span>
+export AUDITKIT_PRO_LICENSE="your-license-key"
+./auditkit-pro-desktop
+<br>
+<span style="color: #608b4e;"># Browser opens to http://localhost:1337</span>
+<span style="color: #608b4e;"># Change port if needed:</span>
+./auditkit-pro-desktop --port 8080
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section>
         <div class="container">
             <h2>How It Works</h2>
@@ -759,7 +804,7 @@ Security Group: sg-0ab56571076bcff37 (port 22)
             </div>
 
             <p style="font-size: 0.9em; opacity: 0.8;">
-                AuditKit Pro v0.7.0 • November 2025
+                AuditKit Pro v0.8.0 • November 2025
             </p>
         </div>
     </footer>
