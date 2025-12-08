@@ -4,7 +4,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/auditkit)](https://github.com/guardian-nexus/auditkit/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v0.7.0-green.svg)](https://github.com/guardian-nexus/auditkit/releases)
+[![Version](https://img.shields.io/badge/version-v0.7.1-green.svg)](https://github.com/guardian-nexus/auditkit/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://auditkit.substack.com)
 
 ---
@@ -96,7 +96,7 @@ AuditKit scans your cloud infrastructure for compliance gaps and security miscon
 
 ---
 
-## NEW: AuditKit Pro Desktop (v0.8.0)
+## NEW: AuditKit Pro Desktop (v0.8.1)
 
 **Pro customers now get a beautiful web-based dashboard** that runs locally on your machine.
 
