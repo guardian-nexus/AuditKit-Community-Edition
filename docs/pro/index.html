@@ -449,12 +449,16 @@
                     <p><strong>GKE Security:</strong> 10 checks for pod policies, network policies, RBAC, binary authorization.<br><br><strong>Vertex AI Compliance:</strong> 10 checks for ML model governance, data access controls, audit logging.</p>
                     <div class="code-example">./auditkit-pro scan -provider gcp --advanced</div>
                 </div>
+            </div>
 
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 30px;">
+                <div></div>
                 <div class="feature-card">
                     <h3>On-Prem Scanning <span style="background: #f39c12; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.6em; vertical-align: middle; margin-left: 8px;">EXPERIMENTAL</span></h3>
                     <p>Scan on-premises servers connected via <strong>Azure Arc</strong>. Pulls security assessments from Microsoft Defender for Cloud and Guest Configuration compliance. Extends your compliance posture to hybrid environments.</p>
                     <div class="code-example">./auditkit-pro scan -provider arc -framework cmmc</div>
                 </div>
+                <div></div>
             </div>
         </div>
     </section>
