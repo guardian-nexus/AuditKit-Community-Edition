@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Arc On-Premises Scanning - AuditKit Pro</title>
+    <meta name="description" content="Scan Azure Arc-enabled on-premises servers for compliance. Pull security assessments from Microsoft Defender for Cloud. AuditKit Pro feature.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .pro-badge {
+            display: inline-block;
+            background: #ff6b6b;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 600;
+        }
+
+        .experimental-badge {
+            display: inline-block;
+            background: #f39c12;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .header-badges {
+            margin-top: 15px;
+        }
+
+        nav {
+            background: #2c3e50;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        nav a:hover {
+            opacity: 1;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h2 {
+            font-size: 2em;
+            margin: 50px 0 20px 0;
+            color: #2c3e50;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            margin: 30px 0 15px 0;
+            color: #34495e;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            margin: 25px 0 10px 0;
+            color: #34495e;
+        }
+
+        p {
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+            line-height: 1.8;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .note strong {
+            color: #e65100;
+        }
+
+        .pro-note {
+            background: linear-gradient(135deg, #fff0f0 0%, #ffe6e6 100%);
+            border-left: 4px solid #ff6b6b;
+            padding: 20px 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+
+        .pro-note strong {
+            color: #ff6b6b;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            text-decoration: none;
+        }
+
+        .btn-pro {
+            background: #ff6b6b;
+        }
+
+        .btn-pro:hover {
+            background: #e55a5a;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 3px solid #667eea;
+        }
+
+        .feature-card h4 {
+            margin-top: 0;
+            color: #667eea;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        footer a {
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Azure Arc On-Premises Scanning</h1>
+        <p>Scan your on-premises servers connected via Azure Arc</p>
+        <div class="header-badges">
+            <span class="pro-badge">PRO ONLY</span>
+            <span class="experimental-badge">EXPERIMENTAL</span>
+        </div>
+    </div>
+
+    <nav>
+        <div class="container">
+            <a href="../">Home</a>
+            <a href="../getting-started.html">Getting Started</a>
+            <a href="../installation.html">Installation</a>
+            <a href="../cli-reference.html">CLI Reference</a>
+            <a href="../faq.html">FAQ</a>
+            <a href="../examples/">Examples</a>
+            <a href="./" style="color: #ff6b6b;">Providers</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="pro-note" style="text-align: center;">
+            <strong>Pro Feature:</strong> Azure Arc on-premises scanning is available exclusively in AuditKit Pro v0.8.2+.<br>
+            <a href="https://auditkit.io/pro/" class="btn btn-pro" style="margin-top: 15px;">Upgrade to AuditKit Pro</a>
+        </div>
+
+        <h2>Overview</h2>
+        <p>Azure Arc extends Azure management to your on-premises servers. AuditKit Pro can scan Arc-enabled machines for compliance by pulling:</p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h4>Defender for Cloud Assessments</h4>
+                <p>Security recommendations and vulnerabilities from Microsoft Defender</p>
+            </div>
+            <div class="feature-card">
+                <h4>Guest Configuration Compliance</h4>
+                <p>Azure Policy compliance status for Windows/Linux baselines</p>
+            </div>
+            <div class="feature-card">
+                <h4>Agent Health Monitoring</h4>
+                <p>Arc agent connectivity status for all connected servers</p>
+            </div>
+        </div>
+
+        <h3>Supported Frameworks</h3>
+        <ul>
+            <li>SOC2 Type II</li>
+            <li>PCI-DSS v4.0</li>
+            <li>CMMC Level 2 (Pro)</li>
+            <li>NIST 800-53 Rev 5</li>
+            <li>ISO 27001</li>
+        </ul>
+
+        <h2>Prerequisites</h2>
+        <p>Before scanning Arc machines, you need:</p>
+        <ol>
+            <li><strong>Azure Arc-enabled servers</strong> - On-prem machines with the Arc agent installed</li>
+            <li><strong>Microsoft Defender for Cloud</strong> - Enabled on your subscription (for security assessments)</li>
+            <li><strong>Azure credentials</strong> - <code>az login</code> or service principal configured</li>
+            <li><strong>Reader access</strong> - To the subscription containing Arc machines</li>
+        </ol>
+
+        <h3>Verify Arc Machines Are Connected</h3>
+        <pre><code># List Arc-enabled servers in your subscription
+az connectedmachine list --query "[].{name:name, status:status}" -o table</code></pre>
+
+        <h3>Enable Defender for Cloud</h3>
+        <p>For security assessments, enable Defender for Servers on Arc machines:</p>
+        <ol>
+            <li>Azure Portal > Microsoft Defender for Cloud</li>
+            <li>Environment Settings > Your Subscription</li>
+            <li>Enable "Servers" plan</li>
+            <li>Arc machines will be auto-enrolled</li>
+        </ol>
+
+        <h2>Setup</h2>
+
+        <h3>1. Configure Azure Credentials</h3>
+        <pre><code># Interactive login
+az login
+
+# Set subscription containing Arc machines
+export AZURE_SUBSCRIPTION_ID="your-subscription-id"
+
+# Verify access
+az account show</code></pre>
+
+        <h3>2. Service Principal (Optional)</h3>
+        <p>For automation/CI/CD:</p>
+        <pre><code># Create service principal with Reader access
+az ad sp create-for-rbac \
+  --name "auditkit-arc-scanner" \
+  --role Reader \
+  --scopes /subscriptions/YOUR_SUBSCRIPTION_ID
+
+# Set environment variables
+export AZURE_CLIENT_ID="app-id-from-output"
+export AZURE_CLIENT_SECRET="password-from-output"
+export AZURE_TENANT_ID="tenant-from-output"
+export AZURE_SUBSCRIPTION_ID="your-subscription-id"</code></pre>
+
+        <h2>Usage</h2>
+
+        <h3>CLI</h3>
+        <pre><code># Scan Arc machines against PCI-DSS
+auditkit-pro scan -provider arc -framework pci
+
+# Scan against SOC2
+auditkit-pro scan -provider arc -framework soc2
+
+# Scan against CMMC Level 2
+auditkit-pro scan -provider arc -framework cmmc
+
+# Generate PDF report
+auditkit-pro scan -provider arc -framework pci -format pdf -output arc-compliance.pdf
+
+# Verbose output
+auditkit-pro scan -provider arc -framework soc2 -verbose</code></pre>
+
+        <h3>Desktop GUI</h3>
+        <ol>
+            <li>Open AuditKit Pro Desktop (<code>http://localhost:1337</code>)</li>
+            <li>Click "Run Scan"</li>
+            <li>Select "Azure Arc (On-Prem)" as provider</li>
+            <li>Choose framework(s)</li>
+            <li>Click "Start Scan"</li>
+        </ol>
+
+        <h2>What Gets Scanned</h2>
+
+        <h3>1. Arc Agent Health</h3>
+        <p>Checks connectivity status of all Arc-enabled servers:</p>
+        <ul>
+            <li><strong>PASS</strong> - Agent connected and reporting</li>
+            <li><strong>FAIL</strong> - Agent disconnected or expired</li>
+        </ul>
+        <p><em>Frameworks: PCI 10.1, SOC2 CC7.1, ISO 27001 A.12.4, CMMC AU.L2-3.3.1</em></p>
+
+        <h3>2. Defender for Cloud Assessments</h3>
+        <p>Pulls security recommendations from Microsoft Defender:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Assessment Type</th>
+                    <th>Framework Mapping</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>System updates missing</td>
+                    <td>PCI 6.2, SOC2 CC7.1, CMMC SI.L2-3.14.1</td>
+                </tr>
+                <tr>
+                    <td>Endpoint protection issues</td>
+                    <td>PCI 5.1, SOC2 CC6.8, CMMC SI.L2-3.14.2</td>
+                </tr>
+                <tr>
+                    <td>Disk encryption</td>
+                    <td>PCI 3.4, SOC2 CC6.1, CMMC SC.L2-3.13.11</td>
+                </tr>
+                <tr>
+                    <td>Vulnerability findings</td>
+                    <td>PCI 11.2, SOC2 CC7.1, CMMC RA.L2-3.11.2</td>
+                </tr>
+                <tr>
+                    <td>Network/firewall issues</td>
+                    <td>PCI 1.3, SOC2 CC6.6, CMMC SC.L2-3.13.1</td>
+                </tr>
+                <tr>
+                    <td>Access control issues</td>
+                    <td>PCI 8.2, SOC2 CC6.1, CMMC AC.L2-3.1.1</td>
+                </tr>
+                <tr>
+                    <td>Logging/monitoring gaps</td>
+                    <td>PCI 10.2, SOC2 CC7.2, CMMC AU.L2-3.3.1</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>3. Guest Configuration Compliance</h3>
+        <p>Reports on Azure Policy Guest Configuration assignments:</p>
+        <ul>
+            <li>Windows security baselines</li>
+            <li>Linux security baselines</li>
+            <li>Custom configuration policies</li>
+        </ul>
+        <p><em>Frameworks: PCI 2.2, SOC2 CC6.1, ISO 27001 A.12.6</em></p>
+
+        <h2>Required Permissions</h2>
+        <p>The scanning identity needs:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Permission</th>
+                    <th>Scope</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Reader</td>
+                    <td>Subscription</td>
+                    <td>List Arc machines, read assessments</td>
+                </tr>
+                <tr>
+                    <td>Security Reader</td>
+                    <td>Subscription</td>
+                    <td>Read Defender for Cloud data</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <pre><code># Assign Reader role
+az role assignment create \
+  --assignee YOUR_SP_OR_USER \
+  --role Reader \
+  --scope /subscriptions/YOUR_SUBSCRIPTION_ID
+
+# Assign Security Reader role
+az role assignment create \
+  --assignee YOUR_SP_OR_USER \
+  --role "Security Reader" \
+  --scope /subscriptions/YOUR_SUBSCRIPTION_ID</code></pre>
+
+        <h2>Limitations</h2>
+        <ul>
+            <li><strong>Requires Defender for Cloud</strong> - Security assessments only available if Defender is enabled</li>
+            <li><strong>Agent must be connected</strong> - Disconnected machines show limited data</li>
+            <li><strong>Azure-only</strong> - This scans Arc machines in Azure; standalone on-prem scanning not supported</li>
+            <li><strong>No agentless scanning</strong> - Machines must have Arc agent installed</li>
+        </ul>
+
+        <h2>Troubleshooting</h2>
+
+        <h3>"No Arc machines found"</h3>
+        <pre><code># Verify Arc machines exist
+az connectedmachine list -o table
+
+# Check subscription
+echo $AZURE_SUBSCRIPTION_ID
+az account show --query id</code></pre>
+
+        <h3>"Failed to get assessments"</h3>
+        <ul>
+            <li>Ensure Defender for Cloud is enabled</li>
+            <li>Verify Security Reader role is assigned</li>
+            <li>Some machines may not have assessments if recently onboarded</li>
+        </ul>
+
+        <h3>"Authentication failed"</h3>
+        <pre><code># Re-authenticate
+az login
+
+# Or check service principal
+az ad sp show --id $AZURE_CLIENT_ID</code></pre>
+
+        <h2>Related</h2>
+        <ul>
+            <li><a href="../setup/azure.html">Azure Provider Setup</a></li>
+            <li><a href="../frameworks/cmmc.html">CMMC Framework</a></li>
+            <li><a href="../frameworks/soc2.html">SOC2 Framework</a></li>
+        </ul>
+
+        <div class="pro-note" style="text-align: center; margin-top: 50px;">
+            <strong>Ready to scan your on-premises servers?</strong><br>
+            <a href="https://auditkit.io/pro/" class="btn btn-pro" style="margin-top: 15px;">Upgrade to AuditKit Pro</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>
+            <a href="../">Home</a> ·
+            <a href="../examples/">Examples</a> ·
+            <a href="https://github.com/guardian-nexus/auditkit">GitHub</a> ·
+            <a href="../pro/">AuditKit Pro</a>
+        </p>
+        <p style="margin-top: 15px; opacity: 0.8;">
+            AuditKit Pro v0.8.2 · December 2025
+        </p>
+    </footer>
+</body>
+</html>
