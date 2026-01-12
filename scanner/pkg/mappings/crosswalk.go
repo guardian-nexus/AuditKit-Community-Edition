@@ -18,6 +18,8 @@ type Crosswalk struct {
 	CMMCToCIS     map[string][]string `yaml:"cmmc_to_800_53"`
 	HIPAAToCIS    map[string][]string `yaml:"hipaa_to_800_53"`
 	ISO27001ToCIS map[string][]string `yaml:"iso27001_to_800_53"`
+	GDPRToCIS     map[string][]string `yaml:"gdpr_to_800_53"`
+	NISTCSFToCIS  map[string][]string `yaml:"nist_csf_to_800_53"`
 }
 
 // FedRAMPBaselines holds FedRAMP baseline control lists
@@ -115,6 +117,24 @@ func (c *Crosswalk) Get800_53Controls(frameworks map[string]string) []string {
 		}
 	}
 
+	// Check GDPR mappings
+	if gdprID, exists := frameworks["GDPR"]; exists {
+		if controls, found := c.GDPRToCIS[gdprID]; found {
+			for _, ctrl := range controls {
+				controlSet[ctrl] = true
+			}
+		}
+	}
+
+	// Check NIST CSF mappings
+	if csfID, exists := frameworks["NIST-CSF"]; exists {
+		if controls, found := c.NISTCSFToCIS[csfID]; found {
+			for _, ctrl := range controls {
+				controlSet[ctrl] = true
+			}
+		}
+	}
+
 	// Convert set to slice
 	var result []string
 	for ctrl := range controlSet {
@@ -156,6 +176,16 @@ func (c *Crosswalk) Get800_53ByControlID(controlID string) []string {
 
 	// Try ISO 27001 mapping (e.g., "A.8.1", "A.8.24")
 	if controls, found := c.ISO27001ToCIS[controlID]; found {
+		return controls
+	}
+
+	// Try GDPR mapping (e.g., "Art32-1a", "Art5-1f")
+	if controls, found := c.GDPRToCIS[controlID]; found {
+		return controls
+	}
+
+	// Try NIST CSF mapping (e.g., "PR.AC-1", "DE.CM-1")
+	if controls, found := c.NISTCSFToCIS[controlID]; found {
 		return controls
 	}
 

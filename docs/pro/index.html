@@ -445,9 +445,29 @@
                 </div>
 
                 <div class="feature-card">
-                    <h3>GCP Advanced (NEW)</h3>
+                    <h3>GCP Advanced</h3>
                     <p><strong>GKE Security:</strong> 10 checks for pod policies, network policies, RBAC, binary authorization.<br><br><strong>Vertex AI Compliance:</strong> 10 checks for ML model governance, data access controls, audit logging.</p>
                     <div class="code-example">./auditkit-pro scan -provider gcp --advanced</div>
+                </div>
+            </div>
+
+            <div class="feature-grid" style="margin-top: 30px;">
+                <div class="feature-card">
+                    <h3>Custom Controls (NEW)</h3>
+                    <p>Define your own security checks in YAML. Create organization-specific controls, tag requirements, naming conventions, and resource count validations. Execute custom checks alongside built-in frameworks.</p>
+                    <div class="code-example">./auditkit-pro scan --custom-controls my-controls.yaml</div>
+                </div>
+
+                <div class="feature-card">
+                    <h3>AWS Data Services</h3>
+                    <p><strong>SageMaker:</strong> ML notebook encryption, network isolation, root access controls.<br><br><strong>Redshift + OpenSearch + ElastiCache:</strong> Encryption, audit logging, VPC isolation, backup policies.</p>
+                    <div class="code-example">./auditkit-pro scan -provider aws -verbose</div>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Offline Mode</h3>
+                    <p>Cache scan results locally for air-gapped environments. Run scans without cloud connectivity, replay cached results anytime. Essential for classified networks.</p>
+                    <div class="code-example">./auditkit-pro scan --offline --cache-file scan.json</div>
                 </div>
             </div>
 
@@ -553,7 +573,7 @@
 
     <section style="background: #e8f5e9;">
         <div class="container">
-            <h2>NEW: Desktop GUI (v0.8.3)</h2>
+            <h2>Desktop GUI (v0.9.0)</h2>
             <p style="text-align: center; font-size: 1.15em; margin-bottom: 40px; color: #666;">
                 Beautiful web-based dashboard that runs locally. No cloud dependencies. Air-gap compatible.
             </p>
@@ -876,7 +896,7 @@ Security Group: sg-0ab56571076bcff37 (port 22)
             </div>
 
             <p style="font-size: 0.9em; opacity: 0.8;">
-                AuditKit Pro v0.8.3 • December 2025
+                AuditKit Pro v0.9.0 • January 2026
             </p>
         </div>
     </footer>

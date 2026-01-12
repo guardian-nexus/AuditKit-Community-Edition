@@ -13,8 +13,10 @@ import (
 	gcpScanner "github.com/guardian-nexus/auditkit/scanner/pkg/gcp"
 	awsScanner "github.com/guardian-nexus/auditkit/scanner/pkg/aws"
 	azureScanner "github.com/guardian-nexus/auditkit/scanner/pkg/azure"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/cli"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/integrations"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/integrations/scubagear"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/offline"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/remediation"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/report"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/tracker"
@@ -22,7 +24,7 @@ import (
 	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
 )
 
-const CurrentVersion = "v0.7.1"
+const CurrentVersion = "v0.8.0"
 
 type ComplianceResult struct {
 	Timestamp       time.Time       `json:"timestamp"`
@@ -72,7 +74,7 @@ func main() {
 	var (
 		provider  = flag.String("provider", "aws", "Cloud provider: aws, azure, gcp")
 		profile   = flag.String("profile", "default", "AWS profile, Azure subscription, or GCP project ID")
-		framework = flag.String("framework", "all", "Compliance framework: soc2, pci, cmmc, hipaa (limited), all")
+		framework = flag.String("framework", "all", "Compliance framework: soc2, pci, cmmc, hipaa, gdpr, nist-csf, all")
 		format    = flag.String("format", "text", "Output format (text, json, html, pdf, csv)")
 		output    = flag.String("output", "", "Output file (default: stdout)")
 		verbose   = flag.Bool("verbose", false, "Verbose output")
@@ -80,6 +82,8 @@ func main() {
 		services  = flag.String("services", "all", "Comma-separated services to scan")
 		source    = flag.String("source", "", "Integration source: scubagear, prowler")
 		file      = flag.String("file", "", "Integration file to parse")
+		offlineMode = flag.Bool("offline", false, "Use cached scan results (no cloud API calls)")
+		cacheFile   = flag.String("cache-file", "", "Load scan from specific cache file")
 	)
 
 	if len(os.Args) < 2 {
@@ -92,7 +96,7 @@ func main() {
 
 	switch command {
 	case "scan":
-		runScan(*provider, *profile, *framework, *format, *output, *verbose, *full, *services)
+		runScan(*provider, *profile, *framework, *format, *output, *verbose, *full, *services, *offlineMode, *cacheFile)
 	case "integrate":
 		runIntegration(*source, *file, *format, *output, *verbose)
 	case "report":
@@ -105,6 +109,8 @@ func main() {
 		showProgress(*provider, *profile)
 	case "compare":
 		compareScan(*provider, *profile)
+	case "cache":
+		runCacheCommand(*provider, *profile, *framework, *verbose)
 	case "update":
 		updater.CheckForUpdates()
 	case "version":
@@ -127,13 +133,14 @@ Usage:
   auditkit fix [options]         Generate remediation script
   auditkit progress              Show compliance improvement over time
   auditkit compare               Compare last two scans
+  auditkit cache [options]       Manage offline scan cache
   auditkit update                Check for updates
   auditkit version               Show version
 
 Options:
   -provider string   Cloud provider: aws, azure, gcp (default "aws")
   -profile string    AWS profile, Azure subscription, or GCP project (default "default")
-  -framework string  Compliance framework: soc2, pci, cmmc, hipaa, 800-53, all (default "all")
+  -framework string  Compliance framework: soc2, pci, cmmc, hipaa, gdpr, nist-csf, 800-53, all (default "all")
   -format string     Output format (text, json, html, pdf, csv) (default "text")
   -output string     Output file (default: stdout)
   -services string   Services to scan (default "all")
@@ -141,12 +148,16 @@ Options:
   -file string       File to parse for integration
   -verbose          Verbose output
   -full             Show all controls in text output (default: truncated)
+  -offline          Use cached scan results (no cloud API calls)
+  -cache-file       Load scan from specific cache file
 
 Frameworks:
   soc2      SOC2 Type II Common Criteria (full coverage)
   pci       PCI-DSS v4.0 (full coverage)
   cmmc      CMMC Level 1 (17 practices)
   hipaa     HIPAA Security Rule (experimental)
+  gdpr      GDPR Technical Controls (Articles 5, 25, 32, etc.)
+  nist-csf  NIST Cybersecurity Framework 2.0 (ID, PR, DE, RS, RC)
   800-53    NIST 800-53 Rev 5 (via framework crosswalk)
   cis       CIS Benchmarks (auto-detects provider)
   cis-aws   CIS AWS Foundations (~60 controls)
@@ -426,12 +437,240 @@ func printIntegrationSummary(result ComplianceResult) {
 	fmt.Printf("\n")
 }
 
-func runScan(provider, profile, framework, format, output string, verbose bool, full bool, services string) {
+func runOfflineScan(provider, profile, framework, format, output string, verbose, full bool, cacheFile string) {
+	cache, err := offline.NewCache()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error initializing cache: %v\n", err)
+		os.Exit(1)
+	}
+
+	var cachedScan *offline.CachedScan
+
+	if cacheFile != "" {
+		// Load from specific file
+		cachedScan, err = cache.LoadFromFile(cacheFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error loading cache file: %v\n", err)
+			os.Exit(1)
+		}
+	} else {
+		// Try to get account ID from environment or use profile
+		accountID := profile
+		if provider == "aws" && profile == "default" {
+			// Try to get AWS account ID from environment
+			if awsAccount := os.Getenv("AWS_ACCOUNT_ID"); awsAccount != "" {
+				accountID = awsAccount
+			}
+		}
+
+		// Load latest cached scan
+		cachedScan, err = cache.LoadLatest(provider, accountID, framework)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "No cached scan found for %s/%s/%s\n", provider, accountID, framework)
+			fmt.Fprintf(os.Stderr, "\nTo create a cache, run a scan first:\n")
+			fmt.Fprintf(os.Stderr, "  auditkit scan -provider %s -framework %s\n\n", provider, framework)
+			fmt.Fprintf(os.Stderr, "To list cached scans:\n")
+			fmt.Fprintf(os.Stderr, "  auditkit cache\n")
+			os.Exit(1)
+		}
+	}
+
+	if verbose {
+		fmt.Printf("Loading cached scan from %s\n", cachedScan.Timestamp.Format(time.RFC3339))
+		age := time.Since(cachedScan.Timestamp)
+		if age > 24*time.Hour {
+			fmt.Printf("Warning: Cached scan is %.0f hours old\n", age.Hours())
+		}
+	}
+
+	// Convert cached scan to ComplianceResult
+	result := convertCachedToComplianceResult(cachedScan)
+
+	// Display offline mode indicator
+	fmt.Printf("\n%s[OFFLINE MODE]%s Loading cached scan from %s\n",
+		cli.Yellow, cli.Reset, cachedScan.Timestamp.Format("2006-01-02 15:04:05"))
+	fmt.Printf("Cache age: %s\n\n", time.Since(cachedScan.Timestamp).Round(time.Minute))
+
+	// Output results using existing formatters
+	switch format {
+	case "text":
+		if output == "" {
+			printTextSummary(result, full)
+		} else {
+			outputTextToFile(result, output)
+		}
+	case "pdf":
+		pdfResult := report.ComplianceResult{
+			Timestamp:       result.Timestamp,
+			Provider:        result.Provider,
+			AccountID:       result.AccountID,
+			Score:           result.Score,
+			TotalControls:   result.TotalControls,
+			PassedControls:  result.PassedControls,
+			FailedControls:  result.FailedControls,
+			Controls:        convertControlsForPDF(result.Controls),
+			Recommendations: result.Recommendations,
+			Framework:       result.Framework,
+		}
+
+		if output == "" {
+			output = fmt.Sprintf("auditkit-%s-%s-report-%s-offline.pdf",
+				provider,
+				strings.ToLower(framework),
+				time.Now().Format("2006-01-02-150405"))
+		}
+
+		err := report.GeneratePDF(pdfResult, output)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error generating PDF: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("PDF report saved to %s (from cached scan)\n", output)
+	case "json":
+		outputJSON(result, output)
+	case "html":
+		outputHTML(result, output)
+	case "csv":
+		outputCSV(result, output)
+	default:
+		fmt.Fprintf(os.Stderr, "Unknown format: %s\n", format)
+		os.Exit(1)
+	}
+}
+
+func convertCachedToComplianceResult(cached *offline.CachedScan) ComplianceResult {
+	controls := []ControlResult{}
+	for _, c := range cached.Controls {
+		controls = append(controls, ControlResult{
+			ID:                c.ID,
+			Name:              c.Name,
+			Category:          c.Category,
+			Severity:          c.Severity,
+			Status:            c.Status,
+			Evidence:          c.Evidence,
+			Remediation:       c.Remediation,
+			RemediationDetail: c.RemediationDetail,
+			Priority:          c.Priority,
+			Impact:            c.Impact,
+			ScreenshotGuide:   c.ScreenshotGuide,
+			ConsoleURL:        c.ConsoleURL,
+			Frameworks:        c.Frameworks,
+		})
+	}
+
+	return ComplianceResult{
+		Timestamp:       cached.Timestamp,
+		Provider:        cached.Provider,
+		Framework:       cached.Framework,
+		AccountID:       cached.AccountID,
+		Score:           cached.Score,
+		TotalControls:   cached.TotalControls,
+		PassedControls:  cached.PassedControls,
+		FailedControls:  cached.FailedControls,
+		Controls:        controls,
+		Recommendations: cached.Recommendations,
+	}
+}
+
+func saveScanToCache(result ComplianceResult, version string) error {
+	cache, err := offline.NewCache()
+	if err != nil {
+		return err
+	}
+
+	cachedControls := []offline.CachedControl{}
+	for _, c := range result.Controls {
+		cachedControls = append(cachedControls, offline.CachedControl{
+			ID:                c.ID,
+			Name:              c.Name,
+			Category:          c.Category,
+			Severity:          c.Severity,
+			Status:            c.Status,
+			Evidence:          c.Evidence,
+			Remediation:       c.Remediation,
+			RemediationDetail: c.RemediationDetail,
+			Priority:          c.Priority,
+			Impact:            c.Impact,
+			ScreenshotGuide:   c.ScreenshotGuide,
+			ConsoleURL:        c.ConsoleURL,
+			Frameworks:        c.Frameworks,
+		})
+	}
+
+	cachedScan := offline.CachedScan{
+		Timestamp:       result.Timestamp,
+		Provider:        result.Provider,
+		Framework:       result.Framework,
+		AccountID:       result.AccountID,
+		Score:           result.Score,
+		TotalControls:   result.TotalControls,
+		PassedControls:  result.PassedControls,
+		FailedControls:  result.FailedControls,
+		Controls:        cachedControls,
+		Recommendations: result.Recommendations,
+		Version:         version,
+	}
+
+	return cache.Save(cachedScan)
+}
+
+func runCacheCommand(provider, profile, framework string, verbose bool) {
+	cache, err := offline.NewCache()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error initializing cache: %v\n", err)
+		os.Exit(1)
+	}
+
+	info, err := cache.GetCacheInfo()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading cache: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("\nAuditKit Offline Cache")
+	fmt.Println("======================")
+	fmt.Printf("Cache location: %s\n", info["cache_path"])
+	fmt.Printf("Total cached files: %v\n", info["total_files"])
+
+	scans, ok := info["scans"].([]map[string]interface{})
+	if ok && len(scans) > 0 {
+		fmt.Println("\nCached Scans:")
+		for _, scan := range scans {
+			ts, ok := scan["timestamp"].(time.Time)
+			age := ""
+			if ok {
+				age = time.Since(ts).Round(time.Minute).String() + " ago"
+			}
+			fmt.Printf("  - %s | %s | %s | Score: %.1f%% | %s\n",
+				scan["provider"], scan["framework"], scan["account"],
+				scan["score"], age)
+		}
+	} else {
+		fmt.Println("\nNo cached scans found.")
+		fmt.Println("Run a scan first: auditkit scan -provider aws -framework soc2")
+	}
+
+	fmt.Println("\nOffline Usage:")
+	fmt.Println("  auditkit scan --offline              Load latest cached scan")
+	fmt.Println("  auditkit scan --cache-file <path>    Load specific cache file")
+	fmt.Println()
+}
+
+func runScan(provider, profile, framework, format, output string, verbose bool, full bool, services string, offlineMode bool, cacheFile string) {
+	// Handle offline mode
+	if offlineMode || cacheFile != "" {
+		runOfflineScan(provider, profile, framework, format, output, verbose, full, cacheFile)
+		return
+	}
+
 	validFrameworks := map[string]bool{
 		"soc2":             true,
 		"pci":              true,
 		"hipaa":            true,
 		"cmmc":             true,
+		"gdpr":             true,
+		"nist-csf":         true,
+		"csf":              true,
 		"800-53":           true,
 		"nist800-53":       true,
 		"fedramp-low":      true,
@@ -448,7 +687,7 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 
 	if !validFrameworks[strings.ToLower(framework)] {
 		fmt.Fprintf(os.Stderr, "Error: Invalid framework: %s\n", framework)
-		fmt.Fprintf(os.Stderr, "Valid options: soc2, pci, cmmc (Level 1), hipaa, 800-53, fedramp-low, fedramp-moderate, fedramp-high, iso27001, cis, cis-aws, cis-azure, cis-gcp, all\n")
+		fmt.Fprintf(os.Stderr, "Valid options: soc2, pci, cmmc (Level 1), hipaa, gdpr, nist-csf, 800-53, fedramp-low, fedramp-moderate, fedramp-high, iso27001, cis, cis-aws, cis-azure, cis-gcp, all\n")
 		fmt.Fprintf(os.Stderr, "\n")
 		fmt.Fprintf(os.Stderr, "CMMC Level 2 requires upgrade to Pro:\n")
 		fmt.Fprintf(os.Stderr, "  Visit: https://auditkit.io/pro\n")
@@ -464,6 +703,15 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 	result := performScan(provider, profile, framework, verbose, services)
 
 	saveProgress(result.AccountID, result.Score, result.Controls, framework)
+
+	// Save to offline cache for later offline use
+	if err := saveScanToCache(result, CurrentVersion); err != nil {
+		if verbose {
+			fmt.Printf("Note: Could not save to offline cache: %v\n", err)
+		}
+	} else if verbose {
+		fmt.Println("Scan saved to offline cache")
+	}
 
 	automatedChecks := result.PassedControls + result.FailedControls
 	manualChecks := 0
@@ -551,8 +799,15 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 func performScan(provider, profile, framework string, verbose bool, services string) ComplianceResult {
 	var scanResults []interface{}
 	var accountID string
-	
+
 	ctx := context.Background()
+
+	// Start spinner for visual feedback
+	var spinner *cli.Spinner
+	if !verbose {
+		spinner = cli.NewSpinner(fmt.Sprintf("Scanning %s for %s compliance...", strings.ToUpper(provider), strings.ToUpper(framework)))
+		spinner.Start()
+	}
 
 	// CIS CHANGE: Normalize framework name
 	framework = strings.ToLower(strings.TrimSpace(framework))
@@ -721,7 +976,12 @@ func performScan(provider, profile, framework string, verbose bool, services str
 			}
 		}
 	}
-	
+
+	// Stop spinner before processing results
+	if spinner != nil {
+		spinner.StopWithSuccess(fmt.Sprintf("Scanned %d controls", len(scanResults)))
+	}
+
 	for _, result := range scanResults {
 		var control ControlResult
 		
@@ -898,7 +1158,9 @@ func performScan(provider, profile, framework string, verbose bool, services str
 						(requestedUpper == "PCI-DSS" && fwUpper == "PCI") ||
 						(requestedUpper == "SOC2" && fwUpper == "SOC2") ||
 						(requestedUpper == "CMMC" && fwUpper == "CMMC") ||
-						(requestedUpper == "HIPAA" && fwUpper == "HIPAA") {
+						(requestedUpper == "HIPAA" && fwUpper == "HIPAA") ||
+						(requestedUpper == "GDPR" && fwUpper == "GDPR") ||
+						((requestedUpper == "NIST-CSF" || requestedUpper == "CSF") && fwUpper == "NIST-CSF") {
 						hasRequestedFramework = true
 						break
 					}
@@ -1367,48 +1629,50 @@ func getPriorityAndImpact(controlID, severity, status, framework string) (string
 }
 
 func printTextSummary(result ComplianceResult, full bool) {
-	fmt.Printf("\n")
 	frameworkLabel := "Multi-Framework"
 	if result.Framework != "" && result.Framework != "all" {
 		frameworkLabel = strings.ToUpper(result.Framework)
 	}
-	
-	fmt.Printf("AuditKit %s Compliance Scan Results\n", frameworkLabel)
-	fmt.Printf("=====================================\n")
-	fmt.Printf("%s Account: %s\n", strings.ToUpper(result.Provider), result.AccountID)
-	fmt.Printf("Framework: %s\n", frameworkLabel)
+
+	// Print summary box
+	fmt.Print(cli.SummaryBox(
+		result.Provider,
+		result.AccountID,
+		frameworkLabel,
+		result.Score,
+		result.PassedControls,
+		result.FailedControls,
+		result.TotalControls,
+	))
 	fmt.Printf("Scan Time: %s\n", result.Timestamp.Format("2006-01-02 15:04:05"))
-	fmt.Printf("\n")
-	
-	scoreColor := "\033[32m"
-	if result.Score < 80 {
-		scoreColor = "\033[33m"
-	}
-	if result.Score < 60 {
-		scoreColor = "\033[31m"
-	}
-	fmt.Printf("Compliance Score: %s%.1f%%\033[0m\n", scoreColor, result.Score)
-	fmt.Printf("Controls Passed: %d/%d\n", result.PassedControls, result.TotalControls)
 	
 	criticalCount := 0
 	highCount := 0
+	mediumCount := 0
 	for _, control := range result.Controls {
 		if control.Status == "FAIL" {
 			if strings.Contains(control.Priority, "CRITICAL") {
 				criticalCount++
 			} else if strings.Contains(control.Priority, "HIGH") {
 				highCount++
+			} else {
+				mediumCount++
 			}
 		}
 	}
-	
-	if criticalCount > 0 {
-		fmt.Printf("\033[31mCritical Issues: %d (FIX IMMEDIATELY)\033[0m\n", criticalCount)
+
+	if criticalCount > 0 || highCount > 0 {
+		fmt.Println()
+		if criticalCount > 0 {
+			fmt.Printf("  %s %s%d issues require immediate attention%s\n",
+				cli.Critical(), cli.Red, criticalCount, cli.Reset)
+		}
+		if highCount > 0 {
+			fmt.Printf("  %s %s%d high priority issues%s\n",
+				cli.High(), cli.Yellow, highCount, cli.Reset)
+		}
 	}
-	if highCount > 0 {
-		fmt.Printf("\033[33mHigh Priority: %d\033[0m\n", highCount)
-	}
-	fmt.Printf("\n")
+	fmt.Println()
 	
 	if result.FailedControls > 0 {
 		hasCritical := false
@@ -1416,71 +1680,72 @@ func printTextSummary(result ComplianceResult, full bool) {
 		for _, control := range result.Controls {
 			if control.Status == "FAIL" && strings.Contains(control.Priority, "CRITICAL") {
 				if !hasCritical {
-					fmt.Printf("\033[31mCRITICAL - Fix These NOW:\033[0m\n")
-					fmt.Printf("================================\n")
+					cli.Header("CRITICAL - Fix These NOW")
 					hasCritical = true
 				}
-				
+
 				if !full && criticalShown >= 10 {
 					remaining := criticalCount - 10
 					if remaining > 0 {
-						fmt.Printf("  ... and %d more critical issues (use --full to see all)\n\n", remaining)
+						fmt.Printf("  %s... and %d more critical issues (use --full to see all)%s\n\n",
+							cli.Dim, remaining, cli.Reset)
 					}
 					break
 				}
-				
-				fmt.Printf("\n\033[31m[FAIL]\033[0m %s - %s\n", control.ID, control.Name)
-				fmt.Printf("  Issue: %s\n", control.Evidence)
+
+				fmt.Printf("\n%s %s%s%s - %s\n", cli.Fail(), cli.Bold, control.ID, cli.Reset, control.Name)
+				fmt.Printf("  %sIssue:%s %s\n", cli.Dim, cli.Reset, control.Evidence)
 				
 				if control.Remediation != "" {
-					fmt.Printf("  Fix: %s\n", control.Remediation)
+					fmt.Printf("  %sFix:%s %s\n", cli.Green, cli.Reset, control.Remediation)
 				}
-				
+
 				if control.ScreenshotGuide != "" {
-					fmt.Printf("  Evidence: %s\n", control.ScreenshotGuide)
+					fmt.Printf("  %sEvidence:%s %s\n", cli.Cyan, cli.Reset, control.ScreenshotGuide)
 				}
-				
+
 				if control.ConsoleURL != "" {
-					fmt.Printf("  Console: %s\n", control.ConsoleURL)
+					fmt.Printf("  %sConsole:%s %s\n", cli.Blue, cli.Reset, control.ConsoleURL)
 				}
-				fmt.Printf("\n")
+				fmt.Println()
 				criticalShown++
 			}
 		}
-		
+
 		hasHigh := false
 		highShown := 0
 		for _, control := range result.Controls {
 			if control.Status == "FAIL" && strings.Contains(control.Priority, "HIGH") {
 				if !hasHigh {
-					fmt.Printf("\033[33mHIGH Priority Issues:\033[0m\n")
-					fmt.Printf("========================\n")
+					cli.SubHeader("HIGH Priority Issues")
 					hasHigh = true
 				}
-				
+
 				if !full && highShown >= 10 {
 					remaining := highCount - highShown
 					if remaining > 0 {
-						fmt.Printf("  ... and %d more high priority issues (use --full to see all)\n\n", remaining)
+						fmt.Printf("  %s... and %d more high priority issues (use --full to see all)%s\n\n",
+							cli.Dim, remaining, cli.Reset)
 					}
 					break
 				}
-				
-				fmt.Printf("\n\033[33m[FAIL]\033[0m %s - %s\n", control.ID, control.Name)
-				fmt.Printf("  Issue: %s\n", control.Evidence)
-				
+
+				fmt.Printf("\n%s%s[FAIL]%s %s%s%s - %s\n",
+					cli.Yellow, cli.Bold, cli.Reset, cli.Bold, control.ID, cli.Reset, control.Name)
+				fmt.Printf("  %sIssue:%s %s\n", cli.Dim, cli.Reset, control.Evidence)
+
 				if control.Remediation != "" {
-					fmt.Printf("  Fix: %s\n", control.Remediation)
+					fmt.Printf("  %sFix:%s %s\n", cli.Green, cli.Reset, control.Remediation)
 				}
-				
+
 				if control.ScreenshotGuide != "" {
-					fmt.Printf("  Evidence: %s\n", control.ScreenshotGuide)
+					fmt.Printf("  %sEvidence:%s %s\n", cli.Cyan, cli.Reset, control.ScreenshotGuide)
 				}
-				
+
 				if control.ConsoleURL != "" {
-					fmt.Printf("  Console: %s\n", control.ConsoleURL)
+					fmt.Printf("  %sConsole:%s %s\n", cli.Blue, cli.Reset, control.ConsoleURL)
 				}
-				fmt.Printf("\n")
+				fmt.Println()
 				highShown++
 			}
 		}
@@ -1497,29 +1762,29 @@ func printTextSummary(result ComplianceResult, full bool) {
 		for _, control := range result.Controls {
 			if control.Status == "FAIL" && !strings.Contains(control.Priority, "CRITICAL") && !strings.Contains(control.Priority, "HIGH") {
 				if !hasOther {
-					fmt.Printf("Other Issues:\n")
-					fmt.Printf("================\n")
+					cli.SubHeader("Other Issues")
 					hasOther = true
 				}
-				
+
 				if !full && otherShown >= 10 {
 					remaining := otherCount - 10
 					if remaining > 0 {
-						fmt.Printf("  ... and %d more issues (use --full to see all)\n\n", remaining)
+						fmt.Printf("  %s... and %d more issues (use --full to see all)%s\n\n",
+							cli.Dim, remaining, cli.Reset)
 					}
 					break
 				}
-				
-				fmt.Printf("[FAIL] %s - %s\n", control.ID, control.Name)
-				fmt.Printf("  Issue: %s\n", control.Evidence)
+
+				fmt.Printf("%s %s - %s\n", cli.Fail(), control.ID, control.Name)
+				fmt.Printf("  %sIssue:%s %s\n", cli.Dim, cli.Reset, control.Evidence)
 				if control.Remediation != "" {
-					fmt.Printf("  Fix: %s\n", control.Remediation)
+					fmt.Printf("  %sFix:%s %s\n", cli.Green, cli.Reset, control.Remediation)
 				}
-				fmt.Printf("\n")
+				fmt.Println()
 				otherShown++
 			}
 		}
-		
+
 		hasInfo := false
 		infoShown := 0
 		infoCount := 0
@@ -1532,68 +1797,73 @@ func printTextSummary(result ComplianceResult, full bool) {
 		for _, control := range result.Controls {
 			if control.Status == "MANUAL" || control.Status == "INFO" {
 				if !hasInfo {
-					fmt.Printf("Manual Documentation Required:\n")
-					fmt.Printf("=================================\n")
+					cli.SubHeader("Manual Documentation Required")
 					hasInfo = true
 				}
-				
+
 				if !full && infoShown >= 20 {
 					remaining := infoCount - 20
 					if remaining > 0 {
-						fmt.Printf("  ... and %d more manual controls (use --full to see all)\n\n", remaining)
+						fmt.Printf("  %s... and %d more manual controls (use --full to see all)%s\n\n",
+							cli.Dim, remaining, cli.Reset)
 					}
 					break
 				}
-				
-				fmt.Printf("[INFO] %s - %s\n", control.ID, control.Name)
-				fmt.Printf("  Guidance: %s\n", control.Evidence)
+
+				fmt.Printf("%s %s - %s\n", cli.Info(), control.ID, control.Name)
+				fmt.Printf("  %sGuidance:%s %s\n", cli.Dim, cli.Reset, control.Evidence)
 				if control.ScreenshotGuide != "" {
-					fmt.Printf("  Evidence: %s\n", control.ScreenshotGuide)
+					fmt.Printf("  %sEvidence:%s %s\n", cli.Cyan, cli.Reset, control.ScreenshotGuide)
 				}
-				fmt.Printf("\n")
+				fmt.Println()
 				infoShown++
 			}
 		}
 	}
-	
-	fmt.Printf("\033[32mPassed Controls:\033[0m\n")
-	fmt.Printf("===================\n")
+
+	// Passed controls section
+	cli.SubHeader("Passed Controls")
 	passCount := 0
 	for _, control := range result.Controls {
 		if control.Status == "PASS" {
-			fmt.Printf("  - %s - %s\n", control.ID, control.Name)
+			fmt.Printf("  %s %s - %s\n", cli.Pass(), control.ID, control.Name)
 			passCount++
 			if !full && passCount >= 15 {
 				remaining := result.PassedControls - 15
 				if remaining > 0 {
-					fmt.Printf("  ... and %d more passing controls (use --full to see all)\n", remaining)
+					fmt.Printf("  %s... and %d more passing controls (use --full to see all)%s\n",
+						cli.Dim, remaining, cli.Reset)
 				}
 				break
 			}
 		}
 	}
-	
+
+	// Recommendations
 	if len(result.Recommendations) > 0 {
-		fmt.Printf("\nPriority Action Items:\n")
-		fmt.Printf("=========================\n")
+		cli.SubHeader("Priority Action Items")
 		for i, rec := range result.Recommendations {
 			if i >= 5 {
 				break
 			}
-			fmt.Printf("  %d. %s\n", i+1, rec)
+			fmt.Printf("  %s%d.%s %s\n", cli.Cyan, i+1, cli.Reset, rec)
 		}
 	}
-	
-	fmt.Printf("\n")
+
+	// Footer tips
+	fmt.Println()
 	if !full && result.TotalControls > 50 {
-		fmt.Printf("💡 Tip: Use --full flag to see all %d controls without truncation\n", result.TotalControls)
-		fmt.Printf("   auditkit scan -provider %s -framework %s --full\n\n", result.Provider, strings.ToLower(result.Framework))
+		fmt.Printf("%sTip:%s Use --full flag to see all %d controls without truncation\n",
+			cli.Yellow, cli.Reset, result.TotalControls)
+		fmt.Printf("     auditkit scan -provider %s -framework %s --full\n\n",
+			result.Provider, strings.ToLower(result.Framework))
 	}
-	fmt.Printf("For detailed %s report with full evidence checklist:\n", frameworkLabel)
-	fmt.Printf("   auditkit scan -provider %s -framework %s -format pdf -output report.pdf\n", result.Provider, strings.ToLower(result.Framework))
-	fmt.Printf("\nTo track evidence collection progress:\n")
+	fmt.Printf("%sFor detailed %s report:%s\n", cli.Cyan, frameworkLabel, cli.Reset)
+	fmt.Printf("   auditkit scan -provider %s -framework %s -format pdf -output report.pdf\n",
+		result.Provider, strings.ToLower(result.Framework))
+	fmt.Printf("\n%sTo track evidence collection progress:%s\n", cli.Cyan, cli.Reset)
 	fmt.Printf("   auditkit evidence -provider %s\n", result.Provider)
-	fmt.Printf("\n")
+	fmt.Println()
 }
 
 func generatePrioritizedRecommendations(controls []ControlResult, criticalCount, highCount int, framework string) []string {

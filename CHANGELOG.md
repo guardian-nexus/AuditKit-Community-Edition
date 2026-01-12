@@ -2,6 +2,43 @@
 
 All notable changes to AuditKit will be documented in this file.
 
+## [v0.8.0] - 2026-01-11
+
+### Added
+- **AWS Data Analytics & ML Services**
+  - SageMaker: 6 security checks (notebook encryption, direct internet access, root access, endpoint encryption, training job encryption, model network isolation)
+  - Redshift: 7 security checks (cluster encryption, audit logging, public access, SSL enforcement, backup retention, automatic upgrades, enhanced VPC routing)
+  - ElastiCache: 5 security checks (encryption at rest, encryption in transit, automatic minor version upgrade, auth token, backup retention)
+  - OpenSearch: 6 security checks (encryption at rest, node-to-node encryption, HTTPS enforcement, VPC deployment, audit logs, fine-grained access control)
+  - CIS AWS Benchmark mappings added (sections 19-22)
+- **Offline Mode** - Scan without cloud connectivity
+  - `--offline` flag to use cached scan results
+  - `--cache-file` to specify cache file path
+  - Automatic caching of scan results to ~/.auditkit/cache/
+  - `auditkit cache` command to manage cached scans
+  - Essential for air-gapped and classified environments
+- **GDPR Framework** - General Data Protection Regulation mapping
+  - 27 GDPR articles mapped via NIST 800-53 crosswalk
+  - Data protection, privacy rights, and security controls
+  - Use `-framework gdpr`
+- **NIST CSF** - NIST Cybersecurity Framework mapping
+  - All 5 functions (Identify, Protect, Detect, Respond, Recover)
+  - 23 categories mapped to existing controls
+  - Use `-framework nist-csf`
+
+### Improved
+- AWS service coverage increased from 64 to 90+ automated checks
+- All framework remediation guidance updated to January 2026 standards
+- CIS AWS Benchmark mappings updated to v3.0
+- PCI-DSS v4.0 remediation updated to reflect 2026 requirements
+- HIPAA guidance updated for 2026 enforcement requirements
+
+### Technical
+- Added elasticache, opensearch, redshift, sagemaker AWS SDK integrations
+- New offline/cache.go package for scan result caching
+- Updated types.go with framework mappings for all new services
+- Fixed pointer handling for AWS SDK v2 *bool fields
+
 ## [v0.7.1] - 2025-12-14
 
 ### Fixed

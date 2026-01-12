@@ -319,6 +319,189 @@ iso27001_to_800_53:
   A.8.33: [CA-8]                   # Test information
   A.8.34: [AU-9]                   # Protection of information systems during audit
 
+# GDPR → NIST 800-53 Rev 5
+# Focus on technical/organizational measures that can be automated
+gdpr_to_800_53:
+  # Article 5: Principles relating to processing of personal data
+  Art5-1f: [SC-13, SC-28, AC-3]        # Integrity and confidentiality
+  Art5-2: [AU-2, AU-3, AU-12]          # Accountability (logging)
+
+  # Article 24: Responsibility of the controller
+  Art24-1: [PM-1, PM-9]                # Implement appropriate measures
+  Art24-2: [PL-1, PL-2]                # Data protection policies
+
+  # Article 25: Data protection by design and default
+  Art25-1: [SA-8, SC-28]               # Privacy by design
+  Art25-2: [AC-6, CM-7]                # Privacy by default (least privilege)
+
+  # Article 30: Records of processing activities
+  Art30-1: [AU-2, AU-3]                # Maintain processing records
+
+  # Article 32: Security of processing
+  Art32-1a: [SC-13, SC-28]             # Encryption of personal data
+  Art32-1b: [AC-2, AC-3, SC-7]         # Confidentiality, integrity, availability
+  Art32-1c: [CP-9, CP-10]              # Restore availability (backup/recovery)
+  Art32-1d: [CA-2, CA-7]               # Regular testing and evaluation
+  Art32-2: [RA-3, RA-5]                # Risk-appropriate security
+
+  # Article 33: Notification of personal data breach
+  Art33-1: [IR-6]                      # Breach notification to authority
+  Art33-3: [AU-2, AU-6]                # Document breaches (logging)
+
+  # Article 34: Communication of breach to data subject
+  Art34-1: [IR-6]                      # Breach notification to subjects
+
+  # Article 35: Data protection impact assessment
+  Art35-1: [RA-3]                      # Impact assessments
+
+# NIST Cybersecurity Framework (CSF) 2.0 → NIST 800-53 Rev 5
+nist_csf_to_800_53:
+  # IDENTIFY (ID)
+  # Asset Management
+  ID.AM-1: [CM-8]                      # Physical devices inventoried
+  ID.AM-2: [CM-8]                      # Software platforms inventoried
+  ID.AM-3: [AC-4, SC-7]                # Data flows mapped
+  ID.AM-5: [SC-7]                      # Resources prioritized
+
+  # Business Environment
+  ID.BE-5: [CP-2]                      # Resilience requirements
+
+  # Governance
+  ID.GV-1: [PM-1, PL-1]                # Security policy established
+  ID.GV-2: [PM-1]                      # Roles and responsibilities
+  ID.GV-3: [PM-1]                      # Legal requirements understood
+  ID.GV-4: [RA-3]                      # Risk management processes
+
+  # Risk Assessment
+  ID.RA-1: [RA-5]                      # Vulnerabilities identified
+  ID.RA-2: [SI-5]                      # Threat intelligence received
+  ID.RA-3: [RA-3]                      # Threats identified
+  ID.RA-4: [RA-3]                      # Business impacts identified
+  ID.RA-5: [RA-3]                      # Risk responses identified
+  ID.RA-6: [RA-3]                      # Risk responses prioritized
+
+  # Risk Management Strategy
+  ID.RM-1: [PM-9]                      # Risk management processes
+  ID.RM-2: [PM-9]                      # Risk tolerance determined
+  ID.RM-3: [PM-9]                      # Risk tolerance informed by role
+
+  # PROTECT (PR)
+  # Identity Management and Access Control
+  PR.AC-1: [AC-2, IA-2]                # Identities managed
+  PR.AC-2: [PE-2, PE-3]                # Physical access managed
+  PR.AC-3: [AC-17]                     # Remote access managed
+  PR.AC-4: [AC-2, AC-6]                # Access permissions managed
+  PR.AC-5: [SC-7]                      # Network integrity protected
+  PR.AC-6: [IA-2, IA-2(1)]             # Identities proofed, MFA
+  PR.AC-7: [IA-5, IA-5(1)]             # Authentication mechanisms
+
+  # Awareness and Training
+  PR.AT-1: [AT-2]                      # Users trained
+  PR.AT-2: [AT-3]                      # Privileged users trained
+  PR.AT-3: [AT-2]                      # Third parties understand roles
+  PR.AT-4: [AT-2]                      # Senior execs understand roles
+  PR.AT-5: [AT-2]                      # Security personnel trained
+
+  # Data Security
+  PR.DS-1: [SC-28]                     # Data at rest protected
+  PR.DS-2: [SC-8]                      # Data in transit protected
+  PR.DS-3: [CM-8]                      # Assets managed through lifecycle
+  PR.DS-4: [AU-4]                      # Adequate capacity
+  PR.DS-5: [AC-4, SC-7]                # Data leak protections
+  PR.DS-6: [SI-7]                      # Integrity checking mechanisms
+  PR.DS-7: [CM-2]                      # Development/test separate from prod
+  PR.DS-8: [SI-7]                      # Integrity of hardware verified
+
+  # Information Protection
+  PR.IP-1: [CM-2, CM-6]                # Baseline config established
+  PR.IP-2: [SA-3]                      # SDLC implemented
+  PR.IP-3: [CM-3]                      # Configuration change control
+  PR.IP-4: [CP-9]                      # Backups conducted
+  PR.IP-5: [PE-18]                     # Physical security policies
+  PR.IP-6: [MP-6]                      # Data destroyed per policy
+  PR.IP-7: [SI-2]                      # Protection processes improved
+  PR.IP-8: [CA-2]                      # Protection tech effectiveness shared
+  PR.IP-9: [IR-8]                      # Response and recovery plans
+  PR.IP-10: [IR-3]                     # Response and recovery tested
+  PR.IP-11: [PS-7]                     # HR practices include security
+  PR.IP-12: [SI-2]                     # Vulnerability management plan
+
+  # Maintenance
+  PR.MA-1: [MA-2]                      # Maintenance performed
+  PR.MA-2: [MA-4]                      # Remote maintenance approved
+
+  # Protective Technology
+  PR.PT-1: [AU-2, AU-12]               # Audit logs determined
+  PR.PT-2: [MP-2, MP-4]                # Removable media protected
+  PR.PT-3: [CM-7]                      # Least functionality
+  PR.PT-4: [SC-7]                      # Communications protected
+  PR.PT-5: [AC-6]                      # Mechanisms for resilience
+
+  # DETECT (DE)
+  # Anomalies and Events
+  DE.AE-1: [AU-6]                      # Baseline operations established
+  DE.AE-2: [SI-4]                      # Events analyzed
+  DE.AE-3: [AU-6, SI-4]                # Event data aggregated
+  DE.AE-4: [IR-4]                      # Impact determined
+  DE.AE-5: [IR-5]                      # Incident thresholds established
+
+  # Security Continuous Monitoring
+  DE.CM-1: [SC-7, SI-4]                # Network monitored
+  DE.CM-2: [PE-6]                      # Physical environment monitored
+  DE.CM-3: [AU-12]                     # Personnel activity monitored
+  DE.CM-4: [SI-3]                      # Malicious code detected
+  DE.CM-5: [SI-4]                      # Unauthorized mobile code detected
+  DE.CM-6: [SA-9]                      # External service activity monitored
+  DE.CM-7: [CA-7]                      # Unauthorized activity monitored
+  DE.CM-8: [RA-5]                      # Vulnerability scans performed
+
+  # Detection Processes
+  DE.DP-1: [CA-2]                      # Detection roles defined
+  DE.DP-2: [CA-7]                      # Detection meets requirements
+  DE.DP-3: [SI-4]                      # Detection processes tested
+  DE.DP-4: [SI-4]                      # Event detection communicated
+  DE.DP-5: [CA-2, CA-7]                # Detection processes improved
+
+  # RESPOND (RS)
+  # Response Planning
+  RS.RP-1: [IR-8]                      # Response plan executed
+
+  # Communications
+  RS.CO-1: [IR-1]                      # Personnel know roles
+  RS.CO-2: [IR-6]                      # Incidents reported
+  RS.CO-3: [SI-5]                      # Information shared
+  RS.CO-4: [IR-4]                      # Coordination with stakeholders
+  RS.CO-5: [SI-5]                      # External sharing occurs
+
+  # Analysis
+  RS.AN-1: [IR-4]                      # Notifications investigated
+  RS.AN-2: [IR-4]                      # Impact understood
+  RS.AN-3: [IR-4]                      # Forensics performed
+  RS.AN-4: [IR-4]                      # Incidents categorized
+  RS.AN-5: [RA-7]                      # Processes established
+
+  # Mitigation
+  RS.MI-1: [IR-4]                      # Incidents contained
+  RS.MI-2: [IR-4]                      # Incidents mitigated
+  RS.MI-3: [RA-5]                      # Vulnerabilities mitigated
+
+  # Improvements
+  RS.IM-1: [IR-4]                      # Response plans incorporate lessons
+  RS.IM-2: [IR-4]                      # Response strategies updated
+
+  # RECOVER (RC)
+  # Recovery Planning
+  RC.RP-1: [CP-10]                     # Recovery plan executed
+
+  # Improvements
+  RC.IM-1: [CP-2]                      # Recovery plans incorporate lessons
+  RC.IM-2: [CP-2]                      # Recovery strategies updated
+
+  # Communications
+  RC.CO-1: [CP-2]                      # Public relations managed
+  RC.CO-2: [CP-2]                      # Reputation repaired
+  RC.CO-3: [IR-4]                      # Recovery activities communicated
+
 # HIPAA Security Rule → NIST 800-53 Rev 5 (Experimental)
 hipaa_to_800_53:
   "164.308(a)(1)": [RA-1, RA-3]         # Risk assessment

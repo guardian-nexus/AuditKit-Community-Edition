@@ -22,6 +22,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
+	"github.com/aws/aws-sdk-go-v2/service/elasticache"
 	"github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk"
 	"github.com/aws/aws-sdk-go-v2/service/guardduty"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
@@ -30,8 +31,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/macie2"
 	"github.com/aws/aws-sdk-go-v2/service/networkfirewall"
+	"github.com/aws/aws-sdk-go-v2/service/opensearch"
 	"github.com/aws/aws-sdk-go-v2/service/organizations"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
+	"github.com/aws/aws-sdk-go-v2/service/redshift"
+	"github.com/aws/aws-sdk-go-v2/service/sagemaker"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
@@ -78,6 +82,11 @@ type AWSScanner struct {
 	dynamodbClient       *dynamodb.Client
 	cloudFormationClient *cloudformation.Client
 	acmClient            *acm.Client
+	// New services (January 2026)
+	sagemakerClient   *sagemaker.Client
+	redshiftClient    *redshift.Client
+	elasticacheClient *elasticache.Client
+	opensearchClient  *opensearch.Client
 }
 
 type ScanResult struct {
@@ -141,6 +150,11 @@ func NewScannerWithConfig(cfg aws.Config) (*AWSScanner, error) {
 		dynamodbClient:       dynamodb.NewFromConfig(cfg),
 		cloudFormationClient: cloudformation.NewFromConfig(cfg),
 		acmClient:            acm.NewFromConfig(cfg),
+		// New services (January 2026)
+		sagemakerClient:   sagemaker.NewFromConfig(cfg),
+		redshiftClient:    redshift.NewFromConfig(cfg),
+		elasticacheClient: elasticache.NewFromConfig(cfg),
+		opensearchClient:  opensearch.NewFromConfig(cfg),
 	}, nil
 }
 
@@ -227,6 +241,11 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 		checks.NewACMChecks(s.acmClient),                                // CIS 16.1-16.2
 		checks.NewIAMExtendedChecks(s.iamClient),                        // CIS 17.1-17.2
 		checks.NewAuroraChecks(s.rdsClient),                             // CIS 18.1
+		// Sections 19-22 - Data Analytics & ML Services (January 2026)
+		checks.NewSageMakerChecks(s.sagemakerClient),                    // CIS 19.1-19.6
+		checks.NewRedshiftChecks(s.redshiftClient),                      // CIS 20.1-20.7
+		checks.NewElastiCacheChecks(s.elasticacheClient),                // CIS 21.1-21.5
+		checks.NewOpenSearchChecks(s.opensearchClient),                  // CIS 22.1-22.6
 	}
 	
 	// Track which CIS sections we're covering
@@ -294,6 +313,14 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 								sectionCounts["IAM Extended"]++
 							case "18":
 								sectionCounts["Aurora"]++
+							case "19":
+								sectionCounts["SageMaker"]++
+							case "20":
+								sectionCounts["Redshift"]++
+							case "21":
+								sectionCounts["ElastiCache"]++
+							case "22":
+								sectionCounts["OpenSearch"]++
 							}
 						}
 					}
@@ -441,6 +468,11 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 		checks.NewEKSChecks(s.eksClient),                                                              // EKS best practices
 		checks.NewNetworkFirewallChecks(s.nfwClient, s.ec2Client),                                     // Network Firewall
 		checks.NewSecurityServicesChecks(s.gdClient, s.macieClient, s.shClient, s.inspector2Client),   // Additional security
+		// Data Analytics & ML Services (January 2026)
+		checks.NewSageMakerChecks(s.sagemakerClient),                                                  // SageMaker ML security
+		checks.NewRedshiftChecks(s.redshiftClient),                                                    // Redshift data warehouse
+		checks.NewElastiCacheChecks(s.elasticacheClient),                                              // ElastiCache/Redis
+		checks.NewOpenSearchChecks(s.opensearchClient),                                                // OpenSearch/Elasticsearch
 	}
 	
 	for _, check := range soc2Checks {

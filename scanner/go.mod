@@ -13,7 +13,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/sql/armsql v1.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage v1.8.1
 	// AWS SDK v2
-	github.com/aws/aws-sdk-go-v2 v1.39.4
+	github.com/aws/aws-sdk-go-v2 v1.41.1
 	github.com/aws/aws-sdk-go-v2/config v1.31.8
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.59.1
 	github.com/aws/aws-sdk-go-v2/service/backup v1.47.4
@@ -46,8 +46,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.1 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.18.12 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.7 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.11 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.11 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.17 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.17 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.7 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.2 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.7 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.29.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.34.4 // indirect
-	github.com/aws/smithy-go v1.23.1 // indirect
+	github.com/aws/smithy-go v1.24.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
@@ -76,6 +76,25 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v1.0.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/security/armsecurity v0.14.0
+	github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.44.7
+	github.com/aws/aws-sdk-go-v2/service/acm v1.37.8
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.35.8
+	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.32.8
+	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.68.1
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.52.2
+	github.com/aws/aws-sdk-go-v2/service/ecr v1.51.0
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.65.4
+	github.com/aws/aws-sdk-go-v2/service/eks v1.74.5
+	github.com/aws/aws-sdk-go-v2/service/elasticache v1.51.9
+	github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk v1.33.9
+	github.com/aws/aws-sdk-go-v2/service/macie2 v1.50.0
+	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.57.3
+	github.com/aws/aws-sdk-go-v2/service/opensearch v1.57.1
+	github.com/aws/aws-sdk-go-v2/service/redshift v1.61.5
+	github.com/aws/aws-sdk-go-v2/service/route53 v1.58.5
+	github.com/aws/aws-sdk-go-v2/service/sagemaker v1.229.1
+	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.39.9
+	github.com/aws/aws-sdk-go-v2/service/sqs v1.42.11
 	github.com/microsoftgraph/msgraph-sdk-go v1.87.0
 	google.golang.org/api v0.252.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -92,22 +111,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.29.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.53.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.53.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.44.7 // indirect
-	github.com/aws/aws-sdk-go-v2/service/acm v1.37.8 // indirect
-	github.com/aws/aws-sdk-go-v2/service/apigateway v1.35.8 // indirect
-	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.32.8 // indirect
-	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.68.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.52.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ecr v1.51.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ecs v1.65.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/eks v1.74.5 // indirect
-	github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk v1.33.9 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.11.11 // indirect
-	github.com/aws/aws-sdk-go-v2/service/macie2 v1.50.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/networkfirewall v1.57.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/route53 v1.58.5 // indirect
-	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.39.9 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sqs v1.42.11 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20250501225837-2ac532fd4443 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4 // indirect

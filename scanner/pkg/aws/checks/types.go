@@ -667,6 +667,130 @@ var FrameworkMappings = map[string]map[string]string{
 		FrameworkPCI:   "9.5",
 		FrameworkCIS:   "18.1",
 	},
+	// SageMaker Security
+	"SAGEMAKER_ENCRYPTION": {
+		FrameworkSOC2:  "CC6.3",
+		FrameworkPCI:   "3.4",
+		FrameworkHIPAA: "164.312(a)(2)(iv)",
+		FrameworkCIS:   "19.1",
+	},
+	"SAGEMAKER_NETWORK": {
+		FrameworkSOC2:  "CC6.1",
+		FrameworkPCI:   "1.2.1",
+		FrameworkHIPAA: "164.312(e)(1)",
+		FrameworkCIS:   "19.2",
+	},
+	"SAGEMAKER_ACCESS": {
+		FrameworkSOC2:  "CC6.6",
+		FrameworkPCI:   "7.1",
+		FrameworkHIPAA: "164.312(a)(1)",
+		FrameworkCIS:   "19.3",
+	},
+	// Redshift Security
+	"REDSHIFT_ENCRYPTION": {
+		FrameworkSOC2:  "CC6.3",
+		FrameworkPCI:   "3.4",
+		FrameworkHIPAA: "164.312(a)(2)(iv)",
+		FrameworkCIS:   "20.1",
+	},
+	"REDSHIFT_NETWORK": {
+		FrameworkSOC2:  "CC6.1",
+		FrameworkPCI:   "1.2.1",
+		FrameworkHIPAA: "164.312(e)(1)",
+		FrameworkCIS:   "20.2",
+	},
+	"REDSHIFT_LOGGING": {
+		FrameworkSOC2:  "CC7.1",
+		FrameworkPCI:   "10.2",
+		FrameworkHIPAA: "164.312(b)",
+		FrameworkCIS:   "20.3",
+	},
+	"REDSHIFT_SSL": {
+		FrameworkSOC2:  "CC6.4",
+		FrameworkPCI:   "4.1",
+		FrameworkHIPAA: "164.312(e)(1)",
+		FrameworkCIS:   "20.4",
+	},
+	"REDSHIFT_PATCHING": {
+		FrameworkSOC2:  "CC7.5",
+		FrameworkPCI:   "6.2",
+		FrameworkHIPAA: "164.308(a)(5)(ii)(B)",
+		FrameworkCIS:   "20.5",
+	},
+	"REDSHIFT_BACKUP": {
+		FrameworkSOC2:  "A1.2",
+		FrameworkPCI:   "9.5",
+		FrameworkHIPAA: "164.308(a)(7)(ii)(A)",
+		FrameworkCIS:   "20.6",
+	},
+	// ElastiCache Security
+	"ELASTICACHE_ENCRYPTION": {
+		FrameworkSOC2:  "CC6.3",
+		FrameworkPCI:   "3.4",
+		FrameworkHIPAA: "164.312(a)(2)(iv)",
+		FrameworkCIS:   "21.1",
+	},
+	"ELASTICACHE_TRANSIT": {
+		FrameworkSOC2:  "CC6.4",
+		FrameworkPCI:   "4.1",
+		FrameworkHIPAA: "164.312(e)(1)",
+		FrameworkCIS:   "21.2",
+	},
+	"ELASTICACHE_AUTH": {
+		FrameworkSOC2:  "CC6.6",
+		FrameworkPCI:   "8.3.1",
+		FrameworkHIPAA: "164.312(a)(2)(i)",
+		FrameworkCIS:   "21.3",
+	},
+	"ELASTICACHE_PATCHING": {
+		FrameworkSOC2:  "CC7.5",
+		FrameworkPCI:   "6.2",
+		FrameworkHIPAA: "164.308(a)(5)(ii)(B)",
+		FrameworkCIS:   "21.4",
+	},
+	"ELASTICACHE_BACKUP": {
+		FrameworkSOC2:  "A1.2",
+		FrameworkPCI:   "9.5",
+		FrameworkHIPAA: "164.308(a)(7)(ii)(A)",
+		FrameworkCIS:   "21.5",
+	},
+	// OpenSearch Security
+	"OPENSEARCH_ENCRYPTION": {
+		FrameworkSOC2:  "CC6.3",
+		FrameworkPCI:   "3.4",
+		FrameworkHIPAA: "164.312(a)(2)(iv)",
+		FrameworkCIS:   "22.1",
+	},
+	"OPENSEARCH_TRANSIT": {
+		FrameworkSOC2:  "CC6.4",
+		FrameworkPCI:   "4.1",
+		FrameworkHIPAA: "164.312(e)(1)",
+		FrameworkCIS:   "22.2",
+	},
+	"OPENSEARCH_HTTPS": {
+		FrameworkSOC2:  "CC6.4",
+		FrameworkPCI:   "4.1",
+		FrameworkHIPAA: "164.312(e)(1)",
+		FrameworkCIS:   "22.3",
+	},
+	"OPENSEARCH_NETWORK": {
+		FrameworkSOC2:  "CC6.1",
+		FrameworkPCI:   "1.2.1",
+		FrameworkHIPAA: "164.312(e)(1)",
+		FrameworkCIS:   "22.4",
+	},
+	"OPENSEARCH_LOGGING": {
+		FrameworkSOC2:  "CC7.1",
+		FrameworkPCI:   "10.2",
+		FrameworkHIPAA: "164.312(b)",
+		FrameworkCIS:   "22.5",
+	},
+	"OPENSEARCH_ACCESS": {
+		FrameworkSOC2:  "CC6.6",
+		FrameworkPCI:   "7.1",
+		FrameworkHIPAA: "164.312(a)(1)",
+		FrameworkCIS:   "22.6",
+	},
 }
 
 // Helper function to get framework mappings for a control

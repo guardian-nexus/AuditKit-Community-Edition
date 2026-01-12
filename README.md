@@ -4,7 +4,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/auditkit)](https://github.com/guardian-nexus/auditkit/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v0.7.1-green.svg)](https://github.com/guardian-nexus/auditkit/releases)
+[![Version](https://img.shields.io/badge/version-v0.8.0-green.svg)](https://github.com/guardian-nexus/auditkit/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://auditkit.substack.com)
 
 ---
@@ -97,21 +97,25 @@ AuditKit scans your cloud infrastructure for compliance gaps and security miscon
 
 ---
 
-## Recent Changes (v0.7.1)
+## Recent Changes (v0.8.0)
 
-**December 14, 2025**
+**January 11, 2026**
 
-Fixed:
-- **GCP PCI-DSS Checks** - Connected comprehensive PCI-DSS v4.0 implementation covering all 12 requirements
-- **Azure PCI-DSS Checks** - Connected comprehensive PCI-DSS implementation (was using filtered basic checks)
-- **AWS Credential Report Parsing** - Fixed CSV parsing for IAM credential reports (unused credentials check)
-- **Azure VM Public IP Detection** - Added proper NIC and PublicIP client integration for accurate detection
+New Features:
+- **AWS Data Services** - Added SageMaker (6 checks), Redshift (7 checks), ElastiCache (5 checks), OpenSearch (6 checks)
+- **Offline Mode** - Cache scan results for air-gapped environments with --offline and --cache-file flags
+- **GDPR Framework** - Added GDPR compliance mapping via NIST 800-53 crosswalk
+- **NIST CSF** - Added NIST Cybersecurity Framework (CSF) mapping
+- **Framework Updates** - All frameworks updated to January 2026 standards
 
-These fixes improve compliance check accuracy across all three major cloud providers.
+Improvements:
+- AWS service coverage increased from 64 to 90+ checks
+- All framework remediation guidance updated to current versions
+- Updated CIS AWS Benchmark mappings to v3.0
 
 ---
 
-## NEW: AuditKit Pro Desktop (v0.8.3)
+## AuditKit Pro Desktop (v0.9.0)
 
 **Pro customers now get a beautiful web-based dashboard** that runs locally on your machine.
 
@@ -280,18 +284,21 @@ go build -o auditkit-gcp ./cmd/auditkit-gcp
 
 ---
 
-## What's New in v0.7.0
+## What's New in v0.8.0
 
 ### New Features
-- **CIS Benchmarks:** Security hardening for AWS (58 controls), Azure (~40+ controls), GCP (~30+ controls)
-- **GCP Support:** 170+ automated security checks across Cloud Storage, IAM, Compute, VPC, SQL, KMS, Logging
-- **NIST 800-53 Rev 5:** ~150 technical controls mapped from existing frameworks
-- **ISO 27001:2022:** ~60 technical controls via 800-53 crosswalk
-- **Multi-Cloud Reports:** Scan AWS, Azure, and GCP with unified reporting
+- **AWS Data Services:** SageMaker, Redshift, ElastiCache, OpenSearch checks for data security
+- **Offline Mode:** Run scans offline with cached results for air-gapped environments
+- **GDPR Mapping:** GDPR compliance via NIST 800-53 crosswalk
+- **NIST CSF:** NIST Cybersecurity Framework mapping
 
-### Coming November 2025
-- FedRAMP baseline filtering (Low/Moderate/High)
-- CIS Benchmarks expansion (more controls for Azure/GCP)
+### Improvements
+- AWS service coverage increased to 90+ checks
+- All framework remediation updated to January 2026 standards
+- CIS AWS Benchmark mappings updated to v3.0
+
+### Coming in Pro v0.9.0
+- Custom controls - define your own security checks in YAML
 - Enhanced multi-account scanning
 
 **[Full Release Notes →](./CHANGELOG.md)**
