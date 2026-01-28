@@ -133,19 +133,19 @@
             <h2 class="text-center">Core Features</h2>
 
             <div class="grid-3">
-                <div class="card">
+                <div class="card card-flex">
                     <h3>CMMC Level 2 Complete</h3>
                     <p>All 110 CMMC Level 2 practices automated across AWS, Azure, GCP, and Microsoft 365. Real-time gap identification with specific remediation steps for each cloud provider.</p>
                     <div class="code-inline">./auditkit-pro scan -framework cmmc -verbose</div>
                 </div>
 
-                <div class="card">
+                <div class="card card-flex">
                     <h3>Multi-Account Scanning</h3>
                     <p>Scan entire AWS Organizations, Azure Management Groups, and GCP Folders with one command. Unified compliance reports across all accounts. Perfect for separate dev/staging/prod environments.</p>
                     <div class="code-inline">./auditkit-pro scan -framework cmmc --org-scan</div>
                 </div>
 
-                <div class="card">
+                <div class="card card-flex">
                     <h3>GCP Advanced</h3>
                     <p><strong>GKE Security:</strong> 10 checks for pod policies, network policies, RBAC, binary authorization.<br><br><strong>Vertex AI Compliance:</strong> 10 checks for ML model governance, data access controls, audit logging.</p>
                     <div class="code-inline">./auditkit-pro scan -provider gcp --advanced</div>
@@ -153,19 +153,19 @@
             </div>
 
             <div class="grid-3" style="margin-top: 2rem;">
-                <div class="card">
+                <div class="card card-flex">
                     <h3>Custom Controls <span class="badge-new">NEW</span></h3>
                     <p>Define your own security checks in YAML. Create organization-specific controls, tag requirements, naming conventions, and resource count validations. Execute custom checks alongside built-in frameworks.</p>
                     <div class="code-inline">./auditkit-pro scan --custom-controls my-controls.yaml</div>
                 </div>
 
-                <div class="card">
+                <div class="card card-flex">
                     <h3>AWS Data Services</h3>
                     <p><strong>SageMaker:</strong> ML notebook encryption, network isolation, root access controls.<br><br><strong>Redshift + OpenSearch + ElastiCache:</strong> Encryption, audit logging, VPC isolation, backup policies.</p>
                     <div class="code-inline">./auditkit-pro scan -provider aws -verbose</div>
                 </div>
 
-                <div class="card">
+                <div class="card card-flex">
                     <h3>Offline Mode</h3>
                     <p>Cache scan results locally for air-gapped environments. Run scans without cloud connectivity, replay cached results anytime. Essential for classified networks.</p>
                     <div class="code-inline">./auditkit-pro scan --offline --cache-file scan.json</div>
@@ -193,19 +193,19 @@
             </p>
 
             <div class="grid-3">
-                <div class="card">
+                <div class="card card-flex">
                     <h3>Evidence Package Generator</h3>
                     <p>Generates auditor-ready ZIP files with screenshots, configuration dumps, logs, and documentation in the exact format C3PAOs expect. Saves 40+ hours of manual evidence collection per assessment.</p>
                     <div class="code-inline">./auditkit-pro evidence-package -framework cmmc -output ./audit</div>
                 </div>
 
-                <div class="card">
+                <div class="card card-flex">
                     <h3>Exception &amp; Waiver Management</h3>
                     <p>Track approved exceptions with compensating controls, expiration dates, and risk acceptance documentation. Maintains audit trail for C3PAO review.</p>
                     <div class="code-inline">./auditkit-pro exception add -control AC.1.001</div>
                 </div>
 
-                <div class="card">
+                <div class="card card-flex">
                     <h3>Continuous Monitoring Daemon</h3>
                     <p>Scheduled scans with automated alerting via syslog, email, or webhook. Detects compliance drift in real-time. Air-gapped friendly for CMMC environments.</p>
                     <div class="code-inline">./auditkit-pro daemon start -schedule "0 2 * * *"</div>
@@ -225,39 +225,47 @@
     </section>
 
     <!-- Desktop GUI -->
-    <section class="section" style="background: var(--emerald-light);">
+    <section class="section section-dark">
         <div class="container">
             <h2 class="text-center">Desktop GUI (v0.9.0)</h2>
-            <p class="text-center text-muted text-lg mb-3">
+            <p class="text-center text-lg mb-3" style="color: var(--slate-300);">
                 Web-based dashboard that runs locally. No cloud dependencies. Air-gap compatible.
             </p>
 
-            <!-- Screenshot Gallery -->
-            <div style="max-width: 1000px; margin: 0 auto 2.5rem;">
-                <div class="grid-3">
-                    <div class="text-center" style="cursor: pointer;" onclick="openLightbox(0)">
-                        <div style="aspect-ratio: 16/10; overflow: hidden; border-radius: var(--radius-lg);">
-                            <img src="../examples/screenshots/auditkitwebgui-dashboard.png" alt="Dashboard" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+            <!-- Screenshot Carousel -->
+            <div class="carousel-wrapper">
+                <div class="carousel-track">
+                    <div class="carousel-slides" id="carousel-slides">
+                        <div class="carousel-slide" onclick="openLightbox(0)">
+                            <img src="../examples/screenshots/auditkitwebgui-dashboard.png" alt="Dashboard">
+                            <div class="carousel-caption">
+                                <strong>Dashboard</strong>
+                                <p>Real-time compliance scores &amp; trends</p>
+                            </div>
                         </div>
-                        <p style="margin-top: 0.75rem;"><strong>Dashboard</strong></p>
-                        <p class="text-sm text-muted">Real-time scores &amp; trends</p>
-                    </div>
-                    <div class="text-center" style="cursor: pointer;" onclick="openLightbox(1)">
-                        <div style="aspect-ratio: 16/10; overflow: hidden; border-radius: var(--radius-lg);">
-                            <img src="../examples/screenshots/auditkitwebgui-findings.png" alt="Findings" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+                        <div class="carousel-slide" onclick="openLightbox(1)">
+                            <img src="../examples/screenshots/auditkitwebgui-findings.png" alt="Findings Explorer">
+                            <div class="carousel-caption">
+                                <strong>Findings Explorer</strong>
+                                <p>Search &amp; filter by severity</p>
+                            </div>
                         </div>
-                        <p style="margin-top: 0.75rem;"><strong>Findings Explorer</strong></p>
-                        <p class="text-sm text-muted">Search &amp; filter by severity</p>
-                    </div>
-                    <div class="text-center" style="cursor: pointer;" onclick="openLightbox(2)">
-                        <div style="aspect-ratio: 16/10; overflow: hidden; border-radius: var(--radius-lg);">
-                            <img src="../examples/screenshots/auditkitwebgui-scanhistory.png" alt="Scan History" style="width: 100%; height: 100%; object-fit: cover; object-position: top;">
+                        <div class="carousel-slide" onclick="openLightbox(2)">
+                            <img src="../examples/screenshots/auditkitwebgui-scanhistory.png" alt="Scan History">
+                            <div class="carousel-caption">
+                                <strong>Scan History</strong>
+                                <p>Browse all past scans</p>
+                            </div>
                         </div>
-                        <p style="margin-top: 0.75rem;"><strong>Scan History</strong></p>
-                        <p class="text-sm text-muted">Browse all past scans</p>
                     </div>
                 </div>
-                <p class="text-center text-sm" style="margin-top: 1rem; color: var(--slate-400);">Click any image to enlarge &bull; Use arrow keys to navigate</p>
+                <button class="carousel-btn carousel-btn-prev" onclick="carouselNav(-1)">&#10094;</button>
+                <button class="carousel-btn carousel-btn-next" onclick="carouselNav(1)">&#10095;</button>
+                <div class="carousel-dots" id="carousel-dots">
+                    <button class="carousel-dot active" onclick="carouselGo(0)"></button>
+                    <button class="carousel-dot" onclick="carouselGo(1)"></button>
+                    <button class="carousel-dot" onclick="carouselGo(2)"></button>
+                </div>
             </div>
 
             <div class="grid-3">
@@ -279,7 +287,7 @@
                 <div class="code-block" style="display: inline-block; text-align: left; min-width: 500px;"><span class="comment"># Run the Desktop GUI</span>
 export AUDITKIT_PRO_LICENSE="your-license-key"
 ./auditkit-pro-desktop
-
+<hr class="result-separator">
 <span class="comment"># Browser opens to http://localhost:1337</span>
 <span class="comment"># Change port if needed:</span>
 ./auditkit-pro-desktop --port 8080</div>
@@ -299,6 +307,34 @@ export AUDITKIT_PRO_LICENSE="your-license-key"
     </div>
 
     <script>
+        // Carousel
+        var carouselIndex = 0;
+        var totalSlides = 3;
+        var autoplayTimer;
+
+        function carouselGo(index) {
+            carouselIndex = index;
+            document.getElementById('carousel-slides').style.transform = 'translateX(-' + (index * 100) + '%)';
+            var dots = document.querySelectorAll('.carousel-dot');
+            dots.forEach(function(d, i) { d.classList.toggle('active', i === index); });
+            resetAutoplay();
+        }
+
+        function carouselNav(dir) {
+            var next = carouselIndex + dir;
+            if (next >= totalSlides) next = 0;
+            if (next < 0) next = totalSlides - 1;
+            carouselGo(next);
+        }
+
+        function resetAutoplay() {
+            clearInterval(autoplayTimer);
+            autoplayTimer = setInterval(function() { carouselNav(1); }, 5000);
+        }
+
+        resetAutoplay();
+
+        // Lightbox
         var slides = [
             { src: '../examples/screenshots/auditkitwebgui-dashboard.png', caption: 'Dashboard - Real-time compliance scores & trends' },
             { src: '../examples/screenshots/auditkitwebgui-findings.png', caption: 'Findings Explorer - Search & filter by severity' },
@@ -346,21 +382,22 @@ export AUDITKIT_PRO_LICENSE="your-license-key"
 git clone git@github.com:guardian-nexus/auditkit-pro.git
 cd auditkit-pro/scanner
 go build ./cmd/auditkit-pro
-
+<hr class="result-separator">
 <span class="comment"># 2. Run initial CMMC Level 2 assessment (30 minutes)</span>
 ./auditkit-pro scan -provider aws -framework cmmc -verbose
-
+<hr class="result-separator">
 <span class="comment"># Output shows you exactly what's missing and how to fix it</span>
 <span class="fail">&#10007; FAIL</span> | AC.L2-3.1.3 | CUI access controls missing
-&rarr; Remediation: aws iam create-policy --policy-document file://cui-policy.json
-&rarr; Evidence needed: IAM policy JSON + console screenshot
-
+  &rarr; Remediation: aws iam create-policy \
+      --policy-document file://cui-policy.json
+  &rarr; Evidence needed: IAM policy JSON + console screenshot
+<hr class="result-separator">
 <span class="comment"># 3. Fix issues and re-scan (unlimited)</span>
 ./auditkit-pro scan -provider aws -framework cmmc -verbose
-
+<hr class="result-separator">
 <span class="comment"># 4. Generate C3PAO-ready evidence package</span>
 ./auditkit-pro evidence-package -framework cmmc -output ./cmmc-evidence
-
+<hr class="result-separator">
 <span class="comment"># 5. Schedule C3PAO knowing you'll pass</span>
 <span class="pass">&#10003; All 110 practices passing - ready for C3PAO assessment</span></div>
             </div>
@@ -381,15 +418,17 @@ go build ./cmd/auditkit-pro
                     <p>Controls that meet compliance requirements show specific evidence of what's configured correctly.</p>
                     <div class="code-block" style="font-size: 0.8rem;">
 <span class="pass">&#10003; PASS</span> | <span class="command">CC6.6</span> - Authentication Controls
-Root account has MFA enabled
-<span class="comment">&rarr; Meets SOC2 CC6.6, PCI DSS 8.3.1, HIPAA 164.312(a)(2)(i)</span>
-
+  Root account has MFA enabled
+  <span class="comment">&rarr; Meets SOC2 CC6.6, PCI DSS 8.3.1,
+    HIPAA 164.312(a)(2)(i)</span>
+<hr class="result-separator">
 <span class="pass">&#10003; PASS</span> | <span class="command">CC6.3</span> - Encryption at Rest
-All 15 S3 buckets have encryption enabled
-<span class="comment">&rarr; Meets SOC2 CC6.3, PCI DSS 3.4, HIPAA 164.312(a)(2)(iv)</span>
-
+  All 15 S3 buckets have encryption enabled
+  <span class="comment">&rarr; Meets SOC2 CC6.3, PCI DSS 3.4,
+    HIPAA 164.312(a)(2)(iv)</span>
+<hr class="result-separator">
 <span class="pass">&#10003; PASS</span> | <span class="command">AC.L1-3.1.1</span> - Security Control
-IAM users have appropriate access restrictions</div>
+  IAM users have appropriate access restrictions</div>
                 </div>
 
                 <div class="card">
@@ -397,18 +436,20 @@ IAM users have appropriate access restrictions</div>
                     <p>Failed controls show exactly what's wrong, how to fix it, and what evidence you'll need for auditors.</p>
                     <div class="code-block" style="font-size: 0.8rem;">
 <span class="fail">&#10007; FAIL</span> | <span class="command">CC6.1</span> - Access Controls
-<span class="label">Issue:</span> 1 security groups have SSH open to 0.0.0.0/0
-Security Group: sg-0ab56571076bcff37 (port 22)
-<span class="comment">&rarr; Violates PCI DSS 1.2.1 (firewall config)</span>
-
-<span class="fix">Fix:</span> aws ec2 revoke-security-group-ingress \
-  --group-id sg-0ab56571076bcff37 \
-  --protocol tcp --port 22 --cidr 0.0.0.0/0
-
+  <span class="label">Issue:</span> 1 security group has SSH open to 0.0.0.0/0
+  Security Group: sg-0ab56571076bcff37 (port 22)
+  <span class="comment">&rarr; Violates PCI DSS 1.2.1 (firewall config)</span>
+<hr class="result-separator">
+<span class="fix">Fix:</span>
+  aws ec2 revoke-security-group-ingress \
+    --group-id sg-0ab56571076bcff37 \
+    --protocol tcp --port 22 \
+    --cidr 0.0.0.0/0
+<hr class="result-separator">
 <span class="command">Evidence needed:</span>
-1. Go to EC2 &rarr; Security Groups
-2. Screenshot 'Inbound rules' tab
-3. Show NO rules with Source '0.0.0.0/0' for port 22</div>
+  1. Go to EC2 &rarr; Security Groups
+  2. Screenshot 'Inbound rules' tab
+  3. Show NO rules with Source '0.0.0.0/0' for port 22</div>
                 </div>
 
                 <div class="card">
@@ -438,7 +479,7 @@ Security Group: sg-0ab56571076bcff37 (port 22)
 
                 <div class="code-block"><span class="comment"># Generate evidence package for CMMC assessment</span>
 ./auditkit-pro evidence-package -framework cmmc -output ./audit-evidence
-
+<hr class="result-separator">
 <span class="pass">&#10003; Evidence package generated: audit-evidence.zip</span></div>
 
                 <div class="code-block" style="font-size: 0.8rem; line-height: 1.8;">

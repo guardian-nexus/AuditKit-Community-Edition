@@ -84,6 +84,9 @@ pre code { background: none; padding: 0; }
 .section-dark h1, .section-dark h2, .section-dark h3, .section-dark h4 { color: var(--white); }
 .section-dark p { color: var(--text-on-dark); }
 .section-dark a { color: var(--emerald); }
+.section-dark .btn { color: var(--white); }
+.section-dark .btn-primary { background: var(--emerald); color: var(--white); }
+.section-dark .btn-outline-light { color: var(--white); }
 .section-dark .text-muted { color: var(--text-on-dark-muted); }
 
 /* ---------- Navigation ---------- */
@@ -175,7 +178,7 @@ pre code { background: none; padding: 0; }
 
 .hero h1 { font-size: 3.5rem; max-width: 800px; margin: 0 auto 1.5rem; }
 .hero .subtitle { font-size: 1.35rem; color: var(--text-muted); max-width: 640px; margin: 0 auto 2rem; line-height: 1.7; }
-.hero-logo { height: 56px; margin: 0 auto 2rem; }
+.hero-logo { height: 80px; margin: 0 auto 2rem; }
 
 .hero-dark {
   background: var(--navy);
@@ -457,6 +460,110 @@ tr:last-child td { border-bottom: none; }
 .flex-wrap { flex-wrap: wrap; }
 .items-center { align-items: center; }
 .justify-center { justify-content: center; }
+
+/* ---------- Card Flex (align code-inline at bottom) ---------- */
+.card-flex {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-flex .code-inline {
+  margin-top: auto;
+}
+
+/* ---------- Code Block Separators ---------- */
+.code-block .result-separator {
+  display: block;
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin: 1rem 0;
+}
+
+/* ---------- Carousel ---------- */
+.carousel-wrapper {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto 2.5rem;
+}
+
+.carousel-track {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--navy);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+}
+
+.carousel-slides {
+  display: flex;
+  transition: transform 0.4s ease;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  text-align: center;
+  cursor: pointer;
+}
+
+.carousel-slide img {
+  width: 100%;
+  display: block;
+}
+
+.carousel-caption {
+  padding: 1rem;
+  text-align: center;
+}
+
+.carousel-caption strong { color: var(--white); font-size: 1rem; }
+.carousel-caption p { color: var(--slate-400); font-size: 0.9rem; margin: 0.25rem 0 0; }
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--navy);
+  color: var(--white);
+  border: 2px solid rgba(255,255,255,0.15);
+  font-size: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+  z-index: 10;
+}
+
+.carousel-btn:hover {
+  background: var(--navy-light);
+  border-color: rgba(255,255,255,0.3);
+}
+
+.carousel-btn-prev { left: -22px; }
+.carousel-btn-next { right: -22px; }
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--slate-300);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.carousel-dot.active {
+  background: var(--emerald);
+}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
