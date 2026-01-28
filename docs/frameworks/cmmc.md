@@ -6,13 +6,13 @@ Complete guide to CMMC Level 1 and Level 2 compliance with AuditKit.
 
 ## Overview
 
-**CMMC** is a cybersecurity framework required for DoD contractors.
+**CMMC** is a cybersecurity framework required for DoW contractors.
 
 **Why CMMC matters:**
-- Required for all DoD contracts (as of November 10, 2025)
+- Required for all DoW contracts (as of November 10, 2025)
 - Protects Federal Contract Information (FCI) and Controlled Unclassified Information (CUI)
-- Mandatory for bidding on DoD contracts
-- Failure to comply = cannot bid on DoD work
+- Mandatory for bidding on DoW contracts
+- Failure to comply = cannot bid on DoW work
 
 **Certification:** Requires third-party assessment by C3PAO (CMMC Third-Party Assessor Organization)
 
@@ -23,7 +23,7 @@ Complete guide to CMMC Level 1 and Level 2 compliance with AuditKit.
 ### Level 1: Foundational (17 Practices)
 
 **Protects:** Federal Contract Information (FCI)  
-**Required for:** All DoD contractors  
+**Required for:** All DoW contractors  
 **Assessment:** Self-assessment allowed  
 **Cost:** Free with AuditKit
 
@@ -39,7 +39,7 @@ Complete guide to CMMC Level 1 and Level 2 compliance with AuditKit.
 ### Level 2: Advanced (110 Practices)
 
 **Protects:** Controlled Unclassified Information (CUI)  
-**Required for:** DoD contractors handling CUI  
+**Required for:** DoW contractors handling CUI  
 **Assessment:** C3PAO required  
 **Cost:** $297/month with AuditKit Pro
 
@@ -320,7 +320,7 @@ auditkit-pro evidence -framework cmmc-l2 -format html -output cmmc-l2-evidence.h
 | **Timeline** | 2-4 weeks | 3-6 months |
 | **Automated Checks** | 8 | 33 |
 | **Manual Docs** | 9 | 77 |
-| **Required For** | All DoD contracts | CUI contracts |
+| **Required For** | All DoW contracts | CUI contracts |
 | **Deadline** | Now | Nov 10, 2025 |
 
 ---

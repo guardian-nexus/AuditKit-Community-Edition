@@ -25,7 +25,7 @@ AuditKit supports multiple compliance frameworks for automated technical control
 Fully tested, comprehensive coverage, used in production environments:
 - **SOC2 Type II** - For SaaS companies and startups
 - **PCI-DSS v4.0** - For payment card processing
-- **CMMC Level 1** - For all DoD contractors
+- **CMMC Level 1** - For all DoW contractors
 - **CIS Benchmarks** - For security hardening (AWS: 126+ controls, Azure: ~40+ controls, GCP: 61 controls)
 - **NIST 800-53** - For federal contractors and FedRAMP compliance
 - **ISO 27001** - For international information security compliance
@@ -33,7 +33,7 @@ Fully tested, comprehensive coverage, used in production environments:
 
 ### Pro Only
 Requires AuditKit Pro subscription:
-- **CMMC Level 2** - For DoD contractors handling CUI
+- **CMMC Level 2** - For DoW contractors handling CUI
 
 ---
 
@@ -43,8 +43,8 @@ Requires AuditKit Pro subscription:
 
 **SaaS/Startups:** SOC2 Type II  
 **E-commerce/Payment Processing:** PCI-DSS v4.0  
-**DoD Contractors (FCI):** CMMC Level 1  
-**DoD Contractors (CUI):** CMMC Level 2 (Pro)  
+**DoW Contractors (FCI):** CMMC Level 1  
+**DoW Contractors (CUI):** CMMC Level 2 (Pro)  
 **Federal Contractors:** NIST 800-53 Rev 5  
 **Healthcare:** HIPAA (experimental)  
 **Security Hardening:** CIS Benchmarks
@@ -53,7 +53,7 @@ Requires AuditKit Pro subscription:
 
 **Customer demands compliance:** SOC2  
 **Processing credit cards:** PCI-DSS  
-**DoD contract requires it:** CMMC  
+**DoW contract requires it:** CMMC  
 **Federal agency requires it:** NIST 800-53  
 **Handling PHI:** HIPAA  
 **Security best practices:** CIS Benchmarks
@@ -86,7 +86,7 @@ Requires AuditKit Pro subscription:
 **[Learn more →](./pci-dss.md)**
 
 ### CMMC
-**Purpose:** Cybersecurity Maturity Model Certification for DoD  
+**Purpose:** Cybersecurity Maturity Model Certification for DoW  
 **Certification:**  
 - Level 1: Self-assessment  
 - Level 2: C3PAO required ($25,000 - $150,000)
@@ -201,8 +201,8 @@ Many organizations need multiple frameworks:
 **Common combinations:**
 - SOC2 + PCI-DSS (SaaS with payment processing)
 - SOC2 + CIS Benchmarks (SaaS with strong security posture)
-- CMMC + NIST 800-53 (DoD + federal work)
-- CMMC + CIS Benchmarks (DoD with hardening requirements)
+- CMMC + NIST 800-53 (DoW + federal work)
+- CMMC + CIS Benchmarks (DoW with hardening requirements)
 - SOC2 + HIPAA (Healthcare SaaS)
 
 **Good news:** AuditKit scans once, reports on all frameworks
@@ -212,7 +212,7 @@ Many organizations need multiple frameworks:
 **If you need multiple frameworks:**
 1. Start with broadest: SOC2 or NIST 800-53
 2. Add security hardening: CIS Benchmarks
-3. Add specific: PCI-DSS for payments, CMMC for DoD
+3. Add specific: PCI-DSS for payments, CMMC for DoW
 4. Last: HIPAA (most organizational policies)
 
 **Security-first approach:**

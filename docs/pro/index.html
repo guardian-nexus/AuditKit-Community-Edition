@@ -28,7 +28,7 @@
     </nav>
 
     <div class="alert-bar">
-        CMMC NOW MANDATORY: All new DoD contracts require CMMC (effective Nov 10, 2025)
+        CMMC NOW MANDATORY: All new DoW contracts require CMMC (effective Nov 10, 2025)
     </div>
 
     <!-- Hero -->
@@ -287,7 +287,7 @@
                 <div class="code-block" style="display: inline-block; text-align: left; min-width: 500px;"><span class="comment"># Run the Desktop GUI</span>
 export AUDITKIT_PRO_LICENSE="your-license-key"
 ./auditkit-pro-desktop
-<hr class="result-separator">
+
 <span class="comment"># Browser opens to http://localhost:1337</span>
 <span class="comment"># Change port if needed:</span>
 ./auditkit-pro-desktop --port 8080</div>
@@ -382,22 +382,22 @@ export AUDITKIT_PRO_LICENSE="your-license-key"
 git clone git@github.com:guardian-nexus/auditkit-pro.git
 cd auditkit-pro/scanner
 go build ./cmd/auditkit-pro
-<hr class="result-separator">
+
 <span class="comment"># 2. Run initial CMMC Level 2 assessment (30 minutes)</span>
 ./auditkit-pro scan -provider aws -framework cmmc -verbose
-<hr class="result-separator">
+
 <span class="comment"># Output shows you exactly what's missing and how to fix it</span>
 <span class="fail">&#10007; FAIL</span> | AC.L2-3.1.3 | CUI access controls missing
   &rarr; Remediation: aws iam create-policy \
       --policy-document file://cui-policy.json
   &rarr; Evidence needed: IAM policy JSON + console screenshot
-<hr class="result-separator">
+
 <span class="comment"># 3. Fix issues and re-scan (unlimited)</span>
 ./auditkit-pro scan -provider aws -framework cmmc -verbose
-<hr class="result-separator">
+
 <span class="comment"># 4. Generate C3PAO-ready evidence package</span>
 ./auditkit-pro evidence-package -framework cmmc -output ./cmmc-evidence
-<hr class="result-separator">
+
 <span class="comment"># 5. Schedule C3PAO knowing you'll pass</span>
 <span class="pass">&#10003; All 110 practices passing - ready for C3PAO assessment</span></div>
             </div>
@@ -421,12 +421,12 @@ go build ./cmd/auditkit-pro
   Root account has MFA enabled
   <span class="comment">&rarr; Meets SOC2 CC6.6, PCI DSS 8.3.1,
     HIPAA 164.312(a)(2)(i)</span>
-<hr class="result-separator">
+
 <span class="pass">&#10003; PASS</span> | <span class="command">CC6.3</span> - Encryption at Rest
   All 15 S3 buckets have encryption enabled
   <span class="comment">&rarr; Meets SOC2 CC6.3, PCI DSS 3.4,
     HIPAA 164.312(a)(2)(iv)</span>
-<hr class="result-separator">
+
 <span class="pass">&#10003; PASS</span> | <span class="command">AC.L1-3.1.1</span> - Security Control
   IAM users have appropriate access restrictions</div>
                 </div>
@@ -439,13 +439,13 @@ go build ./cmd/auditkit-pro
   <span class="label">Issue:</span> 1 security group has SSH open to 0.0.0.0/0
   Security Group: sg-0ab56571076bcff37 (port 22)
   <span class="comment">&rarr; Violates PCI DSS 1.2.1 (firewall config)</span>
-<hr class="result-separator">
+
 <span class="fix">Fix:</span>
   aws ec2 revoke-security-group-ingress \
     --group-id sg-0ab56571076bcff37 \
     --protocol tcp --port 22 \
     --cidr 0.0.0.0/0
-<hr class="result-separator">
+
 <span class="command">Evidence needed:</span>
   1. Go to EC2 &rarr; Security Groups
   2. Screenshot 'Inbound rules' tab
@@ -479,7 +479,7 @@ go build ./cmd/auditkit-pro
 
                 <div class="code-block"><span class="comment"># Generate evidence package for CMMC assessment</span>
 ./auditkit-pro evidence-package -framework cmmc -output ./audit-evidence
-<hr class="result-separator">
+
 <span class="pass">&#10003; Evidence package generated: audit-evidence.zip</span></div>
 
                 <div class="code-block" style="font-size: 0.8rem; line-height: 1.8;">
@@ -529,7 +529,7 @@ go build ./cmd/auditkit-pro
 
             <div class="faq-item">
                 <h3>What's the difference between CMMC Level 1 and Level 2?</h3>
-                <p>Level 1 (17 practices) protects Federal Contract Information (FCI). Level 2 (110 practices) protects Controlled Unclassified Information (CUI). If your DoD contracts involve CUI, you need Level 2. AuditKit Free includes Level 1, Pro includes both.</p>
+                <p>Level 1 (17 practices) protects Federal Contract Information (FCI). Level 2 (110 practices) protects Controlled Unclassified Information (CUI). If your DoW contracts involve CUI, you need Level 2. AuditKit Free includes Level 1, Pro includes both.</p>
             </div>
 
             <div class="faq-item">

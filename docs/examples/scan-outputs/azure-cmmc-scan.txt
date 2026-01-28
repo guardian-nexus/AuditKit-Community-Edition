@@ -24,7 +24,7 @@ CMMC Level 1 complete: 17 controls tested
 
 🔓 UNLOCK CMMC LEVEL 2:
   • 110 additional Level 2 practices for CUI
-  • Required for DoD contractors handling CUI
+  • Required for DoW contractors handling CUI
   • Complete evidence collection guides
   • November 10, 2025 deadline compliance
 

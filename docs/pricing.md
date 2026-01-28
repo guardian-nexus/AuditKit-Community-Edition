@@ -1,6 +1,6 @@
 # Pricing
 
-Free for most use cases. Pro for DoD contractors and advanced GCP users.
+Free for most use cases. Pro for DoW contractors and advanced GCP users.
 
 ---
 
@@ -40,7 +40,7 @@ Free for most use cases. Pro for DoD contractors and advanced GCP users.
 
 **Best for:**
 - Startups preparing for SOC2
-- Companies without DoD contracts
+- Companies without DoW contracts
 - Basic GCP users (Storage, Compute, SQL)
 - Single account/project scanning
 - Budget-conscious teams
@@ -56,7 +56,7 @@ Free for most use cases. Pro for DoD contractors and advanced GCP users.
 **Everything in Free, plus:**
 
 **CMMC Level 2 (110 practices)**
-- Required for DoD contractors handling CUI
+- Required for DoW contractors handling CUI
 - Complete NIST SP 800-171 Rev 2 coverage
 - November 10, 2025 deadline compliance
 - C3PAO assessment preparation
@@ -91,7 +91,7 @@ Free for most use cases. Pro for DoD contractors and advanced GCP users.
 - Hardware-locked activation
 
 **Best for:**
-- DoD contractors (CMMC Level 2 required)
+- DoW contractors (CMMC Level 2 required)
 - Companies using GKE or Vertex AI
 - Multi-cloud organizations
 - Enterprises needing priority support
@@ -209,11 +209,11 @@ Free for most use cases. Pro for DoD contractors and advanced GCP users.
 
 ---
 
-### Scenario 2: DoD Contractor (CMMC Level 2)
+### Scenario 2: DoW Contractor (CMMC Level 2)
 
 **Requirements:**
 - CMMC Level 2 (110 practices)
-- Handling CUI for DoD contracts
+- Handling CUI for DoW contracts
 - Multi-cloud (AWS + Azure)
 - C3PAO assessment required
 

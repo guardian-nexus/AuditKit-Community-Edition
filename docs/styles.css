@@ -471,14 +471,6 @@ tr:last-child td { border-bottom: none; }
   margin-top: auto;
 }
 
-/* ---------- Code Block Separators ---------- */
-.code-block .result-separator {
-  display: block;
-  border: none;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  margin: 1rem 0;
-}
-
 /* ---------- Carousel ---------- */
 .carousel-wrapper {
   position: relative;

@@ -192,7 +192,7 @@ bash fixes.sh
 
 **Timeline:** Most startups fix 80%+ of issues in 2-4 weeks
 
-### For DoD Contractors: CMMC Compliance
+### For DoW Contractors: CMMC Compliance
 
 **Goal:** Self-assess CMMC Level 1 before C3PAO assessment
 

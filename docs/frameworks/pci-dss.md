@@ -325,7 +325,7 @@ Based on Verizon Payment Security Reports:
 |-----------|-------|---------------------|
 | **SOC2** | Trust Services | Medium - encryption, access control, logging |
 | **HIPAA** | Healthcare data | Medium - similar technical controls |
-| **CMMC** | DoD contractors | High - many aligned security controls |
+| **CMMC** | DoW contractors | High - many aligned security controls |
 | **ISO 27001** | Information security | High - comprehensive security management |
 
 **Key PCI-DSS differentiators:**

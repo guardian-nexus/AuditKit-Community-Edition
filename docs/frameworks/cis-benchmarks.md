@@ -94,7 +94,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 | **CIS Benchmarks** | Security hardening | Technical configuration | Proactive security posture |
 | **SOC2** | Audit compliance | Trust services | SaaS sales requirements |
 | **PCI-DSS** | Payment security | Cardholder data | Processing payments |
-| **CMMC** | Defense contracts | CUI protection | DoD contractor requirements |
+| **CMMC** | Defense contracts | CUI protection | DoW contractor requirements |
 | **NIST 800-53** | Federal compliance | Risk management | Government work |
 
 **Best Practice:** Use CIS Benchmarks alongside compliance frameworks for comprehensive security.

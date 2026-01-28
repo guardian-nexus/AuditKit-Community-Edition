@@ -28,7 +28,7 @@
     </nav>
 
     <div class="alert-bar">
-        CMMC NOW MANDATORY: DoD contracts require CMMC compliance (effective Nov 10, 2025) &middot;
+        CMMC NOW MANDATORY: DoW contracts require CMMC compliance (effective Nov 10, 2025) &middot;
         <a href="/pro/">Identify all 110 gaps in 30 minutes &rarr;</a>
     </div>
 
@@ -85,17 +85,17 @@
 <span class="prompt">$</span> <span class="command">auditkit scan -provider aws -framework soc2 -verbose</span>
 
 <span class="comment"># Scanning 64 SOC2 controls across AWS...</span>
-<hr class="result-separator">
+
 <span class="fail">&#10007; FAIL</span> | <span class="framework">CC6.6</span> | MFA Not Enforced
-<span class="label">Evidence:</span>    3 IAM users without MFA: admin-user, deploy-bot, john.doe
-<span class="label">Remediation:</span> aws iam enable-mfa-device --user-name admin-user
-<span class="label">Screenshot:</span>  IAM &rarr; Users &rarr; Security credentials &rarr; Show MFA enabled
-<span class="label">Console URL:</span> <span class="url">https://console.aws.amazon.com/iam/home#/users</span>
-<hr class="result-separator">
+  <span class="label">Evidence:</span>    3 IAM users without MFA: admin-user, deploy-bot, john.doe
+  <span class="label">Remediation:</span> aws iam enable-mfa-device --user-name admin-user
+  <span class="label">Screenshot:</span>  IAM &rarr; Users &rarr; Security credentials &rarr; Show MFA enabled
+  <span class="label">Console URL:</span> <span class="url">https://console.aws.amazon.com/iam/home#/users</span>
+
 <span class="pass">&#10003; PASS</span> | <span class="framework">CC6.1</span> | CloudTrail Logging Enabled
-<span class="label">Evidence:</span>    CloudTrail enabled in all regions, logs encrypted
-<span class="label">Frameworks:</span>  SOC2 (CC6.1), PCI-DSS (10.2.2), CMMC (AU.L2-3.3.1)
-<hr class="result-separator">
+  <span class="label">Evidence:</span>    CloudTrail enabled in all regions, logs encrypted
+  <span class="label">Frameworks:</span>  SOC2 (CC6.1), PCI-DSS (10.2.2), CMMC (AU.L2-3.3.1)
+
 <span class="comment"># Scan complete: 58/64 passing (91%)</span>
 <span class="comment"># PDF report: compliance-report.pdf</span>
 <span class="comment"># Evidence tracker: evidence-tracker.html</span>
@@ -230,22 +230,22 @@
 
             <div class="code-block"><span class="comment"># Quick install (Go required)</span>
 go install github.com/guardian-nexus/auditkit/scanner/cmd/auditkit@latest
-<hr class="result-separator">
+
 <span class="comment"># Or build from source</span>
 git clone https://github.com/guardian-nexus/auditkit.git
 cd auditkit/scanner && go build ./cmd/auditkit
-<hr class="result-separator">
+
 <span class="comment"># Run your first scan</span>
 ./auditkit scan -framework soc2 -format pdf -output report.pdf
-<hr class="result-separator">
+
 <span class="comment"># Multi-framework scan</span>
 ./auditkit scan -framework all -format pdf
-<hr class="result-separator">
+
 <span class="comment"># Azure scan</span>
 az login
 export AZURE_SUBSCRIPTION_ID="your-subscription-id"
 ./auditkit scan -provider azure -framework soc2
-<hr class="result-separator">
+
 <span class="comment"># GCP scan</span>
 gcloud auth application-default login
 export GOOGLE_CLOUD_PROJECT="your-project-id"
@@ -270,7 +270,7 @@ export GOOGLE_CLOUD_PROJECT="your-project-id"
   Root account has MFA enabled
   <span class="comment">&rarr; Meets SOC2 CC6.6, PCI DSS 8.3.1,
     HIPAA 164.312(a)(2)(i)</span>
-<hr class="result-separator">
+
 <span class="pass">&#10003; PASS</span> | <span class="command">CC6.3</span> - Encryption at Rest
   All 15 S3 buckets have encryption enabled
   <span class="comment">&rarr; Meets SOC2 CC6.3, PCI DSS 3.4,
@@ -285,13 +285,13 @@ export GOOGLE_CLOUD_PROJECT="your-project-id"
   <span class="label">Issue:</span> SSH open to 0.0.0.0/0
   Security Group: sg-0ab56571076bcff37 (port 22)
   <span class="comment">&rarr; Violates PCI DSS 1.2.1</span>
-<hr class="result-separator">
+
 <span class="fix">Fix:</span>
   aws ec2 revoke-security-group-ingress \
     --group-id sg-0ab56571076bcff37 \
     --protocol tcp --port 22 \
     --cidr 0.0.0.0/0
-<hr class="result-separator">
+
 <span class="command">Evidence needed:</span>
   1. Go to EC2 &rarr; Security Groups
   2. Screenshot 'Inbound rules' tab
@@ -354,7 +354,7 @@ export GOOGLE_CLOUD_PROJECT="your-project-id"
         <div class="container text-center">
             <h2>Need CMMC Level 2?</h2>
             <p class="text-lg mb-3" style="color: var(--slate-300);">
-                DoD contractors handling CUI must comply. Identify all 110 gaps in 30 minutes vs 30 days.
+                DoW contractors handling CUI must comply. Identify all 110 gaps in 30 minutes vs 30 days.
             </p>
 
             <div class="grid-4 mb-3">

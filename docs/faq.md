@@ -193,7 +193,7 @@ All read-only, no write permissions required.
 **CMMC Level 1 (17 practices) - FREE**
 - Protects Federal Contract Information (FCI)
 - Basic cybersecurity hygiene
-- Required for all DoD contractors
+- Required for all DoW contractors
 - Self-assessment allowed
 
 **CMMC Level 2 (110 practices) - PRO**
@@ -204,7 +204,7 @@ All read-only, no write permissions required.
 
 **Example CUI:** Technical specs, mission plans, personnel records, logistics data
 
-**If your DoD contract mentions CUI, you need Level 2.**
+**If your DoW contract mentions CUI, you need Level 2.**
 
 ### How much does CMMC Level 2 Pro cost?
 
@@ -219,9 +219,9 @@ Compare to:
 
 ### When is the CMMC deadline?
 
-**November 10, 2025** - CMMC requirements start appearing in DoD contracts
+**November 10, 2025** - CMMC requirements start appearing in DoW contracts
 
-DoD contractors must be compliant when specified in contract solicitations. Many contracts now include CMMC Level 1 or Level 2 requirements.
+DoW contractors must be compliant when specified in contract solicitations. Many contracts now include CMMC Level 1 or Level 2 requirements.
 
 **[Start your assessment now →](./getting-started.md)**
 
