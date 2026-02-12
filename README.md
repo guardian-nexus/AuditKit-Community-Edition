@@ -7,6 +7,8 @@
 [![Version](https://img.shields.io/badge/version-v0.8.1-green.svg)](https://github.com/guardian-nexus/auditkit/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://auditkit.substack.com)
 
+**Need CMMC Level 2, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
+
 ---
 
 ## Quick Start
@@ -63,7 +65,7 @@ AuditKit scans your cloud infrastructure for compliance gaps and security miscon
 | **SOC2 Type II** | 64 | 64 | 64 | SaaS customer requirements |
 | **PCI-DSS v4.0** | All 12 Req | All 12 Req | All 12 Req | Payment card processing |
 | **CMMC Level 1** | 17 | 17 | 17 | DoD contractor compliance (FCI) |
-| **CMMC Level 2** | 110 | 110 | 110 | DoD contractor compliance (CUI) - [Pro](https://auditkit.io/pro) |
+| **CMMC Level 2** | 110 | 110 | 110 | DoD contractor compliance (CUI) - [AuditKit](https://auditkit.io/) |
 | **NIST 800-53 Rev 5** | ~150 | ~150 | ~150 | Federal contractor requirements / FedRAMP |
 | **ISO 27001:2022** | ~60 | ~60 | ~60 | International information security |
 | **HIPAA Security Rule** | 70 | 62 | 40 | Healthcare data protection |
@@ -78,9 +80,9 @@ AuditKit scans your cloud infrastructure for compliance gaps and security miscon
 
 ---
 
-## Free vs Pro
+## Community Edition vs AuditKit
 
-| Feature | Free | Pro ($297/mo) |
+| Feature | Community Edition | AuditKit ($297/mo) |
 |---------|------|---------------|
 | **Cloud Providers** | AWS, Azure, GCP, M365 | Same |
 | **Compliance Frameworks** | SOC2, PCI-DSS, CMMC L1, NIST 800-53 | Same |
@@ -93,7 +95,7 @@ AuditKit scans your cloud infrastructure for compliance gaps and security miscon
 | **Desktop GUI** | - | Web dashboard at localhost:1337 |
 | **Support** | Community (GitHub Issues) | Priority email + 14-day trial |
 
-**[Compare Features →](./docs/pricing.md)** • **[Start Pro Trial →](https://auditkit.io/pro)**
+**[Compare Features →](./docs/pricing.md)** • **[Start Free Trial →](https://auditkit.io/)**
 
 ---
 
@@ -119,11 +121,11 @@ Improvements:
 
 ---
 
-## AuditKit Pro Desktop (v0.9.0)
+## AuditKit Desktop (v0.9.0)
 
-**Pro customers now get a beautiful web-based dashboard** that runs locally on your machine.
+**AuditKit customers now get a beautiful web-based dashboard** that runs locally on your machine.
 
-![AuditKit Pro Desktop Dashboard](./docs/examples/screenshots/auditkitwebgui-dashboard.png)
+![AuditKit Desktop Dashboard](./docs/examples/screenshots/auditkitwebgui-dashboard.png)
 
 ### Desktop Features
 - **Visual Dashboard** - Real-time compliance scores and trends
@@ -141,7 +143,7 @@ Improvements:
 |-----------|----------|--------------|
 | <img src="./docs/examples/screenshots/auditkitwebgui-dashboard.png" width="280" alt="Dashboard"> | <img src="./docs/examples/screenshots/auditkitwebgui-findings.png" width="280" alt="Findings"> | <img src="./docs/examples/screenshots/auditkitwebgui-scanhistory.png" width="280" alt="Scan History"> |
 
-### Quick Start (Pro Desktop)
+### Quick Start (Desktop)
 ```bash
 # Set license and run
 export AUDITKIT_PRO_LICENSE="your-license-key"
@@ -151,7 +153,7 @@ export AUDITKIT_PRO_LICENSE="your-license-key"
 # Change port if needed: ./auditkit-pro-desktop --port 8080
 ```
 
-**[Learn More About Pro →](https://auditkit.io/pro)** • **[Start 14-Day Trial →](https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01)**
+**[Learn More →](https://auditkit.io/)** • **[Start 14-Day Trial →](https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01)**
 
 ---
 
@@ -159,7 +161,7 @@ export AUDITKIT_PRO_LICENSE="your-license-key"
 
 **For Startups:** Free SOC2 prep without $50K consultants  
 **For Security Teams:** CIS Benchmarks for proactive hardening  
-**For DoD Contractors:** CMMC Level 1 (Free) or Level 2 (Pro) compliance  
+**For DoD Contractors:** CMMC Level 1 (Community Edition) or [Level 2](https://auditkit.io/) compliance  
 **For Multi-Cloud:** Single tool for AWS + Azure + GCP + M365  
 **For DevOps:** JSON output for CI/CD integration
 
@@ -320,7 +322,7 @@ prowler aws --output-formats json -o prowler-output     # Run Prowler first
 - Evidence tracker now saves progress across browser sessions
 - Prowler auto-detects cloud provider from scan results
 
-### Coming in Pro v0.9.1
+### Coming in v0.9.1
 - Daemon stop/status commands for continuous monitoring
 - Azure MFA checks via Microsoft Graph API
 - Windows daemon support
@@ -363,7 +365,7 @@ We need help with:
 - **Community Support:** [GitHub Issues](https://github.com/guardian-nexus/auditkit/issues)
 - **Security Issues:** [SECURITY.md](./SECURITY.md)
 - **Newsletter:** [auditkit.substack.com](https://auditkit.substack.com)
-- **Pro Support:** Priority email + Slack channel (info@auditkit.io)
+- **AuditKit Support:** Priority email + Slack channel (info@auditkit.io)
 
 ---
 
@@ -385,7 +387,7 @@ AuditKit is built by current defense sector professionals with deep expertise in
 
 **Our Philosophy:**
 - Ship features, not promises
-- Open source first, Pro tier for advanced needs
+- Open source first, paid tier for advanced needs
 - Documentation that doesn't suck
 - Responsive support (we actually read your issues)
 
