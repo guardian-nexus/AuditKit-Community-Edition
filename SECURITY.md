@@ -493,33 +493,39 @@ AuditKit uses standard GCP SDK authentication:
 
 ### License Key Security
 
-**AuditKit Pro requires a license key:**
+**AuditKit Pro uses a `.lic` license file:**
 
 ```bash
-export AUDITKIT_PRO_LICENSE=AKP-XXXXXXXX-XXXXXXXXXX-XXXXXXXX
+# Save the .lic file received after purchase/trial signup
+mkdir -p ~/.auditkit-pro
+cp ~/Downloads/license.lic ~/.auditkit-pro/license.lic
+
+# Activation is automatic on first run — no separate activate command needed
+
+# Legacy method (deprecated):
+# export AUDITKIT_PRO_LICENSE=AKP-XXXXXXXX-XXXXXXXXXX-XXXXXXXX
 ```
 
 **License Validation Security:**
-- License keys use HMAC-SHA256 signatures for integrity verification
-- The embedded HMAC key in the binary is for VERIFICATION ONLY (cannot create licenses)
-- License signing happens server-side on secure infrastructure
+- License files use Ed25519 asymmetric signatures for integrity verification
+- The embedded public key in the binary is for VERIFICATION ONLY (cannot create licenses)
+- License signing happens server-side with the private key on secure infrastructure
 - Hardware fingerprinting prevents unauthorized sharing
 - Offline validation after initial activation (no phone-home during scans)
 
 **Best Practices:**
-- Store license key in environment variable (not in code)
-- Use secrets management (AWS Secrets Manager, Azure Key Vault, GCP Secret Manager)
-- Don't commit license keys to version control
-- Rotate keys if compromised (contact support)
+- Store `.lic` file at `~/.auditkit-pro/license.lic` (default location)
+- Restrict file permissions: `chmod 600 ~/.auditkit-pro/license.lic`
+- Don't commit `.lic` files to version control
+- Contact support if license is compromised
 - Use read-only filesystem mounts in containers when possible
 
 ### Hardware Lock
 
-**Pro licenses are locked to one machine:**
-- License validates machine fingerprint
+**Pro licenses are locked to one machine (both CLI and Desktop):**
+- License validates machine fingerprint on first run
 - Prevents unauthorized sharing
-- Deactivate before moving to new machine: `./auditkit-pro deactivate`
-- Reactivate on new machine: `./auditkit-pro activate`
+- Contact support to transfer license to a new machine
 
 ### Multi-Account Scanning Security
 
@@ -671,32 +677,32 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 
 **AuditKit Pro:**
 - **Fully offline capable** - No internet connection required for activation or scanning
-- License validation uses embedded HMAC key (offline verification)
+- License validation uses embedded Ed25519 public key (offline verification)
 - Hardware fingerprint stored locally
 - No phone-home during scans or activation
 - Perfect for SCIFs, classified environments, and air-gapped networks
 
 **Air-Gap Installation Process (Pro):**
 ```bash
-# 1. Purchase license (requires internet to get license key)
-# You receive: AUDITKIT_PRO_LICENSE=AKP-XXXXXXXX-XXXXXXXXXX-XXXXXXXX
+# 1. Purchase license (requires internet to receive .lic file)
+# You receive: license.lic (Ed25519-signed license file)
 
-# 2. On air-gapped machine (fully offline):
-# Set license key
-export AUDITKIT_PRO_LICENSE=AKP-XXXXXXXX-XXXXXXXXXX-XXXXXXXX
+# 2. Transfer the .lic file and Pro binary to the air-gapped machine
+#    (e.g., via USB or secure file transfer)
 
-# Activate license (offline - no internet required)
-./auditkit-pro activate
+# 3. On air-gapped machine (fully offline):
+mkdir -p ~/.auditkit-pro
+cp /media/usb/license.lic ~/.auditkit-pro/license.lic
 
-# Run scans (fully offline)
+# Activation is automatic on first run (offline - no internet required)
 ./auditkit-pro scan -provider aws -framework cmmc
 ```
 
 **How Offline Activation Works:**
-- License keys are pre-signed with HMAC-SHA256 on secure server
-- Binary contains verification key (can verify, cannot forge)
-- Activation validates signature locally
-- Creates hardware-locked files on disk
+- License files are pre-signed with Ed25519 on secure server
+- Binary contains public verification key (can verify, cannot forge)
+- First run validates signature locally and locks to hardware
+- Creates hardware-locked state on disk
 - No network calls during activation or scanning
 
 ### Export Control Compliance

@@ -145,12 +145,17 @@ Improvements:
 
 ### Quick Start (Desktop)
 ```bash
-# Set license and run
-export AUDITKIT_PRO_LICENSE="your-license-key"
+# Save your .lic file (received after purchase/trial signup)
+mkdir -p ~/.auditkit-pro
+cp ~/Downloads/license.lic ~/.auditkit-pro/license.lic
+
+# Run — activation is automatic on first run
 ./auditkit-pro-desktop
 
 # Browser opens automatically to http://localhost:1337
 # Change port if needed: ./auditkit-pro-desktop --port 8080
+
+# Legacy method (deprecated): export AUDITKIT_PRO_LICENSE="AKP-..."
 ```
 
 **[Learn More →](https://auditkit.io/)** • **[Start 14-Day Trial →](https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01)**

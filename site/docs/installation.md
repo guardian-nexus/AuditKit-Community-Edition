@@ -520,19 +520,20 @@ auditkit version
 **For AuditKit customers:**
 
 1. **[Sign up for trial →](https://auditkit.io/pro/)**
-2. Receive license key via email
+2. Receive `.lic` license file via email
 3. Download Pro binary from customer portal
-4. Activate with license key:
+4. Save your license file and run:
 
 ```bash
 # Install Pro binary (note: different binary name)
 chmod +x auditkit-pro
 sudo mv auditkit-pro /usr/local/bin/auditkit-pro
 
-# Activate license
-auditkit-pro activate --license-key YOUR-LICENSE-KEY
+# Save license file (received after purchase/trial signup)
+mkdir -p ~/.auditkit-pro
+cp ~/Downloads/license.lic ~/.auditkit-pro/license.lic
 
-# Verify Pro features enabled
+# Activation is automatic on first run — no separate command needed
 auditkit-pro version  # Shows "Pro" edition
 
 # Run Pro scans
@@ -540,6 +541,8 @@ auditkit-pro scan -provider aws -framework cmmc-l2
 ```
 
 **Note:** Pro version uses `auditkit-pro` command, not `auditkit`
+
+**Legacy method (deprecated):** The old `export AUDITKIT_PRO_LICENSE=AKP-...` environment variable still works but is deprecated in favor of the `.lic` file.
 
 **[Pro feature details →](./pricing.md)**
 

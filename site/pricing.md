@@ -329,8 +329,8 @@ go build ./cmd/auditkit
 
 1. **[Start 14-day free trial →](https://auditkit.io/pro/)**
 2. No credit card required
-3. Download Pro binary
-4. Activate with license key
+3. Download Pro binary and save your `.lic` file to `~/.auditkit-pro/license.lic`
+4. Run `auditkit-pro` — activation is automatic on first run
 5. Start scanning with Pro features
 
 **Questions?** Email info@auditkit.io
