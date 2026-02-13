@@ -182,8 +182,12 @@ pre code { background: none; padding: 0; }
 
 /* ---------- Page Header ---------- */
 .page-header {
-  padding: 5rem 1.5rem 4rem;
+  padding: 5rem 1.5rem 2rem;
   text-align: center;
+}
+
+.page-header + .section {
+  padding-top: 2rem;
 }
 
 .page-header .subtitle {
@@ -197,8 +201,12 @@ pre code { background: none; padding: 0; }
 .page-header-dark {
   background: var(--navy);
   color: var(--white);
-  padding: 5rem 1.5rem 4rem;
+  padding: 5rem 1.5rem 2rem;
   text-align: center;
+}
+
+.page-header-dark + .section {
+  padding-top: 2rem;
 }
 
 .page-header-dark h1 { color: var(--white); }
@@ -655,7 +663,8 @@ tr:last-child td { border-bottom: none; }
   .hero h1, .hero-dark h1 { font-size: 2.5rem; }
   .section { padding: 3.5rem 1.25rem; }
   .hero, .hero-dark { padding: 4rem 1.25rem; }
-  .page-header, .page-header-dark { padding: 3rem 1.25rem 2.5rem; }
+  .page-header, .page-header-dark { padding: 3rem 1.25rem 1.5rem; }
+  .page-header + .section { padding-top: 1.5rem; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: repeat(2, 1fr); }
   .btn-group { flex-direction: column; align-items: stretch; }
