@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Scan Outputs - AuditKit</title>
+    <meta name="description" content="Example terminal outputs from AuditKit compliance scans across AWS and Azure.">
+    <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <nav class="site-nav" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <img src="../../auditkit-logo-dark.svg" alt="AuditKit">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+            <div class="nav-links">
+                <a href="/#features">Features</a>
+                <a href="/#cmmc">CMMC</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/docs/">Docs</a>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="nav-cta" onclick="if (window.auditKitConsent && window.auditKitConsent.marketing && typeof gtag === 'function') { gtag('event', 'conversion', {'send_to': 'AW-17730440946/q5TvCL37jsAbEPKdxIZC', 'value': 297.0, 'currency': 'USD'}); } return true;">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main">
+    <section class="page-header">
+        <div class="container">
+            <h1>Sample Scan Outputs</h1>
+            <p class="subtitle">Real terminal output from AuditKit compliance scans.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container-prose">
+            <h2>AWS Scans</h2>
+            <ul>
+                <li><a href="./aws-soc2-scan.txt">AWS SOC2 Scan</a> — SOC2 Type II compliance check</li>
+                <li><a href="./aws-pci-scan.txt">AWS PCI-DSS Scan</a> — PCI-DSS v4.0 compliance check</li>
+                <li><a href="./aws-cmmc-scan.txt">AWS CMMC Scan</a> — CMMC Level 1 compliance check</li>
+            </ul>
+
+            <h2>Azure Scans</h2>
+            <ul>
+                <li><a href="./azure-cmmc-scan.txt">Azure CMMC Scan</a> — CMMC Level 1 compliance check</li>
+            </ul>
+
+            <p style="margin-top: 2rem;"><a href="../">&larr; Back to Examples</a></p>
+        </div>
+    </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p style="margin-bottom: 2rem; color: var(--slate-300); font-size: 1rem;">
+                <strong style="color: var(--white);">Built for defense contractors, by engineers who understand compliance.</strong>
+            </p>
+
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/">AuditKit</a></li>
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/community.html">Community Edition (Open Source)</a></li>
+                        <li><a href="/about.html">About</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="/docs/getting-started.html">Quick Start Guide</a></li>
+                        <li><a href="/docs/installation.html">Installation</a></li>
+                        <li><a href="/docs/cli-reference.html">CLI Reference</a></li>
+                        <li><a href="/docs/faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Frameworks</h4>
+                    <ul>
+                        <li><a href="/docs/frameworks/cmmc.html">CMMC</a></li>
+                        <li><a href="/docs/frameworks/soc2.html">SOC2</a></li>
+                        <li><a href="/docs/frameworks/pci-dss.html">PCI-DSS</a></li>
+                        <li><a href="/docs/frameworks/hipaa.html">HIPAA</a></li>
+                        <li><a href="/docs/frameworks/nist-800-53.html">NIST 800-53</a></li>
+                        <li><a href="/docs/frameworks/iso27001.html">ISO 27001</a></li>
+                        <li><a href="/docs/frameworks/fedramp.html">FedRAMP</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/docs/setup/aws.html">AWS Setup</a></li>
+                        <li><a href="/docs/setup/azure.html">Azure Setup</a></li>
+                        <li><a href="/docs/setup/gcp.html">GCP Setup</a></li>
+                        <li><a href="/docs/setup/m365.html">M365 Setup</a></li>
+                        <li><a href="/examples/">Examples</a></li>
+                        <li><a href="https://github.com/guardian-nexus/auditkit">GitHub</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Sales</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>Community Edition is Apache 2.0. AuditKit is commercially licensed.</p>
+                <p>&copy; 2026 AuditKit</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../cookie-consent.js"></script>
+    <script>
+        (function() {
+            var toggle = document.querySelector('.nav-toggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function() {
+                    var open = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', open);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
