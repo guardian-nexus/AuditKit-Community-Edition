@@ -4,7 +4,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v0.8.1-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
+[![Version](https://img.shields.io/badge/version-v0.8.2-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://auditkit.substack.com)
 
 **Need CMMC Level 2, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
@@ -99,18 +99,22 @@ AuditKit scans your cloud infrastructure for compliance gaps and security miscon
 
 ---
 
-## Recent Changes (v0.8.1)
+## Recent Changes (v0.8.2)
 
 **February 2026**
+
+Fixes:
+- Removed stubbed `report` command from CLI (use `auditkit scan -format pdf` instead)
+- Fixed documentation for FedRAMP baseline filtering (was marked "coming soon" but fully works)
+- Updated HIPAA control count to ~15 (was understated)
+- Removed overclaimed features from website and docs
+
+### Previous: v0.8.1 (February 2026)
 
 New Features:
 - **Prowler Integration** - Import Prowler scan results and convert to AuditKit format with full framework mapping
 - **Azure Fix Scripts** - Generate remediation scripts for Azure (AWS and GCP already supported)
 - **Evidence Tracker HTML** - Interactive HTML checklist for evidence collection with progress tracking
-
-Improvements:
-- Evidence tracker now includes localStorage persistence, export to JSON, and print support
-- Prowler integration supports AWS, Azure, and GCP findings with automatic provider detection
 
 ### Previous: v0.8.0 (January 2026)
 
@@ -316,21 +320,13 @@ prowler aws --output-formats json -o prowler-output     # Run Prowler first
 
 ---
 
-## What's New in v0.8.1
+## What's New in v0.8.2
 
-### New Features
-- **Prowler Integration:** Import Prowler AWS/Azure/GCP results and map to compliance frameworks
-- **Azure Fix Scripts:** Generate remediation scripts for Azure resources
-- **Evidence Tracker HTML:** Interactive checklist with progress bar, localStorage persistence, and JSON export
-
-### Improvements
-- Evidence tracker now saves progress across browser sessions
-- Prowler auto-detects cloud provider from scan results
-
-### Coming in v0.9.1
-- Daemon stop/status commands for continuous monitoring
-- Azure MFA checks via Microsoft Graph API
-- Windows daemon support
+### Fixes
+- Removed broken `report` command stub (use `auditkit scan -format pdf`)
+- FedRAMP baseline filtering (`fedramp-low`, `fedramp-moderate`, `fedramp-high`) documented as working
+- Updated HIPAA control count to ~15 across AWS, Azure, and GCP
+- Cleaned up overclaimed features in docs and website
 
 **[Full Release Notes →](./CHANGELOG.md)**
 
