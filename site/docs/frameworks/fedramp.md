@@ -113,15 +113,15 @@ auditkit scan -provider aws -framework 800-53 -format pdf -output fedramp-report
 auditkit scan -provider aws -framework 800-53 -format csv -output fedramp-gaps.csv
 ```
 
-**Coming in v0.8.0:**
+**FedRAMP baseline filtering:**
 ```bash
-# FedRAMP Low baseline filtering (coming soon)
+# FedRAMP Low baseline
 auditkit scan -provider aws -framework fedramp-low
 
-# FedRAMP Moderate baseline filtering (coming soon)
+# FedRAMP Moderate baseline
 auditkit scan -provider aws -framework fedramp-moderate
 
-# FedRAMP High baseline filtering (coming soon)
+# FedRAMP High baseline
 auditkit scan -provider aws -framework fedramp-high
 ```
 

@@ -568,7 +568,6 @@ const (
 	MediumRisk        = "MEDIUM RISK:"
 	Compliant         = "COMPLIANT:"
 	ManualReview      = "MANUAL REVIEW REQUIRED:"
-	NotImplemented    = "NOT IMPLEMENTED:"
 	CheckError        = "ERROR:"
 )
 

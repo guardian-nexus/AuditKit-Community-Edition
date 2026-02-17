@@ -150,12 +150,6 @@ auditkit version
 
 ---
 
-### Option 4: Docker (Coming Soon)
-
-Docker support planned for v0.8.0.
-
----
-
 ## Installing Cloud CLI Tools
 
 AuditKit requires cloud CLI tools for authentication.

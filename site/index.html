@@ -134,7 +134,7 @@
         <div class="container">
             <h2 class="text-center">One Platform, Two Interfaces</h2>
             <p class="text-center text-muted text-lg mb-3">
-                A CLI scanner for engineers who automate everything, and a desktop dashboard for teams who need visibility. Both included.
+                A CLI scanner for engineers who automate everything, and a desktop dashboard for teams who need visibility. Both included with AuditKit Pro.
             </p>
 
             <div class="grid-2" style="max-width: 1000px; margin: 0 auto;">
@@ -324,10 +324,11 @@ go build ./cmd/auditkit-pro
         </div>
     </section>
 
-    <!-- Core Features -->
+    <!-- Pro Features -->
     <section class="section" id="features">
         <div class="container">
-            <h2 class="text-center">Core Features</h2>
+            <h2 class="text-center">Pro Features</h2>
+            <p class="text-center text-muted text-lg mb-3">Available with an AuditKit Pro subscription.</p>
 
             <div class="grid-3">
                 <div class="card card-flex">
@@ -359,7 +360,7 @@ go build ./cmd/auditkit-pro
                 <div class="card card-flex">
                     <h3>Drift Detection</h3>
                     <p>Compare dev/staging/prod environments to identify configuration drift. Ensures consistent security posture across all environments before your audit.</p>
-                    <div class="code-inline">./auditkit-pro drift-check -environments "dev,prod"</div>
+                    <div class="code-inline">./auditkit-pro drift-check --env dev:ACCT1 --env prod:ACCT2</div>
                 </div>
 
                 <div class="card card-flex">

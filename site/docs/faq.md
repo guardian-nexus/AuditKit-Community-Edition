@@ -102,7 +102,7 @@ Compare to traditional costs:
 | CMMC Level 1 | Production | 17 practices |
 | CMMC Level 2 | Pro only | 110 practices |
 | NIST 800-53 Rev 5 | Production | ~150 technical controls |
-| HIPAA | Experimental | ~10 controls |
+| HIPAA | Experimental | ~15 controls |
 
 **[Framework details →](./frameworks/)**
 
@@ -333,8 +333,6 @@ Not in the Free version. Reports follow standard compliance framework formats.
 
 **Pro version:** Reports include:
 - Watermarking with license info
-- Company branding (coming soon)
-- Custom evidence fields (coming soon)
 
 ### What's in the PDF report?
 

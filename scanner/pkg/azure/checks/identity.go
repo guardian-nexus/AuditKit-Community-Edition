@@ -38,9 +38,7 @@ func (c *IdentityChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *IdentityChecks) checkGlobalAdminMFA(ctx context.Context) CheckResult {
-	// In production, would use Microsoft Graph API to check
-	// For now, return a placeholder that shows the check structure
-	
+	// Graph API requires admin consent; return manual check for community edition
 	return CheckResult{
 		Control:   "CC6.6",
 		Name:      "Global Administrator MFA",

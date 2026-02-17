@@ -25,7 +25,7 @@ import (
 	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
 )
 
-const CurrentVersion = "v0.8.1"
+const CurrentVersion = "v0.8.2"
 
 type ComplianceResult struct {
 	Timestamp       time.Time       `json:"timestamp"`
@@ -100,8 +100,6 @@ func main() {
 		runScan(*provider, *profile, *framework, *format, *output, *verbose, *full, *services, *offlineMode, *cacheFile)
 	case "integrate":
 		runIntegration(*source, *file, *format, *output, *verbose)
-	case "report":
-		generateReport(*format, *output)
 	case "evidence":
 		runEvidenceTracker(*provider, *profile, *output)
 	case "fix":
@@ -129,7 +127,6 @@ func printUsage() {
 Usage:
   auditkit scan [options]        Scan infrastructure for compliance
   auditkit integrate [options]   Import external tool results (ScubaGear, Prowler)
-  auditkit report [options]      Generate audit-ready report
   auditkit evidence [options]    Track evidence collection progress
   auditkit fix [options]         Generate remediation script
   auditkit progress              Show compliance improvement over time
@@ -2631,8 +2628,3 @@ func generateEvidenceTrackerHTML(controls []tracker.ControlResult, accountID str
 	return html
 }
 
-func generateReport(format, output string) {
-	fmt.Println("Generating audit report from last scan...")
-	fmt.Println("Note: This feature requires cached scan results (not yet implemented)")
-	fmt.Println("For now, run: auditkit scan -format pdf")
-}
