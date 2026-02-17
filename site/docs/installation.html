@@ -8,7 +8,7 @@
     <link rel="icon" type="image/svg+xml" href="../auditkit-logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -50,7 +50,7 @@
 
             <p><strong>Requirements:</strong></p>
             <ul>
-                <li>Go 1.19 or newer (for building from source)</li>
+                <li>Go 1.21 or newer (for building from source)</li>
                 <li>Cloud CLI tools (AWS CLI, Azure CLI, or gcloud CLI)</li>
                 <li>Read-only cloud credentials</li>
                 <li>Internet connection (for downloading and scanning)</li>
@@ -70,7 +70,7 @@
 
             <h4>Linux</h4>
             <pre class="code-block"><code># Download latest release
-wget https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/download/v0.8.0/auditkit-linux-amd64
+wget https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64
 
 # Make executable
 chmod +x auditkit-linux-amd64
@@ -83,7 +83,7 @@ auditkit version</code></pre>
 
             <h4>macOS</h4>
             <pre class="code-block"><code># Download latest release
-curl -L https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/download/v0.8.0/auditkit-darwin-amd64 -o auditkit
+curl -L https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-amd64 -o auditkit
 
 # Make executable
 chmod +x auditkit
@@ -99,7 +99,7 @@ auditkit version</code></pre>
 
             <h4>Windows</h4>
             <pre class="code-block"><code># Download from GitHub Releases page
-# https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/download/v0.8.0/auditkit-windows-amd64.exe
+# https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-windows-amd64.exe
 
 # Rename to auditkit.exe
 Rename-Item auditkit-windows-amd64.exe auditkit.exe
@@ -111,11 +111,11 @@ Rename-Item auditkit-windows-amd64.exe auditkit.exe
             <p>For developers or custom builds</p>
 
             <h4>Prerequisites</h4>
-            <pre class="code-block"><code># Install Go 1.19 or newer
+            <pre class="code-block"><code># Install Go 1.21 or newer
 # Download from: https://go.dev/dl/
 
 # Verify Go installation
-go version  # Should show 1.19 or higher</code></pre>
+go version  # Should show 1.21 or higher</code></pre>
 
             <h4>Clone and Build</h4>
             <pre class="code-block"><code># Clone repository
@@ -237,8 +237,8 @@ gcloud --version</code></pre>
             <pre class="code-block"><code>auditkit version</code></pre>
 
             <p><strong>Expected output:</strong></p>
-            <pre class="code-block"><code>AuditKit v0.8.0
-Built: 2025-10-19</code></pre>
+            <pre class="code-block"><code>AuditKit v0.8.1
+Built: 2026-02-17</code></pre>
 
             <h3>Check Cloud CLI Tools</h3>
             <pre class="code-block"><code># AWS
@@ -303,7 +303,7 @@ xattr -d com.apple.quarantine auditkit
 
             <h3>Build errors with Go</h3>
             <p><strong>Cause:</strong> Go version too old or dependencies missing</p>
-            <pre class="code-block"><code># Update Go to 1.19 or newer
+            <pre class="code-block"><code># Update Go to 1.21 or newer
 go version
 
 # Clean build cache
@@ -317,17 +317,18 @@ go build ./cmd/auditkit</code></pre>
 
             <ol>
                 <li><a href="/">Sign up for trial →</a></li>
-                <li>Receive license key via email</li>
+                <li>Receive <code>.lic</code> license file via email</li>
                 <li>Download Pro binary from customer portal</li>
-                <li>Activate with license key</li>
+                <li>Save license file to <code>~/.auditkit-pro/license.lic</code></li>
             </ol>
 
             <pre class="code-block"><code># Install Pro binary
 chmod +x auditkit-pro
 sudo mv auditkit-pro /usr/local/bin/auditkit-pro
 
-# Activate license
-auditkit-pro activate --license-key YOUR-LICENSE-KEY
+# Save license file (attached to your welcome email)
+mkdir -p ~/.auditkit-pro
+cp license.lic ~/.auditkit-pro/license.lic
 
 # Verify Pro features enabled
 auditkit-pro version  # Shows "Pro" edition
@@ -361,7 +362,7 @@ auditkit-pro scan -provider aws -framework cmmc-l2</code></pre>
     <footer class="site-footer">
         <div class="footer-inner">
             <p style="margin-bottom: 2rem; color: var(--slate-300); font-size: 1rem;">
-                <strong style="color: var(--white);">Built for defense contractors, by engineers who understand compliance.</strong>
+                <strong style="color: var(--white);">Built for compliance teams, by engineers who understand the audit process.</strong>
             </p>
 
             <div class="footer-grid">
@@ -407,19 +408,20 @@ auditkit-pro scan -provider aws -framework cmmc-l2</code></pre>
                         <li><a href="/docs/setup/m365.html">M365 Setup</a></li>
                         <li><a href="/examples/">Examples</a></li>
                         <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition">GitHub</a></li>
-                        <li><a href="mailto:hello@auditkit.io">Contact Sales</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Us</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
                 <p>Community Edition is Apache 2.0. AuditKit is commercially licensed.</p>
-                <p>&copy; 2026 AuditKit</p>
+                <p>&copy; 2026 Guardian Nexus LLC</p>
             </div>
         </div>
     </footer>
 
     <script src="../cookie-consent.js"></script>
+    <script src="../main.js"></script>
     <script>
         (function() {
             var toggle = document.querySelector('.nav-toggle');

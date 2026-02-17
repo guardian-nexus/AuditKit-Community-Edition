@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pricing - AuditKit</title>
-    <meta name="description" content="AuditKit pricing - Free for SOC2/PCI/CMMC L1, $297/month for CMMC Level 2 and Pro features.">
+    <meta name="description" content="AuditKit pricing - Community Edition free forever. AuditKit $297/month for CMMC Level 2, evidence packages, Desktop GUI, and more.">
     <link rel="icon" type="image/svg+xml" href="./auditkit-logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -34,107 +34,90 @@
     <section class="page-header">
         <div class="container">
             <h1>Pricing</h1>
-            <p class="subtitle">CMMC Level 2 gap analysis for $297/month. Community Edition free forever.</p>
+            <p class="subtitle">Community Edition free forever. AuditKit $297/month with a 14-day free trial.</p>
         </div>
     </section>
 
     <section class="section" style="padding-top: 2rem;">
         <div class="container-content">
+
             <div class="callout-warning text-center">
                 <h4>Important</h4>
-                <p>AuditKit automates technical control scanning. You still need auditors for certification.<br>CPA for SOC2: $15K-$30K &bull; C3PAO for CMMC: $25K-$150K</p>
+                <p>AuditKit automates technical control scanning. You still need auditors for certification.<br>CPA for SOC2: $15K-$30K &bull; QSA for PCI-DSS: $15K-$50K &bull; C3PAO for CMMC: $25K-$150K</p>
             </div>
 
-            <h2 class="text-center" style="margin-top: 3rem;">Plans</h2>
+            <!-- Pricing Cards -->
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <div class="pricing-card-header">
+                        <h3>Community Edition</h3>
+                        <div class="pricing-price">$0</div>
+                        <p class="pricing-term">Free forever &bull; Apache 2.0</p>
+                    </div>
+                    <div class="pricing-card-body">
+                        <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition" class="btn btn-outline" style="width: 100%; margin-bottom: 1.5rem;">View on GitHub</a>
+                        <ul class="pricing-features">
+                            <li class="pricing-section-label">Cloud Providers</li>
+                            <li class="included">AWS, Azure, GCP, M365</li>
+                            <li class="pricing-section-label">Frameworks</li>
+                            <li class="included">SOC2, PCI-DSS v4.0, NIST 800-53</li>
+                            <li class="included">HIPAA (Technical Safeguards)</li>
+                            <li class="included">CIS Benchmarks (AWS, Azure, GCP)</li>
+                            <li class="included">FedRAMP, ISO 27001, GDPR (mappings)</li>
+                            <li class="included">CMMC Level 1 (17 practices)</li>
+                            <li class="excluded">CMMC Level 2 (110 practices)</li>
+                            <li class="pricing-section-label">Features</li>
+                            <li class="included">Single account scanning</li>
+                            <li class="included">PDF, HTML, JSON, CSV output</li>
+                            <li class="excluded">Multi-account scanning</li>
+                            <li class="excluded">Evidence package generator</li>
+                            <li class="excluded">Custom controls (YAML)</li>
+                            <li class="excluded">GCP Advanced (GKE, Vertex AI)</li>
+                            <li class="excluded">Desktop GUI</li>
+                            <li class="excluded">Continuous monitoring</li>
+                            <li class="excluded">Drift detection</li>
+                            <li class="pricing-section-label">Support</li>
+                            <li class="included">Community (GitHub Issues)</li>
+                        </ul>
+                    </div>
+                </div>
 
-            <table>
-                <tr>
-                    <th>Feature</th>
-                    <th>Community Edition</th>
-                    <th>AuditKit ($297/mo)</th>
-                </tr>
-                <tr>
-                    <td>AWS, Azure, GCP, M365</td>
-                    <td>Yes</td>
-                    <td>Yes</td>
-                </tr>
-                <tr>
-                    <td>SOC2, PCI-DSS, NIST 800-53</td>
-                    <td>Yes</td>
-                    <td>Yes</td>
-                </tr>
-                <tr>
-                    <td>HIPAA Security Rule</td>
-                    <td>Yes (Technical Safeguards)</td>
-                    <td>Yes (Technical Safeguards)</td>
-                </tr>
-                <tr>
-                    <td>CIS Benchmarks (AWS, Azure, GCP)</td>
-                    <td>Yes</td>
-                    <td>Yes</td>
-                </tr>
-                <tr>
-                    <td>FedRAMP, ISO 27001, GDPR (mappings)</td>
-                    <td>Yes</td>
-                    <td>Yes</td>
-                </tr>
-                <tr>
-                    <td>CMMC Level 1 (17 practices)</td>
-                    <td>Yes</td>
-                    <td>Yes</td>
-                </tr>
-                <tr>
-                    <td><strong>CMMC Level 2 (110 practices)</strong></td>
-                    <td>-</td>
-                    <td>Yes</td>
-                </tr>
-                <tr>
-                    <td>Multi-Account Scanning</td>
-                    <td>One at a time</td>
-                    <td>AWS Orgs, Azure MGs, GCP Folders</td>
-                </tr>
-                <tr>
-                    <td>Evidence Package Generator</td>
-                    <td>-</td>
-                    <td>Yes (C3PAO-ready)</td>
-                </tr>
-                <tr>
-                    <td>Custom Controls</td>
-                    <td>-</td>
-                    <td>Yes (YAML-defined)</td>
-                </tr>
-                <tr>
-                    <td>GCP Advanced (GKE, Vertex AI)</td>
-                    <td>-</td>
-                    <td>Yes (+32 checks)</td>
-                </tr>
-                <tr>
-                    <td>Desktop GUI</td>
-                    <td>-</td>
-                    <td>Yes</td>
-                </tr>
-                <tr>
-                    <td>Continuous Monitoring</td>
-                    <td>-</td>
-                    <td>Yes (daemon + alerts)</td>
-                </tr>
-                <tr>
-                    <td>Drift Detection</td>
-                    <td>-</td>
-                    <td>Yes</td>
-                </tr>
-                <tr>
-                    <td>Azure Arc (On-Prem)</td>
-                    <td>-</td>
-                    <td>Yes (experimental)</td>
-                </tr>
-                <tr>
-                    <td>Support</td>
-                    <td>Community</td>
-                    <td>Priority email</td>
-                </tr>
-            </table>
+                <div class="pricing-card pricing-card-featured">
+                    <div class="pricing-card-badge">Most Popular</div>
+                    <div class="pricing-card-header">
+                        <h3>AuditKit</h3>
+                        <div class="pricing-price">$297<span class="pricing-period">/mo</span></div>
+                        <p class="pricing-term">14-day free trial &bull; Cancel anytime</p>
+                    </div>
+                    <div class="pricing-card-body">
+                        <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary" style="width: 100%; margin-bottom: 1.5rem;" onclick="if (window.auditKitConsent && window.auditKitConsent.marketing && typeof gtag === 'function') { gtag('event', 'conversion', {'send_to': 'AW-17730440946/q5TvCL37jsAbEPKdxIZC', 'value': 297.0, 'currency': 'USD'}); } return true;">Start 14-Day Free Trial</a>
+                        <ul class="pricing-features">
+                            <li class="pricing-section-label">Cloud Providers</li>
+                            <li class="included">AWS, Azure, GCP, M365</li>
+                            <li class="pricing-section-label">Frameworks</li>
+                            <li class="included">SOC2, PCI-DSS v4.0, NIST 800-53</li>
+                            <li class="included">HIPAA (Technical Safeguards)</li>
+                            <li class="included">CIS Benchmarks (AWS, Azure, GCP)</li>
+                            <li class="included">FedRAMP, ISO 27001, GDPR (mappings)</li>
+                            <li class="included">CMMC Level 1 (17 practices)</li>
+                            <li class="included"><strong>CMMC Level 2 (110 practices)</strong></li>
+                            <li class="pricing-section-label">Features</li>
+                            <li class="included"><strong>Multi-account scanning</strong> (AWS Orgs, Azure MGs, GCP Folders)</li>
+                            <li class="included">PDF, HTML, JSON, CSV output</li>
+                            <li class="included"><strong>Evidence package generator</strong> (auditor-ready)</li>
+                            <li class="included"><strong>Custom controls</strong> (YAML-defined)</li>
+                            <li class="included"><strong>GCP Advanced</strong> (GKE + Vertex AI, +32 checks)</li>
+                            <li class="included"><strong>Desktop GUI</strong></li>
+                            <li class="included"><strong>Continuous monitoring</strong> (daemon + alerts)</li>
+                            <li class="included"><strong>Drift detection</strong></li>
+                            <li class="pricing-section-label">Support</li>
+                            <li class="included"><strong>Priority email</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Cost Comparison -->
             <h2 class="text-center mt-4">Cost Comparison</h2>
 
             <div class="grid-2" style="max-width: 900px; margin: 2rem auto 0;">
@@ -159,6 +142,7 @@
                 </div>
             </div>
 
+            <!-- Use Cases -->
             <h2 class="text-center mt-4">Use Cases</h2>
 
             <div class="grid-2" style="max-width: 900px; margin: 2rem auto 0;">
@@ -193,7 +177,7 @@
     <footer class="site-footer">
         <div class="footer-inner">
             <p style="margin-bottom: 2rem; color: var(--slate-300); font-size: 1rem;">
-                <strong style="color: var(--white);">Built for defense contractors, by engineers who understand compliance.</strong>
+                <strong style="color: var(--white);">Built for compliance teams, by engineers who understand the audit process.</strong>
             </p>
 
             <div class="footer-grid">
@@ -239,19 +223,20 @@
                         <li><a href="/docs/setup/m365.html">M365 Setup</a></li>
                         <li><a href="/examples/">Examples</a></li>
                         <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition">GitHub</a></li>
-                        <li><a href="mailto:hello@auditkit.io">Contact Sales</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Us</a></li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
                 <p>Community Edition is Apache 2.0. AuditKit is commercially licensed.</p>
-                <p>&copy; 2026 AuditKit</p>
+                <p>&copy; 2026 Guardian Nexus LLC</p>
             </div>
         </div>
     </footer>
 
     <script src="./cookie-consent.js"></script>
+    <script src="./main.js"></script>
     <script>
         (function() {
             var toggle = document.querySelector('.nav-toggle');
