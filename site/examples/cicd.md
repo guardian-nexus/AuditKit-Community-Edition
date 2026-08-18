@@ -733,7 +733,7 @@ FAIL:Build failed due to compliance issues
 
 ## Additional Resources
 
-- [AuditKit CLI Reference](../cli-reference.md)
-- [Understanding Results](../understanding-results.md)
-- [Cloud Provider Setup](../setup/)
-- [Sample Reports](../examples/reports/)
+- [AuditKit CLI Reference](../docs/cli-reference.md)
+- [Getting Started](../docs/getting-started.md)
+- [Cloud Provider Setup](../docs/setup/)
+- [Sample Reports](./reports/)

@@ -324,7 +324,7 @@ Help us expand CIS coverage:
 - Improve remediation guidance
 - Add Terraform/CloudFormation templates
 
-**[Contributing Guide →](../../CONTRIBUTING.md)**
+**[Contributing Guide →](../../../CONTRIBUTING.md)**
 
 ---
 

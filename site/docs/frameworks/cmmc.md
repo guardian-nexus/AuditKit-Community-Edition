@@ -474,5 +474,5 @@ Based on C3PAO assessments, here are the most common failures:
 
 - **[Getting Started →](../getting-started.md)**
 - **[CLI Reference →](../cli-reference.md)**
-- **[Pricing (Free vs Pro) →](../pricing.md)**
+- **[Pricing (Free vs Pro) →](../../pricing.md)**
 - **[Cloud Setup Guides →](../setup/)**

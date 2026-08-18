@@ -284,7 +284,7 @@ if (( $(echo "$SCORE < 80" | bc -l) )); then
 fi
 ```
 
-**[CI/CD examples →](./examples/ci-cd/)**
+**[CI/CD examples →](../examples/cicd.md)**
 
 ### What if I get rate limited?
 
@@ -344,7 +344,7 @@ Not in the Free version. Reports follow standard compliance framework formats.
 - Compliance framework mapping
 - Scan metadata (date, account, etc.)
 
-**[View sample reports →](./examples/)**
+**[View sample reports →](../examples/)**
 
 ---
 
@@ -381,7 +381,7 @@ auditkit integrate -source prowler -file prowler-output.json -format pdf -output
 
 This maps Prowler findings to SOC2, PCI-DSS, CMMC, HIPAA, and other compliance frameworks.
 
-**[Prowler integration guide →](./integrations/prowler.md)**
+**[Prowler integration guide →](./cli-reference.md#integrate)**
 
 ### How do I integrate M365?
 

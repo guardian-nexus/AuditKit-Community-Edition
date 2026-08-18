@@ -481,5 +481,5 @@ auditkit scan -provider gcp -framework soc2  # Includes Vertex AI checks
 
 - **Command help:** `auditkit [command] --help`
 - **Documentation:** [Full docs →](../)
-- **Examples:** [Sample usage →](./examples/)
+- **Examples:** [Sample usage →](../examples/)
 - **Issues:** [GitHub Issues](https://github.com/guardian-nexus/AuditKit-Community-Edition/issues)

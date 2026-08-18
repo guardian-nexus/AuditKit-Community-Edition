@@ -45,7 +45,7 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 - Single account/project scanning
 - Budget-conscious teams
 
-**[Get Started →](./getting-started.md)**
+**[Get Started →](./docs/getting-started.md)**
 
 ---
 
@@ -323,7 +323,7 @@ go build ./cmd/auditkit
 ./auditkit scan -provider aws -framework soc2
 ```
 
-**[Installation guide →](./getting-started.md)**
+**[Installation guide →](./docs/installation.md)**
 
 ### Pro Version
 
@@ -378,6 +378,6 @@ go build ./cmd/auditkit
 
 - **[Compare features in detail →](#detailed-comparison)**
 - **[View use case scenarios →](#use-case-scenarios)**
-- **[Read the FAQ →](./faq.md)**
+- **[Read the FAQ →](./docs/faq.md)**
 - **[Start free trial →](https://auditkit.io/pro/)**
-- **[Get started with Free →](./getting-started.md)**
+- **[Get started with Free →](./docs/getting-started.md)**

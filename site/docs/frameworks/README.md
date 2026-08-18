@@ -243,4 +243,4 @@ Many organizations need multiple frameworks:
 - **[Choose your framework →](#framework-details)**
 - **[Run your first scan →](../getting-started.md)**
 - **[View provider coverage →](../providers/)**
-- **[Compare Free vs Pro →](../pricing.md)**
+- **[Compare Free vs Pro →](../../pricing.md)**

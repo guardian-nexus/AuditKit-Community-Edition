@@ -542,7 +542,7 @@ auditkit-pro scan -provider aws -framework cmmc-l2
 
 **Legacy method (deprecated):** The old `export AUDITKIT_PRO_LICENSE=AKP-...` environment variable still works but is deprecated in favor of the `.lic` file.
 
-**[Pro feature details →](./pricing.md)**
+**[Pro feature details →](../pricing.md)**
 
 ---
 
@@ -551,4 +551,4 @@ auditkit-pro scan -provider aws -framework cmmc-l2
 - **[Run your first scan →](./getting-started.md)**
 - **[Setup cloud credentials →](./setup/)**
 - **[CLI Reference →](./cli-reference.md)**
-- **[Examples →](./examples/)**
+- **[Examples →](../examples/)**
