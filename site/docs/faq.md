@@ -522,7 +522,7 @@ auditkit evidence -format html -output evidence-tracker.html
 
 **Support:**
 - [GitHub Issues](https://github.com/guardian-nexus/AuditKit-Community-Edition/issues)
-- [Newsletter](https://auditkit.substack.com)
+- [Newsletter](https://guardiannexus.substack.com)
 - Pro Support: info@auditkit.io
 
 **Try Pro:**

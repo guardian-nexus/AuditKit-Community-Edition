@@ -275,7 +275,7 @@ Then re-scan.
 - **Examples:** [Sample reports →](../examples/)
 - **Issues:** [GitHub Issues](https://github.com/guardian-nexus/AuditKit-Community-Edition/issues)
 - **FAQ:** [Common questions →](./faq.md)
-- **Newsletter:** [auditkit.substack.com](https://auditkit.substack.com)
+- **Newsletter:** [guardiannexus.substack.com](https://guardiannexus.substack.com)
 
 ---
 

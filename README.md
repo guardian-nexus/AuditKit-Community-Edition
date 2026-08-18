@@ -5,7 +5,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Version](https://img.shields.io/badge/version-v0.8.3-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
-[![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://auditkit.substack.com)
+[![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://guardiannexus.substack.com)
 
 **Need CMMC Level 2, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
 
@@ -387,7 +387,7 @@ We need help with:
 
 - **Community Support:** [GitHub Issues](https://github.com/guardian-nexus/AuditKit-Community-Edition/issues)
 - **Security Issues:** [SECURITY.md](./SECURITY.md)
-- **Newsletter:** [auditkit.substack.com](https://auditkit.substack.com)
+- **Newsletter:** [guardiannexus.substack.com](https://guardiannexus.substack.com)
 - **AuditKit Support:** Priority email + Slack channel (info@auditkit.io)
 
 ---
