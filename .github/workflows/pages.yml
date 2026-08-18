@@ -2,8 +2,22 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
+    paths:
+      - 'site/**'
+      - '.github/scripts/check-links.sh'
+      - '.github/workflows/pages.yml'
 jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify local links resolve
+        run: .github/scripts/check-links.sh
+
   deploy:
+    needs: check-links
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       pages: write
