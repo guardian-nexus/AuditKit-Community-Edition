@@ -217,7 +217,7 @@ bash fixes.sh
 ./auditkit scan -provider gcp -framework soc2 -output gcp-results.json
 
 # Compare results
-# (Unified reporting coming in v0.8.0)
+# Unified multi-cloud reporting is an AuditKit Pro feature
 ```
 
 ---

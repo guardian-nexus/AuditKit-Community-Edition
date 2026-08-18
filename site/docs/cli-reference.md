@@ -228,8 +228,7 @@ auditkit version
 
 **Output:**
 ```
-AuditKit v0.8.1
-Built: 2026-02-03
+AuditKit v0.8.3 - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)
 ```
 
 ---

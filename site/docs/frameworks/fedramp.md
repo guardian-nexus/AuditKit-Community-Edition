@@ -100,9 +100,14 @@ FedRAMP defines three security impact levels based on FIPS 199:
 
 ## Running FedRAMP Scans
 
-**Note:** Dedicated FedRAMP baseline filtering coming in v0.8.0. For now, use NIST 800-53 which covers all FedRAMP requirements:
+Baseline filtering is supported directly via `fedramp-low`, `fedramp-moderate`
+and `fedramp-high`. NIST 800-53 covers all FedRAMP requirements if you prefer
+the full control set.
 
 ```bash
+# Filter to a specific FedRAMP baseline
+auditkit scan -provider aws -framework fedramp-moderate
+
 # NIST 800-53 (covers all FedRAMP baselines)
 auditkit scan -provider aws -framework 800-53
 
