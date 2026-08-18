@@ -58,7 +58,7 @@ gcloud alpha monitoring policies create \
   --condition-threshold-duration=0s`,
 		Priority:  PriorityHigh,
 		Timestamp: time.Now(),
-		ScreenshotGuide: fmt.Sprintf(`Google Cloud Console steps:
+		ScreenshotGuide: fmt.Sprintf(`Google Cloud Console steps for project %s:
 1. Go to Logging → Logs-based Metrics
 2. Screenshot showing metric "project_ownership_changes"
 3. Go to Monitoring → Alerting

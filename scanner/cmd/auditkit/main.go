@@ -25,7 +25,7 @@ import (
 	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
 )
 
-const CurrentVersion = "v0.8.2"
+var CurrentVersion = "v0.8.3"
 
 type ComplianceResult struct {
 	Timestamp       time.Time       `json:"timestamp"`
@@ -395,8 +395,9 @@ func convertIntegrationResults(results []integrations.IntegrationResult, provide
 	}
 
 	score := 0.0
-	if len(controls) > 0 {
-		score = float64(passed) / float64(len(controls)) * 100
+	automatedChecks := passed + failed
+	if automatedChecks > 0 {
+		score = float64(passed) / float64(automatedChecks) * 100
 	}
 
 	return ComplianceResult{

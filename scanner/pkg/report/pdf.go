@@ -202,7 +202,7 @@ func generateComplianceDisclaimer(pdf *gofpdf.Fpdf, result ComplianceResult) {
 	failed := 0
 
 	for _, control := range result.Controls {
-		if control.Status == "INFO" {
+		if control.Status == "INFO" || control.Status == "MANUAL" {
 			manual++
 		} else {
 			automated++
@@ -573,7 +573,7 @@ func generateEvidenceGuideComplete(pdf *gofpdf.Fpdf, result ComplianceResult) {
 			failedControls = append(failedControls, control)
 		} else if control.Status == "PASS" {
 			passedControls = append(passedControls, control)
-		} else if control.Status == "INFO" {
+		} else if control.Status == "INFO" || control.Status == "MANUAL" {
 			infoControls = append(infoControls, control)
 		}
 	}

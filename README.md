@@ -4,7 +4,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v0.8.2-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
+[![Version](https://img.shields.io/badge/version-v0.8.3-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://auditkit.substack.com)
 
 **Need CMMC Level 2, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
@@ -99,9 +99,23 @@ AuditKit scans your cloud infrastructure for compliance gaps and security miscon
 
 ---
 
-## Recent Changes (v0.8.2)
+## Recent Changes (v0.8.3)
 
-**February 2026**
+**August 2026**
+
+Fixes:
+- Compliance score in PDF/HTML reports now matches the CLI (manual controls were counted as automated)
+- Manual controls now appear in reports - 45 were being dropped from the evidence guide entirely
+- M365 scans now score on the same basis as other providers
+- Fixed all binary download URLs in the installation guide and CI/CD examples (previously 404)
+- Added Linux ARM64 and Apple Silicon installation instructions
+- Provider-specific binaries now report the correct version (were pinned at v0.7.0)
+- Release archives dropped the version from filenames so `releases/latest/download/` links keep working
+- `go vet` and `go test ./...` pass again
+
+Scores may read higher than v0.8.2 on scans with manual controls. Pass/fail results are unchanged.
+
+### Previous: v0.8.2 (February 2026)
 
 Fixes:
 - Removed stubbed `report` command from CLI (use `auditkit scan -format pdf` instead)
@@ -320,15 +334,23 @@ prowler aws --output-formats json -o prowler-output     # Run Prowler first
 
 ---
 
-## What's New in v0.8.2
+## What's New in v0.8.3
 
 ### Fixes
+- Compliance score now matches between CLI output and PDF/HTML reports
+- Manual controls are no longer dropped from reports
+- Working download links for all platforms, including Linux ARM64
+- Correct version reported by provider-specific binaries
+
+### Previous: v0.8.2
+
+#### Fixes
 - Removed broken `report` command stub (use `auditkit scan -format pdf`)
 - FedRAMP baseline filtering (`fedramp-low`, `fedramp-moderate`, `fedramp-high`) documented as working
 - Updated HIPAA control count to ~15 across AWS, Azure, and GCP
 - Cleaned up overclaimed features in docs and website
 
-**[Full Release Notes →](./CHANGELOG.md)**
+**[Full Release Notes →](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest)**
 
 ---
 

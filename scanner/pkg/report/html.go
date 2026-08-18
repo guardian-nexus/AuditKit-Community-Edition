@@ -28,7 +28,7 @@ func GenerateHTML(result ComplianceResult) string {
 	failed := 0
 
 	for _, control := range result.Controls {
-		if control.Status == "INFO" {
+		if control.Status == "INFO" || control.Status == "MANUAL" {
 			manual++
 		} else {
 			automated++
@@ -901,7 +901,7 @@ func generateInfoControlsHTML(result ComplianceResult) string {
 
 	infoCount := 0
 	for _, control := range result.Controls {
-		if control.Status == "INFO" {
+		if control.Status == "INFO" || control.Status == "MANUAL" {
 			infoCount++
 
 			html += fmt.Sprintf(`

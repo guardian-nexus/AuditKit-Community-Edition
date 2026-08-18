@@ -58,7 +58,8 @@
 
             <p><strong>Disk Space:</strong></p>
             <ul>
-                <li>Binary: ~15 MB</li>
+                <li>Universal binary (all clouds): ~59 MB download, ~300 MB installed</li>
+                <li>Single-cloud binary (auditkit-aws / -azure / -gcp): ~6-11 MB download</li>
                 <li>Source code: ~50 MB</li>
                 <li>Scan results: ~1-10 MB per scan</li>
             </ul>
@@ -68,41 +69,75 @@
             <h3>Option 1: Download Pre-Built Binary (Recommended)</h3>
             <p>Fastest and easiest method</p>
 
-            <h4>Linux</h4>
-            <pre class="code-block"><code># Download latest release
-wget https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64
+            <p>Releases ship a universal binary (all clouds) plus smaller single-cloud
+            builds: <code class="code-inline">auditkit-aws</code>,
+            <code class="code-inline">auditkit-azure</code>,
+            <code class="code-inline">auditkit-gcp</code>. Swap the name in any command below
+            if you only scan one provider.</p>
 
-# Make executable
-chmod +x auditkit-linux-amd64
+            <h4>Linux (x86_64)</h4>
+            <pre class="code-block"><code># Download and extract
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz
+tar -xzf auditkit-linux-amd64.tar.gz
 
 # Move to PATH
 sudo mv auditkit-linux-amd64 /usr/local/bin/auditkit
+sudo chmod +x /usr/local/bin/auditkit
 
 # Verify installation
 auditkit version</code></pre>
 
-            <h4>macOS</h4>
-            <pre class="code-block"><code># Download latest release
-curl -L https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-amd64 -o auditkit
-
-# Make executable
-chmod +x auditkit
+            <h4>Linux (ARM64)</h4>
+            <p>For AWS Graviton, Raspberry Pi, and Linux VMs on Apple Silicon Macs.</p>
+            <pre class="code-block"><code># Download and extract
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-arm64.tar.gz
+tar -xzf auditkit-linux-arm64.tar.gz
 
 # Move to PATH
-sudo mv auditkit /usr/local/bin/
+sudo mv auditkit-linux-arm64 /usr/local/bin/auditkit
+sudo chmod +x /usr/local/bin/auditkit
 
-# If you get security warning on first run:
-# System Preferences > Security & Privacy > Allow
+# Verify installation
+auditkit version</code></pre>
+
+            <h4>macOS (Apple Silicon)</h4>
+            <pre class="code-block"><code># Download and extract
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-arm64.tar.gz
+tar -xzf auditkit-darwin-arm64.tar.gz
+
+# Move to PATH
+sudo mv auditkit-darwin-arm64 /usr/local/bin/auditkit
+sudo chmod +x /usr/local/bin/auditkit
+
+# The binary is unsigned. If macOS blocks it on first run:
+# System Settings -> Privacy and Security -> Open Anyway
+
+# Verify installation
+auditkit version</code></pre>
+
+            <h4>macOS (Intel)</h4>
+            <pre class="code-block"><code># Download and extract
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-amd64.tar.gz
+tar -xzf auditkit-darwin-amd64.tar.gz
+
+# Move to PATH
+sudo mv auditkit-darwin-amd64 /usr/local/bin/auditkit
+sudo chmod +x /usr/local/bin/auditkit
 
 # Verify installation
 auditkit version</code></pre>
 
             <h4>Windows</h4>
-            <pre class="code-block"><code># Download from GitHub Releases page
-# https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-windows-amd64.exe
+            <p>Run these in PowerShell.</p>
+            <pre class="code-block"><code># Download and extract
+curl.exe -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-windows-amd64.zip
+Expand-Archive auditkit-windows-amd64.zip -DestinationPath .
 
 # Rename to auditkit.exe
 Rename-Item auditkit-windows-amd64.exe auditkit.exe
+
+# The binary is unsigned. If SmartScreen blocks it:
+# "More info" -> "Run anyway"
 
 # Add to PATH or run from current directory
 .\auditkit.exe version</code></pre>

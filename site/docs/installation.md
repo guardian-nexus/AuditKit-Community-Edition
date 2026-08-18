@@ -34,13 +34,14 @@ Complete installation instructions for AuditKit.
 
 ```bash
 # Download latest release
-wget https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/download/v0.7.0/auditkit-linux-amd64
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz
 
-# Make executable
-chmod +x auditkit-linux-amd64
+# Extract
+tar -xzf auditkit-linux-amd64.tar.gz
 
 # Move to PATH
 sudo mv auditkit-linux-amd64 /usr/local/bin/auditkit
+sudo chmod +x /usr/local/bin/auditkit
 
 # Verify installation
 auditkit version
@@ -50,7 +51,11 @@ auditkit version
 
 ```bash
 # Download latest release
-curl -L https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/download/v0.7.0/auditkit-darwin-amd64 -o auditkit
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-arm64.tar.gz   # Apple Silicon
+# curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-amd64.tar.gz  # Intel
+
+# Extract and rename
+tar -xzf auditkit-darwin-*.tar.gz && mv auditkit-darwin-* auditkit
 
 # Make executable
 chmod +x auditkit
@@ -69,7 +74,7 @@ auditkit version
 
 ```powershell
 # Download from GitHub Releases page
-# https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/download/v0.7.0/auditkit-windows-amd64.exe
+# https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-windows-amd64.zip
 
 # Rename to auditkit.exe
 Rename-Item auditkit-windows-amd64.exe auditkit.exe
@@ -327,7 +332,7 @@ auditkit update
 
 ```bash
 # Download new version
-wget https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/download/v0.X.X/auditkit-linux-amd64
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz
 
 # Replace old binary
 chmod +x auditkit-linux-amd64
@@ -466,7 +471,7 @@ rm -rf ~/.auditkit/
 
 1. Download binary on internet-connected machine:
 ```bash
-wget https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/download/v0.7.0/auditkit-linux-amd64
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz
 ```
 
 2. Transfer to air-gapped machine via USB/secure transfer
