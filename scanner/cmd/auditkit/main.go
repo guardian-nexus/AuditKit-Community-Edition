@@ -1319,7 +1319,7 @@ func showProgress(provider, profile string) {
 		scanner, err := awsScanner.NewScanner(profile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		accountID = scanner.GetAccountID(ctx)
 	case "azure":
@@ -1331,7 +1331,7 @@ func showProgress(provider, profile string) {
 		scanner, err := azureScanner.NewScanner(subscriptionID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		accountID = scanner.GetAccountID(ctx)
 	case "gcp":
@@ -1345,7 +1345,7 @@ func showProgress(provider, profile string) {
 		scanner, err := gcpScanner.NewScanner(projectID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		defer scanner.Close()
 		accountID = scanner.GetAccountID(ctx)
@@ -1411,7 +1411,7 @@ func compareScan(provider, profile string) {
 		scanner, err := awsScanner.NewScanner(profile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		accountID = scanner.GetAccountID(ctx)
 	case "azure":
@@ -1423,7 +1423,7 @@ func compareScan(provider, profile string) {
 		scanner, err := azureScanner.NewScanner(subscriptionID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		accountID = scanner.GetAccountID(ctx)
 	case "gcp":
@@ -1437,7 +1437,7 @@ func compareScan(provider, profile string) {
 		scanner, err := gcpScanner.NewScanner(projectID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		defer scanner.Close()
 		accountID = scanner.GetAccountID(ctx)
@@ -1493,7 +1493,7 @@ func generateFixScript(provider, profile, output string) {
 		scanner, err := awsScanner.NewScanner(profile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		accountID = scanner.GetAccountID(ctx)
 		fmt.Printf("Scanning AWS Account %s to identify fixes...\n", accountID)
@@ -1517,7 +1517,7 @@ func generateFixScript(provider, profile, output string) {
 		scanner, err := azureScanner.NewScanner(subscriptionID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		accountID = scanner.GetAccountID(ctx)
 		fmt.Printf("Scanning Azure Subscription %s to identify fixes...\n", accountID)
@@ -1544,7 +1544,7 @@ func generateFixScript(provider, profile, output string) {
 		scanner, err := gcpScanner.NewScanner(projectID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		defer scanner.Close()
 		accountID = scanner.GetAccountID(ctx)
@@ -1571,7 +1571,7 @@ func generateFixScript(provider, profile, output string) {
 	err := remediation.GenerateFixScript(controls, output)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error generating fix script: %v\n", err)
-		return
+		os.Exit(1)
 	}
 	
 	fmt.Printf("Fix script generated: %s\n", output)
@@ -1592,7 +1592,7 @@ func runEvidenceTracker(provider, profile, output string) {
 		scanner, err := awsScanner.NewScanner(profile)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		accountID = scanner.GetAccountID(ctx)
 		fmt.Printf("Scanning AWS Account %s...\n", accountID)
@@ -1615,7 +1615,7 @@ func runEvidenceTracker(provider, profile, output string) {
 		scanner, err := azureScanner.NewScanner(subscriptionID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		accountID = scanner.GetAccountID(ctx)
 		fmt.Printf("Scanning Azure Subscription %s...\n", accountID)
@@ -1640,7 +1640,7 @@ func runEvidenceTracker(provider, profile, output string) {
 		scanner, err := gcpScanner.NewScanner(projectID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			return
+			os.Exit(1)
 		}
 		defer scanner.Close()
 		accountID = scanner.GetAccountID(ctx)
@@ -1666,7 +1666,7 @@ func runEvidenceTracker(provider, profile, output string) {
 	err := os.WriteFile(output, []byte(html), 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error generating tracker: %v\n", err)
-		return
+		os.Exit(1)
 	}
 	
 	fmt.Printf("Evidence tracker saved to %s\n", output)
