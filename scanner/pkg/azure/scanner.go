@@ -34,6 +34,7 @@ type AzureScanner struct {
 	sqlDBClient         *armsql.DatabasesClient
 	keyVaultClient      *armkeyvault.VaultsClient
 	monitorClient       *armmonitor.ActivityLogsClient
+	diagnosticClient    *armmonitor.DiagnosticSettingsClient
 	roleClient          *armauthorization.RoleAssignmentsClient
 	roleDefClient       *armauthorization.RoleDefinitionsClient
 	securityClient      *armsecurity.PricingsClient                 // For Defender checks
@@ -121,6 +122,13 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		return nil, fmt.Errorf("failed to create monitor client: %v", err)
 	}
 
+	// Diagnostic settings are addressed by resource URI rather than subscription.
+	// A failure here is not fatal: the checks that use it degrade to manual.
+	diagnosticClient, err := armmonitor.NewDiagnosticSettingsClient(cred, nil)
+	if err != nil {
+		diagnosticClient = nil
+	}
+
 	roleClient, err := armauthorization.NewRoleAssignmentsClient(subscriptionID, cred, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create role assignments client: %v", err)
@@ -162,6 +170,7 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		sqlDBClient:         sqlDBClient,
 		keyVaultClient:      keyVaultClient,
 		monitorClient:       monitorClient,
+		diagnosticClient:    diagnosticClient,
 		roleClient:          roleClient,
 		roleDefClient:       roleDefClient,
 		securityClient:      securityClient,
@@ -283,6 +292,9 @@ func (s *AzureScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanRes
 		s.roleClient,
 		s.sqlDBClient,
 		s.monitorClient,
+		s.graphClient,
+		s.diagnosticClient,
+		s.subscriptionID,
 	)
 
 	checkResults, _ := pciChecker.Run(ctx)

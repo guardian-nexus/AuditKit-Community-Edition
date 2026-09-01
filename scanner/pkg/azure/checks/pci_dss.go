@@ -11,6 +11,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/sql/armsql"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
+	msgraphsdk "github.com/microsoftgraph/msgraph-sdk-go"
 )
 
 // AzurePCIChecks implements PCI-DSS v4.0.1 requirements for Azure
@@ -20,6 +21,11 @@ type AzurePCIChecks struct {
 	roleClient    *armauthorization.RoleAssignmentsClient
 	sqlClient     *armsql.DatabasesClient
 	monitorClient *armmonitor.ActivityLogsClient
+	// graphClient and diagnosticClient are optional; the v4.x checks degrade to
+	// documentation results when they are nil.
+	graphClient      *msgraphsdk.GraphServiceClient
+	diagnosticClient *armmonitor.DiagnosticSettingsClient
+	subscriptionID   string
 }
 
 func NewAzurePCIChecks(
@@ -28,13 +34,19 @@ func NewAzurePCIChecks(
 	roleClient *armauthorization.RoleAssignmentsClient,
 	sqlClient *armsql.DatabasesClient,
 	monitorClient *armmonitor.ActivityLogsClient,
+	graphClient *msgraphsdk.GraphServiceClient,
+	diagnosticClient *armmonitor.DiagnosticSettingsClient,
+	subscriptionID string,
 ) *AzurePCIChecks {
 	return &AzurePCIChecks{
-		storageClient: storageClient,
-		networkClient: networkClient,
-		roleClient:    roleClient,
-		sqlClient:     sqlClient,
-		monitorClient: monitorClient,
+		storageClient:    storageClient,
+		networkClient:    networkClient,
+		roleClient:       roleClient,
+		sqlClient:        sqlClient,
+		monitorClient:    monitorClient,
+		graphClient:      graphClient,
+		diagnosticClient: diagnosticClient,
+		subscriptionID:   subscriptionID,
 	}
 }
 
@@ -847,13 +859,12 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 // CheckFutureDated covers the PCI DSS v4.x requirements that became mandatory on
 // 31 March 2025.
 //
-// These are documentation checks on Azure. The clients available here cover
-// storage, network security groups, role assignments, SQL and activity logs -
-// not Entra ID or diagnostic settings - so service account credentials and log
-// review automation cannot be read from configuration. They are surfaced as
-// MANUAL so they appear in the report rather than being silently absent.
+// 8.6.1, 8.6.3 and 10.4.1.1 are read from configuration when the Graph and
+// diagnostic-settings clients are available. The rest are documentation checks:
+// hardcoded credentials and failure-response procedures are not observable from
+// cloud configuration.
 func (c *AzurePCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
-	return []CheckResult{
+	results := []CheckResult{
 		{
 			Control:           "PCI-4.2.1.1",
 			Name:              "[PCI-DSS] Trusted Key and Certificate Inventory",
@@ -866,19 +877,6 @@ func (c *AzurePCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
 			Timestamp:         time.Now(),
 			Frameworks:        map[string]string{"PCI-DSS": "Req 4.2.1.1"},
-		},
-		{
-			Control:           "PCI-8.6.1",
-			Name:              "[PCI-DSS] Application Account Credential Management",
-			Status:            "INFO",
-			Evidence:          "PCI-DSS Req 8.6.1 (mandatory since 31 Mar 2025): service principals usable for interactive login must be restricted to exceptional, time-boxed circumstances",
-			Remediation:       "Review service principals for interactive use",
-			RemediationDetail: "1. az ad sp list --all --query \"[].{name:displayName,id:appId}\"\n2. Confirm none are used for interactive sign-in\n3. Where unavoidable, document the circumstance and time-box it",
-			Priority:          PriorityHigh,
-			ScreenshotGuide:   "Entra ID sign-in logs filtered to service principal interactive sign-ins",
-			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_AAD_IAM/StartboardApplicationsMenuBlade",
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.1"},
 		},
 		{
 			Control:           "PCI-8.6.2",
@@ -894,45 +892,6 @@ func (c *AzurePCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.2"},
 		},
 		{
-			Control:           "PCI-8.6.3",
-			Name:              "[PCI-DSS] Application Account Credential Rotation",
-			Status:            "INFO",
-			Evidence:          "PCI-DSS Req 8.6.3 (mandatory since 31 Mar 2025): credentials for application and system accounts must be rotated at a frequency set by your targeted risk analysis (Req 12.3.1)",
-			Remediation:       "Rotate service principal credentials",
-			RemediationDetail: "1. az ad sp credential list --id APP_ID\n2. Replace secrets approaching their defined rotation age\n3. Prefer managed identities, which remove the credential entirely",
-			Priority:          PriorityHigh,
-			ScreenshotGuide:   "Service principal credential list showing ages within your defined rotation period",
-			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.3"},
-		},
-		{
-			Control:           "PCI-10.4.1.1",
-			Name:              "[PCI-DSS] Automated Audit Log Review",
-			Status:            "INFO",
-			Evidence:          "PCI-DSS Req 10.4.1.1 (mandatory since 31 Mar 2025): audit log reviews must be performed by automated mechanisms, not read by hand",
-			Remediation:       "Route logs to Log Analytics and alert on them",
-			RemediationDetail: "1. Configure diagnostic settings to a Log Analytics workspace\n2. Create alert rules for the events your risk analysis identifies\n3. Attach an action group so alerts reach someone",
-			Priority:          PriorityHigh,
-			ScreenshotGuide:   "Diagnostic settings sending to Log Analytics, plus the alert rules defined on it",
-			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade",
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
-		},
-		{
-			Control:           "PCI-10.7.2",
-			Name:              "[PCI-DSS] Security Control Failure Detection",
-			Status:            "INFO",
-			Evidence:          "PCI-DSS Req 10.7.2 (mandatory since 31 Mar 2025): failures of critical security control systems must be detected and alerted on, including logging, network controls and change detection",
-			Remediation:       "Alert on the disabling of security controls",
-			RemediationDetail: "1. Create activity log alerts for diagnostic setting deletion and NSG rule changes\n2. Alert on Defender for Cloud plans being turned off\n3. Attach an action group with a notification target",
-			Priority:          PriorityHigh,
-			ScreenshotGuide:   "Activity log alert rules covering diagnostic settings and security control changes",
-			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade",
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
-		},
-		{
 			Control:           "PCI-10.7.3",
 			Name:              "[PCI-DSS] Security Control Failure Response",
 			Status:            "INFO",
@@ -943,6 +902,207 @@ func (c *AzurePCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			ScreenshotGuide:   "The documented procedure, plus a worked example from a real or exercised failure",
 			Timestamp:         time.Now(),
 			Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.3"},
+		},
+	}
+
+	results = append(results, c.checkAppCredentials(ctx)...)
+	results = append(results, c.checkDiagnosticRouting(ctx)...)
+	results = append(results, CheckResult{
+		Control:           "PCI-10.7.2",
+		Name:              "[PCI-DSS] Security Control Failure Detection",
+		Status:            "INFO",
+		Evidence:          "PCI-DSS Req 10.7.2 (mandatory since 31 Mar 2025): failures of critical security control systems must be detected and alerted on, including logging, network controls and change detection",
+		Remediation:       "Alert on the disabling of security controls",
+		RemediationDetail: "1. Create activity log alerts for diagnostic setting deletion and NSG rule changes\n2. Alert on Defender for Cloud plans being turned off\n3. Attach an action group with a notification target",
+		Priority:          PriorityHigh,
+		ScreenshotGuide:   "Activity log alert rules covering diagnostic settings and security control changes",
+		ConsoleURL:        "https://portal.azure.com/#view/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade",
+		Timestamp:         time.Now(),
+		Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
+	})
+	return results
+}
+
+// checkAppCredentials covers 8.6.1 and 8.6.3. A client secret on an app
+// registration is a long-lived credential that a person can copy and reuse,
+// which is the Azure equivalent of a GCP user-managed service account key.
+// Certificate credentials and managed identities do not carry that risk.
+func (c *AzurePCIChecks) checkAppCredentials(ctx context.Context) []CheckResult {
+	manual := func(reason string) []CheckResult {
+		return []CheckResult{
+			{
+				Control:           "PCI-8.6.1",
+				Name:              "[PCI-DSS] Application Account Credential Management",
+				Status:            "INFO",
+				Evidence:          "PCI-DSS Req 8.6.1 (mandatory since 31 Mar 2025): " + reason + ". Review app registrations for client secrets by hand",
+				Remediation:       "Review app registrations for client secrets",
+				RemediationDetail: "1. az ad app list --all --query \"[].{name:displayName,id:appId}\"\n2. Replace client secrets with certificates or managed identities",
+				Priority:          PriorityHigh,
+				ScreenshotGuide:   "App registrations showing no client secrets, or documented exceptions",
+				ConsoleURL:        "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
+				Timestamp:         time.Now(),
+				Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.1"},
+			},
+		}
+	}
+
+	if c.graphClient == nil {
+		return manual("Microsoft Graph client unavailable")
+	}
+
+	apps, err := c.graphClient.Applications().Get(ctx, nil)
+	if err != nil {
+		return manual(fmt.Sprintf("unable to query app registrations (%v)", err))
+	}
+
+	withSecrets := []string{}
+	staleSecrets := []string{}
+	for _, app := range apps.GetValue() {
+		name := "unnamed"
+		if app.GetDisplayName() != nil {
+			name = *app.GetDisplayName()
+		}
+		creds := app.GetPasswordCredentials()
+		if len(creds) == 0 {
+			continue
+		}
+		withSecrets = append(withSecrets, name)
+		for _, cred := range creds {
+			if cred.GetStartDateTime() == nil {
+				continue
+			}
+			if days := int(time.Since(*cred.GetStartDateTime()).Hours() / 24); days > 90 {
+				staleSecrets = append(staleSecrets, fmt.Sprintf("%s (%d days)", name, days))
+			}
+		}
+	}
+
+	results := []CheckResult{}
+	if len(withSecrets) > 0 {
+		shown := withSecrets
+		if len(shown) > 3 {
+			shown = shown[:3]
+		}
+		results = append(results, CheckResult{
+			Control:           "PCI-8.6.1",
+			Name:              "[PCI-DSS] Application Account Credential Management",
+			Status:            "FAIL",
+			Evidence:          fmt.Sprintf("PCI-DSS Req 8.6.1 (mandatory since 31 Mar 2025): %d app registration(s) hold client secrets, which are long-lived credentials usable outside Azure: %s", len(withSecrets), strings.Join(shown, ", ")),
+			Remediation:       "Replace client secrets with managed identities or certificates",
+			RemediationDetail: "1. Prefer a managed identity, which removes the credential entirely\n2. Otherwise use a certificate credential\n3. Where a secret is unavoidable, document the exceptional circumstance",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "App registration showing no client secrets",
+			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.1"},
+		})
+	} else {
+		results = append(results, CheckResult{
+			Control:    "PCI-8.6.1",
+			Name:       "[PCI-DSS] Application Account Credential Management",
+			Status:     "PASS",
+			Evidence:   "PCI-DSS Req 8.6.1: no app registration holds a client secret",
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.1"},
+		})
+	}
+
+	if len(staleSecrets) > 0 {
+		shown := staleSecrets
+		if len(shown) > 3 {
+			shown = shown[:3]
+		}
+		results = append(results, CheckResult{
+			Control:           "PCI-8.6.3",
+			Name:              "[PCI-DSS] Application Account Credential Rotation",
+			Status:            "FAIL",
+			Evidence:          fmt.Sprintf("PCI-DSS Req 8.6.3 (mandatory since 31 Mar 2025): %d client secret(s) older than 90 days: %s", len(staleSecrets), strings.Join(shown, ", ")),
+			Remediation:       "Rotate or eliminate long-lived client secrets",
+			RemediationDetail: "1. Prefer removing the secret in favour of a managed identity\n2. Otherwise create a replacement, update consumers, then delete the old secret\n3. Set the rotation frequency from your targeted risk analysis (Req 12.3.1)",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "App registration credential list showing ages within your defined rotation period",
+			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.3"},
+		})
+	} else {
+		results = append(results, CheckResult{
+			Control:    "PCI-8.6.3",
+			Name:       "[PCI-DSS] Application Account Credential Rotation",
+			Status:     "PASS",
+			Evidence:   "PCI-DSS Req 8.6.3: no client secret is older than 90 days",
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.3"},
+		})
+	}
+	return results
+}
+
+// checkDiagnosticRouting covers 10.4.1.1. Activity logs routed to a Log
+// Analytics workspace are what make automated review possible; reading the
+// activity log blade by hand is not automated review.
+func (c *AzurePCIChecks) checkDiagnosticRouting(ctx context.Context) []CheckResult {
+	fail := func(status, evidence string) []CheckResult {
+		return []CheckResult{
+			{
+				Control:           "PCI-10.4.1.1",
+				Name:              "[PCI-DSS] Automated Audit Log Review",
+				Status:            status,
+				Evidence:          evidence,
+				Remediation:       "Route activity logs to Log Analytics and alert on them",
+				RemediationDetail: "1. Configure a subscription diagnostic setting to a Log Analytics workspace\n2. Create alert rules for the events your risk analysis identifies\n3. Attach an action group so alerts reach someone",
+				Priority:          PriorityHigh,
+				ScreenshotGuide:   "Diagnostic settings sending to Log Analytics, plus the alert rules defined on it",
+				ConsoleURL:        "https://portal.azure.com/#view/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade",
+				Timestamp:         time.Now(),
+				Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+			},
+		}
+	}
+
+	if c.diagnosticClient == nil || c.subscriptionID == "" {
+		return fail("INFO", "PCI-DSS Req 10.4.1.1 (mandatory since 31 Mar 2025): audit log reviews must be automated. Diagnostic settings client unavailable, verify by hand")
+	}
+
+	routed := []string{}
+	pager := c.diagnosticClient.NewListPager("/subscriptions/"+c.subscriptionID, nil)
+	for pager.More() {
+		page, err := pager.NextPage(ctx)
+		if err != nil {
+			return fail("INFO", fmt.Sprintf("PCI-DSS Req 10.4.1.1 (mandatory since 31 Mar 2025): unable to read diagnostic settings (%v), verify by hand", err))
+		}
+		for _, ds := range page.Value {
+			if ds == nil || ds.Properties == nil {
+				continue
+			}
+			if ds.Properties.WorkspaceID != nil && *ds.Properties.WorkspaceID != "" {
+				name := ""
+				if ds.Name != nil {
+					name = *ds.Name
+				}
+				routed = append(routed, name)
+			}
+		}
+	}
+
+	if len(routed) == 0 {
+		return fail("FAIL", "PCI-DSS Req 10.4.1.1 (mandatory since 31 Mar 2025): no subscription diagnostic setting routes activity logs to a Log Analytics workspace, so log review is not automated")
+	}
+
+	return []CheckResult{
+		{
+			Control:           "PCI-10.4.1.1",
+			Name:              "[PCI-DSS] Automated Audit Log Review",
+			Status:            "PASS",
+			Evidence:          fmt.Sprintf("PCI-DSS Req 10.4.1.1: %d diagnostic setting(s) route activity logs to Log Analytics: %s", len(routed), strings.Join(routed, ", ")),
+			Remediation:       "Confirm alert rules act on the routed logs",
+			RemediationDetail: "Routing alone is not review. Ensure alert rules exist for the events your risk analysis identifies.",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "Log Analytics alert rules defined against the routed activity logs",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
 		},
 	}
 }
