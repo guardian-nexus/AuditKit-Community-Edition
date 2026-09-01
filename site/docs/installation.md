@@ -262,7 +262,7 @@ auditkit version
 
 **Expected output:**
 ```
-AuditKit v0.8.3 - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)
+AuditKit v0.8.4 - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)
 ```
 
 ### Check Cloud CLI Tools

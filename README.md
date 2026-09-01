@@ -4,7 +4,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v0.8.3-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
+[![Version](https://img.shields.io/badge/version-v0.8.4-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://guardiannexus.substack.com)
 
 **Need CMMC Level 2, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
@@ -99,7 +99,28 @@ AuditKit scans your cloud infrastructure for compliance gaps and security miscon
 
 ---
 
-## Recent Changes (v0.8.3)
+## Recent Changes (v0.8.4)
+
+**September 2026**
+
+Scores will drop after upgrading - absent resources and unreadable resources no longer count as passes (55.0% to 30.8% on our test account, same environment)
+
+Fixes:
+- Controls for resource types an account does not use are excluded from the score instead of passing vacuously (89 checks)
+- Checks that cannot read a resource no longer report a verdict about it
+- PCI requirements now resolve to NIST 800-53: 69 of 69, was 19 of 97
+- Macie, Security Hub, Inspector and GCP OS Login remapped to what they actually evidence
+- `evidence import` works - it consumed its own path argument and failed on every invocation
+- PCI password check demanded 12 characters while its remediation told you to set 7
+- Scans that evaluate nothing exit non-zero instead of reporting 0%
+
+Added:
+- SOC2 Availability and Confidentiality criteria (A1.1-A1.3, C1.1, C1.2) on AWS, Azure and GCP
+- PCI DSS v4.0.1 requirements mandatory since 31 March 2025 on all three providers
+- Evidence lifecycle with staleness tracking - `evidence status`, `evidence collect`, `evidence import`
+- GDPR and NIST CSF 2.0 return results, both previously returned nothing
+
+### Previous: v0.8.3
 
 **August 2026**
 
@@ -334,17 +355,29 @@ prowler aws --output-formats json -o prowler-output     # Run Prowler first
 
 ---
 
-## What's New in v0.8.3
+## What's New in v0.8.4
 
 ### Fixes
+- Absent and unreadable resources no longer count as passing controls - expect a lower, more accurate score
+- PCI requirements now resolve to NIST 800-53 (69 of 69, was 19 of 97), so ISO 27001, GDPR, NIST CSF and FedRAMP output is populated
+- `evidence import` works for the first time
+- Security service mappings corrected to what each service actually evidences
+
+### Added
+- SOC2 Availability and Confidentiality criteria on AWS, Azure and GCP
+- PCI DSS v4.0.1 requirements mandatory since 31 March 2025
+- Evidence lifecycle with staleness tracking
+
+### Previous: v0.8.3
+
+#### Fixes
 - Compliance score now matches between CLI output and PDF/HTML reports
 - Manual controls are no longer dropped from reports
 - Working download links for all platforms, including Linux ARM64
 - Correct version reported by provider-specific binaries
 
-### Previous: v0.8.2
+#### Previous: v0.8.2
 
-#### Fixes
 - Removed broken `report` command stub (use `auditkit scan -format pdf`)
 - FedRAMP baseline filtering (`fedramp-low`, `fedramp-moderate`, `fedramp-high`) documented as working
 - Updated HIPAA control count to ~15 across AWS, Azure, and GCP

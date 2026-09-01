@@ -13,7 +13,7 @@ import (
 	"github.com/guardian-nexus/auditkit/scanner/pkg/providers/aws"
 )
 
-var CurrentVersion = "v0.8.3"
+var CurrentVersion = "v0.8.4"
 
 func main() {
 	var (

@@ -2,6 +2,71 @@
 
 All notable changes to AuditKit will be documented in this file.
 
+## [v0.8.4] - 2026-09-01
+
+### Changed
+- **Absent and unreadable resources no longer count as passing controls.** A
+  control the scanner could not evaluate was previously scored as a pass. On the
+  AWS account used to validate this release the score fell from 55.0% to 30.8%
+  with no change to the account. Expect a lower, more accurate score.
+- Only PASS and FAIL contribute to the score; INFO, MANUAL and ERROR are excluded
+- Check statuses are a fixed set, enforced in CI
+- An absent autoscaler is a manual check rather than a scored failure
+- A scan that evaluates nothing exits non-zero instead of reporting 0%
+
+### Added
+- SOC2 Availability and Confidentiality criteria (A1.1, A1.2, A1.3, C1.1, C1.2)
+  on AWS, Azure and GCP
+- PCI DSS v4.0.1 requirements mandatory since 31 March 2025: 4.2.1.1, 8.6.1,
+  8.6.2, 8.6.3, 10.4.1.1, 10.7.2, 10.7.3, on all three providers
+- Evidence lifecycle with staleness tracking: `evidence status`,
+  `evidence collect`, `evidence import`
+- GDPR and NIST CSF 2.0 results; both frameworks previously returned nothing
+- CI running vet, test, build, a check-status guard and a documentation link check
+
+### Fixed
+- PCI requirements resolving to NIST 800-53 went from 19 of 97 to 69 of 69,
+  which also populates the ISO 27001, GDPR, NIST CSF and FedRAMP output derived
+  from it. SOC2 criteria resolve 38 of 38.
+- Macie remapped from 3.5.1 to 3.2.1 and 12.5.2, Security Hub from 10.4.1 and
+  11.5.1 to 10.7.2, Inspector from 11.3.2 to 11.3.1, GCP OS Login from 8.1 to
+  8.2.1
+- `evidence import` consumed its own path argument during flag parsing and
+  failed on every invocation
+- PCI password length check required 12 characters while its remediation
+  instructed you to set 7
+- SOC2 A1.2 was absent from empty Azure subscriptions
+- Evidence tracker overwrote control names with "Security Control"
+- Documentation claimed Excel export, `-format` and `-framework` flags on
+  `evidence` that do not exist; control counts corrected against the code
+
+## [v0.8.3] - 2026-08-18
+
+### Fixed
+- Compliance score in PDF and HTML reports now matches the CLI; manual controls
+  were being counted as automated
+- 45 manual controls were dropped from the evidence guide entirely
+- M365 scans score on the same basis as other providers
+- Binary download URLs in the installation guide and CI/CD examples
+- Provider-specific binaries reported the correct version, previously pinned at
+  v0.7.0
+
+### Added
+- Linux ARM64 and Apple Silicon installation instructions
+
+## [v0.8.2] - 2026-02-17
+
+### Removed
+- Stubbed `report` command; use `auditkit scan -format pdf`
+- Fictional Docker "coming soon" section and other overclaimed features
+
+### Fixed
+- FedRAMP baseline filtering documented as working; it already was
+- HIPAA control count corrected to ~15 across AWS, Azure and GCP
+
+### Added
+- Provider-specific binaries published alongside the universal binary
+
 ## [v0.8.1] - 2026-02-03
 
 ### Added
