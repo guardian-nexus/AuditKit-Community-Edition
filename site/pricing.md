@@ -29,7 +29,7 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 **What's included:**
 - AWS, Azure, GCP, M365 scanning
 - SOC2 Type II (64 controls)
-- PCI-DSS v4.0 (30+ controls)
+- PCI-DSS v4.0.1 (30+ controls)
 - CMMC Level 1 (17 practices)
 - NIST 800-53 Rev 5 (~150 technical controls)
 - GCP Core Services (170+ checks)
@@ -112,7 +112,7 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 | M365 (ScubaGear) | Full support | Full support |
 | **Frameworks** |
 | SOC2 Type II | 64 controls | 64 controls |
-| PCI-DSS v4.0 | 30+ controls | 30+ controls |
+| PCI-DSS v4.0.1 | 30+ controls | 30+ controls |
 | CMMC Level 1 | 17 practices | 17 practices |
 | CMMC Level 2 | - | 110 practices |
 | NIST 800-53 Rev 5 | ~150 controls | ~150 controls |
@@ -161,8 +161,13 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 - Compliance platform: $5,000 - $15,000/year
 - **Total first year:** $65,000 - $150,000
 
+
+> **Note:** C3PAO assessment is a Phase 2 requirement. The Department of War
+> suspended Phase 2 on July 13, 2026, so this cost does not currently apply.
+> Level 2 is self-assessed under Phase 1. Figures below assume Phase 2 resumes.
+
 **CMMC Level 2 Assessment:**
-- C3PAO assessment (required): $25,000 - $150,000
+- C3PAO assessment (Phase 2, currently suspended): $25,000 - $150,000
 - Consultant preparation: $50,000 - $100,000
 - Gap remediation: $20,000 - $75,000
 - **Total:** $95,000 - $325,000
@@ -177,7 +182,7 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 
 **Pro version (CMMC Level 2):**
 - AuditKit: $297/month = $3,564/year
-- C3PAO assessment (still required): $25,000 - $150,000
+- C3PAO assessment (Phase 2, currently suspended): $25,000 - $150,000
 - **Total: $28,564 - $153,564**
 - **Savings vs traditional:** $66,436 - $171,436
 
@@ -215,13 +220,13 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 - CMMC Level 2 (110 practices)
 - Handling CUI for DoW contracts
 - Multi-cloud (AWS + Azure)
-- C3PAO assessment required
+- C3PAO assessment (Phase 2, currently suspended)
 
 **Solution:** Pro version
 
 **Costs:**
 - AuditKit: $3,564/year
-- C3PAO assessment (required): $25,000 - $150,000
+- C3PAO assessment (Phase 2, currently suspended): $25,000 - $150,000
 - Policy documentation (if needed): $10,000 - $30,000
 - **Total: $38,564 - $183,564**
 

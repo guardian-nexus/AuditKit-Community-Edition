@@ -9,7 +9,7 @@ AuditKit supports multiple compliance frameworks for automated technical control
 | Framework | Status | Automated Controls | Cloud Providers |
 |-----------|--------|-------------------|-----------------|
 | **[SOC2 Type II](./soc2.md)** | Production | 64 controls | AWS, Azure, GCP |
-| **[PCI-DSS v4.0](./pci-dss.md)** | Production | All 12 requirements (60+ controls) | AWS, Azure, GCP |
+| **[PCI-DSS v4.0.1](./pci-dss.md)** | Production | All 12 requirements (60+ controls) | AWS, Azure, GCP |
 | **[CMMC Level 1](./cmmc.md)** | Production | 17 practices | AWS, Azure, GCP |
 | **[CMMC Level 2](./cmmc.md)** | Pro Only | 110 practices | AWS, Azure, GCP |
 | **[CIS Benchmarks](./cis-benchmarks.md)** | Production | AWS: 126+, Azure: ~40+, GCP: 61 | AWS, Azure, GCP |
@@ -24,7 +24,7 @@ AuditKit supports multiple compliance frameworks for automated technical control
 ### Production Ready
 Fully tested, comprehensive coverage, used in production environments:
 - **SOC2 Type II** - For SaaS companies and startups
-- **PCI-DSS v4.0** - For payment card processing
+- **PCI-DSS v4.0.1** - For payment card processing
 - **CMMC Level 1** - For all DoW contractors
 - **CIS Benchmarks** - For security hardening (AWS: 126+ controls, Azure: ~40+ controls, GCP: 61 controls)
 - **NIST 800-53** - For federal contractors and FedRAMP compliance
@@ -42,7 +42,7 @@ Requires AuditKit subscription:
 ### By Industry
 
 **SaaS/Startups:** SOC2 Type II  
-**E-commerce/Payment Processing:** PCI-DSS v4.0  
+**E-commerce/Payment Processing:** PCI-DSS v4.0.1  
 **DoW Contractors (FCI):** CMMC Level 1  
 **DoW Contractors (CUI):** CMMC Level 2 (Pro)  
 **Federal Contractors:** NIST 800-53 Rev 5  
@@ -77,7 +77,7 @@ Requires AuditKit subscription:
 
 **[Learn more →](./soc2.md)**
 
-### PCI-DSS v4.0
+### PCI-DSS v4.0.1
 **Purpose:** Payment Card Industry Data Security Standard  
 **Certification:** Requires QSA assessment  
 **Cost:** $15,000 - $50,000 for assessment  
@@ -89,7 +89,7 @@ Requires AuditKit subscription:
 **Purpose:** Cybersecurity Maturity Model Certification for DoW  
 **Certification:**  
 - Level 1: Self-assessment  
-- Level 2: C3PAO required ($25,000 - $150,000)
+- Level 2: Self-assessment under Phase 1. C3PAO ($25,000 - $150,000) applies only if Phase 2 resumes, suspended since July 13, 2026
 
 **Timeline:**  
 - Level 1: 2-4 weeks  

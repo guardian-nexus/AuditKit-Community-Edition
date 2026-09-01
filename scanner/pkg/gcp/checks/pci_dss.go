@@ -14,7 +14,7 @@ import (
 	"google.golang.org/api/sqladmin/v1"
 )
 
-// GCPPCIChecks implements PCI-DSS v4.0 requirements for GCP
+// GCPPCIChecks implements PCI-DSS v4.0.1 requirements for GCP
 type GCPPCIChecks struct {
 	storageClient  *storage.Client
 	iamClient      *admin.IamClient
@@ -46,7 +46,7 @@ func NewGCPPCIChecks(
 }
 
 func (c *GCPPCIChecks) Name() string {
-	return "GCP PCI-DSS v4.0 Requirements"
+	return "GCP PCI-DSS v4.0.1 Requirements"
 }
 
 func (c *GCPPCIChecks) Run(ctx context.Context) ([]CheckResult, error) {

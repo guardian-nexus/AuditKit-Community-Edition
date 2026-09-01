@@ -151,7 +151,7 @@ Options:
 
 Frameworks:
   soc2      SOC2 Type II Common Criteria (full coverage)
-  pci       PCI-DSS v4.0 (full coverage)
+  pci       PCI-DSS v4.0.1 (full coverage)
   cmmc      CMMC Level 1 (17 practices)
   hipaa     HIPAA Security Rule (experimental)
   gdpr      GDPR Technical Controls (Articles 5, 25, 32, etc.)

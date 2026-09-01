@@ -208,7 +208,7 @@ func (s *GCPScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 	var results []ScanResult
 
 	if verbose {
-		fmt.Println("Running PCI-DSS v4.0 checks for GCP...")
+		fmt.Println("Running PCI-DSS v4.0.1 checks for GCP...")
 		fmt.Println("Checking all 12 PCI-DSS requirements...")
 	}
 

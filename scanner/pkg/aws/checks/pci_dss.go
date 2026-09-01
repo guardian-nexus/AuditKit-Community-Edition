@@ -14,8 +14,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-// PCIDSSChecks implements PCI-DSS v4.0 requirements
-// v4.0 mandatory since March 31, 2024 - we're now 18 months post-deadline
+// PCIDSSChecks implements PCI-DSS v4.0.1 requirements
+// v4.0.1 is the only active version. All 51 future-dated requirements became
+// mandatory on March 31, 2025 - there is no remaining grace period.
 type PCIDSSChecks struct {
 	iamClient        *iam.Client
 	ec2Client        *ec2.Client
@@ -41,7 +42,7 @@ func NewPCIDSSChecks(
 }
 
 func (c *PCIDSSChecks) Name() string {
-	return "PCI-DSS v4.0 Requirements"
+	return "PCI-DSS v4.0.1 Requirements"
 }
 
 func (c *PCIDSSChecks) Run(ctx context.Context) ([]CheckResult, error) {

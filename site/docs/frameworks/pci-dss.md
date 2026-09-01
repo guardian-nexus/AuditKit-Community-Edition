@@ -1,4 +1,4 @@
-# PCI-DSS v4.0 Compliance
+# PCI-DSS v4.0.1 Compliance
 
 Payment Card Industry Data Security Standard guide.
 
@@ -41,9 +41,9 @@ Payment Card Industry Data Security Standard guide.
 
 ---
 
-## PCI-DSS v4.0
+## PCI-DSS v4.0.1
 
-PCI-DSS v4.0 became mandatory on March 31, 2024. Key updates from v3.2.1:
+PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 
 **Major changes:**
 - Enhanced multi-factor authentication requirements

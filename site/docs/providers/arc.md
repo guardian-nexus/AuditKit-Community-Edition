@@ -18,7 +18,7 @@ Azure Arc extends Azure management to your on-premises servers. AuditKit can sca
 
 **Supported frameworks:**
 - SOC2 Type II
-- PCI-DSS v4.0
+- PCI-DSS v4.0.1
 - CMMC Level 2 (Pro)
 - NIST 800-53 Rev 5
 - ISO 27001

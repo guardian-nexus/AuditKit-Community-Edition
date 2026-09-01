@@ -9,12 +9,18 @@ Complete guide to CMMC Level 1 and Level 2 compliance with AuditKit.
 **CMMC** is a cybersecurity framework required for DoW contractors.
 
 **Why CMMC matters:**
-- Required for all DoW contracts (as of November 10, 2025)
+- In force since November 10, 2025, when the 48 CFR rule took effect
 - Protects Federal Contract Information (FCI) and Controlled Unclassified Information (CUI)
-- Mandatory for bidding on DoW contracts
-- Failure to comply = cannot bid on DoW work
+- Phase 1 is live: self-assessment for Level 1 and Level 2 on applicable contracts
+- Where a solicitation carries the CMMC clause, you cannot bid without meeting it
 
-**Certification:** Requires third-party assessment by C3PAO (CMMC Third-Party Assessor Organization)
+**Current status (September 2026):** the rollout is in Phase 1. On July 13, 2026
+the Department of War suspended the move to Phase 2 pending a reform review, so
+third-party C3PAO assessment is **not** currently mandated. Phase 1 obligations
+continue unchanged: self-assessment, DFARS 252.204-7012, NIST SP 800-171 Rev 2,
+SPRS score postings and annual affirmations.
+
+**Certification:** C3PAO (CMMC Third-Party Assessor Organization) assessment applies from Phase 2, which is currently suspended. Level 2 is self-assessed under Phase 1.
 
 ---
 
@@ -40,7 +46,7 @@ Complete guide to CMMC Level 1 and Level 2 compliance with AuditKit.
 
 **Protects:** Controlled Unclassified Information (CUI)  
 **Required for:** DoW contractors handling CUI  
-**Assessment:** C3PAO required  
+**Assessment:** Self-assessment under Phase 1. C3PAO assessment was scheduled for Phase 2, which is suspended.  
 **Cost:** $297/month with AuditKit
 
 **What is CUI?**
@@ -51,7 +57,7 @@ Complete guide to CMMC Level 1 and Level 2 compliance with AuditKit.
 - Operational procedures
 - Export-controlled technical data
 
-**Timeline:** Required starting November 10, 2025
+**Timeline:** In force since November 10, 2025 (Phase 1)
 
 ---
 
@@ -302,7 +308,7 @@ auditkit-pro evidence -framework cmmc-l2 -format html -output cmmc-l2-evidence.h
 3. Policy/procedure documentation (Months 2-4)
 4. Training implementation (Months 3-5)
 5. Pre-assessment audit (Month 5)
-6. C3PAO assessment (Month 6)
+6. C3PAO assessment (Month 6) - applies if and when Phase 2 resumes
 
 **[Start Pro trial →](https://auditkit.io/pro/)**
 
@@ -314,14 +320,14 @@ auditkit-pro evidence -framework cmmc-l2 -format html -output cmmc-l2-evidence.h
 |--------|---------|---------|
 | **Practices** | 17 | 110 |
 | **Protects** | FCI | CUI |
-| **Assessment** | Self-assessment | C3PAO required |
+| **Assessment** | Self-assessment | Self-assessment (Phase 1); C3PAO deferred with Phase 2 |
 | **Cost (AuditKit)** | Free | $297/month |
-| **Cost (Assessment)** | $0 | $25,000-$150,000 |
+| **Cost (Assessment)** | $0 | $0 under Phase 1; $25,000-$150,000 if C3PAO resumes |
 | **Timeline** | 2-4 weeks | 3-6 months |
 | **Automated Checks** | 8 | 33 |
 | **Manual Docs** | 9 | 77 |
 | **Required For** | All DoW contracts | CUI contracts |
-| **Deadline** | Now | Nov 10, 2025 |
+| **Deadline** | Now | Now (Phase 1, self-assessment) |
 
 ---
 
@@ -341,6 +347,10 @@ This means passing CMMC Level 2 = compliance with NIST SP 800-171.
 ---
 
 ## C3PAO Assessment Process
+
+> **Note:** C3PAO assessment belongs to Phase 2 of the CMMC rollout, which the
+> Department of War suspended on July 13, 2026. The section below describes the
+> process for when it resumes. Under Phase 1 today, Level 2 is self-assessed.
 
 ### Before Assessment
 

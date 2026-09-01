@@ -13,7 +13,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 )
 
-// AzurePCIChecks implements PCI-DSS v4.0 requirements for Azure
+// AzurePCIChecks implements PCI-DSS v4.0.1 requirements for Azure
 type AzurePCIChecks struct {
 	storageClient *armstorage.AccountsClient
 	networkClient *armnetwork.SecurityGroupsClient
@@ -39,7 +39,7 @@ func NewAzurePCIChecks(
 }
 
 func (c *AzurePCIChecks) Name() string {
-	return "Azure PCI-DSS v4.0 Requirements"
+	return "Azure PCI-DSS v4.0.1 Requirements"
 }
 
 func (c *AzurePCIChecks) Run(ctx context.Context) ([]CheckResult, error) {

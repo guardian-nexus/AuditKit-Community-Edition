@@ -511,7 +511,7 @@ func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 	pciChecks := checks.NewPCIDSSChecks(s.iamClient, s.ec2Client, s.s3Client, s.ctClient, s.configClient)
 
 	if verbose {
-		fmt.Printf("  Running PCI-DSS v4.0 requirements...\n")
+		fmt.Printf("  Running PCI-DSS v4.0.1 requirements...\n")
 	}
 
 	checkResults, err := pciChecks.Run(ctx)

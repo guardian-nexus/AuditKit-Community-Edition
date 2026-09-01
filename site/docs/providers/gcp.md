@@ -11,7 +11,7 @@ What AuditKit scans in Google Cloud Platform.
 
 **Supported frameworks:**
 - SOC2 Type II
-- PCI-DSS v4.0
+- PCI-DSS v4.0.1
 - CMMC Level 1 and Level 2 (Pro)
 - NIST 800-53 Rev 5
 - HIPAA (experimental)

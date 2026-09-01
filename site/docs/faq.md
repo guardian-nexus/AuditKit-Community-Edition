@@ -98,7 +98,7 @@ Compare to traditional costs:
 | Framework | Status | Coverage |
 |-----------|--------|----------|
 | SOC2 Type II | Production | 64 controls |
-| PCI-DSS v4.0 | Production | 30+ controls |
+| PCI-DSS v4.0.1 | Production | 30+ controls |
 | CMMC Level 1 | Production | 17 practices |
 | CMMC Level 2 | Pro only | 110 practices |
 | NIST 800-53 Rev 5 | Production | ~150 technical controls |

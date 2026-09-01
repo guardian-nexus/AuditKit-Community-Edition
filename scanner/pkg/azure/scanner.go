@@ -272,7 +272,7 @@ func (s *AzureScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanRes
 	var results []ScanResult
 
 	if verbose {
-		fmt.Println("Running PCI-DSS v4.0 checks for Azure...")
+		fmt.Println("Running PCI-DSS v4.0.1 checks for Azure...")
 		fmt.Println("Checking all 12 PCI-DSS requirements...")
 	}
 
