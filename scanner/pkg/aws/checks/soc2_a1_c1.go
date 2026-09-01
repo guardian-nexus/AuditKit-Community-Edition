@@ -112,6 +112,10 @@ func (c *AvailabilityConfidentialityChecks) checkDataClassification(ctx context.
 		}}
 	}
 
+	if len(buckets.Buckets) == 0 {
+		return []CheckResult{noResources("C1.1", "Confidential Data Identification", "S3 bucket", "C1.1")}
+	}
+
 	untagged := []string{}
 	for _, b := range buckets.Buckets {
 		name := aws.ToString(b.Name)
@@ -181,13 +185,44 @@ func (c *AvailabilityConfidentialityChecks) checkDataDisposal(ctx context.Contex
 		}}
 	}
 
+	if len(buckets.Buckets) == 0 {
+		return []CheckResult{noResources("C1.2", "Confidential Data Disposal", "S3 bucket", "C1.2")}
+	}
+
 	noLifecycle := []string{}
+	unreadable := []string{}
 	for _, b := range buckets.Buckets {
 		name := aws.ToString(b.Name)
 		lc, err := c.s3Client.GetBucketLifecycleConfiguration(ctx, &s3.GetBucketLifecycleConfigurationInput{Bucket: aws.String(name)})
-		if err != nil || len(lc.Rules) == 0 {
+		if err != nil {
+			// AWS returns NoSuchLifecycleConfiguration for a bucket with no
+			// rules, which is a real finding, but AccessDenied and
+			// PermanentRedirect are not: reporting those as a failure would
+			// blame the customer for our own lack of permission.
+			if strings.Contains(err.Error(), "NoSuchLifecycleConfiguration") {
+				noLifecycle = append(noLifecycle, name)
+			} else {
+				unreadable = append(unreadable, name)
+			}
+			continue
+		}
+		if lc == nil || len(lc.Rules) == 0 {
 			noLifecycle = append(noLifecycle, name)
 		}
+	}
+
+	if len(noLifecycle) == 0 && len(unreadable) > 0 {
+		return []CheckResult{{
+			Control:           "C1.2",
+			Name:              "Confidential Data Disposal",
+			Status:            StatusError,
+			Evidence:          fmt.Sprintf("SOC2 C1.2: could not read the lifecycle configuration of %d bucket(s), so disposal could not be assessed: %s", len(unreadable), strings.Join(unreadable[:min(3, len(unreadable))], ", ")),
+			Remediation:       "Grant s3:GetLifecycleConfiguration and re-run",
+			RemediationDetail: "The scanner needs s3:GetLifecycleConfiguration on each bucket to determine whether disposal is enforced.",
+			Priority:          PriorityMedium,
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{FrameworkSOC2: "C1.2"},
+		}}
 	}
 
 	if len(noLifecycle) > 0 {
@@ -220,4 +255,22 @@ func (c *AvailabilityConfidentialityChecks) checkDataDisposal(ctx context.Contex
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{FrameworkSOC2: "C1.2"},
 	}}
+}
+
+// noResources reports that a control could not be assessed because the account
+// holds nothing of the relevant type. This is deliberately INFO rather than
+// PASS: "all 0 buckets are tagged" is not evidence of anything, and scoring it
+// as a pass inflates the compliance score for an empty account.
+func noResources(control, name, resource, framework string) CheckResult {
+	return CheckResult{
+		Control:           control,
+		Name:              name,
+		Status:            StatusInfo,
+		Evidence:          fmt.Sprintf("SOC2 %s: no %s found in this account, so there was nothing to assess", framework, resource),
+		Remediation:       "No action while no such resources exist",
+		RemediationDetail: "Re-run once resources of this type are in scope.",
+		Priority:          PriorityInfo,
+		Timestamp:         time.Now(),
+		Frameworks:        map[string]string{FrameworkSOC2: framework},
+	}
 }

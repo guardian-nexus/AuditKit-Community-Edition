@@ -11,6 +11,7 @@ import (
 
 type ControlResult struct {
 	Control string
+	Name    string
 	Status  string
 }
 

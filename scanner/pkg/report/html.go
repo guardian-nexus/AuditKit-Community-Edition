@@ -108,7 +108,7 @@ func GenerateHTML(result ComplianceResult) string {
                 Formal assessment by qualified auditor is required.
             </p>
         </div>
-    `, automated, automated+manual, automatedScore, automated, manual, manual, getAssessorType(result.Framework), erroredNote(errored))
+    `, automated, automated+manual, automatedScore, automated, manual, manual, erroredNote(errored), getAssessorType(result.Framework))
 
 	// Build watermarked footer HTML
 	footerHTML := ""

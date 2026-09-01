@@ -222,6 +222,26 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 	}
 
 	results := []CheckResult{}
+	if total == 0 {
+		// "all 0 accounts are tagged" is not evidence of anything, and scoring
+		// it as a pass inflates the compliance score for an empty subscription.
+		return []CheckResult{
+			{
+				Control: "C1.1", Name: "Confidential Data Identification", Status: StatusInfo,
+				Evidence:   "SOC2 C1.1: no storage accounts found in this subscription, so there was nothing to assess",
+				Priority:   PriorityInfo,
+				Timestamp:  time.Now(),
+				Frameworks: map[string]string{"SOC2": "C1.1"},
+			},
+			{
+				Control: "C1.2", Name: "Confidential Data Disposal", Status: StatusInfo,
+				Evidence:   "SOC2 C1.2: no storage accounts found in this subscription, so there was nothing to assess",
+				Priority:   PriorityInfo,
+				Timestamp:  time.Now(),
+				Frameworks: map[string]string{"SOC2": "C1.2"},
+			},
+		}
+	}
 	if len(untagged) > 0 {
 		results = append(results, CheckResult{
 			Control:           "C1.1",
@@ -298,6 +318,16 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
 			Frameworks:        map[string]string{"SOC2": "A1.2"},
+		})
+	} else if total == 0 {
+		results = append(results, CheckResult{
+			Control:    "A1.2",
+			Name:       "Data Backup and Recovery Infrastructure",
+			Status:     StatusInfo,
+			Evidence:   "SOC2 A1.2: no storage accounts found in this subscription, so there was nothing to assess",
+			Priority:   PriorityInfo,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"SOC2": "A1.2"},
 		})
 	} else if len(noSoftDelete) > 0 {
 		results = append(results, CheckResult{

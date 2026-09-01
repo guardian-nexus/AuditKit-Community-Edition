@@ -131,7 +131,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 	vpcs, err := c.ec2Client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
 	if err != nil {
 		return append(results, CheckResult{
-			Control:   "PCI-1.4.2",
+			Control:   "PCI-1.4.1",
 			Name:      "[PCI-DSS] Network Segmentation",
 			Status:    "ERROR",
 			Evidence:  fmt.Sprintf("Could not check VPC segmentation: %v", err),
@@ -146,11 +146,11 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 	// Check if we have isolated VPCs (simplified check)
 	if len(vpcs.Vpcs) < 2 {
 		results = append(results, CheckResult{
-			Control:           "PCI-1.4.2",
+			Control:           "PCI-1.4.1",
 			Name:              "[PCI-DSS] Network Segmentation for CDE",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          "PCI-DSS Req 1.4.2 VIOLATION: Only 1 VPC found - PCI requires isolated network for cardholder data environment (CDE)",
+			Evidence:          "PCI-DSS Req 1.4.1 VIOLATION: Only 1 VPC found - PCI requires isolated network for cardholder data environment (CDE)",
 			Remediation:       "Create separate VPC for CDE",
 			RemediationDetail: "1. Create new VPC: aws ec2 create-vpc --cidr-block 10.1.0.0/16\n2. Tag as CDE: aws ec2 create-tags --resources vpc-xxx --tags Key=Environment,Value=CDE\n3. Implement strict NACLs and security groups",
 			Priority:          PriorityCritical,
@@ -163,7 +163,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:   "PCI-1.4.2",
+			Control:   "PCI-1.4.1",
 			Name:      "[PCI-DSS] Network Segmentation for CDE",
 			Status:    "PASS",
 			Evidence:  fmt.Sprintf("%d VPCs found - verify CDE isolation manually", len(vpcs.Vpcs)),
@@ -750,13 +750,16 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 
 		// 8.2.3: Minimum password strength (7+ characters for PCI)
 		minLength := aws.ToInt32(passwordPolicy.PasswordPolicy.MinimumPasswordLength)
-		if minLength < 7 {
+		// v4.0.1 8.3.6 requires 12 characters; 8 is permitted only where the
+		// system cannot technically support 12. The old threshold of 7 was the
+		// v3.2.1 value and passed policies that fail the current standard.
+		if minLength < 12 {
 			results = append(results, CheckResult{
 				Control:           "PCI-8.3.6",
 				Name:              "[PCI-DSS] Minimum Password Length",
 				Status:            "FAIL",
 				Severity:          "HIGH",
-				Evidence:          fmt.Sprintf("PCI-DSS Req 8.3.6: Password length only %d chars - PCI requires minimum 7", minLength),
+				Evidence:          fmt.Sprintf("PCI-DSS Req 8.3.6: Password length only %d chars - v4.0.1 requires minimum 12", minLength),
 				Remediation:       "Set to 7+ characters",
 				RemediationDetail: "aws iam update-account-password-policy --minimum-password-length 7",
 				Priority:          PriorityHigh,
@@ -998,7 +1001,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.2.1, 10.2.1",
+				"PCI-DSS": "Req 10.2.1",
 			},
 		})
 	} else {
@@ -1018,7 +1021,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.2.1, 10.2.1",
+				"PCI-DSS": "Req 10.2.1",
 			},
 		})
 
@@ -1191,7 +1194,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ConsoleURL:        "https://console.aws.amazon.com/guardduty/",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.2.1, 5.2.1",
+			"PCI-DSS": "Req 5.2.1",
 		},
 	})
 
@@ -1206,7 +1209,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Anti-malware console → Show automatic updates enabled and recent scan logs",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.1, 5.3.1",
+			"PCI-DSS": "Req 5.3.1",
 		},
 	})
 
@@ -1221,7 +1224,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Show anti-malware logs with retention policy and review documentation",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.4, 5.3.4",
+			"PCI-DSS": "Req 5.3.4",
 		},
 	})
 
@@ -1245,7 +1248,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ConsoleURL:        "https://console.aws.amazon.com/artifact/home",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.1.1, 9.1.1",
+			"PCI-DSS": "Req 9.1.1",
 		},
 	})
 
@@ -1313,7 +1316,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document current security policy, annual review dates, and communication records",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.1.1, 12.1.1",
+			"PCI-DSS": "Req 12.1.1",
 		},
 	})
 
@@ -1373,7 +1376,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document training program, completion records, and acknowledgment forms",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.6.1, 12.6.1, 12.6.2",
+			"PCI-DSS": "Req 12.6.1, 12.6.2",
 		},
 	})
 
@@ -1388,7 +1391,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document service provider list, contracts, and annual compliance verification",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.8.1, 12.8.1, 12.8.2",
+			"PCI-DSS": "Req 12.8.1, 12.8.2",
 		},
 	})
 
@@ -1403,7 +1406,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document incident response plan, test results, and update history",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.10.1, 12.10.1",
+			"PCI-DSS": "Req 12.10.1",
 		},
 	})
 
@@ -1457,8 +1460,12 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 	staleServiceKeys := []string{}
 	for _, user := range users.Users {
 		userName := aws.ToString(user.UserName)
-		keys, _ := c.iamClient.ListAccessKeys(ctx, &iam.ListAccessKeysInput{UserName: user.UserName})
-		if len(keys.AccessKeyMetadata) == 0 {
+		// The SDK returns a nil output on error, so the result cannot be
+		// dereferenced before checking. ListUsers succeeding does not imply
+		// ListAccessKeys will: it is a separate IAM permission and is throttled
+		// separately.
+		keys, kerr := c.iamClient.ListAccessKeys(ctx, &iam.ListAccessKeysInput{UserName: user.UserName})
+		if kerr != nil || keys == nil || len(keys.AccessKeyMetadata) == 0 {
 			continue
 		}
 		if _, err := c.iamClient.GetLoginProfile(ctx, &iam.GetLoginProfileInput{UserName: aws.String(userName)}); err == nil {

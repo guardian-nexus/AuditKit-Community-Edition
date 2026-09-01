@@ -1,6 +1,7 @@
 package tracker
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -59,6 +60,15 @@ func NewTracker(accountID string) (*EvidenceTracker, error) {
 		if err := json.Unmarshal(data, tracker); err != nil {
 			// If corrupt, start fresh
 			tracker.Controls = make(map[string]EvidenceItem)
+		} else if !bytes.Contains(data, []byte(`"required"`)) {
+			// Files written before Required existed unmarshal it as false,
+			// which would report every control as retired and nothing as
+			// outstanding. Treat a file with no Required field as all-required
+			// until the next scan reconciles it.
+			for id, item := range tracker.Controls {
+				item.Required = true
+				tracker.Controls[id] = item
+			}
 		}
 	}
 

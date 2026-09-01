@@ -48,7 +48,11 @@ func (t *EvidenceTracker) SyncFromScan(items []ScanItem) (added, retired int) {
 			added++
 			existing = EvidenceItem{ControlID: it.ControlID, ControlName: it.Name}
 		}
-		existing.ControlName = it.Name
+		// Only overwrite the name when the scan actually supplied one, otherwise
+		// a caller that fills in ControlID and Status alone wipes every name.
+		if it.Name != "" {
+			existing.ControlName = it.Name
+		}
 		existing.Status = it.Status
 		existing.Required = true
 		t.Controls[it.ControlID] = existing

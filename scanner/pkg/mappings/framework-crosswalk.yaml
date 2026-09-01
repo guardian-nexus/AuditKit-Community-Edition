@@ -58,73 +58,68 @@ soc2_to_800_53:
 # PCI-DSS v4.0 → NIST 800-53 Rev 5
 pci_to_800_53:
   # Requirement 1: Network Security
-  PCI-1.2.1: [SC-7, SC-7(3)]    # Network segmentation
-  PCI-1.3.1: [AC-4, SC-7(5)]    # No direct public access to CDE
-  PCI-1.3.2: [SC-7(11)]         # Restrict inbound traffic
+  PCI-1.4.2: [SC-7, SC-7(3)]    # Network segmentation
   
   # Requirement 2: Secure Configuration
-  PCI-2.1: [CM-6]               # Configuration standards
-  PCI-2.2: [CM-7]               # Disable unnecessary services
-  PCI-2.2.2: [CM-6, CM-7]       # Remove default accounts
+  PCI-2.2.2: [CM-6]               # Configuration standards
+  PCI-2.2.1: [CM-7]               # Disable unnecessary services
+  PCI-2.2.4: [CM-6, CM-7]       # Remove default accounts
 
   # Requirement 3: Protect Cardholder Data
-  PCI-3.4: [SC-13, SC-28]       # Encryption at rest
-  PCI-3.5: [SC-12]              # Cryptographic key management
-  PCI-3.4.1: [SC-28(1)]         # Disk encryption
+  PCI-3.5.1: [SC-13, SC-28]       # Encryption at rest
+  PCI-3.6.1: [SC-12]              # Cryptographic key management
   
   # Requirement 4: Encryption in Transit
-  PCI-4.1: [SC-8, SC-8(1)]      # TLS/encryption in transit
+  PCI-4.2.1: [SC-8, SC-8(1)]      # TLS/encryption in transit
 
   # Requirement 5: Malware Protection
-  PCI-5.1: [SI-3]               # Anti-malware protection
-  PCI-5.2.3: [SI-3]             # Anti-malware updates
-  PCI-5.3.2: [AU-2, SI-3]       # Anti-malware logging
+  PCI-5.2.1: [SI-3]               # Anti-malware protection
+  PCI-5.3.1: [SI-3]             # Anti-malware updates
+  PCI-5.3.4: [AU-2, SI-3]       # Anti-malware logging
 
   # Requirement 6: Secure Systems and Patching
-  PCI-6.2: [SI-2]               # Security patching
-  PCI-6.3.2: [SA-11]            # Secure SDLC
-  PCI-6.4.3: [SC-7(10)]         # Web application firewall
+  PCI-6.3.3: [SI-2]               # Security patching
+  PCI-6.2.1: [SA-11]            # Secure SDLC
+  PCI-6.4.2: [SC-7(10)]         # Web application firewall
 
   # Requirement 7: Access Control
-  PCI-7.1: [AC-6]               # Least privilege
+  PCI-7.2.1: [AC-6]               # Least privilege
   
   # Requirement 8: Authentication
-  PCI-8.1.4: [AC-2(3)]          # Remove inactive users
-  PCI-8.1.8: [AC-12]            # Session timeout
-  PCI-8.2.3: [IA-5(1)]          # Password complexity
-  PCI-8.2.4: [IA-5(1)]          # Password rotation (90 days)
-  PCI-8.2.5: [IA-5(1)]          # Password reuse prevention
-  PCI-8.3.1: [IA-2(1), IA-2(2)] # MFA for all access
+  PCI-8.2.6: [AC-2(3)]          # Remove inactive users
+  PCI-8.2.8: [AC-12]            # Session timeout
+  PCI-8.3.6: [IA-5(1)]          # Password complexity
+  PCI-8.3.9: [IA-5(1)]          # Password rotation (90 days)
+  PCI-8.3.7: [IA-5(1)]          # Password reuse prevention
+  PCI-8.4.2: [IA-2(1), IA-2(2)] # MFA for all access
 
   # Requirement 9: Physical Access Controls
-  PCI-9.1: [PE-2, PE-3]         # Physical access controls
-  PCI-9.2: [PE-2, PE-3]         # Physical access procedures
+  PCI-9.1.1: [PE-2, PE-3]         # Physical access controls
+  PCI-9.2.1: [PE-2, PE-3]         # Physical access procedures
   PCI-9.3: [PE-3, PE-8]         # Visitor management
-  PCI-9.4: [PE-4, MP-6]         # Media security and destruction
+  PCI-9.4.1: [PE-4, MP-6]         # Media security and destruction
 
   # Requirement 10: Logging
-  PCI-10.1: [AU-2, AU-3]        # Audit trail
-  PCI-10.2: [AU-2]              # Log critical events
-  PCI-10.2.1: [AU-3]            # Audit record content
-  PCI-10.5.3: [AU-11]           # Log retention (12 months)
-  PCI-10.5.5: [AU-9]            # Log integrity protection
+  PCI-10.2.1: [AU-2, AU-3]        # Audit trail
+  PCI-10.2.1.1: [AU-3]            # Audit record content
+  PCI-10.5.1: [AU-11]           # Log retention (12 months)
+  PCI-10.3.4: [AU-9]            # Log integrity protection
   
   # Requirement 11: Security Testing and Scanning
-  PCI-11.2.2: [RA-5]            # Quarterly vulnerability scans
-  PCI-11.3.1: [CA-8]            # Annual penetration testing
-  PCI-11.4: [SI-4]              # Intrusion detection/prevention
-  PCI-11.5: [SI-7]              # File integrity monitoring
-  PCI-11.5.1: [SI-7]            # FIM on critical files
+  PCI-11.3.2: [RA-5]            # Quarterly vulnerability scans
+  PCI-11.4.3: [CA-8]            # Annual penetration testing
+  PCI-11.5.1: [SI-4]              # Intrusion detection/prevention
+  PCI-11.5.2: [SI-7]              # File integrity monitoring
 
   # Requirement 12: Information Security Policy
-  PCI-12.1: [PL-1]              # Security policy establishment
-  PCI-12.2: [RA-1, RA-3]        # Annual risk assessment
-  PCI-12.3: [PS-8]              # Acceptable use policies
+  PCI-12.1.1: [PL-1]              # Security policy establishment
+  PCI-12.3.1: [RA-1, RA-3]        # Annual risk assessment
+  PCI-12.2.1: [PS-8]              # Acceptable use policies
   PCI-12.4: [SA-9]              # Vendor management responsibilities
-  PCI-12.5: [PM-1]              # Information security responsibilities
-  PCI-12.6: [AT-2, AT-3]        # Security awareness training
-  PCI-12.8: [SA-9]              # Service provider management
-  PCI-12.10: [IR-8]             # Incident response plan
+  PCI-12.1.4: [PM-1]              # Information security responsibilities
+  PCI-12.6.1: [AT-2, AT-3]        # Security awareness training
+  PCI-12.8.1: [SA-9]              # Service provider management
+  PCI-12.10.1: [IR-8]             # Incident response plan
 
 # CMMC → NIST 800-53 Rev 5
 # CMMC is based on NIST SP 800-171, which derives from 800-53

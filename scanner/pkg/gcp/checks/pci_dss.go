@@ -402,7 +402,7 @@ func (c *GCPPCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/security/command-center?project=%s", c.projectID),
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.2.1, 5.2.1",
+			"PCI-DSS": "Req 5.2.1",
 		},
 	})
 
@@ -417,7 +417,7 @@ func (c *GCPPCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Anti-malware console → Show automatic updates enabled and recent scan logs",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.1, 5.3.1",
+			"PCI-DSS": "Req 5.3.1",
 		},
 	})
 
@@ -432,7 +432,7 @@ func (c *GCPPCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Show anti-malware logs with retention policy and review documentation",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.4, 5.3.4",
+			"PCI-DSS": "Req 5.3.4",
 		},
 	})
 
@@ -510,7 +510,7 @@ func (c *GCPPCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/security/compliance?project=%s", c.projectID),
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.1.1, 9.1.1",
+			"PCI-DSS": "Req 9.1.1",
 		},
 	})
 
@@ -631,7 +631,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document current security policy, annual review dates, and communication records",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.1.1, 12.1.1",
+			"PCI-DSS": "Req 12.1.1",
 		},
 	})
 
@@ -691,7 +691,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document training program, completion records, and acknowledgments",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.6.1, 12.6.1, 12.6.2",
+			"PCI-DSS": "Req 12.6.1, 12.6.2",
 		},
 	})
 
@@ -706,7 +706,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document service provider list, contracts, and annual compliance verification",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.8.1, 12.8.1, 12.8.2",
+			"PCI-DSS": "Req 12.8.1, 12.8.2",
 		},
 	})
 
@@ -721,7 +721,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document incident response plan, test results, and update history",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.10.1, 12.10.1",
+			"PCI-DSS": "Req 12.10.1",
 		},
 	})
 
@@ -775,7 +775,9 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			if key.KeyType != adminpb.ListServiceAccountKeysRequest_USER_MANAGED {
 				continue
 			}
-			withUserKeys = append(withUserKeys, sa.Email)
+			if len(withUserKeys) == 0 || withUserKeys[len(withUserKeys)-1] != sa.Email {
+				withUserKeys = append(withUserKeys, sa.Email)
+			}
 			if key.ValidAfterTime != nil {
 				if days := int(time.Since(key.ValidAfterTime.AsTime()).Hours() / 24); days > 90 {
 					staleKeys = append(staleKeys, fmt.Sprintf("%s (%d days)", sa.Email, days))
@@ -839,7 +841,17 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.2"},
 	})
 
-	if len(staleKeys) > 0 {
+	if iamErr != "" {
+		results = append(results, CheckResult{
+			Control:    "PCI-8.6.3",
+			Name:       "[PCI-DSS] Application Account Credential Rotation",
+			Status:     "ERROR",
+			Evidence:   fmt.Sprintf("Service account enumeration failed (%s), so key ages could not be assessed", iamErr),
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.3"},
+		})
+	} else if len(staleKeys) > 0 {
 		shown := staleKeys
 		if len(shown) > 3 {
 			shown = shown[:3]
@@ -872,6 +884,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 	// 10.4.1.1 - automated log review. A log sink exporting to BigQuery, Pub/Sub
 	// or storage is the mechanism that makes automated review possible.
 	sinks := []string{}
+	sinkErr := ""
 	sit := c.loggingClient.ListSinks(ctx, &loggingpb.ListSinksRequest{
 		Parent: fmt.Sprintf("projects/%s", c.projectID),
 	})
@@ -881,12 +894,30 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			break
 		}
 		if err != nil {
+			// Treating a permission error the same as "no sinks" would report a
+			// failure the project does not have.
+			sinkErr = err.Error()
 			break
+		}
+		// The _Default and _Required sinks exist in every project and are not
+		// evidence that anyone configured automated review.
+		if sink.Name == "_Default" || sink.Name == "_Required" {
+			continue
 		}
 		sinks = append(sinks, sink.Name)
 	}
 
-	if len(sinks) > 0 {
+	if sinkErr != "" {
+		results = append(results, CheckResult{
+			Control:    "PCI-10.4.1.1",
+			Name:       "[PCI-DSS] Automated Audit Log Review",
+			Status:     "ERROR",
+			Evidence:   fmt.Sprintf("Could not list log sinks (%s), so automated log review could not be assessed", sinkErr),
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+		})
+	} else if len(sinks) > 0 {
 		results = append(results, CheckResult{
 			Control:           "PCI-10.4.1.1",
 			Name:              "[PCI-DSS] Automated Audit Log Review",

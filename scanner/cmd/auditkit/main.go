@@ -1658,6 +1658,7 @@ func runEvidenceTracker(provider, profile, output string) {
 		for _, result := range scanResults {
 			controls = append(controls, tracker.ControlResult{
 				Control: result.Control,
+				Name:    getControlName(result.Control),
 				Status:  result.Status,
 			})
 		}
@@ -1681,6 +1682,7 @@ func runEvidenceTracker(provider, profile, output string) {
 		for _, result := range scanResults {
 			controls = append(controls, tracker.ControlResult{
 				Control: result.Control,
+				Name:    getControlName(result.Control),
 				Status:  result.Status,
 			})
 		}
@@ -1708,6 +1710,7 @@ func runEvidenceTracker(provider, profile, output string) {
 			gcpResult := result
 			controls = append(controls, tracker.ControlResult{
 				Control: gcpResult.Control,
+				Name:    getControlName(gcpResult.Control),
 				Status:  gcpResult.Status,
 			})
 		}
@@ -1745,7 +1748,7 @@ func runEvidenceTracker(provider, profile, output string) {
 	if t, terr := tracker.NewTracker(accountID); terr == nil {
 		items := make([]tracker.ScanItem, 0, len(controls))
 		for _, c := range controls {
-			items = append(items, tracker.ScanItem{ControlID: c.Control, Status: c.Status})
+			items = append(items, tracker.ScanItem{ControlID: c.Control, Name: c.Name, Status: c.Status})
 		}
 		added, retired := t.SyncFromScan(items)
 		if serr := t.Save(); serr == nil {
@@ -2901,12 +2904,12 @@ func runEvidenceImport(args []string) {
 		_ = fs.Parse(fs.Args()[1:])
 	}
 
+	// Same two-pass parse as collect: scanning raw argv for the first non-flag
+	// token picks up a flag's value instead, so "import -by alice file.json"
+	// would try to read a file called "alice".
 	path := ""
-	for _, a := range args {
-		if !strings.HasPrefix(a, "-") {
-			path = a
-			break
-		}
+	if fs.NArg() > 0 {
+		path = fs.Arg(0)
 	}
 	if path == "" {
 		fmt.Fprintf(os.Stderr, "Usage: %s evidence import PROGRESS.json [-by name]\n", binaryName())

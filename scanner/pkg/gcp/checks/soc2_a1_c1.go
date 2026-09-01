@@ -202,6 +202,24 @@ func (c *GCPAvailabilityConfidentialityChecks) checkBucketClassification(ctx con
 	}
 
 	results := []CheckResult{}
+	if total == 0 {
+		return []CheckResult{
+			{
+				Control: "C1.1", Name: "Confidential Data Identification", Status: StatusInfo,
+				Evidence:   "SOC2 C1.1: no buckets found in this project, so there was nothing to assess",
+				Priority:   PriorityInfo,
+				Timestamp:  time.Now(),
+				Frameworks: map[string]string{"SOC2": "C1.1"},
+			},
+			{
+				Control: "C1.2", Name: "Confidential Data Disposal", Status: StatusInfo,
+				Evidence:   "SOC2 C1.2: no buckets found in this project, so there was nothing to assess",
+				Priority:   PriorityInfo,
+				Timestamp:  time.Now(),
+				Frameworks: map[string]string{"SOC2": "C1.2"},
+			},
+		}
+	}
 	if len(unlabelled) > 0 {
 		results = append(results, CheckResult{
 			Control:           "C1.1",

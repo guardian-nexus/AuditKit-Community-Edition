@@ -14,20 +14,21 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 VALID="PASS FAIL INFO MANUAL ERROR"
 fails=0
 
-# String literals: Status: "SOMETHING"
+# Both forms: a struct field `Status: "X"` and an assignment `base.Status = "X"`.
+# The assignment form was missed originally, and it is what the newer modules use.
 while IFS= read -r line; do
   [ -z "$line" ] && continue
   file="${line%%:*}"
   rest="${line#*:}"
   lineno="${rest%%:*}"
-  value="$(echo "$line" | sed -E 's/.*Status:[[:space:]]*"([^"]*)".*/\1/')"
+  value="$(echo "$line" | sed -E 's/.*(Status:|\.Status[[:space:]]*=)[[:space:]]*"([^"]*)".*/\2/')"
   ok=0
   for v in $VALID; do [ "$value" = "$v" ] && ok=1 && break; done
   if [ "$ok" -eq 0 ]; then
     echo "  INVALID  ${file#$ROOT/}:${lineno}  Status: \"${value}\""
     fails=$((fails + 1))
   fi
-done < <(grep -rnE 'Status:[[:space:]]*"[^"]*"' --include='*.go' "$ROOT/scanner" 2>/dev/null)
+done < <(grep -rnE '(Status:|\.Status[[:space:]]*=)[[:space:]]*"[^"]*"' --include='*.go' "$ROOT/scanner" 2>/dev/null)
 
 if [ "$fails" -gt 0 ]; then
   echo

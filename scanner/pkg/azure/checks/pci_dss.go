@@ -529,7 +529,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Security/SecurityMenuBlade/0",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.2.1, 5.2.1",
+			"PCI-DSS": "Req 5.2.1",
 		},
 	})
 
@@ -544,7 +544,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 		ScreenshotGuide:   "Defender for Cloud → Show automatic updates enabled and recent scan logs",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.1, 5.3.1",
+			"PCI-DSS": "Req 5.3.1",
 		},
 	})
 
@@ -559,7 +559,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 		ScreenshotGuide:   "Show anti-malware logs with retention policy and review documentation",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.4, 5.3.4",
+			"PCI-DSS": "Req 5.3.4",
 		},
 	})
 
@@ -637,7 +637,7 @@ func (c *AzurePCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckRe
 		ConsoleURL:        "https://servicetrust.microsoft.com/",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.1.1, 9.1.1",
+			"PCI-DSS": "Req 9.1.1",
 		},
 	})
 
@@ -759,7 +759,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document current security policy, annual review dates, and communication records",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.1.1, 12.1.1",
+			"PCI-DSS": "Req 12.1.1",
 		},
 	})
 
@@ -819,7 +819,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document training program, completion records, and acknowledgment forms",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.6.1, 12.6.1, 12.6.2",
+			"PCI-DSS": "Req 12.6.1, 12.6.2",
 		},
 	})
 
@@ -834,7 +834,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document service provider list, contracts, and annual compliance verification",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.8.1, 12.8.1, 12.8.2",
+			"PCI-DSS": "Req 12.8.1, 12.8.2",
 		},
 	})
 
@@ -849,7 +849,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document incident response plan, test results, and update history",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.10.1, 12.10.1",
+			"PCI-DSS": "Req 12.10.1",
 		},
 	})
 
