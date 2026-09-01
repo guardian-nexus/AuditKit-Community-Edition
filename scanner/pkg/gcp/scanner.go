@@ -165,6 +165,7 @@ func (s *GCPScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 		checks.NewGCPCC7Checks(s.loggingClient, s.computeService, s.projectID),
 		checks.NewGCPCC8Checks(s.projectID),
 		checks.NewGCPCC9Checks(s.storageClient, s.sqlService, s.projectID),
+		checks.NewGCPAvailabilityConfidentialityChecks(s.storageClient, s.sqlService, s.projectID),
 
 		// Also run traditional checks for backward compatibility
 		checks.NewStorageChecks(s.storageClient, s.projectID),

@@ -35,6 +35,7 @@ type AzureScanner struct {
 	keyVaultClient      *armkeyvault.VaultsClient
 	monitorClient       *armmonitor.ActivityLogsClient
 	diagnosticClient    *armmonitor.DiagnosticSettingsClient
+	policyClient        *armstorage.ManagementPoliciesClient
 	roleClient          *armauthorization.RoleAssignmentsClient
 	roleDefClient       *armauthorization.RoleDefinitionsClient
 	securityClient      *armsecurity.PricingsClient                 // For Defender checks
@@ -129,6 +130,12 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		diagnosticClient = nil
 	}
 
+	// Blob lifecycle policies. Optional: the checks that use it degrade to manual.
+	policyClient, err := armstorage.NewManagementPoliciesClient(subscriptionID, cred, nil)
+	if err != nil {
+		policyClient = nil
+	}
+
 	roleClient, err := armauthorization.NewRoleAssignmentsClient(subscriptionID, cred, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create role assignments client: %v", err)
@@ -171,6 +178,7 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		keyVaultClient:      keyVaultClient,
 		monitorClient:       monitorClient,
 		diagnosticClient:    diagnosticClient,
+		policyClient:        policyClient,
 		roleClient:          roleClient,
 		roleDefClient:       roleDefClient,
 		securityClient:      securityClient,
@@ -239,6 +247,7 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 		checks.NewAzureCC7Checks(),
 		checks.NewAzureCC8Checks(),
 		checks.NewAzureCC9Checks(),
+		checks.NewAzureAvailabilityConfidentialityChecks(s.storageClient, s.policyClient),
 		checks.NewStorageChecks(s.storageClient),
 		checks.NewAADChecks(s.roleClient, s.roleDefClient, s.graphClient),
 		checks.NewComputeChecks(s.computeClient, s.disksClient, s.nicClient, s.publicIPClient),
