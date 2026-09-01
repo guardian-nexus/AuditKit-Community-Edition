@@ -16,6 +16,11 @@ type EvidenceItem struct {
 	CollectedDate     *time.Time `json:"collected_date,omitempty"`
 	Notes             string     `json:"notes,omitempty"`
 	ScreenshotPath    string     `json:"screenshot_path,omitempty"`
+	CollectedBy       string     `json:"collected_by,omitempty"`
+	// Required is false once a control stops appearing in scans. The item is
+	// kept rather than deleted, because evidence already collected for it
+	// remains part of the audit trail for the period it covered.
+	Required bool `json:"required"`
 }
 
 type EvidenceTracker struct {

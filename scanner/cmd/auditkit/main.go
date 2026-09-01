@@ -101,6 +101,16 @@ func main() {
 	case "integrate":
 		runIntegration(*source, *file, *format, *output, *verbose)
 	case "evidence":
+		if len(os.Args) > 2 {
+			switch os.Args[2] {
+			case "status":
+				runEvidenceStatus(os.Args[3:])
+				return
+			case "collect":
+				runEvidenceCollect(os.Args[3:])
+				return
+			}
+		}
 		runEvidenceTracker(*provider, *profile, *output)
 	case "fix":
 		generateFixScript(*provider, *profile, *output)
@@ -1711,8 +1721,27 @@ func runEvidenceTracker(provider, profile, output string) {
 		os.Exit(1)
 	}
 
+	// Reconcile the durable tracker so progress survives outside the browser.
+	// The HTML checklist keeps its state in localStorage, which is lost when the
+	// cache is cleared and cannot be shared or reviewed.
+	if t, terr := tracker.NewTracker(accountID); terr == nil {
+		items := make([]tracker.ScanItem, 0, len(controls))
+		for _, c := range controls {
+			items = append(items, tracker.ScanItem{ControlID: c.Control, Status: c.Status})
+		}
+		added, retired := t.SyncFromScan(items)
+		if serr := t.Save(); serr == nil {
+			s := t.Summarise(tracker.DefaultEvidenceMaxAge)
+			fmt.Printf("Tracker synced: %d control(s) added, %d retired.\n", added, retired)
+			fmt.Printf("%d of %d required controls have current evidence, %d outstanding.\n",
+				s.Collected, s.Required, s.Outstanding+s.Stale)
+		}
+	}
+
 	fmt.Printf("Evidence tracker saved to %s\n", output)
-	fmt.Println("Open this file in your browser and check off evidence as you collect it!")
+	fmt.Println("Check items off in the browser, or record them durably with:")
+	fmt.Println("  auditkit evidence collect CONTROL-ID -notes \"...\"")
+	fmt.Println("  auditkit evidence status")
 }
 
 func getPriorityAndImpact(controlID, severity, status, framework string) (string, string) {
@@ -2669,4 +2698,162 @@ func generateEvidenceTrackerHTML(controls []tracker.ControlResult, accountID str
 </html>`, accountID, accountID, accountID)
 
 	return html
+}
+
+// ---- evidence lifecycle ----------------------------------------------------
+
+// findTrackerAccount resolves which evidence tracker to act on. Most people
+// have one account, so requiring the id every time is friction for nothing; if
+// there are several, it has to be named.
+func findTrackerAccount(explicit string) (string, error) {
+	if explicit != "" {
+		return explicit, nil
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	entries, err := os.ReadDir(filepath.Join(home, ".auditkit"))
+	if err != nil {
+		return "", fmt.Errorf("no evidence tracker found - run 'auditkit evidence' after a scan first")
+	}
+	found := []string{}
+	for _, e := range entries {
+		n := e.Name()
+		if strings.HasPrefix(n, "evidence_") && strings.HasSuffix(n, ".json") {
+			found = append(found, strings.TrimSuffix(strings.TrimPrefix(n, "evidence_"), ".json"))
+		}
+	}
+	switch len(found) {
+	case 0:
+		return "", fmt.Errorf("no evidence tracker found - run 'auditkit evidence' after a scan first")
+	case 1:
+		return found[0], nil
+	default:
+		return "", fmt.Errorf("several accounts tracked (%s) - pass -account", strings.Join(found, ", "))
+	}
+}
+
+func evidenceMaxAge(days int) time.Duration {
+	if days <= 0 {
+		return tracker.DefaultEvidenceMaxAge
+	}
+	return time.Duration(days) * 24 * time.Hour
+}
+
+func runEvidenceStatus(args []string) {
+	fs := flag.NewFlagSet("evidence status", flag.ExitOnError)
+	account := fs.String("account", "", "Account ID to report on")
+	days := fs.Int("stale-after", 0, "Days before collected evidence is considered stale (default 90)")
+	all := fs.Bool("all", false, "List every outstanding control rather than the first 20")
+	_ = fs.Parse(args)
+
+	acct, err := findTrackerAccount(*account)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
+	t, err := tracker.NewTracker(acct)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open tracker: %v\n", err)
+		os.Exit(1)
+	}
+
+	maxAge := evidenceMaxAge(*days)
+	s := t.Summarise(maxAge)
+
+	fmt.Printf("Evidence status for %s\n", acct)
+	if !t.LastScan.IsZero() {
+		fmt.Printf("Last synced from a scan: %s\n", t.LastScan.Format("2006-01-02 15:04"))
+	}
+	fmt.Println()
+	fmt.Printf("  Collected    %d\n", s.Collected)
+	fmt.Printf("  Outstanding  %d\n", s.Outstanding)
+	fmt.Printf("  Stale        %d  (collected more than %d days ago)\n", s.Stale, int(maxAge.Hours()/24))
+	fmt.Printf("  Required     %d\n", s.Required)
+	if s.Retired > 0 {
+		fmt.Printf("  Retired      %d  (no longer in scans; kept for the audit trail)\n", s.Retired)
+	}
+
+	if s.Required > 0 {
+		pct := float64(s.Collected) / float64(s.Required) * 100
+		fmt.Printf("\n  %.0f%% of required evidence is current\n", pct)
+	}
+
+	outstanding := t.Outstanding(maxAge)
+	if len(outstanding) == 0 {
+		fmt.Println("\nNothing outstanding.")
+		return
+	}
+
+	limit := 20
+	if *all || len(outstanding) < limit {
+		limit = len(outstanding)
+	}
+	fmt.Printf("\nOutstanding (%d shown of %d):\n", limit, len(outstanding))
+	for _, item := range outstanding[:limit] {
+		note := "not collected"
+		if item.EvidenceCollected && item.CollectedDate != nil {
+			note = fmt.Sprintf("stale, collected %s", item.CollectedDate.Format("2006-01-02"))
+		}
+		fmt.Printf("  %-12s %-45s %s\n", item.ControlID, truncate(item.ControlName, 45), note)
+	}
+	if limit < len(outstanding) {
+		fmt.Printf("\n  ... %d more. Use -all to list them.\n", len(outstanding)-limit)
+	}
+	fmt.Println("\nRecord evidence with: auditkit evidence collect CONTROL-ID -notes \"...\"")
+}
+
+func runEvidenceCollect(args []string) {
+	fs := flag.NewFlagSet("evidence collect", flag.ExitOnError)
+	account := fs.String("account", "", "Account ID")
+	notes := fs.String("notes", "", "What was captured and where it came from")
+	artifact := fs.String("artifact", "", "Path to the screenshot or export")
+	by := fs.String("by", "", "Who collected it")
+
+	// Go's flag package stops at the first non-flag argument, so
+	// "collect CC6.1 -notes x" would silently discard every flag. Parsing in two
+	// passes over the same flagset picks up flags on either side of the control
+	// id, and lets flag values be consumed properly rather than mistaken for it.
+	_ = fs.Parse(args)
+	controlID := ""
+	if fs.NArg() > 0 {
+		controlID = fs.Arg(0)
+		_ = fs.Parse(fs.Args()[1:])
+	}
+
+	if controlID == "" {
+		fmt.Fprintf(os.Stderr, "Usage: auditkit evidence collect CONTROL-ID [-notes \"...\"] [-artifact path] [-by name]\n")
+		os.Exit(1)
+	}
+
+	acct, err := findTrackerAccount(*account)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
+	t, err := tracker.NewTracker(acct)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open tracker: %v\n", err)
+		os.Exit(1)
+	}
+
+	if err := t.Record(controlID, *notes, *artifact, *by); err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
+
+	s := t.Summarise(tracker.DefaultEvidenceMaxAge)
+	fmt.Printf("Recorded evidence for %s\n", controlID)
+	fmt.Printf("%d of %d required controls now have current evidence, %d outstanding.\n", s.Collected, s.Required, s.Outstanding+s.Stale)
+}
+
+func truncate(s string, n int) string {
+	if len(s) <= n {
+		return s
+	}
+	if n <= 3 {
+		return s[:n]
+	}
+	return s[:n-3] + "..."
 }
