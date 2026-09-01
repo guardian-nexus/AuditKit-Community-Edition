@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/sqladmin/v1"
 )
@@ -15,13 +16,19 @@ import (
 // Confidentiality criteria for GCP. See the AWS module of the same name for why
 // Processing Integrity and Privacy are out of scope.
 type GCPAvailabilityConfidentialityChecks struct {
-	storageClient *storage.Client
-	sqlService    *sqladmin.Service
-	projectID     string
+	storageClient  *storage.Client
+	sqlService     *sqladmin.Service
+	computeService *compute.Service
+	projectID      string
 }
 
-func NewGCPAvailabilityConfidentialityChecks(storageClient *storage.Client, sqlService *sqladmin.Service, projectID string) *GCPAvailabilityConfidentialityChecks {
-	return &GCPAvailabilityConfidentialityChecks{storageClient: storageClient, sqlService: sqlService, projectID: projectID}
+func NewGCPAvailabilityConfidentialityChecks(storageClient *storage.Client, sqlService *sqladmin.Service, computeService *compute.Service, projectID string) *GCPAvailabilityConfidentialityChecks {
+	return &GCPAvailabilityConfidentialityChecks{
+		storageClient:  storageClient,
+		sqlService:     sqlService,
+		computeService: computeService,
+		projectID:      projectID,
+	}
 }
 
 func (c *GCPAvailabilityConfidentialityChecks) Name() string {
@@ -30,9 +37,67 @@ func (c *GCPAvailabilityConfidentialityChecks) Name() string {
 
 func (c *GCPAvailabilityConfidentialityChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
+	results = append(results, c.checkCapacity(ctx))
 	results = append(results, c.checkRecoveryTesting(ctx))
 	results = append(results, c.checkBucketClassification(ctx)...)
 	return results, nil
+}
+
+// A1.1 - processing capacity is monitored and managed. Autoscalers are the
+// mechanism GCP provides for responding to capacity demand.
+func (c *GCPAvailabilityConfidentialityChecks) checkCapacity(ctx context.Context) CheckResult {
+	base := CheckResult{
+		Control:         "A1.1",
+		Name:            "Processing Capacity Management",
+		Priority:        PriorityMedium,
+		Timestamp:       time.Now(),
+		ScreenshotGuide: "Autoscaler policies showing the metric, targets and instance bounds",
+		ConsoleURL:      "https://console.cloud.google.com/compute/instanceGroups/list",
+		Frameworks:      map[string]string{"SOC2": "A1.1"},
+	}
+
+	if c.computeService == nil {
+		base.Status = "INFO"
+		base.Evidence = "SOC2 A1.1: monitor and manage processing capacity. Compute client unavailable, verify by hand"
+		base.Remediation = "Configure autoscalers for capacity-sensitive workloads"
+		base.RemediationDetail = "Attach autoscalers to managed instance groups, or document how capacity is monitored and provisioned instead."
+		return base
+	}
+
+	agg, err := c.computeService.Autoscalers.AggregatedList(c.projectID).Context(ctx).Do()
+	if err != nil {
+		base.Status = "INFO"
+		base.Evidence = fmt.Sprintf("SOC2 A1.1: unable to read autoscalers (%v), verify capacity management by hand", err)
+		base.Remediation = "Configure autoscalers for capacity-sensitive workloads"
+		base.RemediationDetail = "Attach autoscalers to managed instance groups, or document how capacity is monitored and provisioned instead."
+		return base
+	}
+
+	names := []string{}
+	for _, scoped := range agg.Items {
+		for _, a := range scoped.Autoscalers {
+			names = append(names, a.Name)
+		}
+	}
+
+	if len(names) == 0 {
+		base.Status = "FAIL"
+		base.Severity = "MEDIUM"
+		base.Evidence = "SOC2 A1.1: no autoscalers are configured, so capacity demand is not met automatically"
+		base.Remediation = "Configure autoscalers, or document manual capacity management"
+		base.RemediationDetail = "1. gcloud compute instance-groups managed set-autoscaling NAME --max-num-replicas=N\n2. Base the policy on a metric that reflects real demand\n3. If capacity is managed manually, document the monitoring and provisioning process instead"
+		return base
+	}
+
+	shown := names
+	if len(shown) > 3 {
+		shown = shown[:3]
+	}
+	base.Status = "PASS"
+	base.Evidence = fmt.Sprintf("SOC2 A1.1: %d autoscaler(s) configured: %s", len(names), strings.Join(shown, ", "))
+	base.Remediation = "Confirm the policies reflect real demand"
+	base.RemediationDetail = "An autoscaler existing is not the same as capacity being managed. Check the targets and bounds match observed load."
+	return base
 }
 
 // A1.3 - recovery plan testing. A backup that has never been restored is

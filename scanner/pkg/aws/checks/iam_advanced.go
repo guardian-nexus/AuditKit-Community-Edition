@@ -213,7 +213,7 @@ func (c *IAMAdvancedChecks) CheckRootAccountUsage(ctx context.Context) (CheckRes
 	return CheckResult{
 		Control:         "CC6.6",
 		Name:            "Root Account Usage",
-		Status:          "WARN",
+		Status:          "INFO",
 		Severity:        "HIGH",
 		Evidence:        "Check CloudTrail for root account usage (should be ZERO)",
 		Remediation:     "Never use root account for daily operations",

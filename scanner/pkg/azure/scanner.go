@@ -36,6 +36,8 @@ type AzureScanner struct {
 	monitorClient       *armmonitor.ActivityLogsClient
 	diagnosticClient    *armmonitor.DiagnosticSettingsClient
 	policyClient        *armstorage.ManagementPoliciesClient
+	autoscaleClient     *armmonitor.AutoscaleSettingsClient
+	blobServiceClient   *armstorage.BlobServicesClient
 	roleClient          *armauthorization.RoleAssignmentsClient
 	roleDefClient       *armauthorization.RoleDefinitionsClient
 	securityClient      *armsecurity.PricingsClient                 // For Defender checks
@@ -136,6 +138,16 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		policyClient = nil
 	}
 
+	// Capacity and blob retention. Optional: checks degrade to manual.
+	autoscaleClient, err := armmonitor.NewAutoscaleSettingsClient(subscriptionID, cred, nil)
+	if err != nil {
+		autoscaleClient = nil
+	}
+	blobServiceClient, err := armstorage.NewBlobServicesClient(subscriptionID, cred, nil)
+	if err != nil {
+		blobServiceClient = nil
+	}
+
 	roleClient, err := armauthorization.NewRoleAssignmentsClient(subscriptionID, cred, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create role assignments client: %v", err)
@@ -179,6 +191,8 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		monitorClient:       monitorClient,
 		diagnosticClient:    diagnosticClient,
 		policyClient:        policyClient,
+		autoscaleClient:     autoscaleClient,
+		blobServiceClient:   blobServiceClient,
 		roleClient:          roleClient,
 		roleDefClient:       roleDefClient,
 		securityClient:      securityClient,
@@ -247,7 +261,7 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 		checks.NewAzureCC7Checks(),
 		checks.NewAzureCC8Checks(),
 		checks.NewAzureCC9Checks(),
-		checks.NewAzureAvailabilityConfidentialityChecks(s.storageClient, s.policyClient),
+		checks.NewAzureAvailabilityConfidentialityChecks(s.storageClient, s.policyClient, s.autoscaleClient, s.blobServiceClient),
 		checks.NewStorageChecks(s.storageClient),
 		checks.NewAADChecks(s.roleClient, s.roleDefClient, s.graphClient),
 		checks.NewComputeChecks(s.computeClient, s.disksClient, s.nicClient, s.publicIPClient),

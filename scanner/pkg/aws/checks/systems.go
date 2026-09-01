@@ -45,7 +45,7 @@ func (c *SystemsChecks) CheckPatchCompliance(ctx context.Context) (CheckResult, 
 
 	if err != nil || len(patches.BaselineIdentities) == 0 {
 		return CheckResult{
-			Control:           "A1.1",
+			Control:           "CC7.1",
 			Name:              "Patch Management",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -60,7 +60,7 @@ func (c *SystemsChecks) CheckPatchCompliance(ctx context.Context) (CheckResult, 
 	}
 
 	return CheckResult{
-		Control:   "A1.1",
+		Control:   "CC7.1",
 		Name:      "Patch Management",
 		Status:    "PASS",
 		Evidence:  fmt.Sprintf("%d patch baselines configured", len(patches.BaselineIdentities)),
@@ -75,8 +75,8 @@ func (c *SystemsChecks) CheckAutoScaling(ctx context.Context) (CheckResult, erro
 	if err != nil || len(groups.AutoScalingGroups) == 0 {
 		return CheckResult{
 			Control:         "A1.1",
-			Name:            "High Availability",
-			Status:          "WARN",
+			Name:            "Processing Capacity Management",
+			Status:          "FAIL",
 			Severity:        "MEDIUM",
 			Evidence:        "No auto-scaling configured - single points of failure exist",
 			Remediation:     "Implement auto-scaling for critical services",

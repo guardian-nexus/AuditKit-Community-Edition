@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 )
 
@@ -19,12 +20,24 @@ import (
 // question that matters is whether a restore has actually been exercised, and
 // that is not visible from configuration on any provider.
 type AzureAvailabilityConfidentialityChecks struct {
-	storageClient *armstorage.AccountsClient
-	policyClient  *armstorage.ManagementPoliciesClient
+	storageClient     *armstorage.AccountsClient
+	policyClient      *armstorage.ManagementPoliciesClient
+	autoscaleClient   *armmonitor.AutoscaleSettingsClient
+	blobServiceClient *armstorage.BlobServicesClient
 }
 
-func NewAzureAvailabilityConfidentialityChecks(storageClient *armstorage.AccountsClient, policyClient *armstorage.ManagementPoliciesClient) *AzureAvailabilityConfidentialityChecks {
-	return &AzureAvailabilityConfidentialityChecks{storageClient: storageClient, policyClient: policyClient}
+func NewAzureAvailabilityConfidentialityChecks(
+	storageClient *armstorage.AccountsClient,
+	policyClient *armstorage.ManagementPoliciesClient,
+	autoscaleClient *armmonitor.AutoscaleSettingsClient,
+	blobServiceClient *armstorage.BlobServicesClient,
+) *AzureAvailabilityConfidentialityChecks {
+	return &AzureAvailabilityConfidentialityChecks{
+		storageClient:     storageClient,
+		policyClient:      policyClient,
+		autoscaleClient:   autoscaleClient,
+		blobServiceClient: blobServiceClient,
+	}
 }
 
 func (c *AzureAvailabilityConfidentialityChecks) Name() string {
@@ -47,8 +60,68 @@ func (c *AzureAvailabilityConfidentialityChecks) Run(ctx context.Context) ([]Che
 			Frameworks:        map[string]string{"SOC2": "A1.3"},
 		},
 	}
+	results = append(results, c.checkCapacity(ctx))
 	results = append(results, c.checkStorageClassification(ctx)...)
 	return results, nil
+}
+
+// A1.1 - processing capacity is monitored and managed. Autoscale settings are
+// the mechanism Azure provides for responding to capacity demand.
+func (c *AzureAvailabilityConfidentialityChecks) checkCapacity(ctx context.Context) CheckResult {
+	base := CheckResult{
+		Control:         "A1.1",
+		Name:            "Processing Capacity Management",
+		Priority:        PriorityMedium,
+		Timestamp:       time.Now(),
+		ScreenshotGuide: "Autoscale rules showing the metric, thresholds and instance bounds",
+		ConsoleURL:      "https://portal.azure.com/#view/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade",
+		Frameworks:      map[string]string{"SOC2": "A1.1"},
+	}
+
+	if c.autoscaleClient == nil {
+		base.Status = "INFO"
+		base.Evidence = "SOC2 A1.1: monitor and manage processing capacity. Autoscale client unavailable, verify by hand"
+		base.Remediation = "Configure autoscale rules for capacity-sensitive workloads"
+		base.RemediationDetail = "Define autoscale settings with metric thresholds, or document how capacity is monitored and provisioned instead."
+		return base
+	}
+
+	names := []string{}
+	pager := c.autoscaleClient.NewListBySubscriptionPager(nil)
+	for pager.More() {
+		page, err := pager.NextPage(ctx)
+		if err != nil {
+			base.Status = "INFO"
+			base.Evidence = fmt.Sprintf("SOC2 A1.1: unable to read autoscale settings (%v), verify capacity management by hand", err)
+			base.Remediation = "Configure autoscale rules for capacity-sensitive workloads"
+			base.RemediationDetail = "Define autoscale settings with metric thresholds, or document how capacity is monitored and provisioned instead."
+			return base
+		}
+		for _, a := range page.Value {
+			if a != nil && a.Name != nil {
+				names = append(names, *a.Name)
+			}
+		}
+	}
+
+	if len(names) == 0 {
+		base.Status = "FAIL"
+		base.Severity = "MEDIUM"
+		base.Evidence = "SOC2 A1.1: no autoscale settings are configured, so capacity demand is not met automatically"
+		base.Remediation = "Configure autoscale rules, or document manual capacity management"
+		base.RemediationDetail = "1. Add autoscale settings to capacity-sensitive workloads\n2. Base rules on a metric that reflects real demand\n3. If capacity is managed manually, document the monitoring and provisioning process instead"
+		return base
+	}
+
+	shown := names
+	if len(shown) > 3 {
+		shown = shown[:3]
+	}
+	base.Status = "PASS"
+	base.Evidence = fmt.Sprintf("SOC2 A1.1: %d autoscale setting(s) configured: %s", len(names), strings.Join(shown, ", "))
+	base.Remediation = "Confirm the thresholds reflect real demand"
+	base.RemediationDetail = "Autoscale existing is not the same as capacity being managed. Check the metrics and bounds match observed load."
+	return base
 }
 
 // resourceGroupFromID pulls the resource group out of an ARM resource ID, which
@@ -68,6 +141,7 @@ func resourceGroupFromID(id string) string {
 func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx context.Context) []CheckResult {
 	untagged := []string{}
 	noPolicy := []string{}
+	noSoftDelete := []string{}
 	total := 0
 
 	pager := c.storageClient.NewListPager(nil)
@@ -119,6 +193,23 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 			}
 			if _, err := c.policyClient.Get(ctx, rg, name, armstorage.ManagementPolicyNameDefault, nil); err != nil {
 				noPolicy = append(noPolicy, name)
+			}
+
+			// A1.2 - blob soft delete is the recovery mechanism for accidental
+			// or malicious deletion; without it a delete is unrecoverable.
+			if c.blobServiceClient != nil {
+				props, err := c.blobServiceClient.GetServiceProperties(ctx, rg, name, nil)
+				if err != nil {
+					continue
+				}
+				p := props.BlobServiceProperties.BlobServiceProperties
+				enabled := p != nil &&
+					p.DeleteRetentionPolicy != nil &&
+					p.DeleteRetentionPolicy.Enabled != nil &&
+					*p.DeleteRetentionPolicy.Enabled
+				if !enabled {
+					noSoftDelete = append(noSoftDelete, name)
+				}
 			}
 		}
 	}
@@ -196,5 +287,44 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 			Frameworks: map[string]string{"SOC2": "C1.2"},
 		})
 	}
+	if c.blobServiceClient == nil {
+		results = append(results, CheckResult{
+			Control:           "A1.2",
+			Name:              "Data Backup and Recovery Infrastructure",
+			Status:            "INFO",
+			Evidence:          "SOC2 A1.2: blob services client unavailable, verify soft delete and backup configuration by hand",
+			Remediation:       "Enable blob soft delete",
+			RemediationDetail: "Enable delete retention so an accidental or malicious delete can be recovered.",
+			Priority:          PriorityHigh,
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"SOC2": "A1.2"},
+		})
+	} else if len(noSoftDelete) > 0 {
+		results = append(results, CheckResult{
+			Control:           "A1.2",
+			Name:              "Data Backup and Recovery Infrastructure",
+			Status:            "FAIL",
+			Severity:          "HIGH",
+			Evidence:          fmt.Sprintf("SOC2 A1.2: %d of %d storage account(s) have blob soft delete disabled, so a deletion cannot be recovered: %s", len(noSoftDelete), total, trim(noSoftDelete)),
+			Remediation:       "Enable blob soft delete",
+			RemediationDetail: "1. az storage account blob-service-properties update --account-name NAME --resource-group RG --enable-delete-retention true --delete-retention-days 7\n2. Set the retention window from your recovery objectives",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "Blob service data protection settings showing soft delete enabled with a retention period",
+			ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Storage%2FStorageAccounts",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"SOC2": "A1.2"},
+		})
+	} else {
+		results = append(results, CheckResult{
+			Control:    "A1.2",
+			Name:       "Data Backup and Recovery Infrastructure",
+			Status:     "PASS",
+			Evidence:   fmt.Sprintf("SOC2 A1.2: all %d storage account(s) have blob soft delete enabled", total),
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"SOC2": "A1.2"},
+		})
+	}
+
 	return results
 }
