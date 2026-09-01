@@ -126,7 +126,7 @@ func (c *NetworkChecks) CheckFirewallRules(ctx context.Context) []CheckResult {
 			Name:        "VPC Firewall Rules - Open to Internet",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("CRITICAL: %d firewall rules allow dangerous services from 0.0.0.0/0: %s | Violates PCI DSS 1.2.1, 1.3.1", len(openToInternet), strings.Join(displayRules, ", ")),
+			Evidence:    fmt.Sprintf("CRITICAL: %d firewall rules allow dangerous services from 0.0.0.0/0: %s | Violates PCI DSS 1.4.2, 1.3.1", len(openToInternet), strings.Join(displayRules, ", ")),
 			Remediation: "Restrict firewall rules to specific IP ranges",
 			RemediationDetail: fmt.Sprintf(`# Delete overly permissive rule
 gcloud compute firewall-rules delete %s
@@ -148,7 +148,7 @@ gcloud compute firewall-rules create restricted-ssh \
 			Control:    "CC6.6",
 			Name:       "VPC Firewall Rules - Open to Internet",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d firewall rules have appropriate source restrictions | Meets SOC2 CC6.6, PCI DSS 1.2.1", totalRules),
+			Evidence:   fmt.Sprintf("All %d firewall rules have appropriate source restrictions | Meets SOC2 CC6.6, PCI DSS 1.4.2", totalRules),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("VPC_FIREWALL_OPEN"),
@@ -610,7 +610,7 @@ gcloud compute firewall-rules create allow-ssh-iap \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: fmt.Sprintf("VPC Network → Firewall → Screenshot showing %s with restricted source ranges (NOT 0.0.0.0/0)", sshRulesFromInternet[0]),
 			ConsoleURL:      "https://console.cloud.google.com/net-security/firewall-manager/firewall-policies/list",
-			Frameworks:      map[string]string{"CIS-GCP": "3.4", "SOC2": "CC6.6", "PCI-DSS": "1.3.1"},
+			Frameworks:      map[string]string{"CIS-GCP": "3.4", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -620,7 +620,7 @@ gcloud compute firewall-rules create allow-ssh-iap \
 			Evidence:   "SSH access (port 22) is not allowed from 0.0.0.0/0 | Meets CIS GCP 3.4",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "3.4", "SOC2": "CC6.6", "PCI-DSS": "1.3.1"},
+			Frameworks: map[string]string{"CIS-GCP": "3.4", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	}
 
@@ -707,7 +707,7 @@ gcloud compute firewall-rules create allow-rdp-iap \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: fmt.Sprintf("VPC Network → Firewall → Screenshot showing %s with restricted source ranges (NOT 0.0.0.0/0)", rdpRulesFromInternet[0]),
 			ConsoleURL:      "https://console.cloud.google.com/net-security/firewall-manager/firewall-policies/list",
-			Frameworks:      map[string]string{"CIS-GCP": "3.5", "SOC2": "CC6.6", "PCI-DSS": "1.3.1"},
+			Frameworks:      map[string]string{"CIS-GCP": "3.5", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -717,7 +717,7 @@ gcloud compute firewall-rules create allow-rdp-iap \
 			Evidence:   "RDP access (port 3389) is not allowed from 0.0.0.0/0 | Meets CIS GCP 3.5",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "3.5", "SOC2": "CC6.6", "PCI-DSS": "1.3.1"},
+			Frameworks: map[string]string{"CIS-GCP": "3.5", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	}
 

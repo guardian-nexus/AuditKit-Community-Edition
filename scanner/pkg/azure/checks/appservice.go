@@ -72,7 +72,7 @@ This ensures only authenticated users can access the application.`,
 		Frameworks: map[string]string{
 			"CIS-Azure": "9.1",
 			"SOC2":      "CC6.1",
-			"PCI-DSS":   "8.1.1",
+			"PCI-DSS":   "8.2.1",
 		},
 	}
 }
@@ -103,7 +103,7 @@ This forces all traffic to use encrypted connections.`,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
 			"CIS-Azure": "9.2",
-			"PCI-DSS":   "4.1",
+			"PCI-DSS":   "4.2.1",
 			"HIPAA":     "164.312(e)(1)",
 		},
 	}
@@ -135,7 +135,7 @@ az webapp config set \
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
 			"CIS-Azure": "9.3",
-			"PCI-DSS":   "4.1",
+			"PCI-DSS":   "4.2.1",
 		},
 	}
 }
@@ -266,7 +266,7 @@ Use modern deployment methods instead:
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
 			"CIS-Azure": "9.10",
-			"PCI-DSS":   "4.1",
+			"PCI-DSS":   "4.2.1",
 		},
 	}
 }

@@ -519,7 +519,7 @@ func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
 			Name:              "VM Public IP Exposure",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d/%d VMs have direct public IPs: %s | Violates PCI DSS 1.3.1 (restrict inbound traffic), SOC2 CC6.1 (restrict logical access)", len(vmsWithPublicIP), totalVMs, vmList),
+			Evidence:          fmt.Sprintf("%d/%d VMs have direct public IPs: %s | Violates PCI DSS 1.4.2 (restrict inbound traffic), SOC2 CC6.1 (restrict logical access)", len(vmsWithPublicIP), totalVMs, vmList),
 			Remediation:       "Remove direct public IPs, use Azure Bastion or Application Gateway",
 			RemediationDetail: fmt.Sprintf("az network nic ip-config update --remove PublicIpAddress --name ipconfig1 --nic-name %s-nic --resource-group <rg>", firstVM),
 			ScreenshotGuide:   "1. Go to Azure Portal → Virtual Machines\n2. Select VM '" + firstVM + "'\n3. Go to Networking\n4. Screenshot showing 'Public IP address' field\n5. For PCI DSS: Document that no cardholder data is accessible via public IP",
@@ -537,7 +537,7 @@ func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
 			Control:         "CC6.1",
 			Name:            "VM Public IP Exposure",
 			Status:          "PASS",
-			Evidence:        fmt.Sprintf("None of %d VMs have direct public IP addresses | Meets SOC2 CC6.1, PCI DSS 1.3.1", totalVMs),
+			Evidence:        fmt.Sprintf("None of %d VMs have direct public IP addresses | Meets SOC2 CC6.1, PCI DSS 1.4.2", totalVMs),
 			Severity:        "INFO",
 			ScreenshotGuide: "1. Go to Azure Portal → Virtual Machines\n2. Screenshot showing VMs with no public IPs assigned",
 			ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Compute%2FvirtualMachines",
@@ -545,7 +545,7 @@ func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
 			Timestamp:       time.Now(),
 			Frameworks: map[string]string{
 				"SOC2":    "CC6.1",
-				"PCI-DSS": "1.3.1",
+				"PCI-DSS": "1.4.2",
 			},
 		})
 	}

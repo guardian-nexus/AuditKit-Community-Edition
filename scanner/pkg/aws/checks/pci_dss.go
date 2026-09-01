@@ -17,6 +17,24 @@ import (
 // PCIDSSChecks implements PCI-DSS v4.0.1 requirements
 // v4.0.1 is the only active version. All 51 future-dated requirements became
 // mandatory on March 31, 2025 - there is no remaining grace period.
+//
+// Requirement IDs were remapped from v3.2.1 to v4.0.1 numbering using the PCI SSC
+// "v3.2.1 to v4.0 Summary of Changes" where it gives an explicit mapping, and by
+// matching check content against the v4.0.1 standard text otherwise.
+//
+// Known gaps - future-dated requirements not yet covered. The first five are
+// testable from cloud configuration and are the ones worth adding:
+//
+//	4.2.1.1  inventory of trusted keys and certificates
+//	8.6.1-3  application and system account credential management
+//	10.4.1.1 automated log review mechanisms
+//	10.7.2   detect and alert on security control failures (all entities)
+//	10.7.3   respond to security control failures
+//
+// The remainder are payment-page or process controls a cloud config scanner
+// cannot assess, and should surface as MANUAL rather than be omitted:
+//
+//	3.5.1.1, 5.3.3, 6.4.3, 11.3.1.1, 11.5.1.1, 11.6.1, 12.5.2.1, 12.10.7
 type PCIDSSChecks struct {
 	iamClient        *iam.Client
 	ec2Client        *ec2.Client
@@ -95,7 +113,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 	vpcs, err := c.ec2Client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
 	if err != nil {
 		return append(results, CheckResult{
-			Control:   "PCI-1.2.1",
+			Control:   "PCI-1.4.2",
 			Name:      "[PCI-DSS] Network Segmentation",
 			Status:    "ERROR",
 			Evidence:  fmt.Sprintf("Could not check VPC segmentation: %v", err),
@@ -110,7 +128,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 	// Check if we have isolated VPCs (simplified check)
 	if len(vpcs.Vpcs) < 2 {
 		results = append(results, CheckResult{
-			Control:           "PCI-1.2.1",
+			Control:           "PCI-1.4.2",
 			Name:              "[PCI-DSS] Network Segmentation for CDE",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -127,7 +145,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:   "PCI-1.2.1",
+			Control:   "PCI-1.4.2",
 			Name:      "[PCI-DSS] Network Segmentation for CDE",
 			Status:    "PASS",
 			Evidence:  fmt.Sprintf("%d VPCs found - verify CDE isolation manually", len(vpcs.Vpcs)),
@@ -144,7 +162,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 	sgs, err := c.ec2Client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
 		return append(results, CheckResult{
-			Control:   "PCI-1.3.1",
+			Control:   "PCI-1.4.2",
 			Name:      "[PCI-DSS] Security Group Check",
 			Status:    "ERROR",
 			Evidence:  fmt.Sprintf("Unable to check security groups: %v", err),
@@ -174,7 +192,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 
 	if len(openToWorld) > 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-1.3.1",
+			Control:           "PCI-1.4.2",
 			Name:              "[PCI-DSS] No Direct Public Access to CDE",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -191,7 +209,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:   "PCI-1.3.1",
+			Control:   "PCI-1.4.2",
 			Name:      "[PCI-DSS] No Direct Public Access",
 			Status:    "PASS",
 			Evidence:  "No security groups allow 0.0.0.0/0 access",
@@ -215,7 +233,7 @@ func (c *PCIDSSChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 	sgs, err := c.ec2Client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
 		return append(results, CheckResult{
-			Control:     "PCI-2.2.2",
+			Control:     "PCI-2.2.4",
 			Name:        "[PCI-DSS] Disable Default Configurations",
 			Status:      "ERROR",
 			Severity:    "HIGH",
@@ -238,7 +256,7 @@ func (c *PCIDSSChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 
 	if defaultGroupsWithRules > 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-2.2.2",
+			Control:           "PCI-2.2.4",
 			Name:              "[PCI-DSS] Disable Default Configurations",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -255,7 +273,7 @@ func (c *PCIDSSChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:   "PCI-2.2.2",
+			Control:   "PCI-2.2.4",
 			Name:      "[PCI-DSS] Default Configurations Disabled",
 			Status:    "PASS",
 			Evidence:  "Default security groups have no rules",
@@ -279,7 +297,7 @@ func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 	buckets, err := c.s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
 	if err != nil {
 		return append(results, CheckResult{
-			Control:   "PCI-3.4",
+			Control:   "PCI-3.5.1",
 			Name:      "[PCI-DSS] Encryption at Rest",
 			Status:    "ERROR",
 			Evidence:  fmt.Sprintf("Unable to check S3 buckets: %v", err),
@@ -314,7 +332,7 @@ func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:           "PCI-3.4",
+			Control:           "PCI-3.5.1",
 			Name:              "[PCI-DSS] Encryption at Rest (Mandatory)",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -331,7 +349,7 @@ func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 		})
 	} else if totalBuckets > 0 {
 		results = append(results, CheckResult{
-			Control:   "PCI-3.4",
+			Control:   "PCI-3.5.1",
 			Name:      "[PCI-DSS] Encryption at Rest",
 			Status:    "PASS",
 			Evidence:  fmt.Sprintf("All %d S3 buckets encrypted", totalBuckets),
@@ -355,7 +373,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 	sgs, err := c.ec2Client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
 		return append(results, CheckResult{
-			Control:   "PCI-4.1",
+			Control:   "PCI-4.2.1",
 			Name:      "[PCI-DSS] Encryption in Transit",
 			Status:    "ERROR",
 			Evidence:  fmt.Sprintf("Unable to check security groups: %v", err),
@@ -396,7 +414,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 
 	if len(unencryptedProtocols) > 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-4.1",
+			Control:           "PCI-4.2.1",
 			Name:              "[PCI-DSS] Encryption in Transit",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -413,7 +431,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:   "PCI-4.1",
+			Control:   "PCI-4.2.1",
 			Name:      "[PCI-DSS] Encryption in Transit",
 			Status:    "PASS",
 			Evidence:  "No unencrypted protocols exposed to internet",
@@ -451,7 +469,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 
 	if len(bucketsWithoutSSL) > 0 && len(bucketsWithoutSSL) > len(buckets.Buckets)/2 {
 		results = append(results, CheckResult{
-			Control:           "PCI-4.1.1",
+			Control:           "PCI-4.2.1",
 			Name:              "[PCI-DSS] S3 Secure Transport",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -478,7 +496,7 @@ func (c *PCIDSSChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 	instances, err := c.ec2Client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{})
 	if err != nil {
 		return append(results, CheckResult{
-			Control:   "PCI-6.2",
+			Control:   "PCI-6.3.3",
 			Name:      "[PCI-DSS] Security Patching",
 			Status:    "ERROR",
 			Evidence:  fmt.Sprintf("Unable to check EC2 instances: %v", err),
@@ -514,7 +532,7 @@ func (c *PCIDSSChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 
 	if len(instancesWithoutSSM) > 0 && totalInstances > 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-6.2",
+			Control:           "PCI-6.3.3",
 			Name:              "[PCI-DSS] Security Patching",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -558,7 +576,7 @@ func (c *PCIDSSChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 
 	if webFacingSGs > 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-6.4.7",
+			Control:           "PCI-6.4.2",
 			Name:              "[PCI-DSS] Web Application Protection",
 			Status:            "INFO",
 			Evidence:          fmt.Sprintf("PCI-DSS Req 6.4.7: %d web-facing security groups found - ensure WAF is deployed", webFacingSGs),
@@ -584,7 +602,7 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 	users, err := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
 	if err != nil {
 		return append(results, CheckResult{
-			Control:   "PCI-7.1",
+			Control:   "PCI-7.2.1",
 			Name:      "[PCI-DSS] Least Privilege Access",
 			Status:    "ERROR",
 			Evidence:  fmt.Sprintf("Unable to check IAM users: %v", err),
@@ -615,7 +633,7 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 
 	if len(usersWithAdmin) > 2 { // More than 2 is suspicious
 		results = append(results, CheckResult{
-			Control:           "PCI-7.1",
+			Control:           "PCI-7.2.1",
 			Name:              "[PCI-DSS] Least Privilege Access",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -634,7 +652,7 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 
 	// Check for separation of duties
 	results = append(results, CheckResult{
-		Control:           "PCI-7.1.2",
+		Control:           "PCI-7.2.2",
 		Name:              "[PCI-DSS] Separation of Duties",
 		Status:            "INFO",
 		Evidence:          "MANUAL REVIEW REQUIRED: Verify separation between development, operations, and security roles",
@@ -659,7 +677,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 
 	if err != nil {
 		results = append(results, CheckResult{
-			Control:           "PCI-8.2.4",
+			Control:           "PCI-8.3.9",
 			Name:              "[PCI-DSS] 90-Day Password Rotation",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -683,7 +701,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			}
 
 			results = append(results, CheckResult{
-				Control:           "PCI-8.2.4",
+				Control:           "PCI-8.3.9",
 				Name:              "[PCI-DSS] 90-Day Password Rotation",
 				Status:            "FAIL",
 				Severity:          "CRITICAL",
@@ -700,7 +718,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			})
 		} else {
 			results = append(results, CheckResult{
-				Control:   "PCI-8.2.4",
+				Control:   "PCI-8.3.9",
 				Name:      "[PCI-DSS] 90-Day Password Rotation",
 				Status:    "PASS",
 				Evidence:  fmt.Sprintf("Password expiry set to %d days (PCI compliant)", maxAge),
@@ -716,7 +734,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 		minLength := aws.ToInt32(passwordPolicy.PasswordPolicy.MinimumPasswordLength)
 		if minLength < 7 {
 			results = append(results, CheckResult{
-				Control:           "PCI-8.2.3",
+				Control:           "PCI-8.3.6",
 				Name:              "[PCI-DSS] Minimum Password Length",
 				Status:            "FAIL",
 				Severity:          "HIGH",
@@ -731,7 +749,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			})
 		} else {
 			results = append(results, CheckResult{
-				Control:   "PCI-8.2.3",
+				Control:   "PCI-8.3.6",
 				Name:      "[PCI-DSS] Minimum Password Length",
 				Status:    "PASS",
 				Evidence:  fmt.Sprintf("Password length %d chars meets PCI requirement (7+)", minLength),
@@ -747,7 +765,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 		reusePrevent := aws.ToInt32(passwordPolicy.PasswordPolicy.PasswordReusePrevention)
 		if reusePrevent < 4 {
 			results = append(results, CheckResult{
-				Control:           "PCI-8.2.5",
+				Control:           "PCI-8.3.7",
 				Name:              "[PCI-DSS] Password History",
 				Status:            "FAIL",
 				Severity:          "HIGH",
@@ -765,7 +783,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 		// Check account lockout (PCI: 6 attempts)
 		// Note: AWS doesn't have native account lockout, this is informational
 		results = append(results, CheckResult{
-			Control:           "PCI-8.1.6",
+			Control:           "PCI-8.3.4",
 			Name:              "[PCI-DSS] Account Lockout",
 			Status:            "INFO",
 			Evidence:          "PCI-DSS Req 8.1.6: AWS doesn't support native account lockout - implement via Lambda/CloudWatch",
@@ -784,7 +802,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 	users, err := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
 	if err != nil {
 		return append(results, CheckResult{
-			Control:   "PCI-8.3.1",
+			Control:   "PCI-8.4.2",
 			Name:      "[PCI-DSS] MFA for ALL Console Access",
 			Status:    "ERROR",
 			Evidence:  fmt.Sprintf("Unable to check IAM users: %v", err),
@@ -824,7 +842,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 		}
 
 		results = append(results, CheckResult{
-			Control:           "PCI-8.3.1",
+			Control:           "PCI-8.4.2",
 			Name:              "[PCI-DSS] MFA for ALL Console Access",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -841,7 +859,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 		})
 	} else if totalUsers > 0 {
 		results = append(results, CheckResult{
-			Control:   "PCI-8.3.1",
+			Control:   "PCI-8.4.2",
 			Name:      "[PCI-DSS] MFA for Console Access",
 			Status:    "PASS",
 			Evidence:  "All users with console access have MFA enabled",
@@ -910,7 +928,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 
 	// Check for idle session timeout (PCI: 15 minutes)
 	results = append(results, CheckResult{
-		Control:           "PCI-8.1.8",
+		Control:           "PCI-8.2.8",
 		Name:              "[PCI-DSS] 15-Minute Idle Timeout",
 		Status:            "INFO",
 		Evidence:          "PCI-DSS Req 8.1.8: Verify console timeout is set to 15 minutes or less",
@@ -936,7 +954,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 	trails, err := c.cloudtrailClient.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
 	if err != nil {
 		return append(results, CheckResult{
-			Control:   "PCI-10.1",
+			Control:   "PCI-10.2.1",
 			Name:      "[PCI-DSS] Audit Trail Implementation",
 			Status:    "ERROR",
 			Evidence:  fmt.Sprintf("Unable to check CloudTrail: %v", err),
@@ -950,7 +968,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 
 	if len(trails.Trails) == 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-10.1",
+			Control:           "PCI-10.2.1",
 			Name:              "[PCI-DSS] Audit Trail Implementation",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -975,7 +993,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:   "PCI-10.1",
+			Control:   "PCI-10.2.1",
 			Name:      "[PCI-DSS] Audit Trail Implementation",
 			Status:    "PASS",
 			Evidence:  fmt.Sprintf("%d CloudTrail(s) configured", len(trails.Trails)),
@@ -988,7 +1006,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 
 		// Check retention (12 months for PCI)
 		results = append(results, CheckResult{
-			Control:           "PCI-10.5.3",
+			Control:           "PCI-10.5.1",
 			Name:              "[PCI-DSS] 12-Month Log Retention",
 			Status:            "INFO",
 			Evidence:          "MANUAL CHECK REQUIRED: Verify S3 lifecycle for 12-month retention (3 months readily available)",
@@ -1005,7 +1023,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 
 		// Log integrity validation
 		results = append(results, CheckResult{
-			Control:           "PCI-10.5.2",
+			Control:           "PCI-10.3.2",
 			Name:              "[PCI-DSS] Log Integrity Validation",
 			Status:            "INFO",
 			Evidence:          "Enable CloudTrail log file validation to detect tampering",
@@ -1020,7 +1038,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 
 		// Time synchronization check
 		results = append(results, CheckResult{
-			Control:           "PCI-10.4",
+			Control:           "PCI-10.6.1",
 			Name:              "[PCI-DSS] Time Synchronization",
 			Status:            "INFO",
 			Evidence:          "PCI-DSS Req 10.4: Verify all systems use NTP for time sync",
@@ -1046,7 +1064,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 	configRecorders, err := c.configClient.DescribeConfigurationRecorders(ctx, &configservice.DescribeConfigurationRecordersInput{})
 	if err != nil {
 		return append(results, CheckResult{
-			Control:   "PCI-11.5.1",
+			Control:   "PCI-11.5.2",
 			Name:      "[PCI-DSS] Change Detection Mechanisms",
 			Status:    "ERROR",
 			Evidence:  fmt.Sprintf("Unable to check AWS Config: %v", err),
@@ -1060,7 +1078,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 
 	if len(configRecorders.ConfigurationRecorders) == 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-11.5.1",
+			Control:           "PCI-11.5.2",
 			Name:              "[PCI-DSS] Change Detection Mechanisms",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -1077,7 +1095,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:   "PCI-11.5.1",
+			Control:   "PCI-11.5.2",
 			Name:      "[PCI-DSS] Change Detection",
 			Status:    "PASS",
 			Evidence:  "AWS Config enabled for change detection",
@@ -1091,7 +1109,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 
 	// Quarterly scan reminder
 	results = append(results, CheckResult{
-		Control:           "PCI-11.2.2",
+		Control:           "PCI-11.3.2",
 		Name:              "[PCI-DSS] Quarterly Vulnerability Scans",
 		Status:            "INFO",
 		Evidence:          "PCI-DSS Req 11.2.2: PCI requires QUARTERLY vulnerability scans by Approved Scanning Vendor (ASV)",
@@ -1107,7 +1125,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 
 	// Penetration testing reminder
 	results = append(results, CheckResult{
-		Control:           "PCI-11.3.1",
+		Control:           "PCI-11.4.3",
 		Name:              "[PCI-DSS] Annual Penetration Testing",
 		Status:            "INFO",
 		Evidence:          "PCI-DSS Req 11.3.1: PCI requires ANNUAL penetration testing of CDE",
@@ -1122,7 +1140,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 
 	// File integrity monitoring
 	results = append(results, CheckResult{
-		Control:           "PCI-11.5",
+		Control:           "PCI-11.5.2",
 		Name:              "[PCI-DSS] File Integrity Monitoring",
 		Status:            "INFO",
 		Evidence:          "PCI-DSS Req 11.5: Deploy file integrity monitoring on critical systems",
@@ -1144,7 +1162,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 
 	// PCI-DSS Requirement 5: Protect all systems from malware
 	results = append(results, CheckResult{
-		Control:           "PCI-5.1",
+		Control:           "PCI-5.2.1",
 		Name:              "[PCI-DSS] Anti-Malware Protection",
 		Status:            "INFO",
 		Evidence:          "MANUAL: PCI-DSS Req 5.1 requires anti-malware on all systems commonly affected by malware (workstations, servers)",
@@ -1160,7 +1178,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-5.2.3",
+		Control:           "PCI-5.3.1",
 		Name:              "[PCI-DSS] Anti-Malware Updates",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Verify anti-malware mechanisms are current, actively running, and generating logs",
@@ -1175,7 +1193,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-5.3.2",
+		Control:           "PCI-5.3.4",
 		Name:              "[PCI-DSS] Anti-Malware Scan Logs",
 		Status:            "INFO",
 		Evidence:          "MANUAL: PCI requires anti-malware logs be retained and reviewed periodically",
@@ -1198,7 +1216,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 
 	// Physical access controls - AWS inherited controls
 	results = append(results, CheckResult{
-		Control:           "PCI-9.1",
+		Control:           "PCI-9.1.1",
 		Name:              "[PCI-DSS] Physical Access Controls",
 		Status:            "INFO",
 		Evidence:          "INFO: AWS data centers have physical security controls (inherited control). Review AWS compliance documentation.",
@@ -1214,7 +1232,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-9.2",
+		Control:           "PCI-9.2.1",
 		Name:              "[PCI-DSS] Physical Access Procedures",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Develop procedures to control physical access to facilities with systems that store, process, or transmit cardholder data",
@@ -1229,7 +1247,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-9.4",
+		Control:           "PCI-9.4.1",
 		Name:              "[PCI-DSS] Media Physical Security",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Physically secure all media containing cardholder data (backups, portable devices)",
@@ -1244,7 +1262,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-9.9",
+		Control:           "PCI-9.5.1",
 		Name:              "[PCI-DSS] Point-of-Interaction Device Protection",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Protect point-of-interaction (POI) devices from tampering and substitution",
@@ -1267,7 +1285,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 
 	// Security policy requirements
 	results = append(results, CheckResult{
-		Control:           "PCI-12.1",
+		Control:           "PCI-12.1.1",
 		Name:              "[PCI-DSS] Security Policy Establishment",
 		Status:            "INFO",
 		Evidence:          "MANUAL: PCI-DSS Req 12.1 requires establishing, publishing, maintaining, and disseminating a security policy",
@@ -1282,7 +1300,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.2",
+		Control:           "PCI-12.3.1",
 		Name:              "[PCI-DSS] Risk Assessment Process",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement risk assessment process performed at least annually and upon significant changes",
@@ -1297,7 +1315,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.3",
+		Control:           "PCI-12.2.1",
 		Name:              "[PCI-DSS] Acceptable Use Policies",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Develop usage policies for critical technologies (remote access, wireless, mobile devices, email, internet)",
@@ -1312,7 +1330,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.5",
+		Control:           "PCI-12.1.4",
 		Name:              "[PCI-DSS] Assign Security Responsibilities",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Assign individual or team responsibility for information security management",
@@ -1327,7 +1345,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.6",
+		Control:           "PCI-12.6.1",
 		Name:              "[PCI-DSS] Security Awareness Program",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement formal security awareness program for all personnel",
@@ -1342,7 +1360,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.8",
+		Control:           "PCI-12.8.1",
 		Name:              "[PCI-DSS] Service Provider Management",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Maintain and implement policies for service providers who handle cardholder data",
@@ -1357,7 +1375,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.10",
+		Control:           "PCI-12.10.1",
 		Name:              "[PCI-DSS] Incident Response Plan",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement an incident response plan for security incidents",

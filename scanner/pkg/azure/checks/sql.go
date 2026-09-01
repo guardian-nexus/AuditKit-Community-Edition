@@ -429,7 +429,7 @@ This forces all connections to use SSL/TLS encryption.`,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
 			"CIS-Azure": "5.2.1",
-			"PCI-DSS":   "4.1",
+			"PCI-DSS":   "4.2.1",
 		},
 	})
 
@@ -482,7 +482,7 @@ Use Private Link or VNet integration for secure connectivity.`,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
 			"CIS-Azure": "5.2.5",
-			"PCI-DSS":   "1.2.1",
+			"PCI-DSS":   "1.4.2",
 		},
 	})
 
@@ -538,7 +538,7 @@ Ensures all client connections use SSL/TLS encryption.`,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
 			"CIS-Azure": "5.3.1",
-			"PCI-DSS":   "4.1",
+			"PCI-DSS":   "4.2.1",
 		},
 	})
 
@@ -565,7 +565,7 @@ Disables weak TLS 1.0 and 1.1 protocols.`,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
 			"CIS-Azure": "5.3.2",
-			"PCI-DSS":   "4.1",
+			"PCI-DSS":   "4.2.1",
 		},
 	})
 

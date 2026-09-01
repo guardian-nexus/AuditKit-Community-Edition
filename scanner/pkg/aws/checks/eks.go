@@ -127,7 +127,7 @@ aws eks update-cluster-config \
 			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "8.1", "SOC2": "CC6.6", "PCI-DSS": "1.2.1"},
+			Frameworks:      map[string]string{"CIS-AWS": "8.1", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		}, nil
 	}
 
@@ -218,7 +218,7 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "8.2", "SOC2": "CC7.2", "PCI-DSS": "10.2.2"},
+			Frameworks:      map[string]string{"CIS-AWS": "8.2", "SOC2": "CC7.2", "PCI-DSS": "10.2.1.2"},
 		}, nil
 	}
 
@@ -296,7 +296,7 @@ aws eks create-cluster \
 			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "8.3", "SOC2": "CC6.7", "PCI-DSS": "3.4"},
+			Frameworks:      map[string]string{"CIS-AWS": "8.3", "SOC2": "CC6.7", "PCI-DSS": "3.5.1"},
 		}, nil
 	}
 
@@ -392,7 +392,7 @@ kubectl get namespace default -o yaml | grep pod-security`,
 		ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 		Priority:        PriorityHigh,
 		Timestamp:       time.Now(),
-		Frameworks:      map[string]string{"CIS-AWS": "8.5", "SOC2": "CC8.1", "PCI-DSS": "2.2"},
+		Frameworks:      map[string]string{"CIS-AWS": "8.5", "SOC2": "CC8.1", "PCI-DSS": "2.2.1"},
 	}, nil
 }
 
@@ -437,7 +437,7 @@ kubectl delete clusterrolebinding NAME`,
 		ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 		Priority:        PriorityHigh,
 		Timestamp:       time.Now(),
-		Frameworks:      map[string]string{"CIS-AWS": "8.6", "SOC2": "CC6.3", "PCI-DSS": "7.1.2"},
+		Frameworks:      map[string]string{"CIS-AWS": "8.6", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
 	}, nil
 }
 
@@ -519,7 +519,7 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "8.8", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
+			Frameworks:      map[string]string{"CIS-AWS": "8.8", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 		}, nil
 	}
 

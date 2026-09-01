@@ -132,7 +132,7 @@ func (c *IAMChecks) CheckServiceAccountKeys(ctx context.Context) []CheckResult {
 			Name:        "Service Account Key Age",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("PCI-DSS 8.2.4: %d service account keys older than 90 days: %s", len(keysOlderThan90Days), strings.Join(displayKeys, ", ")),
+			Evidence:    fmt.Sprintf("PCI-DSS 8.3.9: %d service account keys older than 90 days: %s", len(keysOlderThan90Days), strings.Join(displayKeys, ", ")),
 			Remediation: "Rotate service account keys every 90 days",
 			RemediationDetail: `# Create new key
 gcloud iam service-accounts keys create new-key.json \
@@ -178,7 +178,7 @@ gcloud iam service-accounts keys delete KEY_ID \
 			Control:    "CC6.1",
 			Name:       "Service Account Key Rotation",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d service accounts have properly rotated keys (< 90 days) | Meets PCI DSS 8.2.4", totalSAs),
+			Evidence:   fmt.Sprintf("All %d service accounts have properly rotated keys (< 90 days) | Meets PCI DSS 8.3.9", totalSAs),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("IAM_SERVICE_ACCOUNT_KEYS"),
@@ -262,7 +262,7 @@ func (c *IAMChecks) CheckUserMFA(ctx context.Context) []CheckResult {
 			Control:    "CC6.1",
 			Name:       "User MFA Enforcement",
 			Status:     "PASS",
-			Evidence:   "No user accounts found in project IAM (only service accounts) | Meets SOC2 CC6.1, PCI DSS 8.3.1",
+			Evidence:   "No user accounts found in project IAM (only service accounts) | Meets SOC2 CC6.1, PCI DSS 8.4.2",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("IAM_MFA_ENABLED"),
@@ -336,7 +336,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 			Control:    "CC6.3",
 			Name:       "Primitive Role Usage",
 			Status:     "PASS",
-			Evidence:   "No primitive roles assigned to user accounts | Meets SOC2 CC6.3, PCI DSS 7.1.2",
+			Evidence:   "No primitive roles assigned to user accounts | Meets SOC2 CC6.3, PCI DSS 7.2.2",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("IAM_PRIMITIVE_ROLES"),
@@ -403,7 +403,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 			ConsoleURL:      "https://console.cloud.google.com/iam-admin/serviceaccounts",
 			Frameworks: map[string]string{
 				"SOC2":    "CC6.3",
-				"PCI-DSS": "7.1.2",
+				"PCI-DSS": "7.2.2",
 			},
 		})
 	} else {
@@ -416,7 +416,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
 				"SOC2":    "CC6.3",
-				"PCI-DSS": "7.1.2",
+				"PCI-DSS": "7.2.2",
 			},
 		})
 	}
@@ -862,7 +862,7 @@ gcloud projects add-iam-policy-binding %s \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "IAM & Admin → IAM → Screenshot showing users with single, specific roles (no Owner+Editor combinations)",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "1.3", "SOC2": "CC6.3", "PCI-DSS": "7.1"},
+			Frameworks:      map[string]string{"CIS-GCP": "1.3", "SOC2": "CC6.3", "PCI-DSS": "7.2.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -872,7 +872,7 @@ gcloud projects add-iam-policy-binding %s \
 			Evidence:   "No conflicting role assignments detected | Meets CIS 1.3",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "1.3", "SOC2": "CC6.3", "PCI-DSS": "7.1"},
+			Frameworks: map[string]string{"CIS-GCP": "1.3", "SOC2": "CC6.3", "PCI-DSS": "7.2.1"},
 		})
 	}
 
@@ -917,7 +917,7 @@ gcloud kms keys remove-iam-policy-binding KEY_NAME \
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "Security → Key Management → Select key → Permissions → Screenshot showing NO allUsers or allAuthenticatedUsers",
 		ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/security/kms?project=%s", c.projectID),
-		Frameworks:      map[string]string{"CIS-GCP": "1.8", "SOC2": "CC6.1", "PCI-DSS": "3.4"},
+		Frameworks:      map[string]string{"CIS-GCP": "1.8", "SOC2": "CC6.1", "PCI-DSS": "3.5.1"},
 	}}
 }
 
@@ -1118,7 +1118,7 @@ gcloud iam service-accounts add-iam-policy-binding SERVICE_ACCOUNT_EMAIL \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "IAM & Admin → IAM → Screenshot showing no project-level serviceAccountUser/TokenCreator roles + Service Accounts → Permissions showing service-account-level grants",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "1.6", "SOC2": "CC6.1", "PCI-DSS": "7.1.2"},
+			Frameworks:      map[string]string{"CIS-GCP": "1.6", "SOC2": "CC6.1", "PCI-DSS": "7.2.2"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -1128,7 +1128,7 @@ gcloud iam service-accounts add-iam-policy-binding SERVICE_ACCOUNT_EMAIL \
 			Evidence:   "Service Account User/Token Creator roles are not assigned at project level | Meets CIS 1.6 (least privilege enforced)",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "1.6", "SOC2": "CC6.1", "PCI-DSS": "7.1.2"},
+			Frameworks: map[string]string{"CIS-GCP": "1.6", "SOC2": "CC6.1", "PCI-DSS": "7.2.2"},
 		})
 	}
 

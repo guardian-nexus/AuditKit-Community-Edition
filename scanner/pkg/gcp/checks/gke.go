@@ -138,7 +138,7 @@ gcloud container binauthz policy import policy.yaml`,
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Kubernetes Engine → Clusters → Security → Screenshot showing Binary Authorization: Enabled",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/kubernetes/list?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "8.1", "SOC2": "CC8.1", "PCI-DSS": "2.2"},
+			Frameworks:      map[string]string{"CIS-GCP": "8.1", "SOC2": "CC8.1", "PCI-DSS": "2.2.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -148,7 +148,7 @@ gcloud container binauthz policy import policy.yaml`,
 			Evidence:   fmt.Sprintf("All %d GKE clusters have Binary Authorization enabled | Meets CIS 8.1", totalClusters),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.1", "SOC2": "CC8.1", "PCI-DSS": "2.2"},
+			Frameworks: map[string]string{"CIS-GCP": "8.1", "SOC2": "CC8.1", "PCI-DSS": "2.2.1"},
 		})
 	}
 
@@ -217,7 +217,7 @@ kubectl apply -f network-policy.yaml`,
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Kubernetes Engine → Clusters → Networking → Screenshot showing Network policy: Enabled",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/kubernetes/list?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "8.2", "SOC2": "CC6.6", "PCI-DSS": "1.2.1"},
+			Frameworks:      map[string]string{"CIS-GCP": "8.2", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -227,7 +227,7 @@ kubectl apply -f network-policy.yaml`,
 			Evidence:   fmt.Sprintf("All %d GKE clusters have Network Policy enabled | Meets CIS 8.2", len(clusters)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.2", "SOC2": "CC6.6", "PCI-DSS": "1.2.1"},
+			Frameworks: map[string]string{"CIS-GCP": "8.2", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	}
 
@@ -290,7 +290,7 @@ gcloud container clusters update CLUSTER_NAME \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Kubernetes Engine → Clusters → Add-ons → Screenshot showing Kubernetes Dashboard: Disabled",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/kubernetes/list?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "8.3", "SOC2": "CC6.1", "PCI-DSS": "2.2.2"},
+			Frameworks:      map[string]string{"CIS-GCP": "8.3", "SOC2": "CC6.1", "PCI-DSS": "2.2.4"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -300,7 +300,7 @@ gcloud container clusters update CLUSTER_NAME \
 			Evidence:   fmt.Sprintf("All %d GKE clusters have Kubernetes Dashboard disabled | Meets CIS 8.3", len(clusters)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.3", "SOC2": "CC6.1", "PCI-DSS": "2.2.2"},
+			Frameworks: map[string]string{"CIS-GCP": "8.3", "SOC2": "CC6.1", "PCI-DSS": "2.2.4"},
 		})
 	}
 
@@ -387,7 +387,7 @@ gcloud container clusters create-auto CLUSTER_NAME \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Kubernetes Engine → Clusters → Security → Screenshot showing Pod Security Policy: Enabled or Autopilot mode",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/kubernetes/list?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "8.4", "SOC2": "CC6.1", "PCI-DSS": "2.2"},
+			Frameworks:      map[string]string{"CIS-GCP": "8.4", "SOC2": "CC6.1", "PCI-DSS": "2.2.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -397,7 +397,7 @@ gcloud container clusters create-auto CLUSTER_NAME \
 			Evidence:   fmt.Sprintf("All %d GKE clusters have Pod Security Policy or Autopilot enabled | Meets CIS 8.4", len(clusters)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.4", "SOC2": "CC6.1", "PCI-DSS": "2.2"},
+			Frameworks: map[string]string{"CIS-GCP": "8.4", "SOC2": "CC6.1", "PCI-DSS": "2.2.1"},
 		})
 	}
 
@@ -479,7 +479,7 @@ gcloud container clusters create CLUSTER_NAME \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Kubernetes Engine → Clusters → Security → Screenshot showing Workload Identity: Enabled",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/kubernetes/list?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "8.5", "SOC2": "CC6.1", "PCI-DSS": "8.2"},
+			Frameworks:      map[string]string{"CIS-GCP": "8.5", "SOC2": "CC6.1", "PCI-DSS": "8.2.2"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -489,7 +489,7 @@ gcloud container clusters create CLUSTER_NAME \
 			Evidence:   fmt.Sprintf("All %d GKE clusters have Workload Identity enabled | Meets CIS 8.5", len(clusters)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.5", "SOC2": "CC6.1", "PCI-DSS": "8.2"},
+			Frameworks: map[string]string{"CIS-GCP": "8.5", "SOC2": "CC6.1", "PCI-DSS": "8.2.2"},
 		})
 	}
 

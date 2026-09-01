@@ -90,7 +90,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 			ConsoleURL:        "https://console.aws.amazon.com/guardduty/home",
 			Priority:          PriorityCritical,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.1", "SOC2": "CC7.2", "PCI-DSS": "11.4"},
+			Frameworks:        map[string]string{"CIS-AWS": "9.1", "SOC2": "CC7.2", "PCI-DSS": "11.5.1"},
 		}, nil
 	}
 
@@ -147,7 +147,7 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 			ConsoleURL:        "https://console.aws.amazon.com/macie/home",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.2", "SOC2": "CC6.7", "PCI-DSS": "3.4"},
+			Frameworks:        map[string]string{"CIS-AWS": "9.2", "SOC2": "CC6.7", "PCI-DSS": "3.5.1"},
 		}, nil
 	}
 

@@ -108,7 +108,7 @@ func (c *IdentityChecks) checkStaleAccounts(ctx context.Context) CheckResult {
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
 			"SOC2":    "CC6.7",
-			"PCI-DSS": "8.1.4",
+			"PCI-DSS": "8.2.6",
 			"HIPAA":   "164.308(a)(4)(ii)(C)",
 		},
 	}
@@ -129,7 +129,7 @@ func (c *IdentityChecks) checkGuestAccess(ctx context.Context) CheckResult {
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
 			"SOC2":    "CC6.1",
-			"PCI-DSS": "7.1",
+			"PCI-DSS": "7.2.1",
 			"HIPAA":   "164.308(a)(4)",
 		},
 	}

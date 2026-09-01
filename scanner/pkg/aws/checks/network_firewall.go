@@ -249,7 +249,7 @@ aws network-firewall update-firewall-policy \
 			ConsoleURL:      "https://console.aws.amazon.com/vpc/home#FirewallPolicies",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "5.16", "SOC2": "CC6.1", "PCI-DSS": "1.2"},
+			Frameworks:      map[string]string{"CIS-AWS": "5.16", "SOC2": "CC6.1", "PCI-DSS": "1.2.1"},
 		}, nil
 	}
 
@@ -349,7 +349,7 @@ aws network-firewall update-logging-configuration \
 			ConsoleURL:      "https://console.aws.amazon.com/vpc/home#NetworkFirewalls",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "5.17", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
+			Frameworks:      map[string]string{"CIS-AWS": "5.17", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 		}, nil
 	}
 

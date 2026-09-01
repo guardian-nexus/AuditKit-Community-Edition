@@ -103,21 +103,21 @@ func (c *GCPPCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 		if result.Status == "FAIL" {
 			// Re-label with PCI control ID
 			result.Control = "PCI-1.2.1"
-			result.Evidence = fmt.Sprintf("PCI-DSS 1.2.1 VIOLATION: %s", result.Evidence)
+			result.Evidence = fmt.Sprintf("PCI-DSS 1.4.2 VIOLATION: %s", result.Evidence)
 			results = append(results, result)
 		}
 	}
 
 	if len(results) == 0 {
 		results = append(results, CheckResult{
-			Control:   "PCI-1.2.1",
+			Control:   "PCI-1.4.2",
 			Name:      "[PCI-DSS] Network Segmentation",
 			Status:    "PASS",
-			Evidence:  "VPC firewall rules properly configured for network segmentation | Meets PCI DSS 1.2.1",
+			Evidence:  "VPC firewall rules properly configured for network segmentation | Meets PCI DSS 1.4.2",
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "1.2.1",
+				"PCI-DSS": "1.4.2",
 			},
 		})
 	}
@@ -142,11 +142,11 @@ func (c *GCPPCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []CheckR
 
 	if unencryptedCount > 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-3.4",
+			Control:           "PCI-3.5.1",
 			Name:              "[PCI-DSS] Storage Encryption (Mandatory)",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("PCI-DSS 3.4 VIOLATION: %d storage buckets without customer-managed encryption keys", unencryptedCount),
+			Evidence:          fmt.Sprintf("PCI-DSS 3.5.1 VIOLATION: %d storage buckets without customer-managed encryption keys", unencryptedCount),
 			Remediation:       "Enable customer-managed encryption keys (CMEK) immediately for cardholder data",
 			RemediationDetail: "gcloud storage buckets update gs://BUCKET_NAME --default-encryption-key=KMS_KEY",
 			Priority:          PriorityCritical,
@@ -158,25 +158,25 @@ func (c *GCPPCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []CheckR
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:   "PCI-3.4",
+			Control:   "PCI-3.5.1",
 			Name:      "[PCI-DSS] Storage Encryption",
 			Status:    "PASS",
-			Evidence:  "All storage buckets use encryption | Meets PCI DSS 3.4",
+			Evidence:  "All storage buckets use encryption | Meets PCI DSS 3.5.1",
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "3.4",
+				"PCI-DSS": "3.5.1",
 			},
 		})
 	}
 
-	// Check KMS key rotation (PCI-DSS 3.6.4)
+	// Check KMS key rotation (PCI-DSS 3.7.4)
 	kmsChecker := NewKMSChecks(c.kmsClient, c.projectID)
 	keyResults := kmsChecker.CheckKMSKeyRotation(ctx)
 	for _, result := range keyResults {
 		if result.Status == "FAIL" {
 			result.Control = "PCI-3.6.4"
-			result.Evidence = fmt.Sprintf("PCI-DSS 3.6.4: %s", result.Evidence)
+			result.Evidence = fmt.Sprintf("PCI-DSS 3.7.4: %s", result.Evidence)
 			results = append(results, result)
 		}
 	}
@@ -195,7 +195,7 @@ func (c *GCPPCIChecks) CheckReq4_TransitEncryption(ctx context.Context) []CheckR
 	for _, result := range sslResults {
 		if result.Status == "FAIL" {
 			result.Control = "PCI-4.1"
-			result.Evidence = fmt.Sprintf("PCI-DSS 4.1 VIOLATION: %s", result.Evidence)
+			result.Evidence = fmt.Sprintf("PCI-DSS 4.2.1 VIOLATION: %s", result.Evidence)
 			result.Severity = "CRITICAL"
 			result.Priority = PriorityCritical
 			results = append(results, result)
@@ -204,14 +204,14 @@ func (c *GCPPCIChecks) CheckReq4_TransitEncryption(ctx context.Context) []CheckR
 
 	if len(results) == 0 {
 		results = append(results, CheckResult{
-			Control:   "PCI-4.1",
+			Control:   "PCI-4.2.1",
 			Name:      "[PCI-DSS] Encryption in Transit",
 			Status:    "PASS",
-			Evidence:  "SSL/TLS encryption enforced for all connections | Meets PCI DSS 4.1",
+			Evidence:  "SSL/TLS encryption enforced for all connections | Meets PCI DSS 4.2.1",
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "4.1",
+				"PCI-DSS": "4.2.1",
 			},
 		})
 	}
@@ -230,7 +230,7 @@ func (c *GCPPCIChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 	for _, result := range iamResults {
 		if result.Status == "FAIL" && strings.Contains(result.Evidence, "primitive roles") {
 			result.Control = "PCI-7.1"
-			result.Evidence = fmt.Sprintf("PCI-DSS 7.1: %s", result.Evidence)
+			result.Evidence = fmt.Sprintf("PCI-DSS 7.2.1: %s", result.Evidence)
 			result.Severity = "HIGH"
 			results = append(results, result)
 		}
@@ -238,14 +238,14 @@ func (c *GCPPCIChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 
 	if len(results) == 0 {
 		results = append(results, CheckResult{
-			Control:   "PCI-7.1",
+			Control:   "PCI-7.2.1",
 			Name:      "[PCI-DSS] Least Privilege",
 			Status:    "PASS",
-			Evidence:  "IAM follows least privilege principle | Meets PCI DSS 7.1",
+			Evidence:  "IAM follows least privilege principle | Meets PCI DSS 7.2.1",
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "7.1",
+				"PCI-DSS": "7.2.1",
 			},
 		})
 	}
@@ -259,10 +259,10 @@ func (c *GCPPCIChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 
 	// MFA enforcement (PCI requires MFA for ALL access)
 	results = append(results, CheckResult{
-		Control:           "PCI-8.3.1",
+		Control:           "PCI-8.4.2",
 		Name:              "[PCI-DSS] MFA for ALL Access",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS 8.3.1: MANUAL CHECK - Verify MFA enabled for ALL users with console access (no exceptions)",
+		Evidence:          "PCI-DSS 8.4.2: MANUAL CHECK - Verify MFA enabled for ALL users with console access (no exceptions)",
 		Remediation:       "Enable MFA for every user accessing the cardholder data environment",
 		RemediationDetail: "Google Workspace Admin → Security → 2-Step Verification → Enforce for all organizational units",
 		ScreenshotGuide:   "Google Admin Console → Security → 2-Step Verification → Screenshot enforcement for all users",
@@ -270,7 +270,7 @@ func (c *GCPPCIChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 		Priority:          PriorityCritical,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "8.3.1",
+			"PCI-DSS": "8.4.2",
 		},
 	})
 
@@ -281,23 +281,23 @@ func (c *GCPPCIChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 	for _, result := range keyResults {
 		if result.Status == "FAIL" && strings.Contains(result.Evidence, "90 days") {
 			result.Control = "PCI-8.2.4"
-			result.Evidence = fmt.Sprintf("PCI-DSS 8.2.4: %s", result.Evidence)
+			result.Evidence = fmt.Sprintf("PCI-DSS 8.3.9: %s", result.Evidence)
 			results = append(results, result)
 		}
 	}
 
 	// Session timeout
 	results = append(results, CheckResult{
-		Control:           "PCI-8.1.8",
+		Control:           "PCI-8.2.8",
 		Name:              "[PCI-DSS] 15-Minute Session Timeout",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS 8.1.8: Configure 15-minute idle timeout for all sessions",
+		Evidence:          "PCI-DSS 8.2.8: Configure 15-minute idle timeout for all sessions",
 		Remediation:       "Set session timeout to 15 minutes via Identity-Aware Proxy or workspace settings",
 		RemediationDetail: "Cloud Console → IAP → Configure session duration = 15 minutes",
 		Priority:          PriorityHigh,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "8.1.8",
+			"PCI-DSS": "8.2.8",
 		},
 	})
 
@@ -317,24 +317,24 @@ func (c *GCPPCIChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			// Re-map to PCI control
 			newResult := result
 			newResult.Control = "PCI-10.1"
-			newResult.Evidence = fmt.Sprintf("PCI-DSS 10.1: %s", result.Evidence)
+			newResult.Evidence = fmt.Sprintf("PCI-DSS 10.2.1.1: %s", result.Evidence)
 			results = append(results, newResult)
 		}
 	}
 
 	// 12-month retention requirement
 	results = append(results, CheckResult{
-		Control:           "PCI-10.5.3",
+		Control:           "PCI-10.5.1",
 		Name:              "[PCI-DSS] 12-Month Log Retention",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS 10.5.3: Logs must be retained for 12+ months (3 months readily available)",
+		Evidence:          "PCI-DSS 10.5.1: Logs must be retained for 12+ months (3 months readily available)",
 		Remediation:       "Configure Cloud Storage lifecycle for 365+ day retention",
 		RemediationDetail: "Storage bucket → Lifecycle management → Retain for 365+ days",
 		Priority:          PriorityHigh,
 		Timestamp:         time.Now(),
 		ScreenshotGuide:   "Logging → Log Router → Sink → Storage bucket lifecycle policy showing 365+ day retention",
 		Frameworks: map[string]string{
-			"PCI-DSS": "10.5.3",
+			"PCI-DSS": "10.5.1",
 		},
 	})
 
@@ -346,10 +346,10 @@ func (c *GCPPCIChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-2.1",
+		Control:           "PCI-2.2.2",
 		Name:              "[PCI-DSS] Change Default Passwords",
 		Status:            "INFO",
-		Evidence:          "MANUAL: PCI-DSS 2.1 requires changing vendor defaults before deploying systems",
+		Evidence:          "MANUAL: PCI-DSS 2.2.4 requires changing vendor defaults before deploying systems",
 		Remediation:       "Ensure all default passwords are changed",
 		RemediationDetail: "1. Change default passwords on all GCP services and third-party systems\n2. Review Compute Engine instances for default SSH keys\n3. Change default database passwords\n4. Document password change procedures",
 		Priority:          PriorityHigh,
@@ -362,7 +362,7 @@ func (c *GCPPCIChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-2.2.2",
+		Control:           "PCI-2.2.4",
 		Name:              "[PCI-DSS] Disable Default Network Configurations",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Review VPC default configurations and remove unnecessary default rules",
@@ -385,7 +385,7 @@ func (c *GCPPCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-5.1",
+		Control:           "PCI-5.2.1",
 		Name:              "[PCI-DSS] Anti-Malware Protection",
 		Status:            "INFO",
 		Evidence:          "MANUAL: PCI-DSS Req 5.1 requires anti-malware on all systems commonly affected by malware",
@@ -401,7 +401,7 @@ func (c *GCPPCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-5.2.3",
+		Control:           "PCI-5.3.1",
 		Name:              "[PCI-DSS] Anti-Malware Updates",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Verify anti-malware mechanisms are current, actively running, and generating logs",
@@ -416,7 +416,7 @@ func (c *GCPPCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-5.3.2",
+		Control:           "PCI-5.3.4",
 		Name:              "[PCI-DSS] Anti-Malware Scan Logs",
 		Status:            "INFO",
 		Evidence:          "MANUAL: PCI requires anti-malware logs be retained and reviewed periodically",
@@ -438,7 +438,7 @@ func (c *GCPPCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-6.2",
+		Control:           "PCI-6.3.3",
 		Name:              "[PCI-DSS] Security Patching",
 		Status:            "INFO",
 		Evidence:          "MANUAL: PCI-DSS Req 6.2 requires critical security patches within 30 days",
@@ -454,7 +454,7 @@ func (c *GCPPCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-6.3.2",
+		Control:           "PCI-6.2.1",
 		Name:              "[PCI-DSS] Secure Development Lifecycle",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement secure software development lifecycle for custom applications",
@@ -470,7 +470,7 @@ func (c *GCPPCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-6.4.3",
+		Control:           "PCI-6.4.2",
 		Name:              "[PCI-DSS] Web Application Firewall",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Deploy WAF for public-facing web applications",
@@ -493,7 +493,7 @@ func (c *GCPPCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-9.1",
+		Control:           "PCI-9.1.1",
 		Name:              "[PCI-DSS] Physical Access Controls",
 		Status:            "INFO",
 		Evidence:          "INFO: GCP data centers have physical security controls (inherited control). Review GCP compliance documentation.",
@@ -509,7 +509,7 @@ func (c *GCPPCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-9.2",
+		Control:           "PCI-9.2.1",
 		Name:              "[PCI-DSS] Physical Access Procedures",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Develop procedures to control physical access to facilities with systems that store, process, or transmit cardholder data",
@@ -524,7 +524,7 @@ func (c *GCPPCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-9.4",
+		Control:           "PCI-9.4.1",
 		Name:              "[PCI-DSS] Media Physical Security",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Physically secure all media containing cardholder data (backups, portable devices)",
@@ -546,7 +546,7 @@ func (c *GCPPCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-11.2.2",
+		Control:           "PCI-11.3.2",
 		Name:              "[PCI-DSS] Quarterly Vulnerability Scans",
 		Status:            "INFO",
 		Evidence:          "PCI-DSS Req 11.2.2: PCI requires QUARTERLY vulnerability scans by Approved Scanning Vendor (ASV)",
@@ -562,7 +562,7 @@ func (c *GCPPCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-11.3.1",
+		Control:           "PCI-11.4.3",
 		Name:              "[PCI-DSS] Annual Penetration Testing",
 		Status:            "INFO",
 		Evidence:          "PCI-DSS Req 11.3.1: PCI requires ANNUAL penetration testing of CDE",
@@ -577,7 +577,7 @@ func (c *GCPPCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-11.5",
+		Control:           "PCI-11.5.2",
 		Name:              "[PCI-DSS] File Integrity Monitoring",
 		Status:            "INFO",
 		Evidence:          "PCI-DSS Req 11.5: Deploy file integrity monitoring on critical systems",
@@ -592,7 +592,7 @@ func (c *GCPPCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-11.5.1",
+		Control:           "PCI-11.5.2",
 		Name:              "[PCI-DSS] Change Detection Mechanisms",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement change detection for critical files and configurations",
@@ -615,7 +615,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.1",
+		Control:           "PCI-12.1.1",
 		Name:              "[PCI-DSS] Security Policy Establishment",
 		Status:            "INFO",
 		Evidence:          "MANUAL: PCI-DSS Req 12.1 requires establishing, publishing, maintaining, and disseminating a security policy",
@@ -630,7 +630,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.2",
+		Control:           "PCI-12.3.1",
 		Name:              "[PCI-DSS] Risk Assessment Process",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement risk assessment process performed at least annually and upon significant changes",
@@ -645,7 +645,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.3",
+		Control:           "PCI-12.2.1",
 		Name:              "[PCI-DSS] Acceptable Use Policies",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Develop usage policies for critical technologies (remote access, wireless, mobile devices, email, internet)",
@@ -660,7 +660,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.5",
+		Control:           "PCI-12.1.4",
 		Name:              "[PCI-DSS] Assign Security Responsibilities",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Assign individual or team responsibility for information security management",
@@ -675,7 +675,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.6",
+		Control:           "PCI-12.6.1",
 		Name:              "[PCI-DSS] Security Awareness Program",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement formal security awareness program for all personnel",
@@ -690,7 +690,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.8",
+		Control:           "PCI-12.8.1",
 		Name:              "[PCI-DSS] Service Provider Management",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Maintain and implement policies for service providers who handle cardholder data",
@@ -705,7 +705,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.10",
+		Control:           "PCI-12.10.1",
 		Name:              "[PCI-DSS] Incident Response Plan",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement an incident response plan for security incidents",

@@ -112,11 +112,11 @@ func (c *AzurePCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Ch
 
 	if nsgCount == 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-1.2.1",
+			Control:           "PCI-1.4.2",
 			Name:              "[PCI-DSS] Network Segmentation",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          "PCI-DSS 1.2.1 VIOLATION: No Network Security Groups found - no network segmentation",
+			Evidence:          "PCI-DSS 1.4.2 VIOLATION: No Network Security Groups found - no network segmentation",
 			Remediation:       "Create NSGs for network segmentation",
 			RemediationDetail: "Create separate VNets/subnets for CDE with restrictive NSGs",
 			Priority:          PriorityCritical,
@@ -124,34 +124,34 @@ func (c *AzurePCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Ch
 			ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FvirtualNetworks",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "1.2.1",
+				"PCI-DSS": "1.4.2",
 			},
 		})
 	} else if subnetAssociations < nsgCount {
 		results = append(results, CheckResult{
-			Control:           "PCI-1.2.3",
+			Control:           "PCI-1.3.1",
 			Name:              "[PCI-DSS] NSG Subnet Associations",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("PCI-DSS 1.2.3: %d NSGs but only %d subnet associations - incomplete segmentation", nsgCount, subnetAssociations),
+			Evidence:          fmt.Sprintf("PCI-DSS 1.4.2: %d NSGs but only %d subnet associations - incomplete segmentation", nsgCount, subnetAssociations),
 			Remediation:       "Associate NSGs with all subnets",
 			RemediationDetail: "Every subnet should have an NSG for proper segmentation",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "1.2.3",
+				"PCI-DSS": "1.3.1",
 			},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:   "PCI-1.2.1",
+			Control:   "PCI-1.4.2",
 			Name:      "[PCI-DSS] Network Segmentation",
 			Status:    "PASS",
 			Evidence:  fmt.Sprintf("%d NSGs with %d subnet associations configured", nsgCount, subnetAssociations),
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "1.2.1",
+				"PCI-DSS": "1.4.2",
 			},
 		})
 	}
@@ -194,11 +194,11 @@ func (c *AzurePCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []Chec
 
 	if len(unencryptedStorage) > 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-3.4",
+			Control:           "PCI-3.5.1",
 			Name:              "[PCI-DSS] Storage Encryption (Mandatory)",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("PCI-DSS 3.4 VIOLATION: %d storage accounts NOT encrypted", len(unencryptedStorage)),
+			Evidence:          fmt.Sprintf("PCI-DSS 3.5.1 VIOLATION: %d storage accounts NOT encrypted", len(unencryptedStorage)),
 			Remediation:       "Enable encryption immediately",
 			RemediationDetail: "All storage must be encrypted for PCI compliance",
 			Priority:          PriorityCritical,
@@ -212,10 +212,10 @@ func (c *AzurePCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []Chec
 
 	if len(noCustomerKeys) > 0 && len(noCustomerKeys) == totalAccounts {
 		results = append(results, CheckResult{
-			Control:           "PCI-3.5",
+			Control:           "PCI-3.6.1",
 			Name:              "[PCI-DSS] Encryption Key Management",
 			Status:            "INFO",
-			Evidence:          fmt.Sprintf("PCI-DSS 3.5: All storage uses Microsoft-managed keys - consider customer-managed keys for CDE"),
+			Evidence:          fmt.Sprintf("PCI-DSS 3.6.1: All storage uses Microsoft-managed keys - consider customer-managed keys for CDE"),
 			Remediation:       "Consider Azure Key Vault for customer-managed keys",
 			RemediationDetail: "Use customer-managed keys for cardholder data storage",
 			Priority:          PriorityMedium,
@@ -264,35 +264,35 @@ func (c *AzurePCIChecks) CheckReq4_TransitEncryption(ctx context.Context) []Chec
 
 	if len(noHTTPS) > 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-4.1",
+			Control:           "PCI-4.2.1",
 			Name:              "[PCI-DSS] HTTPS Enforcement",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("PCI-DSS 4.1 VIOLATION: %d storage accounts allow HTTP: %s", len(noHTTPS), strings.Join(noHTTPS[:min(3, len(noHTTPS))], ", ")),
+			Evidence:          fmt.Sprintf("PCI-DSS 4.2.1 VIOLATION: %d storage accounts allow HTTP: %s", len(noHTTPS), strings.Join(noHTTPS[:min(3, len(noHTTPS))], ", ")),
 			Remediation:       "Enable HTTPS-only immediately",
 			RemediationDetail: fmt.Sprintf("az storage account update --name %s --https-only true", noHTTPS[0]),
 			Priority:          PriorityCritical,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "4.1",
+				"PCI-DSS": "4.2.1",
 			},
 		})
 	}
 
 	if len(noTLS12) > 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-4.1",
+			Control:           "PCI-4.2.1",
 			Name:              "[PCI-DSS] TLS 1.2+ Required",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("PCI-DSS 4.1: %d storage accounts allow TLS < 1.2: %s", len(noTLS12), strings.Join(noTLS12[:min(3, len(noTLS12))], ", ")),
+			Evidence:          fmt.Sprintf("PCI-DSS 4.2.1: %d storage accounts allow TLS < 1.2: %s", len(noTLS12), strings.Join(noTLS12[:min(3, len(noTLS12))], ", ")),
 			Remediation:       "Set minimum TLS version to 1.2",
 			RemediationDetail: fmt.Sprintf("az storage account update --name %s --min-tls-version TLS1_2", noTLS12[0]),
 			Priority:          PriorityHigh,
 			ScreenshotGuide:   "Storage → Configuration → Minimum TLS version = 1.2",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "4.1",
+				"PCI-DSS": "4.2.1",
 			},
 		})
 	}
@@ -337,11 +337,11 @@ func (c *AzurePCIChecks) CheckReq7_AccessControl(ctx context.Context) []CheckRes
 
 	if totalPrivileged > 5 {
 		results = append(results, CheckResult{
-			Control:           "PCI-7.1",
+			Control:           "PCI-7.2.1",
 			Name:              "[PCI-DSS] Least Privilege Violation",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("PCI-DSS 7.1: %d users with privileged access (Owner: %d, Contributor: %d, UAA: %d) - excessive", totalPrivileged, ownerCount, contributorCount, userAccessAdminCount),
+			Evidence:          fmt.Sprintf("PCI-DSS 7.2.1: %d users with privileged access (Owner: %d, Contributor: %d, UAA: %d) - excessive", totalPrivileged, ownerCount, contributorCount, userAccessAdminCount),
 			Remediation:       "Implement least privilege - use specific roles",
 			RemediationDetail: "Review each privileged user and downgrade to specific roles",
 			Priority:          PriorityHigh,
@@ -353,14 +353,14 @@ func (c *AzurePCIChecks) CheckReq7_AccessControl(ctx context.Context) []CheckRes
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:   "PCI-7.1",
+			Control:   "PCI-7.2.1",
 			Name:      "[PCI-DSS] Least Privilege",
 			Status:    "PASS",
 			Evidence:  fmt.Sprintf("%d privileged users (acceptable for PCI)", totalPrivileged),
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "7.1",
+				"PCI-DSS": "7.2.1",
 			},
 		})
 	}
@@ -374,45 +374,45 @@ func (c *AzurePCIChecks) CheckReq8_Authentication(ctx context.Context) []CheckRe
 
 	// MFA and password policy require Graph API - provide guidance
 	results = append(results, CheckResult{
-		Control:           "PCI-8.3.1",
+		Control:           "PCI-8.4.2",
 		Name:              "[PCI-DSS] MFA for ALL Access",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS 8.3.1: MANUAL CHECK - Verify MFA enabled for ALL users with console access",
+		Evidence:          "PCI-DSS 8.4.2: MANUAL CHECK - Verify MFA enabled for ALL users with console access",
 		Remediation:       "Enable MFA for every user - no exceptions",
 		RemediationDetail: "Azure AD → Users → Per-user MFA → Enable for ALL",
 		ScreenshotGuide:   "Azure AD → Users → Show MFA status = Enabled/Enforced for ALL users",
 		Priority:          PriorityCritical,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "8.3.1",
+			"PCI-DSS": "8.4.2",
 		},
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-8.2.4",
+		Control:           "PCI-8.3.9",
 		Name:              "[PCI-DSS] 90-Day Password Rotation",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS 8.2.4: MANUAL CHECK - Passwords MUST expire every 90 days maximum",
+		Evidence:          "PCI-DSS 8.3.9: MANUAL CHECK - Passwords MUST expire every 90 days maximum",
 		Remediation:       "Configure 90-day password expiration",
 		RemediationDetail: "Azure AD → Password policy → Maximum age = 90 days",
 		Priority:          PriorityCritical,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "8.2.4",
+			"PCI-DSS": "8.3.9",
 		},
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-8.1.8",
+		Control:           "PCI-8.2.8",
 		Name:              "[PCI-DSS] 15-Minute Session Timeout",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS 8.1.8: Configure 15-minute idle timeout for all sessions",
+		Evidence:          "PCI-DSS 8.2.8: Configure 15-minute idle timeout for all sessions",
 		Remediation:       "Set session timeout to 15 minutes",
 		RemediationDetail: "Azure AD → Conditional Access → Session policy = 15 minutes",
 		Priority:          PriorityHigh,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "8.1.8",
+			"PCI-DSS": "8.2.8",
 		},
 	})
 
@@ -427,10 +427,10 @@ func (c *AzurePCIChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 	// Note: Full check requires querying log analytics workspace
 
 	results = append(results, CheckResult{
-		Control:           "PCI-10.1",
+		Control:           "PCI-10.2.1",
 		Name:              "[PCI-DSS] Audit Logging Implementation",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS 10.1: Verify Activity Log is exported to storage/workspace",
+		Evidence:          "PCI-DSS 10.2.1.1: Verify Activity Log is exported to storage/workspace",
 		Remediation:       "Configure Activity Log export with 12-month retention",
 		RemediationDetail: "Monitor → Activity log → Export → Storage account with 365+ day retention",
 		ScreenshotGuide:   "Monitor → Activity log → Diagnostic settings → Show export configured",
@@ -443,16 +443,16 @@ func (c *AzurePCIChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-10.5.3",
+		Control:           "PCI-10.5.1",
 		Name:              "[PCI-DSS] 12-Month Log Retention",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS 10.5.3: Logs must be retained for 12+ months (3 months readily available)",
+		Evidence:          "PCI-DSS 10.5.1: Logs must be retained for 12+ months (3 months readily available)",
 		Remediation:       "Configure storage lifecycle for 365+ day retention",
 		RemediationDetail: "Storage account → Lifecycle management → Archive after 90 days, delete after 365+",
 		Priority:          PriorityHigh,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "10.5.3",
+			"PCI-DSS": "10.5.1",
 		},
 	})
 
@@ -464,10 +464,10 @@ func (c *AzurePCIChecks) CheckReq2_DefaultPasswords(ctx context.Context) []Check
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-2.1",
+		Control:           "PCI-2.2.2",
 		Name:              "[PCI-DSS] Change Default Passwords",
 		Status:            "INFO",
-		Evidence:          "MANUAL: PCI-DSS 2.1 requires changing vendor defaults before deploying systems",
+		Evidence:          "MANUAL: PCI-DSS 2.2.4 requires changing vendor defaults before deploying systems",
 		Remediation:       "Ensure all default passwords are changed",
 		RemediationDetail: "1. Change default passwords on all Azure services and third-party systems\n2. Review VM images for default credentials\n3. Change default database passwords\n4. Document password change procedures",
 		Priority:          PriorityHigh,
@@ -480,7 +480,7 @@ func (c *AzurePCIChecks) CheckReq2_DefaultPasswords(ctx context.Context) []Check
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-2.2.2",
+		Control:           "PCI-2.2.4",
 		Name:              "[PCI-DSS] Disable Default Network Configurations",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Review Virtual Network default configurations and remove unnecessary default rules",
@@ -503,7 +503,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-5.1",
+		Control:           "PCI-5.2.1",
 		Name:              "[PCI-DSS] Anti-Malware Protection",
 		Status:            "INFO",
 		Evidence:          "MANUAL: PCI-DSS Req 5.1 requires anti-malware on all systems commonly affected by malware",
@@ -519,7 +519,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-5.2.3",
+		Control:           "PCI-5.3.1",
 		Name:              "[PCI-DSS] Anti-Malware Updates",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Verify anti-malware mechanisms are current, actively running, and generating logs",
@@ -534,7 +534,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-5.3.2",
+		Control:           "PCI-5.3.4",
 		Name:              "[PCI-DSS] Anti-Malware Scan Logs",
 		Status:            "INFO",
 		Evidence:          "MANUAL: PCI requires anti-malware logs be retained and reviewed periodically",
@@ -556,7 +556,7 @@ func (c *AzurePCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckRes
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-6.2",
+		Control:           "PCI-6.3.3",
 		Name:              "[PCI-DSS] Security Patching",
 		Status:            "INFO",
 		Evidence:          "MANUAL: PCI-DSS Req 6.2 requires critical security patches within 30 days",
@@ -572,7 +572,7 @@ func (c *AzurePCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-6.3.2",
+		Control:           "PCI-6.2.1",
 		Name:              "[PCI-DSS] Secure Development Lifecycle",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement secure software development lifecycle for custom applications",
@@ -588,7 +588,7 @@ func (c *AzurePCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckRes
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-6.4.3",
+		Control:           "PCI-6.4.2",
 		Name:              "[PCI-DSS] Web Application Firewall",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Deploy WAF for public-facing web applications",
@@ -611,7 +611,7 @@ func (c *AzurePCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckRe
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-9.1",
+		Control:           "PCI-9.1.1",
 		Name:              "[PCI-DSS] Physical Access Controls",
 		Status:            "INFO",
 		Evidence:          "INFO: Azure data centers have physical security controls (inherited control). Review Azure compliance documentation.",
@@ -627,7 +627,7 @@ func (c *AzurePCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckRe
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-9.2",
+		Control:           "PCI-9.2.1",
 		Name:              "[PCI-DSS] Physical Access Procedures",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Develop procedures to control physical access to facilities with systems that store, process, or transmit cardholder data",
@@ -642,7 +642,7 @@ func (c *AzurePCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckRe
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-9.4",
+		Control:           "PCI-9.4.1",
 		Name:              "[PCI-DSS] Media Physical Security",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Physically secure all media containing cardholder data (backups, portable devices)",
@@ -664,7 +664,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-11.2.2",
+		Control:           "PCI-11.3.2",
 		Name:              "[PCI-DSS] Quarterly Vulnerability Scans",
 		Status:            "INFO",
 		Evidence:          "PCI-DSS Req 11.2.2: PCI requires QUARTERLY vulnerability scans by Approved Scanning Vendor (ASV)",
@@ -680,7 +680,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-11.3.1",
+		Control:           "PCI-11.4.3",
 		Name:              "[PCI-DSS] Annual Penetration Testing",
 		Status:            "INFO",
 		Evidence:          "PCI-DSS Req 11.3.1: PCI requires ANNUAL penetration testing of CDE",
@@ -695,7 +695,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-11.5",
+		Control:           "PCI-11.5.2",
 		Name:              "[PCI-DSS] File Integrity Monitoring",
 		Status:            "INFO",
 		Evidence:          "PCI-DSS Req 11.5: Deploy file integrity monitoring on critical systems",
@@ -711,7 +711,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-11.5.1",
+		Control:           "PCI-11.5.2",
 		Name:              "[PCI-DSS] Change Detection Mechanisms",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement change detection for critical files and configurations",
@@ -734,7 +734,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 	results := []CheckResult{}
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.1",
+		Control:           "PCI-12.1.1",
 		Name:              "[PCI-DSS] Security Policy Establishment",
 		Status:            "INFO",
 		Evidence:          "MANUAL: PCI-DSS Req 12.1 requires establishing, publishing, maintaining, and disseminating a security policy",
@@ -749,7 +749,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.2",
+		Control:           "PCI-12.3.1",
 		Name:              "[PCI-DSS] Risk Assessment Process",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement risk assessment process performed at least annually and upon significant changes",
@@ -764,7 +764,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.3",
+		Control:           "PCI-12.2.1",
 		Name:              "[PCI-DSS] Acceptable Use Policies",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Develop usage policies for critical technologies (remote access, wireless, mobile devices, email, internet)",
@@ -779,7 +779,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.5",
+		Control:           "PCI-12.1.4",
 		Name:              "[PCI-DSS] Assign Security Responsibilities",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Assign individual or team responsibility for information security management",
@@ -794,7 +794,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.6",
+		Control:           "PCI-12.6.1",
 		Name:              "[PCI-DSS] Security Awareness Program",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement formal security awareness program for all personnel",
@@ -809,7 +809,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.8",
+		Control:           "PCI-12.8.1",
 		Name:              "[PCI-DSS] Service Provider Management",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Maintain and implement policies for service providers who handle cardholder data",
@@ -824,7 +824,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-12.10",
+		Control:           "PCI-12.10.1",
 		Name:              "[PCI-DSS] Incident Response Plan",
 		Status:            "INFO",
 		Evidence:          "MANUAL: Implement an incident response plan for security incidents",

@@ -59,7 +59,7 @@ func (c *SQLChecks) CheckPublicIP(ctx context.Context) []CheckResult {
 			Name:              "Cloud SQL - Public IP",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("CRITICAL: %d Cloud SQL instances have public IPs: %s | Violates PCI DSS 1.3.1", len(publicInstances), strings.Join(publicInstances, ", ")),
+			Evidence:          fmt.Sprintf("CRITICAL: %d Cloud SQL instances have public IPs: %s | Violates PCI DSS 1.4.2", len(publicInstances), strings.Join(publicInstances, ", ")),
 			Remediation:       "Disable public IP and use private IP or Cloud SQL Proxy",
 			RemediationDetail: "gcloud sql instances patch INSTANCE_NAME --no-assign-ip",
 			Priority:          PriorityCritical,
@@ -73,7 +73,7 @@ func (c *SQLChecks) CheckPublicIP(ctx context.Context) []CheckResult {
 			Control:    "CC6.6",
 			Name:       "Cloud SQL - Public IP",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d SQL instances use private IPs | Meets PCI DSS 1.3.1", len(instanceList.Items)),
+			Evidence:   fmt.Sprintf("All %d SQL instances use private IPs | Meets PCI DSS 1.4.2", len(instanceList.Items)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SQL_PUBLIC_IP"),
@@ -202,7 +202,7 @@ gcloud sql instances patch INSTANCE_NAME \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Google Cloud Console → SQL → Select instance → Backups → Screenshot showing backup retention ≥7 days and point-in-time recovery enabled",
 			ConsoleURL:      "https://console.cloud.google.com/sql/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "6.7", "SOC2": "A1.2", "PCI-DSS": "3.1"},
+			Frameworks:      map[string]string{"CIS-GCP": "6.7", "SOC2": "A1.2", "PCI-DSS": "3.2.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -212,7 +212,7 @@ gcloud sql instances patch INSTANCE_NAME \
 			Evidence:   fmt.Sprintf("All %d SQL instances have adequate backup retention (≥7 days) and point-in-time recovery enabled | Meets CIS GCP 6.7", len(instanceList.Items)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "6.7", "SOC2": "A1.2", "PCI-DSS": "3.1"},
+			Frameworks: map[string]string{"CIS-GCP": "6.7", "SOC2": "A1.2", "PCI-DSS": "3.2.1"},
 		})
 	}
 
@@ -241,7 +241,7 @@ func (c *SQLChecks) CheckSSLRequired(ctx context.Context) []CheckResult {
 			Name:              "Cloud SQL - SSL Enforcement",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d SQL instances do not require SSL: %s | Violates PCI DSS 4.1", len(noSSL), strings.Join(noSSL, ", ")),
+			Evidence:          fmt.Sprintf("%d SQL instances do not require SSL: %s | Violates PCI DSS 4.2.1", len(noSSL), strings.Join(noSSL, ", ")),
 			Remediation:       "Require SSL for all connections",
 			RemediationDetail: "gcloud sql instances patch INSTANCE_NAME --require-ssl",
 			Priority:          PriorityHigh,
@@ -255,7 +255,7 @@ func (c *SQLChecks) CheckSSLRequired(ctx context.Context) []CheckResult {
 			Control:    "CC6.1",
 			Name:       "Cloud SQL - SSL Enforcement",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d SQL instances require SSL | Meets PCI DSS 4.1", len(instanceList.Items)),
+			Evidence:   fmt.Sprintf("All %d SQL instances require SSL | Meets PCI DSS 4.2.1", len(instanceList.Items)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SQL_SSL_REQUIRED"),
@@ -405,7 +405,7 @@ gcloud sql instances patch %s \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Cloud SQL → Instance → Configuration → Flags → Screenshot showing log_connections=on",
 			ConsoleURL:      "https://console.cloud.google.com/sql/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "6.2.2", "SOC2": "CC7.2", "PCI-DSS": "10.2.5"},
+			Frameworks:      map[string]string{"CIS-GCP": "6.2.2", "SOC2": "CC7.2", "PCI-DSS": "10.2.1.5"},
 		})
 	} else {
 		postgresCount := 0
@@ -422,7 +422,7 @@ gcloud sql instances patch %s \
 				Evidence:   fmt.Sprintf("All %d PostgreSQL instances have log_connections enabled | Meets CIS GCP 6.2.2", postgresCount),
 				Priority:   PriorityInfo,
 				Timestamp:  time.Now(),
-				Frameworks: map[string]string{"CIS-GCP": "6.2.2", "SOC2": "CC7.2", "PCI-DSS": "10.2.5"},
+				Frameworks: map[string]string{"CIS-GCP": "6.2.2", "SOC2": "CC7.2", "PCI-DSS": "10.2.1.5"},
 			})
 		}
 	}
@@ -568,7 +568,7 @@ gcloud sql instances patch %s \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Cloud SQL → Instance → Configuration → Flags → Screenshot showing log_disconnections=on",
 			ConsoleURL:      "https://console.cloud.google.com/sql/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "6.2.3", "SOC2": "CC7.2", "PCI-DSS": "10.2.5"},
+			Frameworks:      map[string]string{"CIS-GCP": "6.2.3", "SOC2": "CC7.2", "PCI-DSS": "10.2.1.5"},
 		})
 	} else {
 		postgresCount := 0
@@ -585,7 +585,7 @@ gcloud sql instances patch %s \
 				Evidence:   fmt.Sprintf("All %d PostgreSQL instances have log_disconnections enabled | Meets CIS GCP 6.2.3", postgresCount),
 				Priority:   PriorityInfo,
 				Timestamp:  time.Now(),
-				Frameworks: map[string]string{"CIS-GCP": "6.2.3", "SOC2": "CC7.2", "PCI-DSS": "10.2.5"},
+				Frameworks: map[string]string{"CIS-GCP": "6.2.3", "SOC2": "CC7.2", "PCI-DSS": "10.2.1.5"},
 			})
 		}
 	}

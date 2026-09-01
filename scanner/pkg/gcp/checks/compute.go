@@ -77,7 +77,7 @@ func (c *ComputeChecks) CheckDiskEncryption(ctx context.Context) []CheckResult {
 			Name:              "Disk Encryption with CMEK",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("%d disks using Google-managed keys instead of customer-managed keys: %v | Violates PCI DSS 3.4", len(unencryptedDisks), displayDisks),
+			Evidence:          fmt.Sprintf("%d disks using Google-managed keys instead of customer-managed keys: %v | Violates PCI DSS 3.5.1", len(unencryptedDisks), displayDisks),
 			Remediation:       "Use customer-managed encryption keys (CMEK) for sensitive data",
 			RemediationDetail: "Create new disk with --kms-key flag or enable default CMEK for project",
 			Priority:          PriorityMedium,
@@ -91,7 +91,7 @@ func (c *ComputeChecks) CheckDiskEncryption(ctx context.Context) []CheckResult {
 			Control:    "CC6.7",
 			Name:       "Disk Encryption with CMEK",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d disks use customer-managed encryption | Meets PCI DSS 3.4", totalDisks),
+			Evidence:   fmt.Sprintf("All %d disks use customer-managed encryption | Meets PCI DSS 3.5.1", totalDisks),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("COMPUTE_DISK_ENCRYPTION"),
@@ -139,7 +139,7 @@ func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
 			Name:              "Compute Instances - Public IP Addresses",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d instances have public IP addresses: %v | Violates PCI DSS 1.3.1", len(instancesWithPublicIP), displayInstances),
+			Evidence:          fmt.Sprintf("%d instances have public IP addresses: %v | Violates PCI DSS 1.4.2", len(instancesWithPublicIP), displayInstances),
 			Remediation:       "Use Cloud NAT or VPN for outbound connectivity",
 			RemediationDetail: "Remove external IPs and configure Cloud NAT for internet access",
 			Priority:          PriorityHigh,
@@ -153,7 +153,7 @@ func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
 			Control:    "CC6.6",
 			Name:       "Compute Instances - Public IP Addresses",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d instances use private IPs only | Meets PCI DSS 1.3.1", totalInstances),
+			Evidence:   fmt.Sprintf("All %d instances use private IPs only | Meets PCI DSS 1.4.2", totalInstances),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("COMPUTE_PUBLIC_IP"),
@@ -180,7 +180,7 @@ func (c *ComputeChecks) CheckOSPatchManagement(ctx context.Context) []CheckResul
 		ConsoleURL:        "https://console.cloud.google.com/compute/osconfig",
 		Frameworks: map[string]string{
 			"SOC2":    "CC7.1",
-			"PCI-DSS": "6.2",
+			"PCI-DSS": "6.3.3",
 		},
 	})
 
@@ -889,7 +889,7 @@ gcloud compute routers nats create nat-config \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Compute Engine → VM instances → External IP column showing 'None' for all instances",
 			ConsoleURL:      "https://console.cloud.google.com/compute/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "4.11", "SOC2": "CC6.6", "PCI-DSS": "1.3.1"},
+			Frameworks:      map[string]string{"CIS-GCP": "4.11", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	} else if totalInstances > 0 {
 		results = append(results, CheckResult{
@@ -899,7 +899,7 @@ gcloud compute routers nats create nat-config \
 			Evidence:   fmt.Sprintf("All %d instances use private IP addresses only | Meets CIS 4.11", totalInstances),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "4.11", "SOC2": "CC6.6", "PCI-DSS": "1.3.1"},
+			Frameworks: map[string]string{"CIS-GCP": "4.11", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	}
 

@@ -87,7 +87,7 @@ az monitor activity-log alert create \
 		Frameworks: map[string]string{
 			"CIS-Azure": "5.2.1",
 			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.2",
+			"PCI-DSS":   "10.2.1.2",
 		},
 	}
 }
@@ -121,7 +121,7 @@ Operations to monitor:
 		Frameworks: map[string]string{
 			"CIS-Azure": "5.2.2",
 			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.2",
+			"PCI-DSS":   "10.2.1.2",
 		},
 	}
 }
@@ -154,7 +154,7 @@ Also monitor:
 		Frameworks: map[string]string{
 			"CIS-Azure": "5.2.3",
 			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.7",
+			"PCI-DSS":   "10.2.1.7",
 		},
 	}
 }
@@ -182,7 +182,7 @@ az monitor activity-log alert create \
 		Frameworks: map[string]string{
 			"CIS-Azure": "5.2.4",
 			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.1",
+			"PCI-DSS":   "10.2.1.1",
 		},
 	}
 }
@@ -245,7 +245,7 @@ Monitor operations:
 		Frameworks: map[string]string{
 			"CIS-Azure": "5.2.6",
 			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.7",
+			"PCI-DSS":   "10.2.1.7",
 		},
 	}
 }
@@ -273,7 +273,7 @@ az monitor activity-log alert create \
 		Frameworks: map[string]string{
 			"CIS-Azure": "5.2.7",
 			"SOC2":      "CC6.3",
-			"PCI-DSS":   "10.2.7",
+			"PCI-DSS":   "10.2.1.7",
 		},
 	}
 }
@@ -301,7 +301,7 @@ az monitor activity-log alert create \
 		Frameworks: map[string]string{
 			"CIS-Azure": "5.2.8",
 			"SOC2":      "CC9.1",
-			"PCI-DSS":   "10.2.7",
+			"PCI-DSS":   "10.2.1.7",
 		},
 	}
 }
@@ -362,7 +362,7 @@ This prevents regular users from inviting external guests.`,
 		Frameworks: map[string]string{
 			"CIS-Azure": "1.11",
 			"SOC2":      "CC6.1",
-			"PCI-DSS":   "7.1",
+			"PCI-DSS":   "7.2.1",
 		},
 	}
 }
@@ -397,7 +397,7 @@ az rest --method GET --url https://graph.microsoft.com/v1.0/policies/identitySec
 		Frameworks: map[string]string{
 			"CIS-Azure": "1.12",
 			"SOC2":      "CC6.6",
-			"PCI-DSS":   "8.3.1",
+			"PCI-DSS":   "8.4.2",
 			"HIPAA":     "164.312(a)(2)(i)",
 		},
 	}
@@ -432,7 +432,7 @@ az network nsg rule delete --name <rule-name> --nsg-name <nsg-name> --resource-g
 		Frameworks: map[string]string{
 			"CIS-Azure": "6.2",
 			"SOC2":      "CC6.1",
-			"PCI-DSS":   "1.2.1",
+			"PCI-DSS":   "1.4.2",
 			"HIPAA":     "164.312(a)(1)",
 		},
 	}
@@ -461,7 +461,7 @@ az network nsg rule list --nsg-name <nsg-name> --resource-group <rg> --query "[?
 		Frameworks: map[string]string{
 			"CIS-Azure": "6.3",
 			"SOC2":      "CC6.1",
-			"PCI-DSS":   "1.2.1",
+			"PCI-DSS":   "1.4.2",
 		},
 	}
 }
@@ -506,7 +506,7 @@ func (c *AzureCISManualChecks) checkPostgreSQLPortRestricted() CheckResult {
 		Frameworks: map[string]string{
 			"CIS-Azure": "6.5",
 			"SOC2":      "CC6.1",
-			"PCI-DSS":   "1.2.1",
+			"PCI-DSS":   "1.4.2",
 		},
 	}
 }
@@ -526,7 +526,7 @@ func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 		Frameworks: map[string]string{
 			"CIS-Azure": "6.6",
 			"SOC2":      "CC6.1",
-			"PCI-DSS":   "1.2.1",
+			"PCI-DSS":   "1.4.2",
 		},
 	}
 }
@@ -560,7 +560,7 @@ az keyvault update --name <vault-name> --enable-purge-protection true`,
 		Frameworks: map[string]string{
 			"CIS-Azure": "8.1",
 			"SOC2":      "CC9.1",
-			"PCI-DSS":   "3.5.2",
+			"PCI-DSS":   "3.6.1",
 		},
 	}
 }
@@ -586,7 +586,7 @@ az keyvault key set-attributes --vault-name <vault-name> --name <key-name> --exp
 		Frameworks: map[string]string{
 			"CIS-Azure": "8.2",
 			"SOC2":      "CC6.8",
-			"PCI-DSS":   "3.6.4",
+			"PCI-DSS":   "3.7.4",
 		},
 	}
 }
@@ -612,7 +612,7 @@ az keyvault secret set-attributes --vault-name <vault-name> --name <secret-name>
 		Frameworks: map[string]string{
 			"CIS-Azure": "8.4",
 			"SOC2":      "CC6.7",
-			"PCI-DSS":   "8.2.4",
+			"PCI-DSS":   "8.3.9",
 		},
 	}
 }

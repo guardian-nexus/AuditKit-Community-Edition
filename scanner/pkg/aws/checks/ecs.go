@@ -117,7 +117,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 			ConsoleURL:      "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "7.1", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
+			Frameworks:      map[string]string{"CIS-AWS": "7.1", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 		}, nil
 	}
 
@@ -215,7 +215,7 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 			ConsoleURL:      "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "7.2", "SOC2": "CC6.1", "PCI-DSS": "3.4"},
+			Frameworks:      map[string]string{"CIS-AWS": "7.2", "SOC2": "CC6.1", "PCI-DSS": "3.5.1"},
 		}, nil
 	}
 
@@ -375,7 +375,7 @@ aws iam put-role-policy --role-name ECSTaskRole --policy-name TaskPolicy --polic
 			ConsoleURL:      "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "7.4", "SOC2": "CC6.3", "PCI-DSS": "7.1.2"},
+			Frameworks:      map[string]string{"CIS-AWS": "7.4", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
 		}, nil
 	}
 

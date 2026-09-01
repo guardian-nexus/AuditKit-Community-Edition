@@ -257,14 +257,14 @@ func (c *MonitoringChecks) CheckPCIRetention(ctx context.Context) []CheckResult 
 	// This builds on the Activity Log check but adds PCI-specific requirements
 
 	results = append(results, CheckResult{
-		Control:     "PCI-10.5.3",
-		Name:        "[PCI-DSS 10.5.3, 10.7] Activity Log Retention - 12 Months Immediately Available",
+		Control:     "PCI-10.5.1",
+		Name:        "[PCI-DSS 10.5.1, 10.7] Activity Log Retention - 12 Months Immediately Available",
 		Status:      "INFO",
-		Evidence:    "PCI-DSS 10.5.3, 10.7: VERIFY 365+ day retention for Activity Logs with immediate availability (12 months online + 3 months archived = 15 months total)",
+		Evidence:    "PCI-DSS 10.5.1, 10.7: VERIFY 365+ day retention for Activity Logs with immediate availability (12 months online + 3 months archived = 15 months total)",
 		Remediation: "Configure retention policy to meet PCI-DSS requirements",
-		RemediationDetail: `PCI-DSS 10.5.3: Retain audit log history for at least 12 months, with at least the most recent three months immediately available for analysis
+		RemediationDetail: `PCI-DSS 10.5.1: Retain audit log history for at least 12 months, with at least the most recent three months immediately available for analysis
 
-PCI-DSS 10.7: Retain audit trail history for at least 12 months, with at least three months available online
+PCI-DSS 10.5.1: Retain audit trail history for at least 12 months, with at least three months available online
 
 AZURE IMPLEMENTATION:
 PCI-DSS requires 12 months of audit logs that can be queried immediately (not just archived).

@@ -374,7 +374,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 			ConsoleURL:        "https://console.aws.amazon.com/vpc/home#acls:",
 			Priority:          PriorityCritical,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "5.9", "PCI-DSS": "1.2.1", "SOC2": "CC6.6"},
+			Frameworks:        map[string]string{"CIS-AWS": "5.9", "PCI-DSS": "1.4.2", "SOC2": "CC6.6"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -402,7 +402,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 			ConsoleURL:        "https://console.aws.amazon.com/vpc/home#acls:",
 			Priority:          PriorityCritical,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "5.10", "PCI-DSS": "1.2.1", "SOC2": "CC6.6"},
+			Frameworks:        map[string]string{"CIS-AWS": "5.10", "PCI-DSS": "1.4.2", "SOC2": "CC6.6"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -518,7 +518,7 @@ aws ec2 authorize-security-group-ingress --group-id SG_ID --protocol tcp --port 
 			ConsoleURL:      "https://console.aws.amazon.com/ec2/home#SecurityGroups:",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "5.13", "PCI-DSS": "1.2.1", "SOC2": "CC6.6"},
+			Frameworks:      map[string]string{"CIS-AWS": "5.13", "PCI-DSS": "1.4.2", "SOC2": "CC6.6"},
 		}, nil
 	}
 

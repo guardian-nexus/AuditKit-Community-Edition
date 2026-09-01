@@ -584,32 +584,32 @@ Azure AD → External Identities → External collaboration settings → Restric
 
 	// PCI-specific checks
 	results = append(results, CheckResult{
-		Control:           "PCI-8.1.8",
+		Control:           "PCI-8.2.8",
 		Name:              "[PCI-DSS] Session Timeout Configuration",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS 8.1.8: Verify 15-minute idle timeout is configured via Conditional Access",
+		Evidence:          "PCI-DSS 8.2.8: Verify 15-minute idle timeout is configured via Conditional Access",
 		Remediation:       "Configure 15-minute session timeout",
 		RemediationDetail: "Azure AD → Security → Conditional Access → Session controls → Sign-in frequency = 15 minutes",
-		ScreenshotGuide:   "Show Conditional Access policy with 15-minute timeout (PCI-DSS 8.1.8)",
+		ScreenshotGuide:   "Show Conditional Access policy with 15-minute timeout (PCI-DSS 8.2.8)",
 		Priority:          PriorityMedium,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "8.1.8",
+			"PCI-DSS": "8.2.8",
 		},
 	})
 
 	results = append(results, CheckResult{
-		Control:           "PCI-8.1.4",
+		Control:           "PCI-8.2.6",
 		Name:              "[PCI-DSS] Remove Inactive Users",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS 8.1.4: Verify inactive users are removed within 90 days",
+		Evidence:          "PCI-DSS 8.2.6: Verify inactive users are removed within 90 days",
 		Remediation:       "Review and disable inactive accounts",
 		RemediationDetail: "Azure AD → Users → Sort by 'Last sign-in' → Disable users inactive >90 days",
-		ScreenshotGuide:   "Show all users with last sign-in within 90 days (PCI-DSS 8.1.4)",
+		ScreenshotGuide:   "Show all users with last sign-in within 90 days (PCI-DSS 8.2.6)",
 		Priority:          PriorityHigh,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "8.1.4",
+			"PCI-DSS": "8.2.6",
 		},
 	})
 

@@ -130,7 +130,7 @@ func (c *IAMChecks) CheckRootMFA(ctx context.Context) (CheckResult, error) {
 			Name:              "Root Account MFA",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          "Root account has NO MFA protection | Violates CIS-1.5, PCI DSS 8.3.1 (MFA for all console access) & HIPAA 164.312(a)(2)(i)",
+			Evidence:          "Root account has NO MFA protection | Violates CIS-1.5, PCI DSS 8.4.2 (MFA for all console access) & HIPAA 164.312(a)(2)(i)",
 			Remediation:       "Enable MFA on root account immediately\nSee PDF for detailed steps",
 			RemediationDetail: "1. Sign in as root user\n2. Go to Security Credentials\n3. Enable MFA immediately",
 			ScreenshotGuide:   "1. Sign in to AWS as root user\n2. Click account name → 'Security credentials'\n3. Screenshot 'Multi-factor authentication (MFA)' section\n4. Must show at least one MFA device assigned\n5. For PCI DSS: Document MFA type (virtual/hardware)",
@@ -145,7 +145,7 @@ func (c *IAMChecks) CheckRootMFA(ctx context.Context) (CheckResult, error) {
 		Control:         "CIS-1.5, CC6.6",
 		Name:            "Root Account MFA",
 		Status:          "PASS",
-		Evidence:        "Root account has MFA enabled | Meets CIS-1.5, SOC2 CC6.6, PCI DSS 8.3.1, HIPAA 164.312(a)(2)(i)",
+		Evidence:        "Root account has MFA enabled | Meets CIS-1.5, SOC2 CC6.6, PCI DSS 8.4.2, HIPAA 164.312(a)(2)(i)",
 		Severity:        "INFO",
 		ScreenshotGuide: "1. Go to IAM → Security credentials\n2. Screenshot MFA section showing device configured",
 		ConsoleURL:      "https://console.aws.amazon.com/iam/home#/security_credentials",
@@ -163,7 +163,7 @@ func (c *IAMChecks) CheckPasswordPolicy(ctx context.Context) (CheckResult, error
 			Name:              "Password Policy",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          "No password policy configured | Violates PCI DSS 8.2.3-8.2.5 (password requirements)",
+			Evidence:          "No password policy configured | Violates PCI DSS 8.3.6-8.2.5 (password requirements)",
 			Remediation:       "Run: aws iam update-account-password-policy\nSee PDF for required parameters",
 			RemediationDetail: "aws iam update-account-password-policy --minimum-password-length 14 --require-symbols --require-numbers --require-uppercase-characters --require-lowercase-characters --max-password-age 90 --password-reuse-prevention 24",
 			ScreenshotGuide:   "1. Go to IAM → Account settings\n2. Screenshot 'Password policy' section\n3. Must show all requirements enabled\n4. PCI DSS requires minimum 7 chars, we recommend 14+",
@@ -192,13 +192,13 @@ func (c *IAMChecks) CheckPasswordPolicy(ctx context.Context) (CheckResult, error
 	}
 
 	if !requireSymbols {
-		issues = append(issues, "doesn't require symbols (PCI DSS 8.2.3)")
+		issues = append(issues, "doesn't require symbols (PCI DSS 8.3.6)")
 	}
 	if !requireNumbers {
-		issues = append(issues, "doesn't require numbers (PCI DSS 8.2.3)")
+		issues = append(issues, "doesn't require numbers (PCI DSS 8.3.6)")
 	}
 	if !requireUpper || !requireLower {
-		issues = append(issues, "doesn't require mixed case (PCI DSS 8.2.3)")
+		issues = append(issues, "doesn't require mixed case (PCI DSS 8.3.6)")
 	}
 
 	if len(issues) > 0 {
@@ -220,7 +220,7 @@ func (c *IAMChecks) CheckPasswordPolicy(ctx context.Context) (CheckResult, error
 		Control:    "CC6.7",
 		Name:       "Password Policy",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("Password policy meets requirements (14+ chars, complexity) | Meets SOC2 CC6.7, PCI DSS 8.2.3-8.2.5, HIPAA 164.308(a)(5)(ii)(D)"),
+		Evidence:   fmt.Sprintf("Password policy meets requirements (14+ chars, complexity) | Meets SOC2 CC6.7, PCI DSS 8.3.6-8.2.5, HIPAA 164.308(a)(5)(ii)(D)"),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("PASSWORD_POLICY"),
@@ -289,7 +289,7 @@ func (c *IAMChecks) CheckAccessKeyRotation(ctx context.Context) (CheckResult, er
 			Name:              "Access Key Rotation",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("%d access keys are 180+ days old: %s | Violates CIS-1.14, PCI DSS 8.2.4 (change every 90 days)", len(veryOldKeys), keyList),
+			Evidence:          fmt.Sprintf("%d access keys are 180+ days old: %s | Violates CIS-1.14, PCI DSS 8.3.9 (change every 90 days)", len(veryOldKeys), keyList),
 			Remediation:       fmt.Sprintf("Rotate key for user: %s\nRun: aws iam create-access-key", firstUser),
 			RemediationDetail: fmt.Sprintf("aws iam create-access-key --user-name %s && aws iam delete-access-key --access-key-id OLD_KEY_ID --user-name %s", firstUser, firstUser),
 			ScreenshotGuide:   "1. Go to IAM → Users\n2. Click on each user\n3. Go to 'Security credentials' tab\n4. Screenshot 'Access keys' section showing creation dates\n5. For PCI DSS: Document rotation schedule",
@@ -306,7 +306,7 @@ func (c *IAMChecks) CheckAccessKeyRotation(ctx context.Context) (CheckResult, er
 			Name:        "Access Key Rotation",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("%d access keys older than 90 days | CIS-1.14 and PCI DSS 8.2.4 requires rotation", len(oldKeys)),
+			Evidence:    fmt.Sprintf("%d access keys older than 90 days | CIS-1.14 and PCI DSS 8.3.9 requires rotation", len(oldKeys)),
 			Remediation: "Rotate keys older than 90 days",
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),
@@ -318,7 +318,7 @@ func (c *IAMChecks) CheckAccessKeyRotation(ctx context.Context) (CheckResult, er
 		Control:    "CIS-1.14, CC6.8",
 		Name:       "Access Key Rotation",
 		Status:     "PASS",
-		Evidence:   "All access keys rotated within 90 days | Meets CIS-1.14, SOC2 CC6.8, PCI DSS 8.2.4, HIPAA 164.308(a)(4)(ii)(B)",
+		Evidence:   "All access keys rotated within 90 days | Meets CIS-1.14, SOC2 CC6.8, PCI DSS 8.3.9, HIPAA 164.308(a)(4)(ii)(B)",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("ACCESS_KEY_ROTATION"),
@@ -337,7 +337,7 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 				Control:    "CC6.7",
 				Name:       "Unused Credentials",
 				Status:     "INFO",
-				Evidence:   "Unable to generate credential report | Meets PCI DSS 8.1.4 (remove inactive accounts within 90 days)",
+				Evidence:   "Unable to generate credential report | Meets PCI DSS 8.2.6 (remove inactive accounts within 90 days)",
 				Priority:   PriorityInfo,
 				Timestamp:  time.Now(),
 				Frameworks: GetFrameworkMappings("UNUSED_CREDENTIALS"),
@@ -469,7 +469,7 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 			Name:              "Unused Credentials",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d credentials unused for 90+ days: %s | Violates PCI DSS 8.1.4 (remove/disable inactive accounts within 90 days)", len(unusedUsers), userList),
+			Evidence:          fmt.Sprintf("%d credentials unused for 90+ days: %s | Violates PCI DSS 8.2.6 (remove/disable inactive accounts within 90 days)", len(unusedUsers), userList),
 			Remediation:       "Disable or delete unused IAM credentials",
 			RemediationDetail: "aws iam update-login-profile --user-name USERNAME --password-reset-required\naws iam delete-access-key --user-name USERNAME --access-key-id KEY_ID",
 			ScreenshotGuide:   "1. Go to IAM → Users\n2. Sort by 'Last activity'\n3. Screenshot users with no recent activity\n4. For PCI DSS: Document review process for inactive accounts",
@@ -484,7 +484,7 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 		Control:         "CC6.7",
 		Name:            "Unused Credentials",
 		Status:          "PASS",
-		Evidence:        fmt.Sprintf("All credentials used within 90 days (checked %d users) | Meets PCI DSS 8.1.4, SOC2 CC6.7", len(records)-1),
+		Evidence:        fmt.Sprintf("All credentials used within 90 days (checked %d users) | Meets PCI DSS 8.2.6, SOC2 CC6.7", len(records)-1),
 		Severity:        "INFO",
 		ScreenshotGuide: "1. Go to IAM → Credential Report\n2. Download report\n3. Screenshot showing recent activity for all users",
 		ConsoleURL:      "https://console.aws.amazon.com/iam/home#/credential_report",
@@ -895,7 +895,7 @@ aws iam delete-user-policy --user-name %s --policy-name INLINE_POLICY_NAME`, fir
 			ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.3", "PCI-DSS": "7.1.2"},
+			Frameworks:      map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
 		}, nil
 	}
 
@@ -906,7 +906,7 @@ aws iam delete-user-policy --user-name %s --policy-name INLINE_POLICY_NAME`, fir
 		Evidence:   "No IAM policies attached directly to users | Meets CIS 1.22 (centralized permissions via groups/roles)",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.3", "PCI-DSS": "7.1.2"},
+		Frameworks: map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
 	}, nil
 }
 
@@ -926,7 +926,7 @@ func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, e
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.2.4"},
+			Frameworks:        map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
 		}, nil
 	}
 
@@ -945,7 +945,7 @@ func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, e
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.2.4"},
+			Frameworks:        map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
 		}, nil
 	}
 
@@ -962,7 +962,7 @@ func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, e
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.2.4"},
+			Frameworks:        map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
 		}, nil
 	}
 
@@ -973,7 +973,7 @@ func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, e
 		Evidence:   fmt.Sprintf("Password max age is %d days (≤ 90) | Meets CIS 1.20", maxAge),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.2.4"},
+		Frameworks: map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
 	}, nil
 }
 
@@ -993,7 +993,7 @@ func (c *IAMChecks) CheckPasswordReusePrevention(ctx context.Context) (CheckResu
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.2.5"},
+			Frameworks:        map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
 		}, nil
 	}
 
@@ -1012,7 +1012,7 @@ func (c *IAMChecks) CheckPasswordReusePrevention(ctx context.Context) (CheckResu
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.2.5"},
+			Frameworks:        map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
 		}, nil
 	}
 
@@ -1029,7 +1029,7 @@ func (c *IAMChecks) CheckPasswordReusePrevention(ctx context.Context) (CheckResu
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityLow,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.2.5"},
+			Frameworks:        map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
 		}, nil
 	}
 
@@ -1040,7 +1040,7 @@ func (c *IAMChecks) CheckPasswordReusePrevention(ctx context.Context) (CheckResu
 		Evidence:   fmt.Sprintf("Password reuse prevention is %d (≥ 24) | Meets CIS 1.21", reusePrevent),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.2.5"},
+		Frameworks: map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
 	}, nil
 }
 
@@ -1180,7 +1180,7 @@ func (c *IAMChecks) CheckIAMUserAccessReview(ctx context.Context) CheckResult {
 		ConsoleURL:      "https://console.aws.amazon.com/iam/home#/credential_report",
 		Priority:        PriorityMedium,
 		Timestamp:       time.Now(),
-		Frameworks:      map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.2", "PCI-DSS": "8.1.4"},
+		Frameworks:      map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.2", "PCI-DSS": "8.2.6"},
 	}
 }
 

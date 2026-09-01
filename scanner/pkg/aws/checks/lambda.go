@@ -141,7 +141,7 @@ aws lambda update-function-configuration \
 			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "6.2", "SOC2": "CC6.7", "PCI-DSS": "3.4"},
+			Frameworks:      map[string]string{"CIS-AWS": "6.2", "SOC2": "CC6.7", "PCI-DSS": "3.5.1"},
 		}, nil
 	}
 
@@ -212,7 +212,7 @@ aws lambda update-function-configuration \
 			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "6.3", "SOC2": "CC6.3", "PCI-DSS": "7.1.2"},
+			Frameworks:      map[string]string{"CIS-AWS": "6.3", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
 		}, nil
 	}
 
@@ -275,7 +275,7 @@ func (c *LambdaChecks) CheckLambdaPublicAccess(ctx context.Context) (CheckResult
 			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "6.4", "SOC2": "CC6.1", "PCI-DSS": "1.2.1"},
+			Frameworks:      map[string]string{"CIS-AWS": "6.4", "SOC2": "CC6.1", "PCI-DSS": "1.4.2"},
 		}, nil
 	}
 
