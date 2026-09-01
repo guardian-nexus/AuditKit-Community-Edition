@@ -8,7 +8,7 @@ AuditKit supports multiple compliance frameworks for automated technical control
 
 | Framework | Status | Automated Controls | Cloud Providers |
 |-----------|--------|-------------------|-----------------|
-| **[SOC2 Type II](./soc2.md)** | Production | 64 controls | AWS, Azure, GCP |
+| **[SOC2 Type II](./soc2.md)** | Production | 38 criteria | AWS, Azure, GCP |
 | **[PCI-DSS v4.0.1](./pci-dss.md)** | Production | All 12 requirements (60+ controls) | AWS, Azure, GCP |
 | **[CMMC Level 1](./cmmc.md)** | Production | 17 practices | AWS, Azure, GCP |
 | **[CMMC Level 2](./cmmc.md)** | Pro Only | 110 practices | AWS, Azure, GCP |

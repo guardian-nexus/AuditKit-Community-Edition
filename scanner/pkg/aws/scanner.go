@@ -435,6 +435,7 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 		checks.NewCC7Checks(s.ctClient, s.ssmClient, s.lambdaClient),
 		checks.NewCC8Checks(s.lambdaClient, s.ec2Client),
 		checks.NewCC9Checks(s.rdsClient, s.s3Client),
+		checks.NewAvailabilityConfidentialityChecks(s.s3Client, s.rdsClient),
 
 		// Also run traditional checks for backward compatibility
 		checks.NewS3Checks(s.s3Client),

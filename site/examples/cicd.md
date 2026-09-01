@@ -704,7 +704,7 @@ apk add jq                                # Alpine
 
 ```
 PASS:AWS SOC2 Compliance Scan Complete
-   Score: 87.5% (56/64 controls passed)
+   Score: 87.5% (56/64 checks passed)
    Critical Failures: 0
    High Failures: 3
    Medium Failures: 5
@@ -717,7 +717,7 @@ PASS:No critical failures detected
 
 ```
 FAIL:AWS SOC2 Compliance Scan Complete
-   Score: 68.8% (44/64 controls passed)
+   Score: 68.8% (44/64 checks passed)
    Critical Failures: 2
    High Failures: 12
    Medium Failures: 6

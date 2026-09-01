@@ -10,7 +10,7 @@ What AuditKit scans in Microsoft Azure.
 **Supported in:** Free and Pro versions
 
 **Supported frameworks:**
-- SOC2 Type II (64 controls)
+- SOC2 Type II (38 criteria)
 - PCI-DSS v4.0.1 (30+ controls)
 - CMMC Level 1 (17 practices) and Level 2 (110 practices - Pro)
 - NIST 800-53 Rev 5 (~150 controls)
@@ -383,7 +383,7 @@ az network private-endpoint create \
 
 ## Controls by Framework
 
-### SOC2 Type II (64 controls)
+### SOC2 Type II (38 criteria)
 
 **CC1 - Control Environment:** 5 controls  
 **CC2 - Communication:** 4 controls  
