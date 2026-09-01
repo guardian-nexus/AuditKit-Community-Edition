@@ -147,7 +147,7 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 			ConsoleURL:        "https://console.aws.amazon.com/macie/home",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.2", "SOC2": "CC6.7", "PCI-DSS": "3.5.1"},
+			Frameworks:        map[string]string{"CIS-AWS": "9.2", "SOC2": "C1.1", "PCI-DSS": "3.2.1, 12.5.2"},
 		}, nil
 	}
 
@@ -195,7 +195,7 @@ func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (C
 			ConsoleURL:        "https://console.aws.amazon.com/securityhub/home",
 			Priority:          PriorityCritical,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.3", "SOC2": "CC7.1, CC7.2", "PCI-DSS": "10.4.1, 11.5.1"},
+			Frameworks:        map[string]string{"CIS-AWS": "9.3", "SOC2": "CC7.1, CC7.2", "PCI-DSS": "10.7.2"},
 		}, nil
 	}
 
@@ -243,7 +243,7 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 			ConsoleURL:        "https://console.aws.amazon.com/inspector/v2/home",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.4", "SOC2": "CC8.1", "PCI-DSS": "6.3.3, 11.3.2"},
+			Frameworks:        map[string]string{"CIS-AWS": "9.4", "SOC2": "CC8.1", "PCI-DSS": "6.3.3, 11.3.1"},
 		}, nil
 	}
 
