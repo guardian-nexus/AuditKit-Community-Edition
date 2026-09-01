@@ -86,9 +86,14 @@ func (c *Crosswalk) Get800_53Controls(frameworks map[string]string) []string {
 
 	// Check SOC2 mappings
 	if soc2ID, exists := frameworks["SOC2"]; exists {
-		if controls, found := c.SOC2ToCIS[soc2ID]; found {
-			for _, ctrl := range controls {
-				controlSet[ctrl] = true
+		// A check may satisfy several criteria, written "CC6.1, CC6.6". Without
+		// splitting, the whole string is looked up as one key and resolves to
+		// nothing, so the control derives no 800-53 mappings at all.
+		for _, id := range strings.Split(soc2ID, ",") {
+			if controls, found := c.SOC2ToCIS[strings.TrimSpace(id)]; found {
+				for _, ctrl := range controls {
+					controlSet[ctrl] = true
+				}
 			}
 		}
 	}

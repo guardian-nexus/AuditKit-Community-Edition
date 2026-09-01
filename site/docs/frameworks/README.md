@@ -13,7 +13,7 @@ AuditKit supports multiple compliance frameworks for automated technical control
 | **[CMMC Level 1](./cmmc.md)** | Production | 17 practices | AWS, Azure, GCP |
 | **[CMMC Level 2](./cmmc.md)** | Pro Only | 110 practices | AWS, Azure, GCP |
 | **[CIS Benchmarks](./cis-benchmarks.md)** | Production | AWS: 126+, Azure: ~40+, GCP: 61 | AWS, Azure, GCP |
-| **[NIST 800-53 Rev 5](./nist-800-53.md)** | Production | 142 technical controls (covers FedRAMP) | AWS, Azure, GCP |
+| **[NIST 800-53 Rev 5](./nist-800-53.md)** | Production | 144 technical controls (covers FedRAMP) | AWS, Azure, GCP |
 | **[ISO 27001:2022](./iso27001.md)** | Production | ~60 technical controls | AWS, Azure, GCP |
 | **[HIPAA Security Rule](./hipaa.md)** | Production | Technical Safeguards (40-70 mappings) | AWS, Azure, GCP |
 
@@ -113,7 +113,7 @@ Requires AuditKit subscription:
 ### NIST 800-53 Rev 5
 **Purpose:** Security controls for federal information systems  
 **Certification:** Not a certification (used by FedRAMP, FISMA)  
-**Coverage:** 142 automated technical controls  
+**Coverage:** 144 automated technical controls  
 **Timeline:** 6-12 months for full implementation
 
 **[Learn more →](./nist-800-53.md)**

@@ -300,7 +300,7 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"COMPUTE_OS_LOGIN": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "8.1",
+		FrameworkPCI:   "8.2.1",
 		FrameworkHIPAA: "164.312(a)(2)(i)",
 		FrameworkCIS:   "4.4",
 	},

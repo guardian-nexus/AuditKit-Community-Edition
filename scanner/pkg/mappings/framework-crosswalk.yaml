@@ -54,6 +54,8 @@ soc2_to_800_53:
   # Risk Mitigation (CC9)
   CC9.1: [CP-9, CP-10]          # Backup and recovery
   CC9.2: [SA-9]                 # Third-party risk
+  CC6.4: [PE-2, PE-3]           # Physical access to facilities
+  CC6.5: [MP-6, SI-12]          # Disposal of data and assets
   A1.1: [CP-2, SC-5, AU-4]      # Capacity and demand management
   A1.2: [CP-9, CP-10, CP-6]     # Backup and recovery infrastructure
   A1.3: [CP-4, CP-10]           # Recovery testing
@@ -62,6 +64,10 @@ soc2_to_800_53:
 
 # PCI-DSS v4.0 → NIST 800-53 Rev 5
 pci_to_800_53:
+  PCI-6.2.4: [SA-11, SI-10]             # Engineering techniques against common attacks
+  PCI-7.1.1: [AC-1]                     # Access restriction processes documented
+  PCI-8.3.2: [IA-5(1), SC-8]            # Strong cryptography for authentication factors
+  PCI-10.3.1: [AU-9(4), AC-6]           # Read access to audit logs limited
   PCI-11.3.1: [RA-5]                    # Internal vulnerability scans
   PCI-12.5.2: [CM-8, PM-5, RA-2]        # Scope documented and confirmed
   PCI-1.2.1: [CM-6, AC-4, SC-7]         # NSC ruleset configuration standards

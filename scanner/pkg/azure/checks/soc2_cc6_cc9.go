@@ -44,7 +44,7 @@ func (c *AzureCC6Wrapper) Run(ctx context.Context) ([]CheckResult, error) {
 			Timestamp:   time.Now(),
 			Remediation: "Review individual service check results for CC6.1-CC6.8",
 			Frameworks: map[string]string{
-				"SOC2": "CC6.1-CC6.8",
+				"SOC2": "CC6.1, CC6.2, CC6.3, CC6.4, CC6.5, CC6.6, CC6.7, CC6.8",
 			},
 		},
 	}, nil
