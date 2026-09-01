@@ -209,6 +209,18 @@ func (c *EC2Checks) CheckUnencryptedVolumes(ctx context.Context) (CheckResult, e
 		}, nil
 	}
 
+	if totalVolumes == 0 {
+		return CheckResult{
+			Control:    "CC6.3",
+			Name:       "EBS Volume Encryption",
+			Status:     StatusInfo,
+			Evidence:   "No EBS volumes found, so there was nothing to assess",
+			Priority:   PriorityInfo,
+			Timestamp:  time.Now(),
+			Frameworks: GetFrameworkMappings("EBS_ENCRYPTION"),
+		}, nil
+	}
+
 	return CheckResult{
 		Control:    "CC6.3",
 		Name:       "EBS Volume Encryption",
@@ -267,6 +279,18 @@ func (c *EC2Checks) CheckPublicInstances(ctx context.Context) (CheckResult, erro
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks:        GetFrameworkMappings("PUBLIC_INSTANCES"),
+		}, nil
+	}
+
+	if totalInstances == 0 {
+		return CheckResult{
+			Control:    "CC6.1",
+			Name:       "EC2 Public IP Exposure",
+			Status:     StatusInfo,
+			Evidence:   "No running EC2 instances found, so there was nothing to assess",
+			Priority:   PriorityInfo,
+			Timestamp:  time.Now(),
+			Frameworks: GetFrameworkMappings("EC2_PUBLIC_IP"),
 		}, nil
 	}
 

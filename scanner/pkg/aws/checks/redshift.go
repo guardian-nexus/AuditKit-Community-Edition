@@ -92,7 +92,7 @@ func (c *RedshiftChecks) CheckClusterEncryption(ctx context.Context) (CheckResul
 		return CheckResult{
 			Control:    "CC6.3",
 			Name:       "Redshift Cluster Encryption",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Redshift clusters found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -148,7 +148,7 @@ func (c *RedshiftChecks) CheckClusterPublicAccess(ctx context.Context) (CheckRes
 		return CheckResult{
 			Control:    "CC6.1",
 			Name:       "Redshift Public Access",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Redshift clusters found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -208,7 +208,7 @@ func (c *RedshiftChecks) CheckClusterLogging(ctx context.Context) (CheckResult, 
 		return CheckResult{
 			Control:    "CC7.1",
 			Name:       "Redshift Audit Logging",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Redshift clusters found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -286,7 +286,7 @@ func (c *RedshiftChecks) CheckClusterSSL(ctx context.Context) (CheckResult, erro
 		return CheckResult{
 			Control:    "CC6.4",
 			Name:       "Redshift SSL Required",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Redshift clusters found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -342,7 +342,7 @@ func (c *RedshiftChecks) CheckClusterVersionUpgrade(ctx context.Context) (CheckR
 		return CheckResult{
 			Control:    "CC7.5",
 			Name:       "Redshift Auto Version Upgrade",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Redshift clusters found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -399,7 +399,7 @@ func (c *RedshiftChecks) CheckClusterBackupRetention(ctx context.Context) (Check
 		return CheckResult{
 			Control:    "A1.2",
 			Name:       "Redshift Backup Retention",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Redshift clusters found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -455,7 +455,7 @@ func (c *RedshiftChecks) CheckClusterEnhancedVPCRouting(ctx context.Context) (Ch
 		return CheckResult{
 			Control:    "CC6.1",
 			Name:       "Redshift Enhanced VPC Routing",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Redshift clusters found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),

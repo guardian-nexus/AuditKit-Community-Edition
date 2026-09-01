@@ -175,7 +175,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallPolicyRules(ctx context.Cont
 		return CheckResult{
 			Control:    "[CIS-5.16]",
 			Name:       "Network Firewall Policy Rules",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Network Firewall policies found | CIS 5.16 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -272,7 +272,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallLogging(ctx context.Context)
 		return CheckResult{
 			Control:    "[CIS-5.17]",
 			Name:       "Network Firewall Logging",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Network Firewalls found | CIS 5.17 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),

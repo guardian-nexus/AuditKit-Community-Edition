@@ -53,7 +53,7 @@ func (c *Route53Checks) CheckDNSSEC(ctx context.Context) (CheckResult, error) {
 		return CheckResult{
 			Control:    "CIS-5.19",
 			Name:       "Route53 DNSSEC Enabled",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Route53 hosted zones found",
 			Severity:   "INFO",
 			Priority:   PriorityInfo,

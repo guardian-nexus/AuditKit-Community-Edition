@@ -96,7 +96,7 @@ func (c *OpenSearchChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResu
 		return CheckResult{
 			Control:    "CC6.3",
 			Name:       "OpenSearch Encryption at Rest",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No OpenSearch domains found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -160,7 +160,7 @@ func (c *OpenSearchChecks) CheckNodeToNodeEncryption(ctx context.Context) (Check
 		return CheckResult{
 			Control:    "CC6.4",
 			Name:       "OpenSearch Node-to-Node Encryption",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No OpenSearch domains found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -224,7 +224,7 @@ func (c *OpenSearchChecks) CheckHTTPS(ctx context.Context) (CheckResult, error) 
 		return CheckResult{
 			Control:    "CC6.4",
 			Name:       "OpenSearch HTTPS Required",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No OpenSearch domains found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -288,7 +288,7 @@ func (c *OpenSearchChecks) CheckVPCDeployment(ctx context.Context) (CheckResult,
 		return CheckResult{
 			Control:    "CC6.1",
 			Name:       "OpenSearch VPC Deployment",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No OpenSearch domains found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -365,7 +365,7 @@ func (c *OpenSearchChecks) CheckAuditLogs(ctx context.Context) (CheckResult, err
 		return CheckResult{
 			Control:    "CC7.1",
 			Name:       "OpenSearch Audit Logs",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No OpenSearch domains found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -429,7 +429,7 @@ func (c *OpenSearchChecks) CheckFineGrainedAccessControl(ctx context.Context) (C
 		return CheckResult{
 			Control:    "CC6.6",
 			Name:       "OpenSearch Fine-Grained Access Control",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No OpenSearch domains found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),

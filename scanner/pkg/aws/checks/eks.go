@@ -70,7 +70,7 @@ func (c *EKSChecks) CheckEKSEndpointAccess(ctx context.Context) (CheckResult, er
 		return CheckResult{
 			Control:    "[CIS-8.1]",
 			Name:       "EKS Cluster Endpoint Access",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.1 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -153,7 +153,7 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 		return CheckResult{
 			Control:    "[CIS-8.2]",
 			Name:       "EKS Cluster Logging",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.2 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -244,7 +244,7 @@ func (c *EKSChecks) CheckEKSEncryption(ctx context.Context) (CheckResult, error)
 		return CheckResult{
 			Control:    "[CIS-8.3]",
 			Name:       "EKS Cluster Encryption",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.3 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -322,7 +322,7 @@ func (c *EKSChecks) CheckEKSNetworkPolicy(ctx context.Context) (CheckResult, err
 		return CheckResult{
 			Control:    "[CIS-8.4]",
 			Name:       "EKS Network Policy",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.4 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -363,7 +363,7 @@ func (c *EKSChecks) CheckEKSPodSecurityPolicy(ctx context.Context) (CheckResult,
 		return CheckResult{
 			Control:    "[CIS-8.5]",
 			Name:       "EKS Pod Security Policy",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.5 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -407,7 +407,7 @@ func (c *EKSChecks) CheckEKSRBAC(ctx context.Context) (CheckResult, error) {
 		return CheckResult{
 			Control:    "[CIS-8.6]",
 			Name:       "EKS RBAC Configuration",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.6 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -459,7 +459,7 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 		return CheckResult{
 			Control:    "[CIS-8.8]",
 			Name:       "EKS Audit Logging",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.8 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),

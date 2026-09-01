@@ -89,7 +89,7 @@ func (c *RDSChecks) CheckRDSEncryption(ctx context.Context) (CheckResult, error)
 		return CheckResult{
 			Control:    "CC6.3",
 			Name:       "RDS Encryption at Rest",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No RDS instances found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),

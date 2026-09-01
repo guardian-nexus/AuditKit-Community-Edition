@@ -261,7 +261,7 @@ func (c *IAMChecks) CheckUserMFA(ctx context.Context) []CheckResult {
 		results = append(results, CheckResult{
 			Control:    "CC6.1",
 			Name:       "User MFA Enforcement",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No user accounts found in project IAM (only service accounts) | Meets SOC2 CC6.1, PCI DSS 8.4.2",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),

@@ -84,7 +84,7 @@ func (c *ElastiCacheChecks) CheckEncryptionAtRest(ctx context.Context) (CheckRes
 		return CheckResult{
 			Control:    "CC6.3",
 			Name:       "ElastiCache Encryption at Rest",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No ElastiCache clusters found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -140,7 +140,7 @@ func (c *ElastiCacheChecks) CheckEncryptionInTransit(ctx context.Context) (Check
 		return CheckResult{
 			Control:    "CC6.4",
 			Name:       "ElastiCache Encryption in Transit",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No ElastiCache clusters found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -196,7 +196,7 @@ func (c *ElastiCacheChecks) CheckAutoMinorVersionUpgrade(ctx context.Context) (C
 		return CheckResult{
 			Control:    "CC7.5",
 			Name:       "ElastiCache Auto Minor Version Upgrade",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No ElastiCache clusters found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -253,7 +253,7 @@ func (c *ElastiCacheChecks) CheckAuthToken(ctx context.Context) (CheckResult, er
 		return CheckResult{
 			Control:    "CC6.6",
 			Name:       "ElastiCache Redis AUTH Token",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Redis replication groups found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -309,7 +309,7 @@ func (c *ElastiCacheChecks) CheckBackupRetention(ctx context.Context) (CheckResu
 		return CheckResult{
 			Control:    "A1.2",
 			Name:       "ElastiCache Backup Retention",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No Redis replication groups found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),

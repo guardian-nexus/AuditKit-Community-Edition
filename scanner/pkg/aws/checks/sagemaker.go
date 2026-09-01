@@ -96,7 +96,7 @@ func (c *SageMakerChecks) CheckNotebookEncryption(ctx context.Context) (CheckRes
 		return CheckResult{
 			Control:    "CC6.3",
 			Name:       "SageMaker Notebook Encryption",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No SageMaker notebooks found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -159,7 +159,7 @@ func (c *SageMakerChecks) CheckNotebookDirectInternet(ctx context.Context) (Chec
 		return CheckResult{
 			Control:    "CC6.1",
 			Name:       "SageMaker Direct Internet Access",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No SageMaker notebooks found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -222,7 +222,7 @@ func (c *SageMakerChecks) CheckNotebookRootAccess(ctx context.Context) (CheckRes
 		return CheckResult{
 			Control:    "CC6.6",
 			Name:       "SageMaker Root Access",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No SageMaker notebooks found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -293,7 +293,7 @@ func (c *SageMakerChecks) CheckEndpointEncryption(ctx context.Context) (CheckRes
 		return CheckResult{
 			Control:    "CC6.3",
 			Name:       "SageMaker Endpoint Encryption",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No SageMaker endpoints found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -359,7 +359,7 @@ func (c *SageMakerChecks) CheckTrainingJobEncryption(ctx context.Context) (Check
 		return CheckResult{
 			Control:    "CC6.3",
 			Name:       "SageMaker Training Job Encryption",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No SageMaker training jobs found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -425,7 +425,7 @@ func (c *SageMakerChecks) CheckModelNetworkIsolation(ctx context.Context) (Check
 		return CheckResult{
 			Control:    "CC6.1",
 			Name:       "SageMaker Model Network Isolation",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No SageMaker models found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),

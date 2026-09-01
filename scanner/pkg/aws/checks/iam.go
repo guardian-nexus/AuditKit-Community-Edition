@@ -374,7 +374,7 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 		return CheckResult{
 			Control:    "CC6.7",
 			Name:       "Unused Credentials",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No IAM users found in credential report",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),

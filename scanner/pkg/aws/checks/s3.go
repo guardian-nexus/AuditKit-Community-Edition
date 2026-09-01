@@ -86,7 +86,7 @@ func (c *S3Checks) CheckPublicAccess(ctx context.Context) (CheckResult, error) {
 		return CheckResult{
 			Control:    "CC6.2",
 			Name:       "S3 Public Access Block",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No S3 buckets found",
 			Severity:   "INFO",
 			Priority:   PriorityInfo,
@@ -282,7 +282,7 @@ func (c *S3Checks) CheckLogging(ctx context.Context) (CheckResult, error) {
 		return CheckResult{
 			Control:    "CC7.1",
 			Name:       "S3 Access Logging",
-			Status:     "PASS",
+			Status:     StatusInfo,
 			Evidence:   "No S3 buckets found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
