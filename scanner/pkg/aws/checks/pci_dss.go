@@ -22,13 +22,32 @@ import (
 // "v3.2.1 to v4.0 Summary of Changes" where it gives an explicit mapping, and by
 // matching check content against the v4.0.1 standard text otherwise.
 //
-// The cloud-testable v4.x requirements are implemented in
-// CheckFutureDated below: 4.2.1.1, 8.6.1, 8.6.2, 8.6.3, 10.4.1.1, 10.7.2 and
-// 10.7.3, across AWS, Azure and GCP. Coverage depth varies by provider: see
-// each provider's CheckFutureDated for what is automated versus documented.
+// PCI DSS v4.x requirements that became mandatory on 31 March 2025 are
+// implemented in CheckFutureDated. Coverage by provider:
 //
-// Still uncovered - payment-page and process controls a cloud config scanner
-// cannot assess. These should surface as MANUAL rather than be omitted:
+//	requirement  AWS         Azure       GCP
+//	4.2.1.1      documented  documented  documented   certificate inventory
+//	8.6.1        automated   automated   automated    app/system account creds
+//	8.6.2        documented  documented  documented   no hardcoded credentials
+//	8.6.3        automated   automated   automated    credential rotation
+//	10.4.1.1     automated   automated   automated    automated log review
+//	10.7.2       automated   documented  documented   control failure detection
+//	10.7.3       documented  documented  documented   control failure response
+//
+// "documented" means the check emits an INFO result with remediation guidance
+// because the condition is not observable from cloud configuration, or the
+// required client is not wired up. Known work remaining:
+//
+//   - 10.7.2 on Azure and GCP needs a query for alert rules covering security
+//     control changes: activity log alerts on Azure, alerting policies on GCP.
+//     Neither is reachable from the clients currently passed in.
+//   - 4.2.1.1 needs a certificate client per provider (ACM, Key Vault,
+//     Certificate Manager) to list certificates rather than describe the task.
+//   - 8.6.2 and 10.7.3 are not automatable from configuration at all. Hardcoded
+//     credentials live in source, and failure response is a written procedure.
+//
+// Still uncovered entirely - payment-page and process controls a cloud config
+// scanner cannot assess. These should surface as MANUAL rather than be omitted:
 //
 //	3.5.1.1, 5.3.3, 6.4.3, 11.3.1.1, 11.5.1.1, 11.6.1, 12.5.2.1, 12.10.7
 type PCIDSSChecks struct {

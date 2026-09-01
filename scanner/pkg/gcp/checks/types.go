@@ -88,7 +88,7 @@ var FrameworkMappings = map[string]map[string]string{
 	// STORAGE CONTROLS
 	"GCS_BUCKET_PUBLIC": {
 		FrameworkSOC2:  "CC6.1, CC6.6",
-		FrameworkPCI:   "1.2.1, 1.3.1",
+		FrameworkPCI:   "1.4.2",
 		FrameworkCMMC:  "AC.L1-3.1.1",
 		FrameworkNIST:  "AC-3, AC-6",
 		FrameworkHIPAA: "164.312(a)(1)",
@@ -96,7 +96,7 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"GCS_BUCKET_ENCRYPTION": {
 		FrameworkSOC2:  "CC6.1, CC6.7",
-		FrameworkPCI:   "3.4, 3.5.1",
+		FrameworkPCI:   "3.5.1",
 		FrameworkCMMC:  "SC.L2-3.13.11",
 		FrameworkNIST:  "SC-13, SC-28",
 		FrameworkHIPAA: "164.312(a)(2)(iv)",
@@ -112,7 +112,7 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"GCS_BUCKET_LOGGING": {
 		FrameworkSOC2:  "CC7.2",
-		FrameworkPCI:   "10.2.1",
+		FrameworkPCI:   "10.2.1.1",
 		FrameworkCMMC:  "AU.L2-3.3.1",
 		FrameworkNIST:  "AU-2",
 		FrameworkHIPAA: "164.312(b)",
@@ -120,13 +120,13 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"GCS_UNIFORM_ACCESS": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "7.1.2",
+		FrameworkPCI:   "7.2.2",
 		FrameworkHIPAA: "164.312(a)(1)",
 		FrameworkCIS:   "5.2",
 	},
 	"GCS_RETENTION_POLICY": {
 		FrameworkSOC2:  "A1.2",
-		FrameworkPCI:   "3.1",
+		FrameworkPCI:   "3.2.1",
 		FrameworkHIPAA: "164.312(c)(1)",
 		FrameworkCIS:   "5.1",
 	},
@@ -134,7 +134,7 @@ var FrameworkMappings = map[string]map[string]string{
 	// IAM CONTROLS
 	"IAM_MFA_ENABLED": {
 		FrameworkSOC2:  "CC6.1, CC6.2",
-		FrameworkPCI:   "8.3.1",
+		FrameworkPCI:   "8.4.2",
 		FrameworkCMMC:  "IA.L2-3.5.3",
 		FrameworkNIST:  "IA-2(1)",
 		FrameworkHIPAA: "164.312(a)(2)(i)",
@@ -142,7 +142,7 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"IAM_SERVICE_ACCOUNT_KEYS": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "8.2.4",
+		FrameworkPCI:   "8.3.9",
 		FrameworkCMMC:  "IA.L2-3.5.7",
 		FrameworkNIST:  "IA-5",
 		FrameworkHIPAA: "164.308(a)(4)(ii)(B)",
@@ -150,7 +150,7 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"IAM_PRIMITIVE_ROLES": {
 		FrameworkSOC2:  "CC6.3",
-		FrameworkPCI:   "7.1.2",
+		FrameworkPCI:   "7.2.2",
 		FrameworkCMMC:  "AC.L2-3.1.5",
 		FrameworkNIST:  "AC-6",
 		FrameworkHIPAA: "164.308(a)(3)(i)",
@@ -164,13 +164,13 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"IAM_SERVICE_ACCOUNT_ADMIN": {
 		FrameworkSOC2:  "CC6.3",
-		FrameworkPCI:   "7.1",
+		FrameworkPCI:   "7.2.1",
 		FrameworkHIPAA: "164.308(a)(3)(i)",
 		FrameworkCIS:   "1.4",
 	},
 	"IAM_CORPORATE_LOGIN": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "8.2",
+		FrameworkPCI:   "8.2.2",
 		FrameworkHIPAA: "164.312(a)(2)(i)",
 		FrameworkCIS:   "1.1",
 	},
@@ -181,7 +181,7 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"GCP_DEFAULT_SA": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "7.1.2",
+		FrameworkPCI:   "7.2.2",
 		FrameworkCMMC:  "AC.L2-3.1.5",
 		FrameworkNIST:  "AC-6",
 		FrameworkHIPAA: "164.308(a)(3)(i)",
@@ -191,7 +191,7 @@ var FrameworkMappings = map[string]map[string]string{
 	// LOGGING & MONITORING
 	"LOGGING_ENABLED": {
 		FrameworkSOC2:  "CC7.2",
-		FrameworkPCI:   "10.2.1, 10.3.1",
+		FrameworkPCI:   "10.2.1.1, 10.3.1",
 		FrameworkCMMC:  "AU.L2-3.3.1",
 		FrameworkNIST:  "AU-2, AU-12",
 		FrameworkHIPAA: "164.312(b)",
@@ -199,19 +199,19 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"LOG_SINKS": {
 		FrameworkSOC2:  "CC7.2",
-		FrameworkPCI:   "10.5.3",
+		FrameworkPCI:   "10.5.1",
 		FrameworkHIPAA: "164.312(b)",
 		FrameworkCIS:   "2.2",
 	},
 	"LOG_RETENTION": {
 		FrameworkSOC2:  "CC7.2",
-		FrameworkPCI:   "10.7",
+		FrameworkPCI:   "10.5.1",
 		FrameworkHIPAA: "164.312(b)",
 		FrameworkCIS:   "2.3",
 	},
 	"LOG_METRIC_FILTERS": {
 		FrameworkSOC2:  "CC7.3",
-		FrameworkPCI:   "10.6",
+		FrameworkPCI:   "10.4.1",
 		FrameworkHIPAA: "164.312(b)",
 		FrameworkCIS:   "2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.11, 2.12",
 	},
@@ -224,7 +224,7 @@ var FrameworkMappings = map[string]map[string]string{
 	// NETWORK CONTROLS
 	"VPC_FIREWALL_OPEN": {
 		FrameworkSOC2:  "CC6.6",
-		FrameworkPCI:   "1.2.1, 1.3.1",
+		FrameworkPCI:   "1.4.2",
 		FrameworkCMMC:  "SC.L1-3.13.1",
 		FrameworkNIST:  "SC-7",
 		FrameworkHIPAA: "164.312(e)(1)",
@@ -232,13 +232,13 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"VPC_FLOW_LOGS": {
 		FrameworkSOC2:  "CC7.2",
-		FrameworkPCI:   "10.2",
+		FrameworkPCI:   "10.2.1",
 		FrameworkHIPAA: "164.312(b)",
 		FrameworkCIS:   "3.9",
 	},
 	"VPC_DEFAULT_NETWORK": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "1.2.1",
+		FrameworkPCI:   "1.4.2",
 		FrameworkHIPAA: "164.312(e)(1)",
 		FrameworkCIS:   "3.1",
 	},
@@ -261,7 +261,7 @@ var FrameworkMappings = map[string]map[string]string{
 	// COMPUTE CONTROLS
 	"COMPUTE_DISK_ENCRYPTION": {
 		FrameworkSOC2:  "CC6.7",
-		FrameworkPCI:   "3.4",
+		FrameworkPCI:   "3.5.1",
 		FrameworkCMMC:  "SC.L2-3.13.11",
 		FrameworkNIST:  "SC-28",
 		FrameworkHIPAA: "164.312(a)(2)(iv)",
@@ -269,7 +269,7 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"COMPUTE_PUBLIC_IP": {
 		FrameworkSOC2:  "CC6.6",
-		FrameworkPCI:   "1.3.1",
+		FrameworkPCI:   "1.4.2",
 		FrameworkHIPAA: "164.312(e)(1)",
 		FrameworkCIS:   "4.9",
 	},
@@ -303,7 +303,7 @@ var FrameworkMappings = map[string]map[string]string{
 	// SQL / DATABASE CONTROLS
 	"SQL_PUBLIC_IP": {
 		FrameworkSOC2:  "CC6.6",
-		FrameworkPCI:   "1.3.1",
+		FrameworkPCI:   "1.4.2",
 		FrameworkCMMC:  "SC.L1-3.13.1",
 		FrameworkNIST:  "SC-7",
 		FrameworkHIPAA: "164.312(e)(1)",
@@ -319,7 +319,7 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"SQL_SSL_REQUIRED": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "4.1",
+		FrameworkPCI:   "4.2.1",
 		FrameworkHIPAA: "164.312(e)(1)",
 		FrameworkCIS:   "6.3",
 	},
@@ -333,7 +333,7 @@ var FrameworkMappings = map[string]map[string]string{
 	// KMS CONTROLS
 	"KMS_ROTATION_ENABLED": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "3.6.4",
+		FrameworkPCI:   "3.7.4",
 		FrameworkCMMC:  "SC.L2-3.13.11",
 		FrameworkNIST:  "SC-12",
 		FrameworkHIPAA: "164.312(a)(2)(iv)",
@@ -341,7 +341,7 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"KMS_SEPARATION_OF_DUTIES": {
 		FrameworkSOC2:  "CC6.3",
-		FrameworkPCI:   "7.1",
+		FrameworkPCI:   "7.2.1",
 		FrameworkHIPAA: "164.308(a)(3)(i)",
 		FrameworkCIS:   "1.9",
 	},
@@ -349,13 +349,13 @@ var FrameworkMappings = map[string]map[string]string{
 	// BIGQUERY CONTROLS
 	"BIGQUERY_PUBLIC_DATASETS": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "1.3.1",
+		FrameworkPCI:   "1.4.2",
 		FrameworkHIPAA: "164.312(a)(1)",
 		FrameworkCIS:   "7.1, 7.2",
 	},
 	"BIGQUERY_ENCRYPTION": {
 		FrameworkSOC2:  "CC6.7",
-		FrameworkPCI:   "3.4",
+		FrameworkPCI:   "3.5.1",
 		FrameworkHIPAA: "164.312(a)(2)(iv)",
 		FrameworkCIS:   "7.3",
 	},
@@ -363,7 +363,7 @@ var FrameworkMappings = map[string]map[string]string{
 	// GKE / KUBERNETES CONTROLS
 	"GKE_BINARY_AUTHORIZATION": {
 		FrameworkSOC2:  "CC8.1",
-		FrameworkPCI:   "2.2",
+		FrameworkPCI:   "2.2.1",
 		FrameworkCMMC:  "CM.L2-3.4.8",
 		FrameworkNIST:  "CM-7",
 		FrameworkHIPAA: "164.312(c)(1)",
@@ -371,7 +371,7 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"GKE_NETWORK_POLICY": {
 		FrameworkSOC2:  "CC6.6",
-		FrameworkPCI:   "1.2.1",
+		FrameworkPCI:   "1.4.2",
 		FrameworkCMMC:  "SC.L1-3.13.1",
 		FrameworkNIST:  "SC-7",
 		FrameworkHIPAA: "164.312(e)(1)",
@@ -379,13 +379,13 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"GKE_DASHBOARD_DISABLED": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "2.2.2",
+		FrameworkPCI:   "2.2.4",
 		FrameworkHIPAA: "164.308(a)(3)(i)",
 		FrameworkCIS:   "8.3",
 	},
 	"GKE_POD_SECURITY_POLICY": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "2.2",
+		FrameworkPCI:   "2.2.1",
 		FrameworkCMMC:  "CM.L2-3.4.6",
 		FrameworkNIST:  "CM-6",
 		FrameworkHIPAA: "164.312(c)(1)",
@@ -393,7 +393,7 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	"GKE_WORKLOAD_IDENTITY": {
 		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "8.2",
+		FrameworkPCI:   "8.2.2",
 		FrameworkCMMC:  "IA.L2-3.5.3",
 		FrameworkNIST:  "IA-3",
 		FrameworkHIPAA: "164.312(a)(2)(i)",
