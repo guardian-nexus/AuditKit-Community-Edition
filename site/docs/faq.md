@@ -101,7 +101,7 @@ Compare to traditional costs:
 | PCI-DSS v4.0.1 | Production | 48 requirements |
 | CMMC Level 1 | Production | 17 practices |
 | CMMC Level 2 | Pro only | 110 practices |
-| NIST 800-53 Rev 5 | Production | ~150 technical controls |
+| NIST 800-53 Rev 5 | Production | 141 technical controls |
 | HIPAA | Experimental | ~15 controls |
 
 **[Framework details →](./frameworks/)**

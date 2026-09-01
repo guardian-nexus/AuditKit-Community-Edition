@@ -105,9 +105,12 @@ func (c *AzureAvailabilityConfidentialityChecks) checkCapacity(ctx context.Conte
 	}
 
 	if len(names) == 0 {
-		base.Status = "FAIL"
-		base.Severity = "MEDIUM"
-		base.Evidence = "SOC2 A1.1: no autoscale settings are configured, so capacity demand is not met automatically"
+		// An absent autoscale setting is not a failure: a project running only
+		// serverless workloads has nothing to autoscale. The remediation
+		// itself accepts documented manual capacity management, which is
+		// evidence a human has to supply.
+		base.Status = StatusManual
+		base.Evidence = "SOC2 A1.1: no autoscale settings are configured; confirm whether capacity is managed manually or the workload does not require scaling"
 		base.Remediation = "Configure autoscale rules, or document manual capacity management"
 		base.RemediationDetail = "1. Add autoscale settings to capacity-sensitive workloads\n2. Base rules on a metric that reflects real demand\n3. If capacity is managed manually, document the monitoring and provisioning process instead"
 		return base
@@ -142,6 +145,8 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 	untagged := []string{}
 	noPolicy := []string{}
 	noSoftDelete := []string{}
+	unreadablePolicy := []string{}
+	unreadableSoftDelete := []string{}
 	total := 0
 
 	pager := c.storageClient.NewListPager(nil)
@@ -184,22 +189,38 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 
 			// Management policies are the blob lifecycle mechanism. A missing
 			// policy means nothing expires data at end of retention.
-			if c.policyClient == nil || acct.ID == nil {
-				continue
+			rg := ""
+			if acct.ID != nil {
+				rg = resourceGroupFromID(*acct.ID)
 			}
-			rg := resourceGroupFromID(*acct.ID)
 			if rg == "" {
+				unreadablePolicy = append(unreadablePolicy, name)
+				unreadableSoftDelete = append(unreadableSoftDelete, name)
 				continue
 			}
-			if _, err := c.policyClient.Get(ctx, rg, name, armstorage.ManagementPolicyNameDefault, nil); err != nil {
-				noPolicy = append(noPolicy, name)
+			if c.policyClient == nil {
+				unreadablePolicy = append(unreadablePolicy, name)
+			} else if _, err := c.policyClient.Get(ctx, rg, name, armstorage.ManagementPolicyNameDefault, nil); err != nil {
+				// An absent policy is a real finding; an authorisation failure
+				// or a throttle is not, and reporting one as the other blames
+				// the customer for a permission the scanner was not granted.
+				if strings.Contains(err.Error(), "ManagementPolicyNotFound") || strings.Contains(err.Error(), "ResourceNotFound") {
+					noPolicy = append(noPolicy, name)
+				} else {
+					unreadablePolicy = append(unreadablePolicy, name)
+				}
 			}
 
 			// A1.2 - blob soft delete is the recovery mechanism for accidental
 			// or malicious deletion; without it a delete is unrecoverable.
-			if c.blobServiceClient != nil {
+			// This is assessed independently of the lifecycle policy above: a
+			// failure to read one must not silently pass the other.
+			if c.blobServiceClient == nil {
+				unreadableSoftDelete = append(unreadableSoftDelete, name)
+			} else {
 				props, err := c.blobServiceClient.GetServiceProperties(ctx, rg, name, nil)
 				if err != nil {
+					unreadableSoftDelete = append(unreadableSoftDelete, name)
 					continue
 				}
 				p := props.BlobServiceProperties.BlobServiceProperties
@@ -239,6 +260,13 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 				Priority:   PriorityInfo,
 				Timestamp:  time.Now(),
 				Frameworks: map[string]string{"SOC2": "C1.2"},
+			},
+			{
+				Control: "A1.2", Name: "Data Backup and Recovery Infrastructure", Status: StatusInfo,
+				Evidence:   "SOC2 A1.2: no storage accounts found in this subscription, so there was nothing to assess",
+				Priority:   PriorityInfo,
+				Timestamp:  time.Now(),
+				Frameworks: map[string]string{"SOC2": "A1.2"},
 			},
 		}
 	}
@@ -301,7 +329,7 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 			Control:    "C1.2",
 			Name:       "Confidential Data Disposal",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("SOC2 C1.2: all %d storage account(s) have a lifecycle management policy", total),
+			Evidence:   fmt.Sprintf("SOC2 C1.2: all %d readable storage account(s) have a lifecycle management policy%s", total-len(unreadablePolicy), unreadableNote(len(unreadablePolicy))),
 			Priority:   PriorityMedium,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "C1.2"},
@@ -319,15 +347,17 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 			Timestamp:         time.Now(),
 			Frameworks:        map[string]string{"SOC2": "A1.2"},
 		})
-	} else if total == 0 {
+	} else if len(unreadableSoftDelete) == total && total > 0 {
 		results = append(results, CheckResult{
-			Control:    "A1.2",
-			Name:       "Data Backup and Recovery Infrastructure",
-			Status:     StatusInfo,
-			Evidence:   "SOC2 A1.2: no storage accounts found in this subscription, so there was nothing to assess",
-			Priority:   PriorityInfo,
-			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"SOC2": "A1.2"},
+			Control:           "A1.2",
+			Name:              "Data Backup and Recovery Infrastructure",
+			Status:            StatusError,
+			Evidence:          fmt.Sprintf("SOC2 A1.2: could not read the blob service properties of any of the %d storage account(s), so recoverability could not be assessed", total),
+			Remediation:       "Grant Microsoft.Storage/storageAccounts/blobServices/read and re-run",
+			RemediationDetail: "The scanner needs read access to blob service properties to determine whether soft delete is enabled.",
+			Priority:          PriorityHigh,
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"SOC2": "A1.2"},
 		})
 	} else if len(noSoftDelete) > 0 {
 		results = append(results, CheckResult{
@@ -349,7 +379,7 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 			Control:    "A1.2",
 			Name:       "Data Backup and Recovery Infrastructure",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("SOC2 A1.2: all %d storage account(s) have blob soft delete enabled", total),
+			Evidence:   fmt.Sprintf("SOC2 A1.2: all %d readable storage account(s) have a blob soft delete setting%s", total-len(unreadableSoftDelete), unreadableNote(len(unreadableSoftDelete))),
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "A1.2"},
@@ -357,4 +387,13 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 	}
 
 	return results
+}
+
+// unreadableNote appends a count of resources the scanner could not read, so a
+// pass does not imply a completeness the scan never had.
+func unreadableNote(n int) string {
+	if n == 0 {
+		return ""
+	}
+	return fmt.Sprintf(" (a further %d could not be read)", n)
 }

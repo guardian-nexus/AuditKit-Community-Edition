@@ -2228,7 +2228,7 @@ func getControlName(controlID string) string {
 		"CC9.1":      "Risk Mitigation",
 		"CC9.2":      "Vendor Management",
 		"A1.1":       "Availability Monitoring",
-		"A1.2":       "Backup and Recovery",
+		"A1.2":       "Data Backup and Recovery Infrastructure",
 		"A1.3":       "Disaster Recovery",
 		"PI1.1":      "Privacy Controls",
 		"PI1.2":      "Data Subject Rights",
@@ -2236,29 +2236,32 @@ func getControlName(controlID string) string {
 		"PI1.4":      "Data Disposal",
 		"PI1.5":      "Privacy Notice",
 		"PI1.6":      "Data Quality",
-		"C1.1":       "Confidentiality Controls",
-		"C1.2":       "Data Classification",
-		"PCI-1.2.1":  "Network Segmentation",
-		"PCI-1.3.1":  "No Direct Public Access",
+		"C1.1":       "Confidential Data Identification",
+		"C1.2":       "Confidential Data Disposal",
+		"PCI-1.4.1":  "Network Segmentation",
+		"PCI-1.4.2":  "No Direct Public Access",
 		"PCI-2.2.2":  "Default Configuration Changes",
-		"PCI-3.4":    "Encryption at Rest",
-		"PCI-3.5":    "Encryption Key Management",
-		"PCI-4.1":    "Encryption in Transit",
-		"PCI-7.1":    "Least Privilege Access",
+		"PCI-3.5.1":  "Encryption at Rest",
+		"PCI-3.6.1":  "Encryption Key Management",
+		"PCI-4.2.1":  "Encryption in Transit",
+		"PCI-7.2.1":  "Least Privilege Access",
 		"PCI-8.1.4":  "Remove Inactive Users",
 		"PCI-8.1.8":  "Session Timeout",
-		"PCI-8.2.3":  "Password Strength",
-		"PCI-8.2.4":  "Password Rotation",
+		"PCI-8.3.6":  "Password Strength",
+		"PCI-8.3.9":  "Password Rotation",
 		"PCI-8.3.1":  "MFA for All Access",
-		"PCI-10.1":   "Audit Trail Implementation",
-		"PCI-10.5.3": "Log Retention",
-		"PCI-11.2.2": "Quarterly Vulnerability Scans",
+		"PCI-10.2.1": "Audit Trail Implementation",
+		"PCI-10.3.3": "Log Retention",
+		"PCI-11.3.2": "Quarterly Vulnerability Scans",
 	}
 
 	if name, ok := controlNames[controlID]; ok {
 		return name
 	}
-	return "Security Control"
+	// No placeholder: the tracker only overwrites a stored name when this
+	// returns something, and "Security Control" would overwrite every real
+	// name with a label that identifies nothing.
+	return ""
 }
 
 func getControlCategory(controlID string) string {

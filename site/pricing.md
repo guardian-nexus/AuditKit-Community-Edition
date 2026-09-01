@@ -31,7 +31,7 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 - SOC2 Type II (38 criteria: all 33 Common Criteria, plus Availability and Confidentiality)
 - PCI-DSS v4.0.1 (48 requirements)
 - CMMC Level 1 (17 practices)
-- NIST 800-53 Rev 5 (~150 technical controls)
+- NIST 800-53 Rev 5 (141 technical controls)
 - GCP Core Services (135 controls)
 - PDF, HTML, JSON reports
 - Evidence collection tracker
@@ -115,7 +115,7 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 | PCI-DSS v4.0.1 | 48 requirements | 48 requirements |
 | CMMC Level 1 | 17 practices | 17 practices |
 | CMMC Level 2 | - | 110 practices |
-| NIST 800-53 Rev 5 | 128 controls | 128 controls |
+| NIST 800-53 Rev 5 | 141 controls | 141 controls |
 | HIPAA | Experimental | Experimental |
 | **Scanning** |
 | Single account/project | Yes | Yes |

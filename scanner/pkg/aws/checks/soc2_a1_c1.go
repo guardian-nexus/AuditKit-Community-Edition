@@ -125,22 +125,47 @@ func (c *AvailabilityConfidentialityChecks) checkDataClassification(ctx context.
 	}
 
 	untagged := []string{}
+	unreadableTags := []string{}
 	for _, b := range buckets.Buckets {
 		name := aws.ToString(b.Name)
 		tags, err := c.s3Client.GetBucketTagging(ctx, &s3.GetBucketTaggingInput{Bucket: aws.String(name)})
+		if err != nil {
+			// S3 returns NoSuchTagSet for a bucket with no tags at all, which
+			// is a real finding. AccessDenied and PermanentRedirect are not:
+			// treating those as untagged blames the customer for our own lack
+			// of permission, or for the bucket living in another region.
+			if strings.Contains(err.Error(), "NoSuchTagSet") {
+				untagged = append(untagged, name)
+			} else {
+				unreadableTags = append(unreadableTags, name)
+			}
+			continue
+		}
 		classified := false
-		if err == nil {
-			for _, t := range tags.TagSet {
-				key := strings.ToLower(aws.ToString(t.Key))
-				if strings.Contains(key, "classification") || strings.Contains(key, "sensitivity") || strings.Contains(key, "dataclass") {
-					classified = true
-					break
-				}
+		for _, t := range tags.TagSet {
+			key := strings.ToLower(aws.ToString(t.Key))
+			if strings.Contains(key, "classification") || strings.Contains(key, "sensitivity") || strings.Contains(key, "dataclass") {
+				classified = true
+				break
 			}
 		}
 		if !classified {
 			untagged = append(untagged, name)
 		}
+	}
+
+	if len(untagged) == 0 && len(unreadableTags) > 0 {
+		return []CheckResult{{
+			Control:           "C1.1",
+			Name:              "Confidential Data Identification",
+			Status:            StatusError,
+			Evidence:          fmt.Sprintf("SOC2 C1.1: could not read the tags of %d bucket(s), so classification could not be assessed: %s", len(unreadableTags), strings.Join(unreadableTags[:min(3, len(unreadableTags))], ", ")),
+			Remediation:       "Grant s3:GetBucketTagging and re-run",
+			RemediationDetail: "The scanner needs s3:GetBucketTagging on each bucket to determine whether data is classified.",
+			Priority:          PriorityMedium,
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{FrameworkSOC2: "C1.1"},
+		}}
 	}
 
 	if len(untagged) > 0 {
@@ -153,7 +178,7 @@ func (c *AvailabilityConfidentialityChecks) checkDataClassification(ctx context.
 			Name:              "Confidential Data Identification",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("SOC2 C1.1: %d of %d bucket(s) carry no data classification tag: %s", len(untagged), len(buckets.Buckets), strings.Join(shown, ", ")),
+			Evidence:          fmt.Sprintf("SOC2 C1.1: %d of %d bucket(s) carry no data classification tag: %s%s", len(untagged), len(buckets.Buckets), strings.Join(shown, ", "), unreadableNote(len(unreadableTags))),
 			Remediation:       "Tag buckets with a data classification",
 			RemediationDetail: "1. Agree a classification scheme, for example public, internal, confidential\n2. aws s3api put-bucket-tagging --bucket NAME --tagging 'TagSet=[{Key=DataClassification,Value=Confidential}]'\n3. Keep the inventory current as buckets are created",
 			Priority:          PriorityMedium,
@@ -243,7 +268,7 @@ func (c *AvailabilityConfidentialityChecks) checkDataDisposal(ctx context.Contex
 			Name:              "Confidential Data Disposal",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("SOC2 C1.2: %d of %d bucket(s) have no lifecycle rule, so nothing enforces disposal at the end of retention: %s", len(noLifecycle), len(buckets.Buckets), strings.Join(shown, ", ")),
+			Evidence:          fmt.Sprintf("SOC2 C1.2: %d of %d bucket(s) have no lifecycle rule, so nothing enforces disposal at the end of retention: %s%s", len(noLifecycle), len(buckets.Buckets), strings.Join(shown, ", "), unreadableNote(len(unreadable))),
 			Remediation:       "Apply lifecycle rules that expire data",
 			RemediationDetail: "1. Agree a retention period per classification\n2. aws s3api put-bucket-lifecycle-configuration --bucket NAME --lifecycle-configuration file://rules.json\n3. Include noncurrent version expiration where versioning is enabled",
 			Priority:          PriorityMedium,
@@ -281,4 +306,13 @@ func noResources(control, name, resource, framework string) CheckResult {
 		Timestamp:         time.Now(),
 		Frameworks:        map[string]string{FrameworkSOC2: framework},
 	}
+}
+
+// unreadableNote appends a count of resources the scanner could not read, so a
+// real finding does not silently hide the fact that the picture is incomplete.
+func unreadableNote(n int) string {
+	if n == 0 {
+		return ""
+	}
+	return fmt.Sprintf(" (a further %d could not be read)", n)
 }

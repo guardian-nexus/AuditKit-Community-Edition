@@ -748,7 +748,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			})
 		}
 
-		// 8.2.3: Minimum password strength (7+ characters for PCI)
+		// 8.3.6: Minimum password strength (12+ characters under PCI DSS v4.0.1)
 		minLength := aws.ToInt32(passwordPolicy.PasswordPolicy.MinimumPasswordLength)
 		// v4.0.1 8.3.6 requires 12 characters; 8 is permitted only where the
 		// system cannot technically support 12. The old threshold of 7 was the
@@ -760,8 +760,8 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				Status:            "FAIL",
 				Severity:          "HIGH",
 				Evidence:          fmt.Sprintf("PCI-DSS Req 8.3.6: Password length only %d chars - v4.0.1 requires minimum 12", minLength),
-				Remediation:       "Set to 7+ characters",
-				RemediationDetail: "aws iam update-account-password-policy --minimum-password-length 7",
+				Remediation:       "Set to 12+ characters",
+				RemediationDetail: "aws iam update-account-password-policy --minimum-password-length 12",
 				Priority:          PriorityHigh,
 				Timestamp:         time.Now(),
 				Frameworks: map[string]string{
@@ -773,7 +773,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				Control:   "PCI-8.3.6",
 				Name:      "[PCI-DSS] Minimum Password Length",
 				Status:    "PASS",
-				Evidence:  fmt.Sprintf("Password length %d chars meets PCI requirement (7+)", minLength),
+				Evidence:  fmt.Sprintf("Password length %d chars meets PCI requirement (12+)", minLength),
 				Priority:  PriorityInfo,
 				Timestamp: time.Now(),
 				Frameworks: map[string]string{

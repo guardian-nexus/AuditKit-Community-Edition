@@ -285,12 +285,12 @@ func (c *EC2Checks) CheckPublicInstances(ctx context.Context) (CheckResult, erro
 	if totalInstances == 0 {
 		return CheckResult{
 			Control:    "CC6.1",
-			Name:       "EC2 Public IP Exposure",
+			Name:       "Public EC2 Instances",
 			Status:     StatusInfo,
 			Evidence:   "No running EC2 instances found, so there was nothing to assess",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("EC2_PUBLIC_IP"),
+			Frameworks: GetFrameworkMappings("PUBLIC_INSTANCES"),
 		}, nil
 	}
 

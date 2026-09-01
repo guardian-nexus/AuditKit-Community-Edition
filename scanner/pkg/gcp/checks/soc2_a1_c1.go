@@ -81,9 +81,12 @@ func (c *GCPAvailabilityConfidentialityChecks) checkCapacity(ctx context.Context
 	}
 
 	if len(names) == 0 {
-		base.Status = "FAIL"
-		base.Severity = "MEDIUM"
-		base.Evidence = "SOC2 A1.1: no autoscalers are configured, so capacity demand is not met automatically"
+		// An absent autoscaler is not a failure: a project running only
+		// serverless workloads has nothing to autoscale. The remediation
+		// itself accepts documented manual capacity management, which is
+		// evidence a human has to supply.
+		base.Status = StatusManual
+		base.Evidence = "SOC2 A1.1: no autoscalers are configured; confirm whether capacity is managed manually or the workload does not require scaling"
 		base.Remediation = "Configure autoscalers, or document manual capacity management"
 		base.RemediationDetail = "1. gcloud compute instance-groups managed set-autoscaling NAME --max-num-replicas=N\n2. Base the policy on a metric that reflects real demand\n3. If capacity is managed manually, document the monitoring and provisioning process instead"
 		return base
