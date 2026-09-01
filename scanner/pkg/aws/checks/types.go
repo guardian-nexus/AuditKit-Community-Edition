@@ -6,6 +6,31 @@ import (
 	"time"
 )
 
+// Check result statuses. Only StatusPass and StatusFail are scoreable; every
+// other value is excluded from the compliance score rather than counted as a
+// failed automated check.
+//
+// Three separate defects came from this field being an unconstrained string:
+// MANUAL, then WARN, then ERROR each sat in the scoring denominator and could
+// never pass. .github/scripts/check-statuses.sh rejects any value outside this
+// set, so a fourth cannot ship.
+const (
+	StatusPass   = "PASS"   // the control was checked and satisfied
+	StatusFail   = "FAIL"   // the control was checked and not satisfied
+	StatusInfo   = "INFO"   // guidance only; nothing was evaluated
+	StatusManual = "MANUAL" // requires human verification or documentation
+	StatusError  = "ERROR"  // the check could not run, usually a missing permission
+)
+
+// ValidStatus reports whether s is one of the recognised statuses.
+func ValidStatus(s string) bool {
+	switch s {
+	case StatusPass, StatusFail, StatusInfo, StatusManual, StatusError:
+		return true
+	}
+	return false
+}
+
 // Framework constants
 const (
 	FrameworkSOC2  = "SOC2"

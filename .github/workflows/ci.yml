@@ -28,6 +28,10 @@ jobs:
             exit 1
           fi
 
+      - name: Validate check statuses
+        working-directory: .
+        run: .github/scripts/check-statuses.sh
+
       - name: go vet
         run: go vet ./...
 
