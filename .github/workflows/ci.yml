@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  vet-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scanner
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: scanner/go.mod
+          cache-dependency-path: scanner/go.sum
+
+      - name: gofmt
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "These files are not gofmt-clean:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test ./...
+
+      - name: Build all scanner variants
+        run: |
+          go build -o /dev/null ./cmd/auditkit
+          go build -o /dev/null ./cmd/auditkit-aws
+          go build -o /dev/null ./cmd/auditkit-azure
+          go build -o /dev/null ./cmd/auditkit-gcp
