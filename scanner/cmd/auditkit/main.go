@@ -1740,8 +1740,8 @@ func runEvidenceTracker(provider, profile, output string) {
 
 	fmt.Printf("Evidence tracker saved to %s\n", output)
 	fmt.Println("Check items off in the browser, or record them durably with:")
-	fmt.Println("  auditkit evidence collect CONTROL-ID -notes \"...\"")
-	fmt.Println("  auditkit evidence status")
+	fmt.Printf("  %s evidence collect CONTROL-ID -notes \"...\"\n", binaryName())
+	fmt.Printf("  %s evidence status\n", binaryName())
 }
 
 func getPriorityAndImpact(controlID, severity, status, framework string) (string, string) {
@@ -2801,7 +2801,7 @@ func runEvidenceStatus(args []string) {
 	if limit < len(outstanding) {
 		fmt.Printf("\n  ... %d more. Use -all to list them.\n", len(outstanding)-limit)
 	}
-	fmt.Println("\nRecord evidence with: auditkit evidence collect CONTROL-ID -notes \"...\"")
+	fmt.Printf("\nRecord evidence with: %s evidence collect CONTROL-ID -notes \"...\"\n", binaryName())
 }
 
 func runEvidenceCollect(args []string) {
@@ -2823,7 +2823,7 @@ func runEvidenceCollect(args []string) {
 	}
 
 	if controlID == "" {
-		fmt.Fprintf(os.Stderr, "Usage: auditkit evidence collect CONTROL-ID [-notes \"...\"] [-artifact path] [-by name]\n")
+		fmt.Fprintf(os.Stderr, "Usage: %s evidence collect CONTROL-ID [-notes \"...\"] [-artifact path] [-by name]\n", binaryName())
 		os.Exit(1)
 	}
 
@@ -2846,6 +2846,12 @@ func runEvidenceCollect(args []string) {
 	s := t.Summarise(tracker.DefaultEvidenceMaxAge)
 	fmt.Printf("Recorded evidence for %s\n", controlID)
 	fmt.Printf("%d of %d required controls now have current evidence, %d outstanding.\n", s.Collected, s.Required, s.Outstanding+s.Stale)
+}
+
+// binaryName is used in usage hints so the Community and Pro binaries each
+// suggest their own name rather than one hard-coded string.
+func binaryName() string {
+	return filepath.Base(os.Args[0])
 }
 
 func truncate(s string, n int) string {
