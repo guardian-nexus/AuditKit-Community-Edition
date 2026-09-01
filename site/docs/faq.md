@@ -39,7 +39,7 @@ AuditKit can integrate with Prowler for complete NIST 800-53 coverage.
 | SOC2, PCI-DSS, NIST 800-53 | All frameworks | All frameworks |
 | CMMC Level 1 | 17 practices | 17 practices |
 | CMMC Level 2 | - | 110 practices (CUI) |
-| GCP Core | 135 controls | 135 controls |
+| Controls assessed | 229 AWS, 178 Azure, 135 GCP | 321 AWS, 268 Azure, 284 GCP |
 | GCP Advanced | - | GKE + Vertex AI (32 checks) |
 | Multi-Account | One at a time | AWS Orgs, Azure Mgmt, GCP Folders |
 | Support | Community | Priority + 14-day trial |

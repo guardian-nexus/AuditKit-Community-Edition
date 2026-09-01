@@ -107,16 +107,17 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 | **Cloud Providers** |
 | AWS | Full support | Full support |
 | Azure | Full support | Full support |
-| GCP Core | 135 controls | 135 controls |
+| Total controls assessed | 229 AWS, 178 Azure, 135 GCP | 321 AWS, 268 Azure, 284 GCP |
+| GCP Core | Full support | Full support |
 | GCP Advanced | - | GKE + Vertex AI (32 checks) |
 | M365 (ScubaGear) | Full support | Full support |
 | **Frameworks** |
 | SOC2 Type II | 38 criteria | 38 criteria |
-| PCI-DSS v4.0.1 | 69 requirements | 69 requirements |
+| PCI-DSS v4.0.1 | 69 requirements | 73 requirements |
 | CMMC Level 1 | 17 practices | 17 practices |
 | CMMC Level 2 | - | 110 practices |
 | NIST 800-53 Rev 5 | 144 controls | 144 controls |
-| HIPAA | Experimental | Experimental |
+| HIPAA | 17 safeguards, derived | 17 safeguards, derived |
 | **Scanning** |
 | Single account/project | Yes | Yes |
 | Multi-account (AWS Orgs) | - | Yes |

@@ -44,7 +44,7 @@ go build ./cmd/auditkit
 
 AuditKit scans your cloud infrastructure for compliance gaps and security misconfigurations:
 
-- **Automated Scanning:** ~150 technical controls per framework
+- **Automated Scanning:** 229 AWS, 178 Azure and 135 GCP controls
 - **Multi-Cloud Support:** AWS, Azure, GCP, M365 in one tool
 - **Audit-Ready Reports:** PDF/HTML/JSON output with evidence
 - **Fix Commands:** Exact CLI/Terraform commands to remediate issues
@@ -60,40 +60,75 @@ AuditKit scans your cloud infrastructure for compliance gaps and security miscon
 
 ### Compliance Frameworks
 
+Counts are distinct criteria, requirements or practices assessed per provider,
+measured from the checks themselves.
+
 | Framework | AWS | Azure | GCP | Purpose |
 |-----------|-----|-------|-----|---------|
-| **SOC2 Type II** | 64 | 64 | 64 | SaaS customer requirements |
-| **PCI-DSS v4.0** | All 12 Req | All 12 Req | All 12 Req | Payment card processing |
-| **CMMC Level 1** | 17 | 17 | 17 | DoD contractor compliance (FCI) |
-| **CMMC Level 2** | 110 | 110 | 110 | DoD contractor compliance (CUI) - [AuditKit](https://auditkit.io/) |
-| **NIST 800-53 Rev 5** | ~150 | ~150 | ~150 | Federal contractor requirements / FedRAMP |
-| **ISO 27001:2022** | ~60 | ~60 | ~60 | International information security |
-| **HIPAA Security Rule** | 70 | 62 | 40 | Healthcare data protection |
+| **SOC2 Type II** | 38 of 38 | 37 of 38 | 32 of 38 | SaaS customer requirements |
+| **PCI DSS v4.0.1** | 59 | 59 | 49 | Payment card processing |
+| **CMMC Level 1** | 17 of 17 | 17 of 17 | 11 of 17 | DoW contractor compliance (FCI) |
+| **CMMC Level 2** | - | - | - | 110 practices, [AuditKit Pro](https://auditkit.io/) only |
+
+69 distinct PCI DSS v4.0.1 requirements are assessed across the three providers.
+
+### Derived Frameworks
+
+These are not separate checks. Each is derived from the frameworks above through
+the NIST 800-53 crosswalk, so coverage follows from what the scanner already
+assessed.
+
+| Framework | AWS | Azure | GCP | Unit |
+|-----------|-----|-------|-----|------|
+| **NIST 800-53 Rev 5** | 77 | 82 | 82 | controls (144 across all providers) |
+| **ISO 27001:2022** | 46 | 46 | 46 | controls |
+| **NIST CSF 2.0** | 75 | 82 | 83 | subcategories |
+| **HIPAA Security Rule** | 17 | 17 | 17 | safeguards |
+| **GDPR** | 13 | 14 | 14 | articles |
+
+FedRAMP Low, Moderate and High are filtered views of the NIST 800-53 coverage
+above rather than separate control sets.
 
 ### Security Hardening
 
 | Framework | AWS | Azure | GCP | Purpose |
 |-----------|-----|-------|-----|---------|
-| **CIS Benchmarks** | 126+ | ~40+ | 61 | Industry security best practices |
+| **CIS Benchmarks** | 125 | 108 | 26 | Industry security best practices |
 
 **[Framework Details →](./site/docs/frameworks/)** • **[What's the difference? →](./site/docs/frameworks/#compliance-vs-security-hardening)**
 
 ---
 
-## Community Edition vs AuditKit
+## Community Edition vs AuditKit Pro
 
-| Feature | Community Edition | AuditKit ($297/mo) |
-|---------|------|---------------|
-| **Cloud Providers** | AWS, Azure, GCP, M365 | Same |
-| **Compliance Frameworks** | SOC2, PCI-DSS, CMMC L1, NIST 800-53 | Same |
-| **CIS Benchmarks** | AWS (126+ controls) | All clouds when available |
-| **GCP Core** | 170+ checks | Same |
-| **GCP Advanced** | - | GKE + Vertex AI (32 checks) |
-| **On-Prem Scanning** | - | Azure Arc (Experimental) |
-| **Multi-Account** | - | AWS Orgs, Azure Mgmt, GCP Folders |
+This repository is the **Community Edition**: free, open source, and the whole
+scanner for AWS, Azure, GCP and M365 against SOC2, PCI DSS, CMMC Level 1 and the
+frameworks derived from them. It is not a trial or a crippled build.
+
+**AuditKit Pro** is a separate paid product for organisations that need CMMC
+Level 2, estate-wide scanning, or a desktop interface.
+
+| | Community Edition (free) | AuditKit Pro ($297/mo) |
+|---|---|---|
+| **Cloud providers** | AWS, Azure, GCP, M365 | Same |
+| **Controls assessed** | 229 AWS, 178 Azure, 135 GCP | 321 AWS, 268 Azure, 284 GCP |
+| **SOC2 Type II** | 38, 37, 32 criteria | 38, 38, 36 criteria |
+| **PCI DSS v4.0.1** | 69 requirements | 73 requirements |
+| **CMMC Level 1** | Yes | Yes |
 | **CMMC Level 2** | - | 110 practices (CUI handling) |
+| **CIS Benchmarks** | AWS, Azure and GCP | Same |
+| **Derived frameworks** | 800-53, ISO 27001, HIPAA, GDPR, NIST CSF, FedRAMP | Same |
+| **Reports** | PDF, HTML, CSV, JSON | Same |
+| **Evidence lifecycle** | Yes | Yes, plus a packaged audit deliverable |
+| **GKE and Vertex AI** | - | 32 checks |
+| **Multi-account scanning** | - | AWS Organizations, Azure Management Groups, GCP folders |
+| **On-premises** | - | Azure Arc (experimental) |
 | **Desktop GUI** | - | Web dashboard at localhost:1337 |
-| **Support** | Community (GitHub Issues) | Priority email + 14-day trial |
+| **Custom controls** | - | Define your own checks in YAML |
+| **Scheduled scanning** | - | Daemon with webhook, SMTP and syslog alerting |
+| **Support** | GitHub Issues | Priority email, 14-day trial |
+
+Everything in the Community column runs from this repository with no licence key.
 
 **[Compare Features →](./site/pricing.md)** • **[Start Free Trial →](https://auditkit.io/)**
 
@@ -160,9 +195,12 @@ New Features:
 
 ---
 
-## AuditKit Desktop (v0.9.0)
+## AuditKit Pro Desktop (v0.9.4-pro)
 
-**AuditKit customers now get a beautiful web-based dashboard** that runs locally on your machine.
+*This section describes AuditKit Pro, the paid product. It is not part of the
+Community Edition and is not built from this repository.*
+
+AuditKit Pro includes a web-based dashboard that runs locally on your machine.
 
 ![AuditKit Desktop Dashboard](./site/examples/screenshots/auditkitwebgui-dashboard.png)
 
@@ -205,7 +243,7 @@ cp ~/Downloads/license.lic ~/.auditkit-pro/license.lic
 
 **For Startups:** Free SOC2 prep without $50K consultants  
 **For Security Teams:** CIS Benchmarks for proactive hardening  
-**For DoD Contractors:** CMMC Level 1 (Community Edition) or [Level 2](https://auditkit.io/) compliance  
+**For DoW Contractors:** CMMC Level 1 (Community Edition) or [Level 2](https://auditkit.io/) compliance  
 **For Multi-Cloud:** Single tool for AWS + Azure + GCP + M365  
 **For DevOps:** JSON output for CI/CD integration
 
@@ -338,7 +376,7 @@ prowler aws --output-formats json -o prowler-output     # Run Prowler first
 ### Frameworks
 - **[SOC2 Type II](./site/docs/frameworks/soc2.md)** - Trust Services Criteria
 - **[PCI-DSS v4.0](./site/docs/frameworks/pci-dss.md)** - Payment card security
-- **[CMMC](./site/docs/frameworks/cmmc.md)** - DoD contractor compliance
+- **[CMMC](./site/docs/frameworks/cmmc.md)** - DoW contractor compliance
 - **[CIS Benchmarks](./site/docs/frameworks/cis-benchmarks.md)** - Security hardening
 - **[NIST 800-53](./site/docs/frameworks/nist-800-53.md)** - Federal requirements
 - **[All Frameworks →](./site/docs/frameworks/)**
@@ -421,7 +459,7 @@ We need help with:
 - **Community Support:** [GitHub Issues](https://github.com/guardian-nexus/AuditKit-Community-Edition/issues)
 - **Security Issues:** [SECURITY.md](./SECURITY.md)
 - **Newsletter:** [guardiannexus.substack.com](https://guardiannexus.substack.com)
-- **AuditKit Support:** Priority email + Slack channel (info@auditkit.io)
+- **AuditKit Pro Support:** Priority email + Slack channel (info@auditkit.io)
 
 ---
 
