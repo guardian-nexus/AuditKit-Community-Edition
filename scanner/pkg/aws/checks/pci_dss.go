@@ -1620,20 +1620,49 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 	// 10.7.2 - failures of critical security control systems are detected and
 	// alerted on. CloudTrail and Config are two such systems; if either has
 	// stopped, the failure has already happened.
+	// Absence is worse than stoppage: a control system that does not exist
+	// cannot have its failures detected. Only looking for stopped things passes
+	// an account that has no logging at all, which is the wrong way round.
 	stopped := []string{}
+	missing := []string{}
+
+	if len(trails.TrailList) == 0 {
+		missing = append(missing, "CloudTrail (no trail configured)")
+	}
 	for _, t := range trails.TrailList {
 		st, err := c.cloudtrailClient.GetTrailStatus(ctx, &cloudtrail.GetTrailStatusInput{Name: t.Name})
-		if err == nil && !aws.ToBool(st.IsLogging) {
+		if err == nil && st != nil && !aws.ToBool(st.IsLogging) {
 			stopped = append(stopped, aws.ToString(t.Name))
 		}
 	}
+
 	recorders, recErr := c.configClient.DescribeConfigurationRecorderStatus(ctx, &configservice.DescribeConfigurationRecorderStatusInput{})
-	if recErr == nil {
+	if recErr == nil && recorders != nil {
+		if len(recorders.ConfigurationRecordersStatus) == 0 {
+			missing = append(missing, "AWS Config (no recorder configured)")
+		}
 		for _, r := range recorders.ConfigurationRecordersStatus {
 			if !r.Recording {
 				stopped = append(stopped, "AWS Config recorder "+aws.ToString(r.Name))
 			}
 		}
+	}
+
+	if len(missing) > 0 {
+		return append(results, CheckResult{
+			Control:           "PCI-10.7.2",
+			Name:              "[PCI-DSS] Security Control Failure Detection",
+			Status:            "FAIL",
+			Severity:          "CRITICAL",
+			Evidence:          fmt.Sprintf("PCI-DSS Req 10.7.2 (mandatory since 31 Mar 2025): %s. A control system that does not exist cannot have its failures detected", strings.Join(missing, "; ")),
+			Remediation:       "Enable the missing control systems, then alert on their failure",
+			RemediationDetail: "1. Create a multi-region CloudTrail trail\n2. Enable an AWS Config recorder\n3. Add an EventBridge rule for StopLogging and StopConfigurationRecorder with a notification target",
+			Priority:          PriorityCritical,
+			ScreenshotGuide:   "CloudTrail and Config showing active status, plus the EventBridge rule alerting on stoppage",
+			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/home#/trails",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
+		})
 	}
 
 	if len(stopped) > 0 {

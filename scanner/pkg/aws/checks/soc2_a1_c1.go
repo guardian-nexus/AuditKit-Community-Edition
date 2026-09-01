@@ -87,7 +87,15 @@ func (c *AvailabilityConfidentialityChecks) checkRecoveryTesting(ctx context.Con
 		return base
 	}
 
-	base.Status = "INFO"
+	if len(instances.DBInstances) == 0 {
+		base.Status = StatusInfo
+		base.Evidence = "SOC2 A1.3: no RDS instances found in this account, so there was nothing to assess. Recovery testing must still be evidenced for whatever the recovery plan covers"
+		base.Remediation = "Record a restore test for the systems your recovery plan covers"
+		base.RemediationDetail = "Restore from whatever backup mechanism is in scope, record the date, scope and elapsed time, and repeat at the frequency your policy defines."
+		return base
+	}
+
+	base.Status = StatusInfo
 	base.Evidence = fmt.Sprintf("SOC2 A1.3: %d database(s) have automated backups. Recovery testing itself must be evidenced separately - a backup that has never been restored is untested", len(instances.DBInstances))
 	base.Remediation = "Record a restore test"
 	base.RemediationDetail = "Restore a backup into an isolated environment, record the date, scope and elapsed time, and repeat at the frequency your policy defines."
