@@ -22,17 +22,12 @@ import (
 // "v3.2.1 to v4.0 Summary of Changes" where it gives an explicit mapping, and by
 // matching check content against the v4.0.1 standard text otherwise.
 //
-// Known gaps - future-dated requirements not yet covered. The first five are
-// testable from cloud configuration and are the ones worth adding:
+// The cloud-testable future-dated requirements are implemented in
+// CheckFutureDated below: 4.2.1.1, 8.6.1, 8.6.2, 8.6.3, 10.4.1.1, 10.7.2 and
+// 10.7.3. AWS only for now; Azure and GCP do not yet carry them.
 //
-//	4.2.1.1  inventory of trusted keys and certificates
-//	8.6.1-3  application and system account credential management
-//	10.4.1.1 automated log review mechanisms
-//	10.7.2   detect and alert on security control failures (all entities)
-//	10.7.3   respond to security control failures
-//
-// The remainder are payment-page or process controls a cloud config scanner
-// cannot assess, and should surface as MANUAL rather than be omitted:
+// Still uncovered - payment-page and process controls a cloud config scanner
+// cannot assess. These should surface as MANUAL rather than be omitted:
 //
 //	3.5.1.1, 5.3.3, 6.4.3, 11.3.1.1, 11.5.1.1, 11.6.1, 12.5.2.1, 12.10.7
 type PCIDSSChecks struct {
@@ -101,6 +96,9 @@ func (c *PCIDSSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 	// Requirement 12: Information Security Policy
 	results = append(results, c.CheckReq12_SecurityPolicy(ctx)...)
+
+	// v4.x future-dated requirements (mandatory since 31 March 2025)
+	results = append(results, c.CheckFutureDated(ctx)...)
 
 	return results, nil
 }
@@ -1387,6 +1385,270 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		Frameworks: map[string]string{
 			"PCI-DSS": "Req 12.10.1, 12.10.1",
 		},
+	})
+
+	return results
+}
+
+// CheckFutureDated covers the PCI DSS v4.x future-dated requirements that can be
+// assessed from cloud configuration.
+//
+// "Future-dated" is the PCI SSC term for requirements introduced in v4.0 with a
+// delayed effective date. They became mandatory on 31 March 2025 and are scored
+// as fully in-scope in any assessment from that date. There is no grace period
+// remaining; the label describes their history, not their status.
+func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
+	results := []CheckResult{}
+
+	// 4.2.1.1 - an inventory of trusted keys and certificates protecting PAN in
+	// transit. ACM is not among this scanner's clients, so this is documentation.
+	results = append(results, CheckResult{
+		Control:           "PCI-4.2.1.1",
+		Name:              "[PCI-DSS] Trusted Key and Certificate Inventory",
+		Status:            "INFO",
+		Evidence:          "PCI-DSS Req 4.2.1.1 (future-dated, mandatory since 31 Mar 2025): maintain an inventory of trusted keys and certificates used to protect PAN in transit",
+		Remediation:       "Maintain a documented certificate inventory",
+		RemediationDetail: "1. List certificates: aws acm list-certificates\n2. Record issuer, expiry and the service each protects\n3. Review at least annually and on renewal",
+		Priority:          PriorityMedium,
+		ScreenshotGuide:   "ACM console showing issued certificates, plus the maintained inventory document",
+		ConsoleURL:        "https://console.aws.amazon.com/acm/home#/certificates/list",
+		Timestamp:         time.Now(),
+		Frameworks:        map[string]string{"PCI-DSS": "Req 4.2.1.1"},
+	})
+
+	users, err := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
+	if err != nil {
+		results = append(results, CheckResult{
+			Control:    "PCI-8.6.1",
+			Name:       "[PCI-DSS] System Account Interactive Login",
+			Status:     "ERROR",
+			Evidence:   fmt.Sprintf("Unable to check IAM users: %v", err),
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.1"},
+		})
+		return results
+	}
+
+	// 8.6.1 - system/application accounts usable for interactive login must be
+	// managed. An IAM principal holding both a console login profile and access
+	// keys is a service account that can also be logged into interactively.
+	interactive := []string{}
+	staleServiceKeys := []string{}
+	for _, user := range users.Users {
+		userName := aws.ToString(user.UserName)
+		keys, _ := c.iamClient.ListAccessKeys(ctx, &iam.ListAccessKeysInput{UserName: user.UserName})
+		if len(keys.AccessKeyMetadata) == 0 {
+			continue
+		}
+		if _, err := c.iamClient.GetLoginProfile(ctx, &iam.GetLoginProfileInput{UserName: aws.String(userName)}); err == nil {
+			interactive = append(interactive, userName)
+		}
+		// 8.6.3 - credentials for these accounts are rotated periodically.
+		for _, key := range keys.AccessKeyMetadata {
+			if string(key.Status) == "Active" && key.CreateDate != nil {
+				if days := int(time.Since(*key.CreateDate).Hours() / 24); days > 90 {
+					staleServiceKeys = append(staleServiceKeys, fmt.Sprintf("%s (%d days)", userName, days))
+				}
+			}
+		}
+	}
+
+	if len(interactive) > 0 {
+		shown := interactive
+		if len(shown) > 3 {
+			shown = shown[:3]
+		}
+		results = append(results, CheckResult{
+			Control:           "PCI-8.6.1",
+			Name:              "[PCI-DSS] System Account Interactive Login",
+			Status:            "FAIL",
+			Evidence:          fmt.Sprintf("PCI-DSS Req 8.6.1 (future-dated, mandatory since 31 Mar 2025): %d account(s) hold both access keys and a console password: %s", len(interactive), strings.Join(shown, ", ")),
+			Remediation:       "Prevent interactive login for service accounts",
+			RemediationDetail: "1. Confirm whether each account is a service account\n2. Remove the console password: aws iam delete-login-profile --user-name NAME\n3. Where interactive use is genuinely needed, document the exceptional circumstance and time-box it",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "IAM console showing the account has no console password",
+			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/users",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.1"},
+		})
+	} else {
+		results = append(results, CheckResult{
+			Control:    "PCI-8.6.1",
+			Name:       "[PCI-DSS] System Account Interactive Login",
+			Status:     "PASS",
+			Evidence:   "PCI-DSS Req 8.6.1: no account holds both access keys and a console password",
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.1"},
+		})
+	}
+
+	// 8.6.2 - credentials must not be hard coded in scripts, config files or
+	// source. Not observable from cloud configuration.
+	results = append(results, CheckResult{
+		Control:           "PCI-8.6.2",
+		Name:              "[PCI-DSS] No Hardcoded Application Credentials",
+		Status:            "INFO",
+		Evidence:          "PCI-DSS Req 8.6.2 (future-dated, mandatory since 31 Mar 2025): passwords for application and system accounts must not be hard coded in scripts, configuration files or source code",
+		Remediation:       "Move credentials to a secrets manager",
+		RemediationDetail: "1. Scan repositories for embedded secrets\n2. Move them to AWS Secrets Manager or Parameter Store\n3. Grant access via IAM roles rather than long-lived keys",
+		Priority:          PriorityHigh,
+		ScreenshotGuide:   "Secrets Manager inventory, plus evidence of secret scanning in CI",
+		ConsoleURL:        "https://console.aws.amazon.com/secretsmanager/",
+		Timestamp:         time.Now(),
+		Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.2"},
+	})
+
+	if len(staleServiceKeys) > 0 {
+		shown := staleServiceKeys
+		if len(shown) > 3 {
+			shown = shown[:3]
+		}
+		results = append(results, CheckResult{
+			Control:           "PCI-8.6.3",
+			Name:              "[PCI-DSS] Application Account Credential Rotation",
+			Status:            "FAIL",
+			Evidence:          fmt.Sprintf("PCI-DSS Req 8.6.3 (future-dated, mandatory since 31 Mar 2025): %d access key(s) older than 90 days: %s", len(staleServiceKeys), strings.Join(shown, ", ")),
+			Remediation:       "Rotate application and system account credentials",
+			RemediationDetail: "1. Create a replacement key\n2. Update consumers\n3. Deactivate then delete the old key\n4. Set the rotation frequency from your targeted risk analysis (Req 12.3.1)",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "IAM credential report showing key ages within your defined rotation period",
+			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/users",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.3"},
+		})
+	} else {
+		results = append(results, CheckResult{
+			Control:    "PCI-8.6.3",
+			Name:       "[PCI-DSS] Application Account Credential Rotation",
+			Status:     "PASS",
+			Evidence:   "PCI-DSS Req 8.6.3: no active access key is older than 90 days",
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.3"},
+		})
+	}
+
+	results = append(results, c.checkAutomatedLogReview(ctx)...)
+	return results
+}
+
+// checkAutomatedLogReview covers 10.4.1.1, 10.7.2 and 10.7.3.
+func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResult {
+	results := []CheckResult{}
+
+	trails, err := c.cloudtrailClient.DescribeTrails(ctx, &cloudtrail.DescribeTrailsInput{})
+	if err != nil {
+		return append(results, CheckResult{
+			Control:    "PCI-10.4.1.1",
+			Name:       "[PCI-DSS] Automated Audit Log Review",
+			Status:     "ERROR",
+			Evidence:   fmt.Sprintf("Unable to check CloudTrail: %v", err),
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+		})
+	}
+
+	// 10.4.1.1 - automated mechanisms are used to perform audit log reviews.
+	// A trail delivering to CloudWatch Logs is the mechanism AWS provides for
+	// this; manual console reading of raw S3 objects is not automated review.
+	withLogGroup := []string{}
+	for _, t := range trails.TrailList {
+		if t.CloudWatchLogsLogGroupArn != nil && *t.CloudWatchLogsLogGroupArn != "" {
+			withLogGroup = append(withLogGroup, aws.ToString(t.Name))
+		}
+	}
+
+	if len(withLogGroup) > 0 {
+		results = append(results, CheckResult{
+			Control:           "PCI-10.4.1.1",
+			Name:              "[PCI-DSS] Automated Audit Log Review",
+			Status:            "PASS",
+			Evidence:          fmt.Sprintf("PCI-DSS Req 10.4.1.1: %d trail(s) deliver to CloudWatch Logs: %s", len(withLogGroup), strings.Join(withLogGroup, ", ")),
+			Remediation:       "Confirm metric filters and alarms act on the delivered logs",
+			RemediationDetail: "Delivery alone is not review. Ensure metric filters and alarms exist for the events your risk analysis identifies.",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "CloudWatch metric filters and alarms defined against the CloudTrail log group",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+		})
+	} else {
+		results = append(results, CheckResult{
+			Control:           "PCI-10.4.1.1",
+			Name:              "[PCI-DSS] Automated Audit Log Review",
+			Status:            "FAIL",
+			Evidence:          "PCI-DSS Req 10.4.1.1 (future-dated, mandatory since 31 Mar 2025): no CloudTrail trail delivers to CloudWatch Logs, so log review is not automated",
+			Remediation:       "Send CloudTrail to CloudWatch Logs and alarm on it",
+			RemediationDetail: "1. aws cloudtrail update-trail --name NAME --cloud-watch-logs-log-group-arn ARN --cloud-watch-logs-role-arn ROLE\n2. Add metric filters for the events your risk analysis identifies\n3. Attach alarms with a notification target",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "CloudTrail trail configuration showing a CloudWatch Logs group, and the alarms defined on it",
+			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/home#/trails",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+		})
+	}
+
+	// 10.7.2 - failures of critical security control systems are detected and
+	// alerted on. CloudTrail and Config are two such systems; if either has
+	// stopped, the failure has already happened.
+	stopped := []string{}
+	for _, t := range trails.TrailList {
+		st, err := c.cloudtrailClient.GetTrailStatus(ctx, &cloudtrail.GetTrailStatusInput{Name: t.Name})
+		if err == nil && !aws.ToBool(st.IsLogging) {
+			stopped = append(stopped, aws.ToString(t.Name))
+		}
+	}
+	recorders, recErr := c.configClient.DescribeConfigurationRecorderStatus(ctx, &configservice.DescribeConfigurationRecorderStatusInput{})
+	if recErr == nil {
+		for _, r := range recorders.ConfigurationRecordersStatus {
+			if !r.Recording {
+				stopped = append(stopped, "AWS Config recorder "+aws.ToString(r.Name))
+			}
+		}
+	}
+
+	if len(stopped) > 0 {
+		results = append(results, CheckResult{
+			Control:           "PCI-10.7.2",
+			Name:              "[PCI-DSS] Security Control Failure Detection",
+			Status:            "FAIL",
+			Evidence:          fmt.Sprintf("PCI-DSS Req 10.7.2 (future-dated, mandatory since 31 Mar 2025): %d critical security control system(s) are not running: %s", len(stopped), strings.Join(stopped, ", ")),
+			Remediation:       "Restore the stopped controls and alert on future failures",
+			RemediationDetail: "1. Restart the trail or Config recorder\n2. Add an EventBridge rule for StopLogging and StopConfigurationRecorder\n3. Route it to a notification target so the next failure is detected rather than discovered",
+			Priority:          PriorityCritical,
+			ScreenshotGuide:   "CloudTrail and Config showing active status, plus the EventBridge rule alerting on stoppage",
+			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/home#/trails",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
+		})
+	} else {
+		results = append(results, CheckResult{
+			Control:           "PCI-10.7.2",
+			Name:              "[PCI-DSS] Security Control Failure Detection",
+			Status:            "PASS",
+			Evidence:          "PCI-DSS Req 10.7.2: CloudTrail and AWS Config are running",
+			Remediation:       "Alert on stoppage as well as checking current state",
+			RemediationDetail: "Add an EventBridge rule for StopLogging and StopConfigurationRecorder so a future failure raises an alert.",
+			Priority:          PriorityHigh,
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
+		})
+	}
+
+	// 10.7.3 - failures are responded to promptly. A process control.
+	results = append(results, CheckResult{
+		Control:           "PCI-10.7.3",
+		Name:              "[PCI-DSS] Security Control Failure Response",
+		Status:            "INFO",
+		Evidence:          "PCI-DSS Req 10.7.3 (future-dated, mandatory since 31 Mar 2025): document how security control failures are responded to, including restoring the function and recording the duration and cause",
+		Remediation:       "Document the failure response procedure",
+		RemediationDetail: "Record: how the failure is identified, who restores the control, the start and end time of the outage, the cause, and what was changed to prevent recurrence.",
+		Priority:          PriorityMedium,
+		ScreenshotGuide:   "The documented procedure, plus a worked example from a real or exercised failure",
+		Timestamp:         time.Now(),
+		Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.3"},
 	})
 
 	return results
