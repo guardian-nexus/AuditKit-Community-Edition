@@ -1030,7 +1030,9 @@ func performScan(provider, profile, framework string, verbose bool, services str
 	requestedUpper := strings.ToUpper(framework)
 	requestedLower := strings.ToLower(framework)
 
-	if requestedUpper == "800-53" || requestedUpper == "NIST800-53" || strings.HasPrefix(requestedLower, "fedramp-") || requestedLower == "iso27001" || requestedLower == "iso-27001" {
+	if requestedUpper == "800-53" || requestedUpper == "NIST800-53" || strings.HasPrefix(requestedLower, "fedramp-") ||
+		requestedLower == "iso27001" || requestedLower == "iso-27001" ||
+		requestedLower == "gdpr" || requestedLower == "nist-csf" || requestedLower == "csf" {
 		crosswalk, crosswalkErr = mappings.GetCrosswalk()
 		if crosswalkErr != nil && verbose {
 			fmt.Fprintf(os.Stderr, "Warning: Could not load 800-53 crosswalk: %v\n", crosswalkErr)
@@ -1204,6 +1206,46 @@ func performScan(provider, profile, framework string, verbose bool, services str
 
 					if verbose {
 						fmt.Fprintf(os.Stderr, "✓ Mapped %s → %s (ISO 27001)\n", originalID, nist80053IDs)
+					}
+				}
+			} else if requestedLower == "gdpr" && crosswalk != nil {
+				// GDPR articles are derived from the 800-53 controls a check maps
+				// to, rather than requiring every check to carry a GDPR tag.
+				articles := crosswalk.GetGDPRString(control.Frameworks, control.ID)
+
+				if articles != "" {
+					hasRequestedFramework = true
+					originalID := control.ID
+					control.ID = articles
+					control.Name = fmt.Sprintf("%s (via %s, GDPR)", control.Name, originalID)
+
+					if control.Frameworks == nil {
+						control.Frameworks = make(map[string]string)
+					}
+					control.Frameworks["GDPR"] = articles
+					control.Frameworks["Source"] = originalID
+
+					if verbose {
+						fmt.Fprintf(os.Stderr, "Mapped %s -> %s (GDPR)\n", originalID, articles)
+					}
+				}
+			} else if (requestedLower == "nist-csf" || requestedLower == "csf") && crosswalk != nil {
+				subcategories := crosswalk.GetNISTCSFString(control.Frameworks, control.ID)
+
+				if subcategories != "" {
+					hasRequestedFramework = true
+					originalID := control.ID
+					control.ID = subcategories
+					control.Name = fmt.Sprintf("%s (via %s, NIST CSF 2.0)", control.Name, originalID)
+
+					if control.Frameworks == nil {
+						control.Frameworks = make(map[string]string)
+					}
+					control.Frameworks["NIST-CSF"] = subcategories
+					control.Frameworks["Source"] = originalID
+
+					if verbose {
+						fmt.Fprintf(os.Stderr, "Mapped %s -> %s (NIST CSF 2.0)\n", originalID, subcategories)
 					}
 				}
 			} else if strings.HasPrefix(framework, "cis") {

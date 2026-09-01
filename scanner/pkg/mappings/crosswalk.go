@@ -4,12 +4,26 @@
 package mappings
 
 import (
+	_ "embed"
 	"fmt"
 	"os"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 )
+
+// The crosswalk data is embedded rather than read from disk. It was previously
+// loaded from the relative path pkg/mappings/framework-crosswalk.yaml, which
+// only resolved when the binary happened to be run from the scanner source
+// tree. In a released binary the load failed, the crosswalk was nil, and every
+// framework that depends on it (800-53, FedRAMP baselines, ISO 27001, GDPR,
+// NIST CSF) filtered out every control and produced an empty report.
+//
+//go:embed framework-crosswalk.yaml
+var embeddedCrosswalk []byte
+
+//go:embed fedramp-baselines.yaml
+var embeddedFedRAMP []byte
 
 // Crosswalk holds mappings between frameworks and NIST 800-53
 type Crosswalk struct {
@@ -54,9 +68,12 @@ func GetCrosswalk() (*Crosswalk, error) {
 		return globalCrosswalk, nil
 	}
 
-	// Try to load from default location
-	filepath := "pkg/mappings/framework-crosswalk.yaml"
-	return LoadCrosswalk(filepath)
+	var crosswalk Crosswalk
+	if err := yaml.Unmarshal(embeddedCrosswalk, &crosswalk); err != nil {
+		return nil, fmt.Errorf("failed to parse embedded crosswalk: %w", err)
+	}
+	globalCrosswalk = &crosswalk
+	return globalCrosswalk, nil
 }
 
 // Get800_53Controls returns NIST 800-53 control IDs for a given control across all frameworks
@@ -252,9 +269,12 @@ func GetFedRAMPBaselines() (*FedRAMPBaselines, error) {
 		return globalFedRAMPBaselines, nil
 	}
 
-	// Try to load from default location
-	filepath := "pkg/mappings/fedramp-baselines.yaml"
-	return LoadFedRAMPBaselines(filepath)
+	var baselines FedRAMPBaselines
+	if err := yaml.Unmarshal(embeddedFedRAMP, &baselines); err != nil {
+		return nil, fmt.Errorf("failed to parse embedded FedRAMP baselines: %w", err)
+	}
+	globalFedRAMPBaselines = &baselines
+	return globalFedRAMPBaselines, nil
 }
 
 // IsInFedRAMPBaseline checks if an 800-53 control is in the specified FedRAMP baseline
@@ -296,4 +316,63 @@ func (f *FedRAMPBaselines) GetBaselineControls(baseline string) []string {
 	default:
 		return nil
 	}
+}
+
+// reverseFrom builds an 800-53 control ID -> framework ID index from a
+// framework -> 800-53 map. Used to derive GDPR and NIST CSF coverage from the
+// 800-53 controls a check already maps to, the same way ISO 27001 is derived.
+func reverseFrom(forward map[string][]string) map[string][]string {
+	rev := make(map[string][]string)
+	for frameworkID, controls := range forward {
+		for _, ctrl := range controls {
+			rev[ctrl] = append(rev[ctrl], frameworkID)
+		}
+	}
+	return rev
+}
+
+// GetGDPRArticles returns the GDPR article IDs covered by a control, derived
+// from the 800-53 controls it maps to. Returns an empty slice when the control
+// has no 800-53 mapping or none of them touch a GDPR article.
+func (c *Crosswalk) GetGDPRArticles(frameworks map[string]string, controlID string) []string {
+	return c.deriveFrom(c.GDPRToCIS, frameworks, controlID)
+}
+
+// GetNISTCSFSubcategories returns the NIST CSF 2.0 subcategory IDs covered by a
+// control, derived from its 800-53 mappings.
+func (c *Crosswalk) GetNISTCSFSubcategories(frameworks map[string]string, controlID string) []string {
+	return c.deriveFrom(c.NISTCSFToCIS, frameworks, controlID)
+}
+
+func (c *Crosswalk) deriveFrom(forward map[string][]string, frameworks map[string]string, controlID string) []string {
+	nist := c.Get800_53Controls(frameworks)
+	if len(nist) == 0 {
+		nist = c.Get800_53ByControlID(controlID)
+	}
+	if len(nist) == 0 {
+		return nil
+	}
+
+	rev := reverseFrom(forward)
+	seen := make(map[string]bool)
+	out := []string{}
+	for _, ctrl := range nist {
+		for _, id := range rev[ctrl] {
+			if !seen[id] {
+				seen[id] = true
+				out = append(out, id)
+			}
+		}
+	}
+	return out
+}
+
+// GetGDPRString and GetNISTCSFString return the derived IDs as a comma-separated
+// string, or "" when the control maps to neither.
+func (c *Crosswalk) GetGDPRString(frameworks map[string]string, controlID string) string {
+	return strings.Join(c.GetGDPRArticles(frameworks, controlID), ", ")
+}
+
+func (c *Crosswalk) GetNISTCSFString(frameworks map[string]string, controlID string) string {
+	return strings.Join(c.GetNISTCSFSubcategories(frameworks, controlID), ", ")
 }
