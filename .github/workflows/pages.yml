@@ -7,6 +7,13 @@ on:
       - 'site/**'
       - '.github/scripts/check-links.sh'
       - '.github/workflows/pages.yml'
+# Pages allows one deployment at a time. Without this, pushing several commits
+# in quick succession makes the later runs fail with "in progress deployment"
+# even though nothing is wrong.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   check-links:
     runs-on: ubuntu-latest
