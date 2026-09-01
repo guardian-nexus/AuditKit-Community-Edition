@@ -105,7 +105,7 @@ func (c *PCIDSSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	return results, nil
 }
 
-// Requirement 1.2.1: Network segmentation for CDE
+// Requirement 1.4.2: Network segmentation for CDE
 func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []CheckResult {
 	results := []CheckResult{}
 
@@ -120,7 +120,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			Priority:  PriorityCritical,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.2.1",
+				"PCI-DSS": "Req 1.4.2",
 			},
 		})
 	}
@@ -132,7 +132,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			Name:              "[PCI-DSS] Network Segmentation for CDE",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          "PCI-DSS Req 1.2.1 VIOLATION: Only 1 VPC found - PCI requires isolated network for cardholder data environment (CDE)",
+			Evidence:          "PCI-DSS Req 1.4.2 VIOLATION: Only 1 VPC found - PCI requires isolated network for cardholder data environment (CDE)",
 			Remediation:       "Create separate VPC for CDE",
 			RemediationDetail: "1. Create new VPC: aws ec2 create-vpc --cidr-block 10.1.0.0/16\n2. Tag as CDE: aws ec2 create-tags --resources vpc-xxx --tags Key=Environment,Value=CDE\n3. Implement strict NACLs and security groups",
 			Priority:          PriorityCritical,
@@ -140,7 +140,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			ConsoleURL:        "https://console.aws.amazon.com/vpc/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.2.1",
+				"PCI-DSS": "Req 1.4.2",
 			},
 		})
 	} else {
@@ -152,7 +152,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.2.1",
+				"PCI-DSS": "Req 1.4.2",
 			},
 		})
 	}
@@ -169,7 +169,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			Priority:  PriorityHigh,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.3.1",
+				"PCI-DSS": "Req 1.4.2",
 			},
 		})
 	}
@@ -196,7 +196,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			Name:              "[PCI-DSS] No Direct Public Access to CDE",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 1.3.1 VIOLATION: %d security groups allow 0.0.0.0/0 access: %s", len(openToWorld), strings.Join(openToWorld[:min(3, len(openToWorld))], ", ")),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 1.4.2 VIOLATION: %d security groups allow 0.0.0.0/0 access: %s", len(openToWorld), strings.Join(openToWorld[:min(3, len(openToWorld))], ", ")),
 			Remediation:       "Remove all 0.0.0.0/0 rules immediately",
 			RemediationDetail: "aws ec2 revoke-security-group-ingress --group-id sg-xxx --protocol all --cidr 0.0.0.0/0",
 			Priority:          PriorityCritical,
@@ -204,7 +204,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			ConsoleURL:        "https://console.aws.amazon.com/ec2/v2/home#SecurityGroups",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.3.1",
+				"PCI-DSS": "Req 1.4.2",
 			},
 		})
 	} else {
@@ -216,7 +216,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.3.1",
+				"PCI-DSS": "Req 1.4.2",
 			},
 		})
 	}
@@ -242,7 +242,7 @@ func (c *PCIDSSChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 2.2.2",
+				"PCI-DSS": "Req 2.2.4",
 			},
 		})
 	}
@@ -260,7 +260,7 @@ func (c *PCIDSSChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 			Name:              "[PCI-DSS] Disable Default Configurations",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 2.2.2: %d default security groups have rules - PCI requires removing defaults", defaultGroupsWithRules),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 2.2.4: %d default security groups have rules - PCI requires removing defaults", defaultGroupsWithRules),
 			Remediation:       "Remove all rules from default security groups",
 			RemediationDetail: "for each VPC: aws ec2 revoke-security-group-ingress --group-id <default-sg-id> --protocol all --source-group <default-sg-id>",
 			Priority:          PriorityHigh,
@@ -268,7 +268,7 @@ func (c *PCIDSSChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 			ConsoleURL:        "https://console.aws.amazon.com/ec2/v2/home#SecurityGroups",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 2.2.2",
+				"PCI-DSS": "Req 2.2.4",
 			},
 		})
 	} else {
@@ -280,7 +280,7 @@ func (c *PCIDSSChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 2.2.2",
+				"PCI-DSS": "Req 2.2.4",
 			},
 		})
 	}
@@ -288,7 +288,7 @@ func (c *PCIDSSChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 	return results
 }
 
-// Requirement 3.4: Encryption of cardholder data at rest
+// Requirement 3.5.1: Encryption of cardholder data at rest
 func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 	results := []CheckResult{}
 
@@ -304,7 +304,7 @@ func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 			Priority:  PriorityCritical,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 3.4",
+				"PCI-DSS": "Req 3.5.1",
 			},
 		})
 	}
@@ -336,7 +336,7 @@ func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 			Name:              "[PCI-DSS] Encryption at Rest (Mandatory)",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 3.4 VIOLATION: %d/%d S3 buckets NOT encrypted - PCI REQUIRES encryption: %s", len(unencryptedBuckets), totalBuckets, strings.Join(displayBuckets, ", ")),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 3.5.1 VIOLATION: %d/%d S3 buckets NOT encrypted - PCI REQUIRES encryption: %s", len(unencryptedBuckets), totalBuckets, strings.Join(displayBuckets, ", ")),
 			Remediation:       "Enable AES-256 encryption NOW",
 			RemediationDetail: fmt.Sprintf("aws s3api put-bucket-encryption --bucket %s --server-side-encryption-configuration '{\"Rules\":[{\"ApplyServerSideEncryptionByDefault\":{\"SSEAlgorithm\":\"AES256\"}}]}'", unencryptedBuckets[0]),
 			Priority:          PriorityCritical,
@@ -344,7 +344,7 @@ func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 			ConsoleURL:        "https://s3.console.aws.amazon.com/s3/buckets/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 3.4, 3.4.1",
+				"PCI-DSS": "Req 3.5.1, 3.4.1",
 			},
 		})
 	} else if totalBuckets > 0 {
@@ -356,7 +356,7 @@ func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 3.4, 3.4.1",
+				"PCI-DSS": "Req 3.5.1, 3.4.1",
 			},
 		})
 	}
@@ -380,7 +380,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 			Priority:  PriorityCritical,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 4.1",
+				"PCI-DSS": "Req 4.2.1",
 			},
 		})
 	}
@@ -418,7 +418,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 			Name:              "[PCI-DSS] Encryption in Transit",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 4.1 VIOLATION: Unencrypted protocols exposed: %s", strings.Join(unencryptedProtocols[:min(3, len(unencryptedProtocols))], ", ")),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 4.2.1 VIOLATION: Unencrypted protocols exposed: %s", strings.Join(unencryptedProtocols[:min(3, len(unencryptedProtocols))], ", ")),
 			Remediation:       "Use only encrypted protocols (HTTPS, SSH, TLS 1.2+)",
 			RemediationDetail: "Replace HTTP with HTTPS, FTP with SFTP, Telnet with SSH",
 			Priority:          PriorityCritical,
@@ -426,7 +426,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 			ConsoleURL:        "https://console.aws.amazon.com/ec2/v2/home#SecurityGroups",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 4.1, 4.1.1",
+				"PCI-DSS": "Req 4.2.1, 4.1.1",
 			},
 		})
 	} else {
@@ -438,7 +438,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 4.1",
+				"PCI-DSS": "Req 4.2.1",
 			},
 		})
 	}
@@ -473,13 +473,13 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 			Name:              "[PCI-DSS] S3 Secure Transport",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 4.1: %d S3 buckets don't enforce SSL/TLS", len(bucketsWithoutSSL)),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 4.2.1: %d S3 buckets don't enforce SSL/TLS", len(bucketsWithoutSSL)),
 			Remediation:       "Add bucket policy requiring SecureTransport",
 			RemediationDetail: "Add condition: {\"Bool\": {\"aws:SecureTransport\": \"true\"}}",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 4.1",
+				"PCI-DSS": "Req 4.2.1",
 			},
 		})
 	}
@@ -503,7 +503,7 @@ func (c *PCIDSSChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 			Priority:  PriorityHigh,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 6.2",
+				"PCI-DSS": "Req 6.3.3",
 			},
 		})
 	}
@@ -536,7 +536,7 @@ func (c *PCIDSSChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 			Name:              "[PCI-DSS] Security Patching",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 6.2: %d/%d instances not managed by SSM - can't verify 30-day patching", len(instancesWithoutSSM), totalInstances),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 6.3.3: %d/%d instances not managed by SSM - can't verify 30-day patching", len(instancesWithoutSSM), totalInstances),
 			Remediation:       "Enable SSM for patch management",
 			RemediationDetail: "Install SSM agent and enable Patch Manager",
 			Priority:          PriorityHigh,
@@ -544,7 +544,7 @@ func (c *PCIDSSChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 			ConsoleURL:        "https://console.aws.amazon.com/systems-manager/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 6.2",
+				"PCI-DSS": "Req 6.3.3",
 			},
 		})
 	}
@@ -579,13 +579,13 @@ func (c *PCIDSSChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 			Control:           "PCI-6.4.2",
 			Name:              "[PCI-DSS] Web Application Protection",
 			Status:            "INFO",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 6.4.7: %d web-facing security groups found - ensure WAF is deployed", webFacingSGs),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 6.4.2: %d web-facing security groups found - ensure WAF is deployed", webFacingSGs),
 			Remediation:       "Deploy AWS WAF for web applications",
 			RemediationDetail: "PCI requires WAF or regular code reviews for public-facing web apps",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 6.4.7",
+				"PCI-DSS": "Req 6.4.2",
 			},
 		})
 	}
@@ -609,7 +609,7 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 			Priority:  PriorityHigh,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 7.1",
+				"PCI-DSS": "Req 7.2.1",
 			},
 		})
 	}
@@ -637,7 +637,7 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 			Name:              "[PCI-DSS] Least Privilege Access",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 7.1: %d users have admin/power user access - violates least privilege", len(usersWithAdmin)),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 7.2.1: %d users have admin/power user access - violates least privilege", len(usersWithAdmin)),
 			Remediation:       "Restrict to specific required permissions only",
 			RemediationDetail: "Review each user and apply minimal required permissions",
 			Priority:          PriorityHigh,
@@ -645,7 +645,7 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/users",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 7.1, 7.1.2",
+				"PCI-DSS": "Req 7.2.1, 7.1.2",
 			},
 		})
 	}
@@ -661,7 +661,7 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 		Priority:          PriorityMedium,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 7.1.2",
+			"PCI-DSS": "Req 7.2.2",
 		},
 	})
 
@@ -681,7 +681,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Name:              "[PCI-DSS] 90-Day Password Rotation",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          "PCI-DSS Req 8.2.4 VIOLATION: No password policy configured - PCI requires 90-day rotation",
+			Evidence:          "PCI-DSS Req 8.3.9 VIOLATION: No password policy configured - PCI requires 90-day rotation",
 			Remediation:       "Set password expiry to 90 days MAX",
 			RemediationDetail: "aws iam update-account-password-policy --max-password-age 90",
 			Priority:          PriorityCritical,
@@ -689,7 +689,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.2.4",
+				"PCI-DSS": "Req 8.3.9",
 			},
 		})
 	} else {
@@ -705,7 +705,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				Name:              "[PCI-DSS] 90-Day Password Rotation",
 				Status:            "FAIL",
 				Severity:          "CRITICAL",
-				Evidence:          fmt.Sprintf("PCI-DSS Req 8.2.4 VIOLATION: Passwords set to %s - PCI REQUIRES 90 days MAX", currentSetting),
+				Evidence:          fmt.Sprintf("PCI-DSS Req 8.3.9 VIOLATION: Passwords set to %s - PCI REQUIRES 90 days MAX", currentSetting),
 				Remediation:       "Change to 90 days immediately",
 				RemediationDetail: "aws iam update-account-password-policy --max-password-age 90",
 				Priority:          PriorityCritical,
@@ -713,7 +713,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 				Timestamp:         time.Now(),
 				Frameworks: map[string]string{
-					"PCI-DSS": "Req 8.2.4",
+					"PCI-DSS": "Req 8.3.9",
 				},
 			})
 		} else {
@@ -725,7 +725,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				Priority:  PriorityInfo,
 				Timestamp: time.Now(),
 				Frameworks: map[string]string{
-					"PCI-DSS": "Req 8.2.4",
+					"PCI-DSS": "Req 8.3.9",
 				},
 			})
 		}
@@ -738,13 +738,13 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				Name:              "[PCI-DSS] Minimum Password Length",
 				Status:            "FAIL",
 				Severity:          "HIGH",
-				Evidence:          fmt.Sprintf("PCI-DSS Req 8.2.3: Password length only %d chars - PCI requires minimum 7", minLength),
+				Evidence:          fmt.Sprintf("PCI-DSS Req 8.3.6: Password length only %d chars - PCI requires minimum 7", minLength),
 				Remediation:       "Set to 7+ characters",
 				RemediationDetail: "aws iam update-account-password-policy --minimum-password-length 7",
 				Priority:          PriorityHigh,
 				Timestamp:         time.Now(),
 				Frameworks: map[string]string{
-					"PCI-DSS": "Req 8.2.3",
+					"PCI-DSS": "Req 8.3.6",
 				},
 			})
 		} else {
@@ -756,7 +756,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				Priority:  PriorityInfo,
 				Timestamp: time.Now(),
 				Frameworks: map[string]string{
-					"PCI-DSS": "Req 8.2.3",
+					"PCI-DSS": "Req 8.3.6",
 				},
 			})
 		}
@@ -769,13 +769,13 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				Name:              "[PCI-DSS] Password History",
 				Status:            "FAIL",
 				Severity:          "HIGH",
-				Evidence:          fmt.Sprintf("PCI-DSS Req 8.2.5: Password history only %d - PCI requires minimum 4", reusePrevent),
+				Evidence:          fmt.Sprintf("PCI-DSS Req 8.3.7: Password history only %d - PCI requires minimum 4", reusePrevent),
 				Remediation:       "Set password history to 4+",
 				RemediationDetail: "aws iam update-account-password-policy --password-reuse-prevention 4",
 				Priority:          PriorityHigh,
 				Timestamp:         time.Now(),
 				Frameworks: map[string]string{
-					"PCI-DSS": "Req 8.2.5",
+					"PCI-DSS": "Req 8.3.7",
 				},
 			})
 		}
@@ -786,13 +786,13 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Control:           "PCI-8.3.4",
 			Name:              "[PCI-DSS] Account Lockout",
 			Status:            "INFO",
-			Evidence:          "PCI-DSS Req 8.1.6: AWS doesn't support native account lockout - implement via Lambda/CloudWatch",
+			Evidence:          "PCI-DSS Req 8.3.4: AWS doesn't support native account lockout - implement via Lambda/CloudWatch",
 			Remediation:       "Implement account lockout after 6 failed attempts",
 			RemediationDetail: "Use CloudWatch Events + Lambda to track failed logins and disable accounts",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.1.6",
+				"PCI-DSS": "Req 8.3.4",
 			},
 		})
 	}
@@ -809,7 +809,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Priority:  PriorityCritical,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.3.1",
+				"PCI-DSS": "Req 8.4.2",
 			},
 		})
 	}
@@ -846,7 +846,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Name:              "[PCI-DSS] MFA for ALL Console Access",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 8.3.1 VIOLATION: %d users with console access lack MFA - PCI requires MFA for ALL: %s", len(noMFAUsers), strings.Join(displayUsers, ", ")),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 8.4.2 VIOLATION: %d users with console access lack MFA - PCI requires MFA for ALL: %s", len(noMFAUsers), strings.Join(displayUsers, ", ")),
 			Remediation:       "Enable MFA for ALL users with console access",
 			RemediationDetail: "Every user with console access MUST have MFA - no exceptions for PCI",
 			Priority:          PriorityCritical,
@@ -854,7 +854,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/users",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.3.1",
+				"PCI-DSS": "Req 8.4.2",
 			},
 		})
 	} else if totalUsers > 0 {
@@ -866,7 +866,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.3.1",
+				"PCI-DSS": "Req 8.4.2",
 			},
 		})
 	}
@@ -901,7 +901,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Name:              "[PCI-DSS] 90-Day Access Key Rotation",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 8.2.4 VIOLATION: %d access keys older than 90 days: %s", len(oldKeys), strings.Join(displayKeys, ", ")),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 8.3.9 VIOLATION: %d access keys older than 90 days: %s", len(oldKeys), strings.Join(displayKeys, ", ")),
 			Remediation:       "Rotate keys every 90 days",
 			RemediationDetail: "aws iam create-access-key --user-name <user> && aws iam delete-access-key --access-key-id <old-key>",
 			Priority:          PriorityCritical,
@@ -909,7 +909,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/users",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.2.4",
+				"PCI-DSS": "Req 8.3.9",
 			},
 		})
 	} else {
@@ -921,7 +921,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.2.4",
+				"PCI-DSS": "Req 8.3.9",
 			},
 		})
 	}
@@ -931,14 +931,14 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 		Control:           "PCI-8.2.8",
 		Name:              "[PCI-DSS] 15-Minute Idle Timeout",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS Req 8.1.8: Verify console timeout is set to 15 minutes or less",
+		Evidence:          "PCI-DSS Req 8.2.8: Verify console timeout is set to 15 minutes or less",
 		Remediation:       "Set IAM console session timeout to 15 minutes",
 		RemediationDetail: "IAM → Account settings → Console session timeout → 15 minutes",
 		Priority:          PriorityMedium,
 		ScreenshotGuide:   "IAM → Account settings → Show 15-minute session timeout configured",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 8.1.8",
+			"PCI-DSS": "Req 8.2.8",
 		},
 	})
 
@@ -961,7 +961,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			Priority:  PriorityCritical,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.1",
+				"PCI-DSS": "Req 10.2.1",
 			},
 		})
 	}
@@ -972,7 +972,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			Name:              "[PCI-DSS] Audit Trail Implementation",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          "PCI-DSS Req 10.1 VIOLATION: No CloudTrail configured - PCI REQUIRES comprehensive audit trails",
+			Evidence:          "PCI-DSS Req 10.2.1 VIOLATION: No CloudTrail configured - PCI REQUIRES comprehensive audit trails",
 			Remediation:       "Enable CloudTrail immediately",
 			RemediationDetail: "aws cloudtrail create-trail --name pci-audit-trail --s3-bucket-name <bucket> --is-multi-region-trail",
 			Priority:          PriorityCritical,
@@ -980,7 +980,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.1, 10.2.1",
+				"PCI-DSS": "Req 10.2.1, 10.2.1",
 			},
 		})
 	} else {
@@ -1000,7 +1000,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.1, 10.2.1",
+				"PCI-DSS": "Req 10.2.1, 10.2.1",
 			},
 		})
 
@@ -1017,7 +1017,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			ConsoleURL:        "https://s3.console.aws.amazon.com/s3/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.5.3",
+				"PCI-DSS": "Req 10.5.1",
 			},
 		})
 
@@ -1032,7 +1032,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.5.2, 10.5.5",
+				"PCI-DSS": "Req 10.3.2, 10.5.5",
 			},
 		})
 
@@ -1041,13 +1041,13 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			Control:           "PCI-10.6.1",
 			Name:              "[PCI-DSS] Time Synchronization",
 			Status:            "INFO",
-			Evidence:          "PCI-DSS Req 10.4: Verify all systems use NTP for time sync",
+			Evidence:          "PCI-DSS Req 10.6.1: Verify all systems use NTP for time sync",
 			Remediation:       "Ensure all EC2 instances use NTP",
 			RemediationDetail: "Configure chrony or ntpd on all instances",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.4",
+				"PCI-DSS": "Req 10.6.1",
 			},
 		})
 	}
@@ -1071,7 +1071,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 			Priority:  PriorityHigh,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 11.5.1",
+				"PCI-DSS": "Req 11.5.2",
 			},
 		})
 	}
@@ -1082,7 +1082,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 			Name:              "[PCI-DSS] Change Detection Mechanisms",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          "PCI-DSS Req 11.5.1: AWS Config not enabled - required for change detection",
+			Evidence:          "PCI-DSS Req 11.5.2: AWS Config not enabled - required for change detection",
 			Remediation:       "Enable AWS Config",
 			RemediationDetail: "aws configservice put-configuration-recorder --configuration-recorder name=default,roleArn=<role-arn>",
 			Priority:          PriorityHigh,
@@ -1090,7 +1090,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 			ConsoleURL:        "https://console.aws.amazon.com/config/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 11.5.1",
+				"PCI-DSS": "Req 11.5.2",
 			},
 		})
 	} else {
@@ -1102,7 +1102,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 11.5.1",
+				"PCI-DSS": "Req 11.5.2",
 			},
 		})
 	}
@@ -1112,14 +1112,14 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 		Control:           "PCI-11.3.2",
 		Name:              "[PCI-DSS] Quarterly Vulnerability Scans",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS Req 11.2.2: PCI requires QUARTERLY vulnerability scans by Approved Scanning Vendor (ASV)",
+		Evidence:          "PCI-DSS Req 11.3.2: PCI requires QUARTERLY vulnerability scans by Approved Scanning Vendor (ASV)",
 		Remediation:       "Schedule quarterly ASV scans",
 		RemediationDetail: "1. Engage PCI-approved ASV\n2. Schedule quarterly external scans\n3. Internal scans can use AWS Inspector",
 		Priority:          PriorityMedium,
 		ScreenshotGuide:   "Document ASV scan reports dated within last 90 days",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.2.2",
+			"PCI-DSS": "Req 11.3.2",
 		},
 	})
 
@@ -1128,13 +1128,13 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 		Control:           "PCI-11.4.3",
 		Name:              "[PCI-DSS] Annual Penetration Testing",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS Req 11.3.1: PCI requires ANNUAL penetration testing of CDE",
+		Evidence:          "PCI-DSS Req 11.4.3: PCI requires ANNUAL penetration testing of CDE",
 		Remediation:       "Schedule annual pentest",
 		RemediationDetail: "Annual external and internal penetration testing required",
 		Priority:          PriorityMedium,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.3.1",
+			"PCI-DSS": "Req 11.4.3",
 		},
 	})
 
@@ -1143,13 +1143,13 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 		Control:           "PCI-11.5.2",
 		Name:              "[PCI-DSS] File Integrity Monitoring",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS Req 11.5: Deploy file integrity monitoring on critical systems",
+		Evidence:          "PCI-DSS Req 11.5.2: Deploy file integrity monitoring on critical systems",
 		Remediation:       "Implement FIM solution",
 		RemediationDetail: "Use AWS Systems Manager or third-party FIM tools",
 		Priority:          PriorityMedium,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.5",
+			"PCI-DSS": "Req 11.5.2",
 		},
 	})
 
@@ -1165,7 +1165,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		Control:           "PCI-5.2.1",
 		Name:              "[PCI-DSS] Anti-Malware Protection",
 		Status:            "INFO",
-		Evidence:          "MANUAL: PCI-DSS Req 5.1 requires anti-malware on all systems commonly affected by malware (workstations, servers)",
+		Evidence:          "MANUAL: PCI-DSS Req 5.2.1 requires anti-malware on all systems commonly affected by malware (workstations, servers)",
 		Remediation:       "Deploy and maintain anti-malware solution",
 		RemediationDetail: "1. Deploy endpoint protection (Amazon GuardDuty for runtime, third-party for OS-level)\n2. Ensure anti-malware is active and up-to-date\n3. Configure automatic updates and periodic scans\n4. Document anti-malware solution and update schedule",
 		Priority:          PriorityHigh,
@@ -1173,7 +1173,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ConsoleURL:        "https://console.aws.amazon.com/guardduty/",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.1, 5.2.1",
+			"PCI-DSS": "Req 5.2.1, 5.2.1",
 		},
 	})
 
@@ -1188,7 +1188,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Anti-malware console → Show automatic updates enabled and recent scan logs",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.2.3, 5.3.1",
+			"PCI-DSS": "Req 5.3.1, 5.3.1",
 		},
 	})
 
@@ -1203,7 +1203,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Show anti-malware logs with retention policy and review documentation",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.2, 5.3.4",
+			"PCI-DSS": "Req 5.3.4, 5.3.4",
 		},
 	})
 
@@ -1227,7 +1227,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ConsoleURL:        "https://console.aws.amazon.com/artifact/home",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.1, 9.1.1",
+			"PCI-DSS": "Req 9.1.1, 9.1.1",
 		},
 	})
 
@@ -1242,7 +1242,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ScreenshotGuide:   "Document physical access control procedures, visitor logs, and badge system",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.2, 9.3",
+			"PCI-DSS": "Req 9.2.1, 9.3",
 		},
 	})
 
@@ -1252,12 +1252,12 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		Status:            "INFO",
 		Evidence:          "MANUAL: Physically secure all media containing cardholder data (backups, portable devices)",
 		Remediation:       "Implement physical controls for backup media and portable devices",
-		RemediationDetail: "1. Store backup media in secure, locked location\n2. Maintain inventory of all media with cardholder data\n3. Review media inventory at least annually\n4. Securely destroy media when no longer needed (Req 9.8)",
+		RemediationDetail: "1. Store backup media in secure, locked location\n2. Maintain inventory of all media with cardholder data\n3. Review media inventory at least annually\n4. Securely destroy media when no longer needed (Req 9.4.6)",
 		Priority:          PriorityMedium,
 		ScreenshotGuide:   "Show backup media inventory, secure storage documentation, and destruction procedures",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.4, 9.5, 9.8",
+			"PCI-DSS": "Req 9.4.1, 9.5, 9.8",
 		},
 	})
 
@@ -1272,7 +1272,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ScreenshotGuide:   "Document POI device inventory, inspection schedules, and training records",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.9, 9.9.1",
+			"PCI-DSS": "Req 9.5.1, 9.9.1",
 		},
 	})
 
@@ -1288,14 +1288,14 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		Control:           "PCI-12.1.1",
 		Name:              "[PCI-DSS] Security Policy Establishment",
 		Status:            "INFO",
-		Evidence:          "MANUAL: PCI-DSS Req 12.1 requires establishing, publishing, maintaining, and disseminating a security policy",
+		Evidence:          "MANUAL: PCI-DSS Req 12.1.1 requires establishing, publishing, maintaining, and disseminating a security policy",
 		Remediation:       "Create and maintain comprehensive information security policy",
 		RemediationDetail: "1. Establish security policy addressing PCI-DSS requirements\n2. Review policy at least annually\n3. Update when environment changes\n4. Communicate to all relevant personnel\n5. Document policy review and approval",
 		Priority:          PriorityHigh,
 		ScreenshotGuide:   "Document current security policy, annual review dates, and communication records",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.1, 12.1.1",
+			"PCI-DSS": "Req 12.1.1, 12.1.1",
 		},
 	})
 
@@ -1310,7 +1310,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document risk assessments with dates, findings, and mitigation plans",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.2",
+			"PCI-DSS": "Req 12.3.1",
 		},
 	})
 
@@ -1325,7 +1325,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document acceptable use policies, approval records, and technology inventory",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.3",
+			"PCI-DSS": "Req 12.2.1",
 		},
 	})
 
@@ -1340,7 +1340,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document organizational chart showing security responsibilities and role assignments",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.5, 12.5.1",
+			"PCI-DSS": "Req 12.1.4, 12.5.1",
 		},
 	})
 
@@ -1355,7 +1355,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document training program, completion records, and acknowledgment forms",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.6, 12.6.1, 12.6.2",
+			"PCI-DSS": "Req 12.6.1, 12.6.1, 12.6.2",
 		},
 	})
 
@@ -1370,7 +1370,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document service provider list, contracts, and annual compliance verification",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.8, 12.8.1, 12.8.2",
+			"PCI-DSS": "Req 12.8.1, 12.8.1, 12.8.2",
 		},
 	})
 
@@ -1385,7 +1385,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document incident response plan, test results, and update history",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.10, 12.10.1",
+			"PCI-DSS": "Req 12.10.1, 12.10.1",
 		},
 	})
 

@@ -377,7 +377,7 @@ func (c *AzurePCIChecks) CheckReq8_Authentication(ctx context.Context) []CheckRe
 		Control:           "PCI-8.4.2",
 		Name:              "[PCI-DSS] MFA for ALL Access",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS 8.4.2: MANUAL CHECK - Verify MFA enabled for ALL users with console access",
+		Evidence:          "PCI-DSS 8.4.2: MANUAL CHECK - Verify MFA enabled for ALL users accessing the CDE (cloud portal, CLI and API all count as non-console access under 8.4.2)",
 		Remediation:       "Enable MFA for every user - no exceptions",
 		RemediationDetail: "Azure AD → Users → Per-user MFA → Enable for ALL",
 		ScreenshotGuide:   "Azure AD → Users → Show MFA status = Enabled/Enforced for ALL users",
@@ -475,7 +475,7 @@ func (c *AzurePCIChecks) CheckReq2_DefaultPasswords(ctx context.Context) []Check
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Compute/VirtualMachinesMenuBlade/overview",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 2.1, 2.2",
+			"PCI-DSS": "Req 2.2.2, 2.2",
 		},
 	})
 
@@ -491,7 +491,7 @@ func (c *AzurePCIChecks) CheckReq2_DefaultPasswords(ctx context.Context) []Check
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FnetworkSecurityGroups",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 2.2.2",
+			"PCI-DSS": "Req 2.2.4",
 		},
 	})
 
@@ -506,7 +506,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 		Control:           "PCI-5.2.1",
 		Name:              "[PCI-DSS] Anti-Malware Protection",
 		Status:            "INFO",
-		Evidence:          "MANUAL: PCI-DSS Req 5.1 requires anti-malware on all systems commonly affected by malware",
+		Evidence:          "MANUAL: PCI-DSS Req 5.2.1 requires anti-malware on all systems commonly affected by malware",
 		Remediation:       "Deploy and maintain anti-malware solution",
 		RemediationDetail: "1. Deploy Microsoft Defender for Cloud or third-party endpoint protection\n2. Ensure anti-malware is active and up-to-date on all VMs\n3. Configure automatic updates and periodic scans\n4. Document anti-malware solution and update schedule",
 		Priority:          PriorityHigh,
@@ -514,7 +514,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Security/SecurityMenuBlade/0",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.1, 5.2.1",
+			"PCI-DSS": "Req 5.2.1, 5.2.1",
 		},
 	})
 
@@ -529,7 +529,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 		ScreenshotGuide:   "Defender for Cloud → Show automatic updates enabled and recent scan logs",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.2.3, 5.3.1",
+			"PCI-DSS": "Req 5.3.1, 5.3.1",
 		},
 	})
 
@@ -544,7 +544,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 		ScreenshotGuide:   "Show anti-malware logs with retention policy and review documentation",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.2, 5.3.4",
+			"PCI-DSS": "Req 5.3.4, 5.3.4",
 		},
 	})
 
@@ -559,7 +559,7 @@ func (c *AzurePCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckRes
 		Control:           "PCI-6.3.3",
 		Name:              "[PCI-DSS] Security Patching",
 		Status:            "INFO",
-		Evidence:          "MANUAL: PCI-DSS Req 6.2 requires critical security patches within 30 days",
+		Evidence:          "MANUAL: PCI-DSS Req 6.3.3 requires critical security patches within 30 days",
 		Remediation:       "Implement patch management process",
 		RemediationDetail: "1. Use Azure Update Management for automated patching\n2. Implement automated patching where possible\n3. Document patch management procedures\n4. Track critical patches and ensure 30-day compliance",
 		Priority:          PriorityHigh,
@@ -567,7 +567,7 @@ func (c *AzurePCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckRes
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Automation/AutomationMenuBlade/updateManagement",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 6.2",
+			"PCI-DSS": "Req 6.3.3",
 		},
 	})
 
@@ -583,7 +583,7 @@ func (c *AzurePCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckRes
 		ConsoleURL:        "https://dev.azure.com/",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 6.3.2, 6.5",
+			"PCI-DSS": "Req 6.2.1, 6.5",
 		},
 	})
 
@@ -599,7 +599,7 @@ func (c *AzurePCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckRes
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FapplicationGateways",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 6.4.3",
+			"PCI-DSS": "Req 6.4.2",
 		},
 	})
 
@@ -622,7 +622,7 @@ func (c *AzurePCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckRe
 		ConsoleURL:        "https://servicetrust.microsoft.com/",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.1, 9.1.1",
+			"PCI-DSS": "Req 9.1.1, 9.1.1",
 		},
 	})
 
@@ -637,7 +637,7 @@ func (c *AzurePCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckRe
 		ScreenshotGuide:   "Document physical access control procedures, visitor logs, and badge system",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.2, 9.3",
+			"PCI-DSS": "Req 9.2.1, 9.3",
 		},
 	})
 
@@ -647,12 +647,12 @@ func (c *AzurePCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckRe
 		Status:            "INFO",
 		Evidence:          "MANUAL: Physically secure all media containing cardholder data (backups, portable devices)",
 		Remediation:       "Implement physical controls for backup media and portable devices",
-		RemediationDetail: "1. Store backup media in secure, locked location\n2. Maintain inventory of all media with cardholder data\n3. Review media inventory at least annually\n4. Securely destroy media when no longer needed (Req 9.8)",
+		RemediationDetail: "1. Store backup media in secure, locked location\n2. Maintain inventory of all media with cardholder data\n3. Review media inventory at least annually\n4. Securely destroy media when no longer needed (Req 9.4.6)",
 		Priority:          PriorityMedium,
 		ScreenshotGuide:   "Show backup media inventory, secure storage documentation, and destruction procedures",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.4, 9.5, 9.8",
+			"PCI-DSS": "Req 9.4.1, 9.5, 9.8",
 		},
 	})
 
@@ -667,7 +667,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 		Control:           "PCI-11.3.2",
 		Name:              "[PCI-DSS] Quarterly Vulnerability Scans",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS Req 11.2.2: PCI requires QUARTERLY vulnerability scans by Approved Scanning Vendor (ASV)",
+		Evidence:          "PCI-DSS Req 11.3.2: PCI requires QUARTERLY vulnerability scans by Approved Scanning Vendor (ASV)",
 		Remediation:       "Schedule quarterly ASV scans",
 		RemediationDetail: "1. Engage PCI-approved ASV\n2. Schedule quarterly external scans\n3. Internal scans can use Defender for Cloud vulnerability assessment",
 		Priority:          PriorityMedium,
@@ -675,7 +675,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Security/SecurityMenuBlade/22",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.2.2",
+			"PCI-DSS": "Req 11.3.2",
 		},
 	})
 
@@ -683,14 +683,14 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 		Control:           "PCI-11.4.3",
 		Name:              "[PCI-DSS] Annual Penetration Testing",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS Req 11.3.1: PCI requires ANNUAL penetration testing of CDE",
+		Evidence:          "PCI-DSS Req 11.4.3: PCI requires ANNUAL penetration testing of CDE",
 		Remediation:       "Schedule annual penetration test",
 		RemediationDetail: "Annual external and internal penetration testing required",
 		Priority:          PriorityMedium,
 		ScreenshotGuide:   "Document penetration test reports with dates and findings",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.3.1",
+			"PCI-DSS": "Req 11.4.3",
 		},
 	})
 
@@ -698,7 +698,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 		Control:           "PCI-11.5.2",
 		Name:              "[PCI-DSS] File Integrity Monitoring",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS Req 11.5: Deploy file integrity monitoring on critical systems",
+		Evidence:          "PCI-DSS Req 11.5.2: Deploy file integrity monitoring on critical systems",
 		Remediation:       "Implement FIM solution",
 		RemediationDetail: "Use Azure File Integrity Monitoring in Defender for Cloud or third-party FIM tools",
 		Priority:          PriorityMedium,
@@ -706,7 +706,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Security/SecurityMenuBlade/18",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.5",
+			"PCI-DSS": "Req 11.5.2",
 		},
 	})
 
@@ -722,7 +722,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Policy/PolicyMenuBlade/Compliance",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.5.1",
+			"PCI-DSS": "Req 11.5.2",
 		},
 	})
 
@@ -737,14 +737,14 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		Control:           "PCI-12.1.1",
 		Name:              "[PCI-DSS] Security Policy Establishment",
 		Status:            "INFO",
-		Evidence:          "MANUAL: PCI-DSS Req 12.1 requires establishing, publishing, maintaining, and disseminating a security policy",
+		Evidence:          "MANUAL: PCI-DSS Req 12.1.1 requires establishing, publishing, maintaining, and disseminating a security policy",
 		Remediation:       "Create and maintain comprehensive information security policy",
 		RemediationDetail: "1. Establish security policy addressing PCI-DSS requirements\n2. Review policy at least annually\n3. Update when environment changes\n4. Communicate to all relevant personnel\n5. Document policy review and approval",
 		Priority:          PriorityHigh,
 		ScreenshotGuide:   "Document current security policy, annual review dates, and communication records",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.1, 12.1.1",
+			"PCI-DSS": "Req 12.1.1, 12.1.1",
 		},
 	})
 
@@ -759,7 +759,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document risk assessments with dates, findings, and mitigation plans",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.2",
+			"PCI-DSS": "Req 12.3.1",
 		},
 	})
 
@@ -774,7 +774,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document acceptable use policies, approval records, and technology inventory",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.3",
+			"PCI-DSS": "Req 12.2.1",
 		},
 	})
 
@@ -789,7 +789,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document organizational chart showing security responsibilities and role assignments",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.5, 12.5.1",
+			"PCI-DSS": "Req 12.1.4, 12.5.1",
 		},
 	})
 
@@ -804,7 +804,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document training program, completion records, and acknowledgment forms",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.6, 12.6.1, 12.6.2",
+			"PCI-DSS": "Req 12.6.1, 12.6.1, 12.6.2",
 		},
 	})
 
@@ -819,7 +819,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document service provider list, contracts, and annual compliance verification",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.8, 12.8.1, 12.8.2",
+			"PCI-DSS": "Req 12.8.1, 12.8.1, 12.8.2",
 		},
 	})
 
@@ -834,7 +834,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document incident response plan, test results, and update history",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.10, 12.10.1",
+			"PCI-DSS": "Req 12.10.1, 12.10.1",
 		},
 	})
 

@@ -808,15 +808,15 @@ func getFrameworkChecklist(framework string, totalControls int) []string {
 			"[ ] Cardholder Data Environment (CDE) Network Diagram",
 			"[ ] Firewall Configuration Screenshots (Requirement 1)",
 			"[ ] User Access Control Matrix (Requirement 7)",
-			"[ ] MFA Configuration for All Admin Access (Requirement 8.3)",
-			"[ ] Password Policy Settings (Requirement 8.2)",
+			"[ ] MFA Configuration for All Admin Access (Requirement 8.4.1)",
+			"[ ] Password Policy Settings (Requirement 8.2.2)",
 			"[ ] Access Key Rotation Report (< 90 days)",
-			"[ ] Encryption Settings for Data at Rest (Requirement 3.4)",
+			"[ ] Encryption Settings for Data at Rest (Requirement 3.5.1)",
 			"[ ] Audit Log Configuration (Requirement 10)",
 			"[ ] Log Retention Settings (90+ days minimum)",
 			"[ ] Vulnerability Scan Results (Requirement 11)",
-			"[ ] Security Patch Documentation (Requirement 6.2)",
-			"[ ] Incident Response Plan (Requirement 12.10)",
+			"[ ] Security Patch Documentation (Requirement 6.3.3)",
+			"[ ] Incident Response Plan (Requirement 12.10.1)",
 		}
 	case "hipaa":
 		return []string{
