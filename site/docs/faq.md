@@ -39,7 +39,7 @@ AuditKit can integrate with Prowler for complete NIST 800-53 coverage.
 | SOC2, PCI-DSS, NIST 800-53 | All frameworks | All frameworks |
 | CMMC Level 1 | 17 practices | 17 practices |
 | CMMC Level 2 | - | 110 practices (CUI) |
-| GCP Core | 170+ checks | 170+ checks |
+| GCP Core | 135 controls | 135 controls |
 | GCP Advanced | - | GKE + Vertex AI (32 checks) |
 | Multi-Account | One at a time | AWS Orgs, Azure Mgmt, GCP Folders |
 | Support | Community | Priority + 14-day trial |
@@ -78,7 +78,7 @@ Compare to traditional costs:
 
 ### Which GCP services are scanned?
 
-**Free version (170+ checks):**
+**Free version (229 AWS, 178 Azure, 135 GCP controls):**
 - Cloud Storage (GCS)
 - Cloud IAM
 - Compute Engine
@@ -98,7 +98,7 @@ Compare to traditional costs:
 | Framework | Status | Coverage |
 |-----------|--------|----------|
 | SOC2 Type II | Production | 38 criteria |
-| PCI-DSS v4.0.1 | Production | 30+ controls |
+| PCI-DSS v4.0.1 | Production | 48 requirements |
 | CMMC Level 1 | Production | 17 practices |
 | CMMC Level 2 | Pro only | 110 practices |
 | NIST 800-53 Rev 5 | Production | ~150 technical controls |
@@ -128,13 +128,13 @@ auditkit scan -provider gcp
 
 ```bash
 # Scan AWS Organization
-auditkit scan -provider aws --scan-all
+auditkit-pro scan -provider aws --scan-all
 
 # Scan Azure Management Group
-auditkit scan -provider azure --scan-all
+auditkit-pro scan -provider azure --scan-all
 
 # Scan GCP Folders/Organization
-auditkit scan -provider gcp --scan-all
+auditkit-pro scan -provider gcp --scan-all
 ```
 
 **[Upgrade to Pro →](https://auditkit.io/pro/)**
@@ -293,7 +293,7 @@ Cloud providers have API rate limits. If you hit them:
 **AWS:**
 ```bash
 # Reduce concurrent requests (Pro only)
-auditkit scan --scan-all --max-concurrent 2
+auditkit-pro scan --scan-all --max-concurrent 2
 ```
 
 **All providers:**

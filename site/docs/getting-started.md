@@ -107,7 +107,10 @@ CRITICAL - Fix These NOW:
 ```
 
 **What this means:**
-- **Compliance Score:** Percentage of passing controls
+- **Compliance Score:** Of the controls that could be automatically checked,
+  the percentage that passed. Controls needing manual evidence, and controls the
+  scanner could not evaluate, are excluded rather than counted as failures. A
+  resource type you do not use is also excluded, not counted as a pass.
 - **Critical Issues:** Security gaps requiring immediate attention
 - **Each failed control shows:** What's wrong and how to fix it
 

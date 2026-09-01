@@ -174,28 +174,77 @@ Score Change: +5.6%
 
 ### evidence
 
-Generate evidence collection tracker for manual controls.
+Track the evidence an assessor will ask for. Auditors want evidence for every
+control, including the ones that pass, so this covers the whole scan rather than
+just failures.
 
 ```bash
 auditkit evidence [flags]
 ```
 
-**Examples:**
+Runs a scan, writes an HTML checklist, and records the controls in a durable
+tracker at `~/.auditkit/evidence_<account>.json`. The checklist keeps ticks in
+your browser; the tracker is the copy you can share, review, or hand over.
+
+**Flags:**
+- `-provider` - Cloud provider: `aws`, `azure`, `gcp` (default: `aws`)
+- `-profile` - AWS profile, Azure subscription, or GCP project
+- `-output` - Where to write the HTML checklist (default: `evidence-tracker.html`)
+
+---
+
+### evidence status
+
+Show what evidence has been collected, what is outstanding, and what has gone
+stale. Runs against the stored tracker, so it needs no cloud credentials.
+
 ```bash
-# Generate evidence tracker
-auditkit evidence
-
-# Save to HTML
-auditkit evidence -format html -output evidence-tracker.html
-
-# Save to Excel
-auditkit evidence -format excel -output evidence-tracker.xlsx
+auditkit evidence status [flags]
 ```
 
 **Flags:**
-- `-format` - Output format: `text`, `html`, `excel` (default: `html`)
-- `-output` - Output file path
-- `-framework` - Framework: `soc2`, `pci`, `cmmc` (uses last scan if omitted)
+- `-account` - Account ID, if you track more than one
+- `-stale-after` - Days before collected evidence is considered stale (default: 90)
+- `-all` - List every outstanding control rather than the first 20
+
+Evidence older than the staleness window is reported as outstanding rather than
+collected. Assessors sample evidence from within the period under review, so a
+screenshot from last year is not evidence.
+
+---
+
+### evidence collect
+
+Record that evidence has been captured for a control.
+
+```bash
+auditkit evidence collect CONTROL-ID [flags]
+```
+
+**Examples:**
+```bash
+auditkit evidence collect CC6.1 -notes "IAM policy export and console screenshot" -by rob
+auditkit evidence collect CC7.2 -artifact ./evidence/cloudwatch-alarms.png
+```
+
+**Flags:**
+- `-notes` - What was captured and where it came from
+- `-artifact` - Path to the screenshot or export
+- `-by` - Who collected it
+- `-account` - Account ID, if you track more than one
+
+---
+
+### evidence import
+
+Load the JSON exported from the HTML checklist, so ticks made in the browser
+become part of the durable record.
+
+```bash
+auditkit evidence import PROGRESS.json [-by name]
+```
+
+Controls in the file that the scanner has not seen are reported and skipped.
 
 ---
 
@@ -443,16 +492,16 @@ These features require [AuditKit](https://auditkit.io/):
 
 ```bash
 # Scan entire AWS Organization
-auditkit scan -provider aws -framework soc2 --scan-all
+auditkit-pro scan -provider aws -framework soc2 --scan-all
 
 # Scan Azure Management Group
-auditkit scan -provider azure -framework soc2 --scan-all
+auditkit-pro scan -provider azure -framework soc2 --scan-all
 
 # Scan GCP Organization
-auditkit scan -provider gcp -framework soc2 --scan-all
+auditkit-pro scan -provider gcp -framework soc2 --scan-all
 
 # Control concurrency
-auditkit scan -provider aws --scan-all --max-concurrent 5
+auditkit-pro scan -provider aws --scan-all --max-concurrent 5
 ```
 
 ### CMMC Level 2

@@ -29,10 +29,10 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 **What's included:**
 - AWS, Azure, GCP, M365 scanning
 - SOC2 Type II (38 criteria: all 33 Common Criteria, plus Availability and Confidentiality)
-- PCI-DSS v4.0.1 (30+ controls)
+- PCI-DSS v4.0.1 (48 requirements)
 - CMMC Level 1 (17 practices)
 - NIST 800-53 Rev 5 (~150 technical controls)
-- GCP Core Services (170+ checks)
+- GCP Core Services (135 controls)
 - PDF, HTML, JSON reports
 - Evidence collection tracker
 - CLI tool
@@ -107,15 +107,15 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 | **Cloud Providers** |
 | AWS | Full support | Full support |
 | Azure | Full support | Full support |
-| GCP Core | 170+ checks | 170+ checks |
+| GCP Core | 135 controls | 135 controls |
 | GCP Advanced | - | GKE + Vertex AI (32 checks) |
 | M365 (ScubaGear) | Full support | Full support |
 | **Frameworks** |
 | SOC2 Type II | 38 criteria | 38 criteria |
-| PCI-DSS v4.0.1 | 30+ controls | 30+ controls |
+| PCI-DSS v4.0.1 | 48 requirements | 48 requirements |
 | CMMC Level 1 | 17 practices | 17 practices |
 | CMMC Level 2 | - | 110 practices |
-| NIST 800-53 Rev 5 | ~150 controls | ~150 controls |
+| NIST 800-53 Rev 5 | 128 controls | 128 controls |
 | HIPAA | Experimental | Experimental |
 | **Scanning** |
 | Single account/project | Yes | Yes |
