@@ -24,19 +24,28 @@ func GenerateHTML(result ComplianceResult) string {
 	// Count automated vs manual checks
 	automated := 0
 	manual := 0
+	errored := 0
 	passed := 0
 	failed := 0
 
 	for _, control := range result.Controls {
-		if control.Status == "INFO" || control.Status == "MANUAL" {
-			manual++
-		} else {
+		// Only PASS and FAIL are scoreable. Anything else - INFO, MANUAL,
+		// ERROR, or any status added later - must stay out of the denominator,
+		// otherwise it counts as an automated check that can never pass. ERROR
+		// is what a check emits when it cannot read a resource, usually a
+		// missing permission, and scoring that as a failure understates the
+		// environment.
+		switch control.Status {
+		case "PASS":
 			automated++
-			if control.Status == "PASS" {
-				passed++
-			} else if control.Status == "FAIL" {
-				failed++
-			}
+			passed++
+		case "FAIL":
+			automated++
+			failed++
+		case "ERROR":
+			errored++
+		default:
+			manual++
 		}
 	}
 
@@ -88,6 +97,7 @@ func GenerateHTML(result ComplianceResult) string {
             <p style="margin-top: 20px;"><strong>Full compliance requires:</strong></p>
             <ul>
                 <li>Documentation of all %d manual controls</li>
+                %s
                 <li>Evidence collection with screenshots and artifacts</li>
                 <li>Organizational policies and procedures implementation</li>
                 <li>%s</li>
@@ -98,7 +108,7 @@ func GenerateHTML(result ComplianceResult) string {
                 Formal assessment by qualified auditor is required.
             </p>
         </div>
-    `, automated, automated+manual, automatedScore, automated, manual, manual, getAssessorType(result.Framework))
+    `, automated, automated+manual, automatedScore, automated, manual, manual, getAssessorType(result.Framework), erroredNote(errored))
 
 	// Build watermarked footer HTML
 	footerHTML := ""
@@ -968,4 +978,14 @@ func countByStatus(controls []ControlResult, status string) int {
 		}
 	}
 	return count
+}
+
+// erroredNote renders the count of checks that could not be evaluated, usually
+// a missing permission. They are excluded from the score rather than counted as
+// failures, so the report says so explicitly rather than leaving a silent gap.
+func erroredNote(errored int) string {
+	if errored == 0 {
+		return ""
+	}
+	return fmt.Sprintf("<li>%d control(s) could not be evaluated, usually a missing permission. These are excluded from the score, not counted as failures.</li>", errored)
 }

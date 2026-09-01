@@ -198,19 +198,28 @@ func generateComplianceDisclaimer(pdf *gofpdf.Fpdf, result ComplianceResult) {
 	// Count automated vs manual
 	automated := 0
 	manual := 0
+	errored := 0
 	passed := 0
 	failed := 0
 
 	for _, control := range result.Controls {
-		if control.Status == "INFO" || control.Status == "MANUAL" {
-			manual++
-		} else {
+		// Only PASS and FAIL are scoreable. Anything else - INFO, MANUAL,
+		// ERROR, or any status added later - must stay out of the denominator,
+		// otherwise it counts as an automated check that can never pass. ERROR
+		// is what a check emits when it cannot read a resource, usually a
+		// missing permission, and scoring that as a failure understates the
+		// environment.
+		switch control.Status {
+		case "PASS":
 			automated++
-			if control.Status == "PASS" {
-				passed++
-			} else if control.Status == "FAIL" {
-				failed++
-			}
+			passed++
+		case "FAIL":
+			automated++
+			failed++
+		case "ERROR":
+			errored++
+		default:
+			manual++
 		}
 	}
 
@@ -242,6 +251,9 @@ func generateComplianceDisclaimer(pdf *gofpdf.Fpdf, result ComplianceResult) {
 	pdf.MultiCell(170, 5, disclaimerText, "", "C", false)
 
 	disclaimerText2 := fmt.Sprintf("The remaining %d controls require manual documentation and cannot be automated.", manual)
+	if errored > 0 {
+		disclaimerText2 += fmt.Sprintf(" A further %d could not be evaluated, usually because the scanner lacked permission to read the resource; they are excluded from the score rather than counted as failures.", errored)
+	}
 	pdf.SetX(20)
 	pdf.MultiCell(170, 5, disclaimerText2, "", "C", false)
 
