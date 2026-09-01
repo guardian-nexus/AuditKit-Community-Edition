@@ -908,6 +908,11 @@ func performScan(provider, profile, framework string, verbose bool, services str
 		}
 	}
 
+	// A scan that returned nothing because the provider could not be reached is
+	// a failed scan, not a compliant one. Kept separate from partial failures,
+	// which stay warnings.
+	var scanErr error
+
 	switch provider {
 	case "aws":
 		scanner, err := awsScanner.NewScanner(profile)
@@ -932,6 +937,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 
 		awsResults, err := scanner.ScanServices(ctx, serviceList, verbose, framework)
 		if err != nil {
+			scanErr = err
 			fmt.Fprintf(os.Stderr, "Warning during scan: %v\n", err)
 		}
 
@@ -972,6 +978,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 
 		azureResults, err := scanner.ScanServices(ctx, serviceList, verbose, framework)
 		if err != nil {
+			scanErr = err
 			fmt.Fprintf(os.Stderr, "Warning during scan: %v\n", err)
 		}
 
@@ -1015,6 +1022,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 
 		gcpResults, err := scanner.ScanServices(ctx, serviceList, verbose, framework)
 		if err != nil {
+			scanErr = err
 			fmt.Fprintf(os.Stderr, "Warning during GCP scan: %v\n", err)
 		}
 
@@ -1063,6 +1071,15 @@ func performScan(provider, profile, framework string, verbose bool, services str
 	// Stop spinner before processing results
 	if spinner != nil {
 		spinner.StopWithSuccess(fmt.Sprintf("Scanned %d controls", len(scanResults)))
+	}
+
+	// Nothing came back and the provider reported an error: the scan failed. A
+	// 0/0 report reads as a clean result and would be treated as a pass by
+	// anything checking the exit code.
+	if len(scanResults) == 0 && scanErr != nil {
+		fmt.Fprintf(os.Stderr, "\nScan failed: %v\n", scanErr)
+		fmt.Fprintf(os.Stderr, "No controls were evaluated, so no compliance result can be reported.\n")
+		os.Exit(1)
 	}
 
 	for _, result := range scanResults {
