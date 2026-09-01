@@ -195,7 +195,7 @@ func (c *LoggingChecks) CheckLogRetention(ctx context.Context) []CheckResult {
 		// Check retention period (should be at least 90 days, recommend 365)
 		// Default is 30 days
 		if bucket.RetentionDays < 90 {
-			bucketsWithShortRetention = append(bucketsWithShortRetention, 
+			bucketsWithShortRetention = append(bucketsWithShortRetention,
 				fmt.Sprintf("%s (%d days)", bucket.Name, bucket.RetentionDays))
 		}
 	}
@@ -255,11 +255,11 @@ func (c *LoggingChecks) CheckDNSLogging(ctx context.Context) []CheckResult {
 	// DNS logging configuration is in Cloud DNS, not directly in logging API
 	// Providing manual check with guidance
 	results = append(results, CheckResult{
-		Control:  "CIS GCP 2.13",
-		Name:     "[CIS GCP 2.13] DNS Logging Enabled",
-		Status:   "MANUAL",
-		Severity: "MEDIUM",
-		Evidence: "MANUAL CHECK: Verify DNS query logging is enabled for all VPC networks",
+		Control:     "CIS GCP 2.13",
+		Name:        "[CIS GCP 2.13] DNS Logging Enabled",
+		Status:      "MANUAL",
+		Severity:    "MEDIUM",
+		Evidence:    "MANUAL CHECK: Verify DNS query logging is enabled for all VPC networks",
 		Remediation: "Enable DNS logging for all VPC networks",
 		RemediationDetail: `# Enable DNS logging for a VPC network
 gcloud compute networks update NETWORK_NAME \

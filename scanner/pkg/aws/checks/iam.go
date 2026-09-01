@@ -184,13 +184,13 @@ func (c *IAMChecks) CheckPasswordPolicy(ctx context.Context) (CheckResult, error
 	// PCI DSS requires minimum 7 characters, but 14+ is recommended
 	pciMinLength := 7
 	recommendedLength := 14
-	
+
 	if minLength < int32(pciMinLength) {
 		issues = append(issues, fmt.Sprintf("minimum length is %d (PCI DSS requires %d+, recommend %d+)", minLength, pciMinLength, recommendedLength))
 	} else if minLength < int32(recommendedLength) {
 		issues = append(issues, fmt.Sprintf("minimum length is %d (recommend %d+ for better security)", minLength, recommendedLength))
 	}
-	
+
 	if !requireSymbols {
 		issues = append(issues, "doesn't require symbols (PCI DSS 8.2.3)")
 	}
@@ -813,13 +813,13 @@ func (c *IAMChecks) CheckIAMPoliciesOnGroupsOnly(ctx context.Context) (CheckResu
 	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
 	if err != nil {
 		return CheckResult{
-			Control:  "[CIS-1.22]",
-			Name:     "IAM Policies Attached to Groups Only",
-			Status:   "FAIL",
-			Evidence: "Unable to check IAM user policies",
-			Severity: "HIGH",
-			Priority: PriorityHigh,
-			Timestamp: time.Now(),
+			Control:    "[CIS-1.22]",
+			Name:       "IAM Policies Attached to Groups Only",
+			Status:     "FAIL",
+			Evidence:   "Unable to check IAM user policies",
+			Severity:   "HIGH",
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.3"},
 		}, err
 	}
@@ -1047,11 +1047,11 @@ func (c *IAMChecks) CheckPasswordReusePrevention(ctx context.Context) (CheckResu
 // CIS 1.1 - Maintain current contact details
 func (c *IAMChecks) CheckAccountContactDetails(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:           "[CIS-1.1]",
-		Name:              "Account Contact Details",
-		Status:            "MANUAL",
-		Evidence:          "MANUAL CHECK: Verify account contact details are current and monitored",
-		Remediation:       "Update account contact details in AWS Console",
+		Control:     "[CIS-1.1]",
+		Name:        "Account Contact Details",
+		Status:      "MANUAL",
+		Evidence:    "MANUAL CHECK: Verify account contact details are current and monitored",
+		Remediation: "Update account contact details in AWS Console",
 		RemediationDetail: `1. Sign in as root user
 2. Navigate to "My Account" page
 3. Update contact information including:
@@ -1060,22 +1060,22 @@ func (c *IAMChecks) CheckAccountContactDetails(ctx context.Context) CheckResult 
    - Phone Number
    - Email (ensure it's monitored)
 4. Screenshot showing current contact details`,
-		ScreenshotGuide:   "AWS Console → Account (top right) → My Account → Contact Information → Screenshot",
-		ConsoleURL:        "https://console.aws.amazon.com/billing/home#/account",
-		Priority:          PriorityMedium,
-		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"CIS-AWS": "1.1"},
+		ScreenshotGuide: "AWS Console → Account (top right) → My Account → Contact Information → Screenshot",
+		ConsoleURL:      "https://console.aws.amazon.com/billing/home#/account",
+		Priority:        PriorityMedium,
+		Timestamp:       time.Now(),
+		Frameworks:      map[string]string{"CIS-AWS": "1.1"},
 	}
 }
 
 // CIS 1.2 - Ensure security contact information is registered
 func (c *IAMChecks) CheckSecurityContactInfo(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:           "[CIS-1.2]",
-		Name:              "Security Contact Information",
-		Status:            "MANUAL",
-		Evidence:          "MANUAL CHECK: Verify security contact information is registered and monitored",
-		Remediation:       "Register security contact information",
+		Control:     "[CIS-1.2]",
+		Name:        "Security Contact Information",
+		Status:      "MANUAL",
+		Evidence:    "MANUAL CHECK: Verify security contact information is registered and monitored",
+		Remediation: "Register security contact information",
 		RemediationDetail: `1. Sign in as root user
 2. Navigate to "My Account" page
 3. Scroll to "Alternate Contacts" section
@@ -1084,11 +1084,11 @@ func (c *IAMChecks) CheckSecurityContactInfo(ctx context.Context) CheckResult {
    - Email (monitored 24/7)
    - Phone number
 5. Screenshot showing security contact configured`,
-		ScreenshotGuide:   "AWS Console → Account → My Account → Alternate Contacts → Security contact → Screenshot",
-		ConsoleURL:        "https://console.aws.amazon.com/billing/home#/account",
-		Priority:          PriorityHigh,
-		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"CIS-AWS": "1.2", "SOC2": "CC6.1"},
+		ScreenshotGuide: "AWS Console → Account → My Account → Alternate Contacts → Security contact → Screenshot",
+		ConsoleURL:      "https://console.aws.amazon.com/billing/home#/account",
+		Priority:        PriorityHigh,
+		Timestamp:       time.Now(),
+		Frameworks:      map[string]string{"CIS-AWS": "1.2", "SOC2": "CC6.1"},
 	}
 }
 
@@ -1105,7 +1105,7 @@ func (c *IAMChecks) CheckIAMRolesSeparation(ctx context.Context) (CheckResult, e
 
 	for _, role := range rolesOutput.Roles {
 		roleName := aws.ToString(role.RoleName)
-		
+
 		// Check for IAM management roles (various naming conventions)
 		if contains(roleName, "IAMAdmin") || contains(roleName, "IAMMaster") || contains(roleName, "IAMFullAccess") {
 			hasIAMAdminRole = true
@@ -1117,12 +1117,12 @@ func (c *IAMChecks) CheckIAMRolesSeparation(ctx context.Context) (CheckResult, e
 
 	if !hasIAMAdminRole || !hasIAMLimitedRole {
 		return CheckResult{
-			Control:           "[CIS-1.18]",
-			Name:              "IAM Master and Manager Roles",
-			Status:            "INFO",
-			Severity:          "MEDIUM",
-			Evidence:          "MANUAL CHECK: Verify IAM Master (full admin) and IAM Manager (limited) roles exist for separation of duties | CIS 1.18",
-			Remediation:       "Create separate IAM roles for full IAM administration vs limited IAM management",
+			Control:     "[CIS-1.18]",
+			Name:        "IAM Master and Manager Roles",
+			Status:      "INFO",
+			Severity:    "MEDIUM",
+			Evidence:    "MANUAL CHECK: Verify IAM Master (full admin) and IAM Manager (limited) roles exist for separation of duties | CIS 1.18",
+			Remediation: "Create separate IAM roles for full IAM administration vs limited IAM management",
 			RemediationDetail: `# Create IAM Master role (full IAM admin)
 aws iam create-role --role-name IAMMasterRole --assume-role-policy-document file://trust-policy.json
 aws iam attach-role-policy --role-name IAMMasterRole --policy-arn arn:aws:iam::aws:policy/IAMFullAccess
@@ -1132,11 +1132,11 @@ aws iam create-role --role-name IAMManagerRole --assume-role-policy-document fil
 aws iam put-role-policy --role-name IAMManagerRole --policy-name IAMLimitedAccess --policy-document file://limited-iam-policy.json
 
 # Best practice: Separate who can create/delete IAM resources vs who can assign permissions`,
-			ScreenshotGuide:   "IAM → Roles → Screenshot showing IAMMasterRole and IAMManagerRole with appropriate policies",
-			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/roles",
-			Priority:          PriorityMedium,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.18", "SOC2": "CC6.3"},
+			ScreenshotGuide: "IAM → Roles → Screenshot showing IAMMasterRole and IAMManagerRole with appropriate policies",
+			ConsoleURL:      "https://console.aws.amazon.com/iam/home#/roles",
+			Priority:        PriorityMedium,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "1.18", "SOC2": "CC6.3"},
 		}, nil
 	}
 
@@ -1154,11 +1154,11 @@ aws iam put-role-policy --role-name IAMManagerRole --policy-name IAMLimitedAcces
 // CIS 1.22 - Ensure IAM user access is reviewed periodically
 func (c *IAMChecks) CheckIAMUserAccessReview(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:           "[CIS-1.22]",
-		Name:              "IAM User Access Review",
-		Status:            "MANUAL",
-		Evidence:          "MANUAL CHECK: Verify IAM user access is reviewed at least every 90 days",
-		Remediation:       "Establish periodic IAM access review process",
+		Control:     "[CIS-1.22]",
+		Name:        "IAM User Access Review",
+		Status:      "MANUAL",
+		Evidence:    "MANUAL CHECK: Verify IAM user access is reviewed at least every 90 days",
+		Remediation: "Establish periodic IAM access review process",
 		RemediationDetail: `1. Generate credential report:
    aws iam generate-credential-report
    aws iam get-credential-report --output text --query Content | base64 -d > credentials.csv
@@ -1176,11 +1176,11 @@ func (c *IAMChecks) CheckIAMUserAccessReview(ctx context.Context) CheckResult {
 4. Automate with AWS Config rules or Lambda
 
 5. Screenshot showing documented review process`,
-		ScreenshotGuide:   "IAM → Credential Report → Screenshot showing recent review date + documented process",
-		ConsoleURL:        "https://console.aws.amazon.com/iam/home#/credential_report",
-		Priority:          PriorityMedium,
-		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.2", "PCI-DSS": "8.1.4"},
+		ScreenshotGuide: "IAM → Credential Report → Screenshot showing recent review date + documented process",
+		ConsoleURL:      "https://console.aws.amazon.com/iam/home#/credential_report",
+		Priority:        PriorityMedium,
+		Timestamp:       time.Now(),
+		Frameworks:      map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.2", "PCI-DSS": "8.1.4"},
 	}
 }
 

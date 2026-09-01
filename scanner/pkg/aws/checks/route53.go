@@ -38,13 +38,13 @@ func (c *Route53Checks) CheckDNSSEC(ctx context.Context) (CheckResult, error) {
 	resp, err := c.client.ListHostedZones(ctx, &route53.ListHostedZonesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:   "CIS-5.19",
-			Name:      "Route53 DNSSEC Enabled",
-			Status:    "FAIL",
-			Evidence:  fmt.Sprintf("Unable to check Route53 hosted zones: %v", err),
-			Severity:  "MEDIUM",
-			Priority:  PriorityMedium,
-			Timestamp: time.Now(),
+			Control:    "CIS-5.19",
+			Name:       "Route53 DNSSEC Enabled",
+			Status:     "FAIL",
+			Evidence:   fmt.Sprintf("Unable to check Route53 hosted zones: %v", err),
+			Severity:   "MEDIUM",
+			Priority:   PriorityMedium,
+			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("ROUTE53_DNSSEC"),
 		}, err
 	}
@@ -96,12 +96,12 @@ func (c *Route53Checks) CheckDNSSEC(ctx context.Context) (CheckResult, error) {
 		}
 
 		return CheckResult{
-			Control:           "CIS-5.19",
-			Name:              "Route53 DNSSEC Enabled",
-			Status:            "FAIL",
-			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("%d/%d Route53 public hosted zones lack DNSSEC: %s | Violates CIS AWS 5.19 (DNS spoofing protection)", len(nonDNSSECZones), checkedCount, zoneList),
-			Remediation:       fmt.Sprintf("Enable DNSSEC on: %s", nonDNSSECZones[0]),
+			Control:     "CIS-5.19",
+			Name:        "Route53 DNSSEC Enabled",
+			Status:      "FAIL",
+			Severity:    "MEDIUM",
+			Evidence:    fmt.Sprintf("%d/%d Route53 public hosted zones lack DNSSEC: %s | Violates CIS AWS 5.19 (DNS spoofing protection)", len(nonDNSSECZones), checkedCount, zoneList),
+			Remediation: fmt.Sprintf("Enable DNSSEC on: %s", nonDNSSECZones[0]),
 			RemediationDetail: fmt.Sprintf(`# Enable DNSSEC for hosted zone
 aws route53 enable-hosted-zone-dnssec --hosted-zone-id $(aws route53 list-hosted-zones-by-name --dns-name %s --query 'HostedZones[0].Id' --output text)
 
@@ -120,10 +120,10 @@ aws route53 enable-hosted-zone-dnssec --hosted-zone-id $(aws route53 list-hosted
    - DNSSEC signing status: Enabled
    - Key-signing key (KSK) status: Active
    - DNSSEC validation: Enabled`, nonDNSSECZones[0]),
-			ConsoleURL:      fmt.Sprintf("https://console.aws.amazon.com/route53/v2/hostedzones"),
-			Priority:        PriorityMedium,
-			Timestamp:       time.Now(),
-			Frameworks:      GetFrameworkMappings("ROUTE53_DNSSEC"),
+			ConsoleURL: fmt.Sprintf("https://console.aws.amazon.com/route53/v2/hostedzones"),
+			Priority:   PriorityMedium,
+			Timestamp:  time.Now(),
+			Frameworks: GetFrameworkMappings("ROUTE53_DNSSEC"),
 		}, nil
 	}
 

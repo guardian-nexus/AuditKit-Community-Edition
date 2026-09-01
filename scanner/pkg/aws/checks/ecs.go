@@ -96,12 +96,12 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 		}
 
 		return CheckResult{
-			Control:           "[CIS-7.1]",
-			Name:              "ECS Task Definition Logging",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d/%d ECS task definitions without logging: %v | CIS 7.1", len(tasksWithoutLogging), totalTasks, displayTasks),
-			Remediation:       "Configure logging for ECS task definitions",
+			Control:     "[CIS-7.1]",
+			Name:        "ECS Task Definition Logging",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("%d/%d ECS task definitions without logging: %v | CIS 7.1", len(tasksWithoutLogging), totalTasks, displayTasks),
+			Remediation: "Configure logging for ECS task definitions",
 			RemediationDetail: `# Add to task definition JSON:
 {
   "logConfiguration": {
@@ -113,11 +113,11 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
     }
   }
 }`,
-			ScreenshotGuide:   "ECS Console → Task Definitions → Container definition → Storage and Logging → Screenshot showing logging configured",
-			ConsoleURL:        "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "7.1", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
+			ScreenshotGuide: "ECS Console → Task Definitions → Container definition → Storage and Logging → Screenshot showing logging configured",
+			ConsoleURL:      "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "7.1", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
 		}, nil
 	}
 
@@ -178,8 +178,8 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 			for _, envVar := range containerDef.Environment {
 				varName := *envVar.Name
 				if contains(varName, "PASSWORD") || contains(varName, "SECRET") ||
-				   contains(varName, "KEY") || contains(varName, "TOKEN") ||
-				   contains(varName, "CREDENTIAL") {
+					contains(varName, "KEY") || contains(varName, "TOKEN") ||
+					contains(varName, "CREDENTIAL") {
 					// Check if using Secrets Manager (should have valueFrom, not value)
 					if envVar.Value != nil && *envVar.Value != "" {
 						tasksWithPlaintextSecrets = append(tasksWithPlaintextSecrets, family)
@@ -197,12 +197,12 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 		}
 
 		return CheckResult{
-			Control:           "[CIS-7.2]",
-			Name:              "ECS Secrets Management",
-			Status:            "FAIL",
-			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("%d ECS tasks with plaintext sensitive environment variables: %v | CIS 7.2", len(tasksWithPlaintextSecrets), displayTasks),
-			Remediation:       "Use AWS Secrets Manager or Parameter Store for sensitive data",
+			Control:     "[CIS-7.2]",
+			Name:        "ECS Secrets Management",
+			Status:      "FAIL",
+			Severity:    "CRITICAL",
+			Evidence:    fmt.Sprintf("%d ECS tasks with plaintext sensitive environment variables: %v | CIS 7.2", len(tasksWithPlaintextSecrets), displayTasks),
+			Remediation: "Use AWS Secrets Manager or Parameter Store for sensitive data",
 			RemediationDetail: `# Instead of:
 "environment": [{"name": "DB_PASSWORD", "value": "plaintext"}]
 
@@ -211,11 +211,11 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
   "name": "DB_PASSWORD",
   "valueFrom": "arn:aws:secretsmanager:region:account:secret:db-password"
 }]`,
-			ScreenshotGuide:   "ECS Console → Task Definitions → Environment → Screenshot showing secrets from Secrets Manager",
-			ConsoleURL:        "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
-			Priority:          PriorityCritical,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "7.2", "SOC2": "CC6.1", "PCI-DSS": "3.4"},
+			ScreenshotGuide: "ECS Console → Task Definitions → Environment → Screenshot showing secrets from Secrets Manager",
+			ConsoleURL:      "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "7.2", "SOC2": "CC6.1", "PCI-DSS": "3.4"},
 		}, nil
 	}
 
@@ -289,20 +289,20 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 
 	if len(clustersWithoutInsights) > 0 {
 		return CheckResult{
-			Control:           "[CIS-7.3]",
-			Name:              "ECS Container Insights",
-			Status:            "FAIL",
-			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("%d/%d ECS clusters without Container Insights: %v | CIS 7.3", len(clustersWithoutInsights), len(clustersOutput.Clusters), clustersWithoutInsights),
-			Remediation:       "Enable Container Insights for ECS clusters",
+			Control:     "[CIS-7.3]",
+			Name:        "ECS Container Insights",
+			Status:      "FAIL",
+			Severity:    "MEDIUM",
+			Evidence:    fmt.Sprintf("%d/%d ECS clusters without Container Insights: %v | CIS 7.3", len(clustersWithoutInsights), len(clustersOutput.Clusters), clustersWithoutInsights),
+			Remediation: "Enable Container Insights for ECS clusters",
 			RemediationDetail: `aws ecs update-cluster-settings \
   --cluster CLUSTER_NAME \
   --settings name=containerInsights,value=enabled`,
-			ScreenshotGuide:   "ECS Console → Clusters → Update Cluster → CloudWatch Container Insights → Screenshot showing enabled",
-			ConsoleURL:        "https://console.aws.amazon.com/ecs/home#/clusters",
-			Priority:          PriorityMedium,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "7.3", "SOC2": "CC7.2"},
+			ScreenshotGuide: "ECS Console → Clusters → Update Cluster → CloudWatch Container Insights → Screenshot showing enabled",
+			ConsoleURL:      "https://console.aws.amazon.com/ecs/home#/clusters",
+			Priority:        PriorityMedium,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "7.3", "SOC2": "CC7.2"},
 		}, nil
 	}
 
@@ -362,20 +362,20 @@ func (c *ECSChecks) CheckECSTaskRolePermissions(ctx context.Context) (CheckResul
 		}
 
 		return CheckResult{
-			Control:           "[CIS-7.4]",
-			Name:              "ECS Task Role Permissions",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d ECS tasks with overly permissive roles: %v | CIS 7.4", len(tasksWithBroadRoles), displayTasks),
-			Remediation:       "Use least privilege IAM roles for ECS tasks",
+			Control:     "[CIS-7.4]",
+			Name:        "ECS Task Role Permissions",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("%d ECS tasks with overly permissive roles: %v | CIS 7.4", len(tasksWithBroadRoles), displayTasks),
+			Remediation: "Use least privilege IAM roles for ECS tasks",
 			RemediationDetail: `# Create custom role with only required permissions
 aws iam create-role --role-name ECSTaskRole --assume-role-policy-document file://ecs-trust-policy.json
 aws iam put-role-policy --role-name ECSTaskRole --policy-name TaskPolicy --policy-document file://task-policy.json`,
-			ScreenshotGuide:   "ECS Console → Task Definitions → Task role → Screenshot showing least-privilege policy",
-			ConsoleURL:        "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "7.4", "SOC2": "CC6.3", "PCI-DSS": "7.1.2"},
+			ScreenshotGuide: "ECS Console → Task Definitions → Task role → Screenshot showing least-privilege policy",
+			ConsoleURL:      "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "7.4", "SOC2": "CC6.3", "PCI-DSS": "7.1.2"},
 		}, nil
 	}
 

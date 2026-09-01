@@ -266,22 +266,22 @@ func (c *VPCChecks) CheckVPCEndpoints(ctx context.Context) (CheckResult, error) 
 			len(vpcsWithoutS3), len(vpcsWithoutDynamoDB))
 
 		return CheckResult{
-			Control:           "[CIS-5.7, 5.8]",
-			Name:              "VPC Endpoints for AWS Services",
-			Status:            "FAIL",
-			Severity:          "MEDIUM",
-			Evidence:          evidence,
-			Remediation:       "Create VPC endpoints for S3 and DynamoDB to avoid internet traffic",
+			Control:     "[CIS-5.7, 5.8]",
+			Name:        "VPC Endpoints for AWS Services",
+			Status:      "FAIL",
+			Severity:    "MEDIUM",
+			Evidence:    evidence,
+			Remediation: "Create VPC endpoints for S3 and DynamoDB to avoid internet traffic",
 			RemediationDetail: `# Create S3 endpoint
 aws ec2 create-vpc-endpoint --vpc-id VPC_ID --service-name com.amazonaws.REGION.s3 --route-table-ids RTB_ID
 
 # Create DynamoDB endpoint
 aws ec2 create-vpc-endpoint --vpc-id VPC_ID --service-name com.amazonaws.REGION.dynamodb --route-table-ids RTB_ID`,
-			ScreenshotGuide:   "VPC Console → Endpoints → Screenshot showing S3 and DynamoDB endpoints for each VPC",
-			ConsoleURL:        "https://console.aws.amazon.com/vpc/home#Endpoints:",
-			Priority:          PriorityMedium,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "5.7, 5.8"},
+			ScreenshotGuide: "VPC Console → Endpoints → Screenshot showing S3 and DynamoDB endpoints for each VPC",
+			ConsoleURL:      "https://console.aws.amazon.com/vpc/home#Endpoints:",
+			Priority:        PriorityMedium,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "5.7, 5.8"},
 		}, nil
 	}
 
@@ -506,19 +506,19 @@ func (c *VPCChecks) CheckAdminPortSecurity(ctx context.Context) (CheckResult, er
 
 	if len(violatingSGs) > 0 {
 		return CheckResult{
-			Control:           "[CIS-5.13]",
-			Name:              "Security Groups Restrict Admin Ports",
-			Status:            "FAIL",
-			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("%d security group rules allow admin ports from internet: %v | CIS 5.13", len(violatingSGs), truncateList(violatingSGs, 5)),
-			Remediation:       "Restrict admin port access to specific IP ranges",
+			Control:     "[CIS-5.13]",
+			Name:        "Security Groups Restrict Admin Ports",
+			Status:      "FAIL",
+			Severity:    "CRITICAL",
+			Evidence:    fmt.Sprintf("%d security group rules allow admin ports from internet: %v | CIS 5.13", len(violatingSGs), truncateList(violatingSGs, 5)),
+			Remediation: "Restrict admin port access to specific IP ranges",
 			RemediationDetail: `aws ec2 revoke-security-group-ingress --group-id SG_ID --protocol tcp --port 22 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id SG_ID --protocol tcp --port 22 --cidr YOUR_IP/32`,
-			ScreenshotGuide:   "EC2 Console → Security Groups → Inbound Rules → Screenshot showing admin ports restricted to specific IPs",
-			ConsoleURL:        "https://console.aws.amazon.com/ec2/home#SecurityGroups:",
-			Priority:          PriorityCritical,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "5.13", "PCI-DSS": "1.2.1", "SOC2": "CC6.6"},
+			ScreenshotGuide: "EC2 Console → Security Groups → Inbound Rules → Screenshot showing admin ports restricted to specific IPs",
+			ConsoleURL:      "https://console.aws.amazon.com/ec2/home#SecurityGroups:",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "5.13", "PCI-DSS": "1.2.1", "SOC2": "CC6.6"},
 		}, nil
 	}
 
@@ -692,11 +692,11 @@ func truncateList(list []string, maxLen int) []string {
 // CIS-5.8 - Ensure routing tables for VPC peering are "least access"
 func (c *VPCChecks) CheckVPCPeeringRouting(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:           "CIS-5.8",
-		Name:              "VPC Peering Routing Least Access",
-		Status:            "MANUAL",
-		Evidence:          "MANUAL CHECK: Verify VPC peering route tables follow least privilege",
-		Remediation:       "Review and restrict VPC peering routes to specific CIDR blocks",
+		Control:     "CIS-5.8",
+		Name:        "VPC Peering Routing Least Access",
+		Status:      "MANUAL",
+		Evidence:    "MANUAL CHECK: Verify VPC peering route tables follow least privilege",
+		Remediation: "Review and restrict VPC peering routes to specific CIDR blocks",
 		RemediationDetail: `1. List VPC peering connections:
    aws ec2 describe-vpc-peering-connections
 
@@ -712,22 +712,22 @@ func (c *VPCChecks) CheckVPCPeeringRouting(ctx context.Context) CheckResult {
    - VPC peering connections
    - Associated route tables
    - Specific CIDR blocks (not 0.0.0.0/0)`,
-		ScreenshotGuide:   "VPC Console → Peering Connections → Route Tables → Screenshot showing specific CIDR routes (not 0.0.0.0/0)",
-		ConsoleURL:        "https://console.aws.amazon.com/vpc/home#PeeringConnections:",
-		Priority:          PriorityMedium,
-		Timestamp:         time.Now(),
-		Frameworks:        GetFrameworkMappings("VPC_PEERING_ROUTING"),
+		ScreenshotGuide: "VPC Console → Peering Connections → Route Tables → Screenshot showing specific CIDR routes (not 0.0.0.0/0)",
+		ConsoleURL:      "https://console.aws.amazon.com/vpc/home#PeeringConnections:",
+		Priority:        PriorityMedium,
+		Timestamp:       time.Now(),
+		Frameworks:      GetFrameworkMappings("VPC_PEERING_ROUTING"),
 	}
 }
 
 // CIS-5.20 - Ensure VPC endpoints are used for S3
 func (c *VPCChecks) CheckVPCEndpointsForS3(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:           "CIS-5.20",
-		Name:              "VPC Endpoints for S3",
-		Status:            "MANUAL",
-		Evidence:          "MANUAL CHECK: Verify S3 VPC endpoints are configured for private S3 access",
-		Remediation:       "Create VPC endpoints for S3 to avoid internet traffic",
+		Control:     "CIS-5.20",
+		Name:        "VPC Endpoints for S3",
+		Status:      "MANUAL",
+		Evidence:    "MANUAL CHECK: Verify S3 VPC endpoints are configured for private S3 access",
+		Remediation: "Create VPC endpoints for S3 to avoid internet traffic",
 		RemediationDetail: `1. Create S3 VPC endpoint:
    aws ec2 create-vpc-endpoint \
      --vpc-id vpc-XXXXX \
@@ -754,10 +754,10 @@ func (c *VPCChecks) CheckVPCEndpointsForS3(ctx context.Context) CheckResult {
    - VPC endpoints configured for S3
    - Route tables associated with endpoints
    - S3 bucket policies enforcing VPC endpoint access`,
-		ScreenshotGuide:   "VPC Console → Endpoints → Screenshot showing active S3 endpoint(s) + associated route tables",
-		ConsoleURL:        "https://console.aws.amazon.com/vpc/home#Endpoints:",
-		Priority:          PriorityLow,
-		Timestamp:         time.Now(),
-		Frameworks:        GetFrameworkMappings("VPC_S3_ENDPOINTS"),
+		ScreenshotGuide: "VPC Console → Endpoints → Screenshot showing active S3 endpoint(s) + associated route tables",
+		ConsoleURL:      "https://console.aws.amazon.com/vpc/home#Endpoints:",
+		Priority:        PriorityLow,
+		Timestamp:       time.Now(),
+		Frameworks:      GetFrameworkMappings("VPC_S3_ENDPOINTS"),
 	}
 }

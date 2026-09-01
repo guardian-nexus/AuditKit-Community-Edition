@@ -1,8 +1,8 @@
 package checks
 
 import (
-	"fmt"
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -511,7 +511,7 @@ func FormatFrameworkRequirements(frameworks map[string]string) string {
 	if len(frameworks) == 0 {
 		return ""
 	}
-	
+
 	result := " | Requirements: "
 	for fw, requirement := range frameworks {
 		result += fmt.Sprintf("%s %s, ", fw, requirement)

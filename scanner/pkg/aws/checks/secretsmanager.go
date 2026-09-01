@@ -45,14 +45,14 @@ func (c *SecretsManagerChecks) CheckSecretRotation(ctx context.Context) (CheckRe
 	secrets, err := c.client.ListSecrets(ctx, &secretsmanager.ListSecretsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-12.1",
-			Name:       "Secrets Manager Rotation Enabled",
-			Status:     "ERROR",
-			Evidence:   fmt.Sprintf("Failed to list secrets: %v", err),
+			Control:     "CIS-12.1",
+			Name:        "Secrets Manager Rotation Enabled",
+			Status:      "ERROR",
+			Evidence:    fmt.Sprintf("Failed to list secrets: %v", err),
 			Remediation: "Verify Secrets Manager permissions",
-			Priority:   PriorityLow,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("SECRETS_ROTATION"),
+			Priority:    PriorityLow,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("SECRETS_ROTATION"),
 		}, err
 	}
 
@@ -129,27 +129,27 @@ func (c *SecretsManagerChecks) CheckSecretEncryption(ctx context.Context) (Check
 	secrets, err := c.client.ListSecrets(ctx, &secretsmanager.ListSecretsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-12.2",
-			Name:       "Secrets Manager KMS Encryption",
-			Status:     "ERROR",
-			Evidence:   fmt.Sprintf("Failed to list secrets: %v", err),
+			Control:     "CIS-12.2",
+			Name:        "Secrets Manager KMS Encryption",
+			Status:      "ERROR",
+			Evidence:    fmt.Sprintf("Failed to list secrets: %v", err),
 			Remediation: "Verify permissions",
-			Priority:   PriorityLow,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("SECRETS_ENCRYPTION"),
+			Priority:    PriorityLow,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("SECRETS_ENCRYPTION"),
 		}, err
 	}
 
 	if len(secrets.SecretList) == 0 {
 		return CheckResult{
-			Control:    "CIS-12.2",
-			Name:       "Secrets Manager KMS Encryption",
-			Status:     "INFO",
-			Evidence:   "No secrets found",
+			Control:     "CIS-12.2",
+			Name:        "Secrets Manager KMS Encryption",
+			Status:      "INFO",
+			Evidence:    "No secrets found",
 			Remediation: "N/A",
-			Priority:   PriorityLow,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("SECRETS_ENCRYPTION"),
+			Priority:    PriorityLow,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("SECRETS_ENCRYPTION"),
 		}, nil
 	}
 
@@ -206,27 +206,27 @@ func (c *SecretsManagerChecks) CheckUnusedSecrets(ctx context.Context) (CheckRes
 	secrets, err := c.client.ListSecrets(ctx, &secretsmanager.ListSecretsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-12.3",
-			Name:       "Unused Secrets Removed",
-			Status:     "ERROR",
-			Evidence:   "Failed to list secrets",
+			Control:     "CIS-12.3",
+			Name:        "Unused Secrets Removed",
+			Status:      "ERROR",
+			Evidence:    "Failed to list secrets",
 			Remediation: "Verify permissions",
-			Priority:   PriorityLow,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("SECRETS_UNUSED"),
+			Priority:    PriorityLow,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("SECRETS_UNUSED"),
 		}, err
 	}
 
 	if len(secrets.SecretList) == 0 {
 		return CheckResult{
-			Control:    "CIS-12.3",
-			Name:       "Unused Secrets Removed",
-			Status:     "INFO",
-			Evidence:   "No secrets found",
+			Control:     "CIS-12.3",
+			Name:        "Unused Secrets Removed",
+			Status:      "INFO",
+			Evidence:    "No secrets found",
 			Remediation: "N/A",
-			Priority:   PriorityLow,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("SECRETS_UNUSED"),
+			Priority:    PriorityLow,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("SECRETS_UNUSED"),
 		}, nil
 	}
 

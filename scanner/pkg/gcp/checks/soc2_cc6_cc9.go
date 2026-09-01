@@ -61,7 +61,7 @@ func (c *GCPCC6Checks) Run(ctx context.Context) ([]CheckResult, error) {
 	results = append(results, encryptionResults...)
 
 	// CC6.6: Authentication - Covered by IAM MFA checks (already included above)
-	
+
 	// CC6.7: Password/Key Management - Call KMS checks
 	// Note: This requires KMS client which we don't have in this wrapper
 	// The individual service checks cover this

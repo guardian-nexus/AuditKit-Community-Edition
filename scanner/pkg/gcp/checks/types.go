@@ -2,8 +2,8 @@ package checks
 
 import (
 	"context"
-	"time"
 	"fmt"
+	"time"
 )
 
 // CheckResult represents the result of a single compliance check

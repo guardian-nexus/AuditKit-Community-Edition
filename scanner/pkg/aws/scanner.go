@@ -35,9 +35,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/organizations"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 	"github.com/aws/aws-sdk-go-v2/service/redshift"
-	"github.com/aws/aws-sdk-go-v2/service/sagemaker"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/sagemaker"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/aws/aws-sdk-go-v2/service/securityhub"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
@@ -48,30 +48,30 @@ import (
 )
 
 type AWSScanner struct {
-	cfg                 aws.Config
-	s3Client            *s3.Client
-	iamClient           *iam.Client
-	ec2Client           *ec2.Client
-	ctClient            *cloudtrail.Client
-	stsClient           *sts.Client
-	configClient        *configservice.Client
-	gdClient            *guardduty.Client
-	shClient            *securityhub.Client
-	rdsClient           *rds.Client
-	cwClient            *cloudwatch.Client
-	snsClient           *sns.Client
-	ssmClient           *ssm.Client
-	asClient            *autoscaling.Client
-	orgClient           *organizations.Client
-	inspector2Client    *inspector2.Client
-	backupClient        *backup.Client
-	kmsClient           *kms.Client
-	lambdaClient        *lambda.Client
-	ecsClient           *ecs.Client
-	eksClient           *eks.Client
-	macieClient         *macie2.Client
-	nfwClient           *networkfirewall.Client
-	route53Client       *route53.Client
+	cfg                  aws.Config
+	s3Client             *s3.Client
+	iamClient            *iam.Client
+	ec2Client            *ec2.Client
+	ctClient             *cloudtrail.Client
+	stsClient            *sts.Client
+	configClient         *configservice.Client
+	gdClient             *guardduty.Client
+	shClient             *securityhub.Client
+	rdsClient            *rds.Client
+	cwClient             *cloudwatch.Client
+	snsClient            *sns.Client
+	ssmClient            *ssm.Client
+	asClient             *autoscaling.Client
+	orgClient            *organizations.Client
+	inspector2Client     *inspector2.Client
+	backupClient         *backup.Client
+	kmsClient            *kms.Client
+	lambdaClient         *lambda.Client
+	ecsClient            *ecs.Client
+	eksClient            *eks.Client
+	macieClient          *macie2.Client
+	nfwClient            *networkfirewall.Client
+	route53Client        *route53.Client
 	accessAnalyzerClient *accessanalyzer.Client
 	sqsClient            *sqs.Client
 	apigwClient          *apigateway.Client
@@ -174,10 +174,10 @@ func (s *AWSScanner) ScanServices(ctx context.Context, services []string, verbos
 		}
 		return nil, fmt.Errorf("AWS connection failed: %v", err)
 	}
-	
+
 	var results []ScanResult
 	framework = strings.ToLower(framework)
-	
+
 	switch framework {
 	case "soc2":
 		results = append(results, s.runSOC2Checks(ctx, verbose)...)
@@ -201,13 +201,13 @@ func (s *AWSScanner) ScanServices(ctx context.Context, services []string, verbos
 
 func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResult {
 	var results []ScanResult
-	
+
 	if verbose {
 		fmt.Println("Running CIS AWS Foundations Benchmark (v1.4 & 3.0)")
 		fmt.Println("Using existing checks with CIS control mappings...")
 		fmt.Println("")
 	}
-	
+
 	// Run existing AWS check modules - they return results with Frameworks map
 	checkModules := []checks.Check{
 		checks.NewIAMChecks(s.iamClient),
@@ -225,50 +225,50 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 		checks.NewAccessAnalyzerChecks(s.accessAnalyzerClient, s.cfg.Region),
 		checks.NewSecurityServicesChecks(s.gdClient, s.macieClient, s.shClient, s.inspector2Client),
 		checks.NewMonitoringChecks(s.cwClient, s.snsClient, s.shClient), // Add monitoring checks (CIS 4.16)
-		checks.NewCISManualChecks(), // Add manual CIS controls (Section 4)
+		checks.NewCISManualChecks(),                                     // Add manual CIS controls (Section 4)
 		// Section 10 - Additional Services
-		checks.NewSSMChecks(s.ssmClient),                                // CIS 10.1-10.3
-		checks.NewBeanstalkChecks(s.beanstalkClient),                    // CIS 10.4-10.6
-		checks.NewAPIGatewayChecks(s.apigwClient, s.apigwv2Client),      // CIS 10.7-10.9
-		checks.NewBackupVaultChecks(s.backupClient),                     // CIS 10.10-10.12
-		checks.NewMessagingChecks(s.snsClient, s.sqsClient),             // CIS 10.13-10.15
+		checks.NewSSMChecks(s.ssmClient),                           // CIS 10.1-10.3
+		checks.NewBeanstalkChecks(s.beanstalkClient),               // CIS 10.4-10.6
+		checks.NewAPIGatewayChecks(s.apigwClient, s.apigwv2Client), // CIS 10.7-10.9
+		checks.NewBackupVaultChecks(s.backupClient),                // CIS 10.10-10.12
+		checks.NewMessagingChecks(s.snsClient, s.sqsClient),        // CIS 10.13-10.15
 		// Sections 11-18 - Extended Coverage for 100%
-		checks.NewOrganizationsAdvancedChecks(s.orgClient, s.ctClient),  // CIS 11.1-11.4
-		checks.NewSecretsManagerChecks(s.secretsManagerClient),          // CIS 12.1-12.3
-		checks.NewECRChecks(s.ecrClient),                                // CIS 13.1-13.3
-		checks.NewDynamoDBChecks(s.dynamodbClient),                      // CIS 14.1-14.3
-		checks.NewCloudFormationChecks(s.cloudFormationClient),          // CIS 15.1-15.2
-		checks.NewACMChecks(s.acmClient),                                // CIS 16.1-16.2
-		checks.NewIAMExtendedChecks(s.iamClient),                        // CIS 17.1-17.2
-		checks.NewAuroraChecks(s.rdsClient),                             // CIS 18.1
+		checks.NewOrganizationsAdvancedChecks(s.orgClient, s.ctClient), // CIS 11.1-11.4
+		checks.NewSecretsManagerChecks(s.secretsManagerClient),         // CIS 12.1-12.3
+		checks.NewECRChecks(s.ecrClient),                               // CIS 13.1-13.3
+		checks.NewDynamoDBChecks(s.dynamodbClient),                     // CIS 14.1-14.3
+		checks.NewCloudFormationChecks(s.cloudFormationClient),         // CIS 15.1-15.2
+		checks.NewACMChecks(s.acmClient),                               // CIS 16.1-16.2
+		checks.NewIAMExtendedChecks(s.iamClient),                       // CIS 17.1-17.2
+		checks.NewAuroraChecks(s.rdsClient),                            // CIS 18.1
 		// Sections 19-22 - Data Analytics & ML Services (January 2026)
-		checks.NewSageMakerChecks(s.sagemakerClient),                    // CIS 19.1-19.6
-		checks.NewRedshiftChecks(s.redshiftClient),                      // CIS 20.1-20.7
-		checks.NewElastiCacheChecks(s.elasticacheClient),                // CIS 21.1-21.5
-		checks.NewOpenSearchChecks(s.opensearchClient),                  // CIS 22.1-22.6
+		checks.NewSageMakerChecks(s.sagemakerClient),     // CIS 19.1-19.6
+		checks.NewRedshiftChecks(s.redshiftClient),       // CIS 20.1-20.7
+		checks.NewElastiCacheChecks(s.elasticacheClient), // CIS 21.1-21.5
+		checks.NewOpenSearchChecks(s.opensearchClient),   // CIS 22.1-22.6
 	}
-	
+
 	// Track which CIS sections we're covering
 	sectionCounts := make(map[string]int)
-	
+
 	for _, check := range checkModules {
 		if verbose {
 			fmt.Printf("  Running %s...\n", check.Name())
 		}
-		
+
 		checkResults, checkErr := check.Run(ctx)
 		if checkErr != nil && verbose {
 			fmt.Printf("    Warning: %v\n", checkErr)
 		}
-		
+
 		for _, cr := range checkResults {
 			// Check if this control has CIS-AWS mapping in Frameworks
 			if cr.Frameworks != nil && cr.Frameworks["CIS-AWS"] != "" {
 				cisControls := cr.Frameworks["CIS-AWS"]
-				
+
 				// Enhance control name with CIS numbers
 				enhancedName := fmt.Sprintf("[CIS AWS %s] %s", cisControls, cr.Name)
-				
+
 				// Track section coverage (extract first digit from control number)
 				if len(cisControls) > 0 {
 					section := string(cisControls[0])
@@ -325,7 +325,7 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 						}
 					}
 				}
-				
+
 				results = append(results, ScanResult{
 					Control:           enhancedName,
 					Status:            cr.Status,
@@ -340,7 +340,7 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 			}
 		}
 	}
-	
+
 	if verbose {
 		fmt.Printf("\nCIS AWS scan complete: %d controls tested\n", len(results))
 		if len(sectionCounts) > 0 {
@@ -356,13 +356,13 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 		fmt.Println("  • Manual review of organizational policies")
 		fmt.Println("  • Documentation of operational procedures")
 	}
-	
+
 	return results
 }
 
 func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResult {
 	var results []ScanResult
-	
+
 	if verbose {
 		fmt.Println("Running CMMC Level 1 (17 practices) - Open Source")
 		fmt.Println("")
@@ -383,7 +383,7 @@ func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 		fmt.Println("═══════════════════════════════════════════════════════════")
 		fmt.Println("")
 	}
-	
+
 	// ONLY Level 1 (17 practices)
 	level1 := checks.NewAWSCMMCLevel1Checks(s.iamClient, s.s3Client, s.ec2Client, s.ctClient)
 	results1, _ := level1.Run(ctx)
@@ -400,7 +400,7 @@ func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 			Frameworks:        cr.Frameworks,
 		})
 	}
-	
+
 	if verbose {
 		fmt.Printf("\nCMMC Level 1 scan complete: %d controls tested\n", len(results))
 		fmt.Println("")
@@ -412,13 +412,13 @@ func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 		fmt.Println("")
 		fmt.Println("Visit https://auditkit.io/pro for full CMMC Level 2")
 	}
-	
+
 	return results
 }
 
 func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
 	var results []ScanResult
-	
+
 	// Initialize SOC2 checks
 	soc2Checks := []checks.Check{
 		// CC1 & CC2: Control Environment & Communication
@@ -447,44 +447,44 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 		checks.NewVPCChecks(s.ec2Client),
 
 		// CIS AWS Benchmark v1.5.0+ comprehensive coverage
-		checks.NewCISManualChecks(),                                                                   // CIS 4.1-4.15
-		checks.NewAccessAnalyzerChecks(s.accessAnalyzerClient, s.cfg.Region),                          // CIS 1.8
-		checks.NewRoute53Checks(s.route53Client),                                                      // CIS 5.19
-		checks.NewSSMChecks(s.ssmClient),                                                              // CIS 10.1-10.3
-		checks.NewBeanstalkChecks(s.beanstalkClient),                                                  // CIS 10.4-10.6
-		checks.NewAPIGatewayChecks(s.apigwClient, s.apigwv2Client),                                    // CIS 10.7-10.9
-		checks.NewBackupVaultChecks(s.backupClient),                                                   // CIS 10.10-10.12
-		checks.NewMessagingChecks(s.snsClient, s.sqsClient),                                           // CIS 10.13-10.15
-		checks.NewOrganizationsAdvancedChecks(s.orgClient, s.ctClient),                                // CIS 11.1-11.4
-		checks.NewSecretsManagerChecks(s.secretsManagerClient),                                        // CIS 12.1-12.3
-		checks.NewECRChecks(s.ecrClient),                                                              // CIS 13.1-13.3
-		checks.NewDynamoDBChecks(s.dynamodbClient),                                                    // CIS 14.1-14.3
-		checks.NewCloudFormationChecks(s.cloudFormationClient),                                        // CIS 15.1-15.2
-		checks.NewACMChecks(s.acmClient),                                                              // CIS 16.1-16.2
-		checks.NewIAMExtendedChecks(s.iamClient),                                                      // CIS 17.1-17.2
-		checks.NewAuroraChecks(s.rdsClient),                                                           // CIS 18.1
-		checks.NewLambdaChecks(s.lambdaClient),                                                        // Lambda best practices
-		checks.NewECSChecks(s.ecsClient),                                                              // ECS best practices
-		checks.NewEKSChecks(s.eksClient),                                                              // EKS best practices
-		checks.NewNetworkFirewallChecks(s.nfwClient, s.ec2Client),                                     // Network Firewall
-		checks.NewSecurityServicesChecks(s.gdClient, s.macieClient, s.shClient, s.inspector2Client),   // Additional security
+		checks.NewCISManualChecks(), // CIS 4.1-4.15
+		checks.NewAccessAnalyzerChecks(s.accessAnalyzerClient, s.cfg.Region),                        // CIS 1.8
+		checks.NewRoute53Checks(s.route53Client),                                                    // CIS 5.19
+		checks.NewSSMChecks(s.ssmClient),                                                            // CIS 10.1-10.3
+		checks.NewBeanstalkChecks(s.beanstalkClient),                                                // CIS 10.4-10.6
+		checks.NewAPIGatewayChecks(s.apigwClient, s.apigwv2Client),                                  // CIS 10.7-10.9
+		checks.NewBackupVaultChecks(s.backupClient),                                                 // CIS 10.10-10.12
+		checks.NewMessagingChecks(s.snsClient, s.sqsClient),                                         // CIS 10.13-10.15
+		checks.NewOrganizationsAdvancedChecks(s.orgClient, s.ctClient),                              // CIS 11.1-11.4
+		checks.NewSecretsManagerChecks(s.secretsManagerClient),                                      // CIS 12.1-12.3
+		checks.NewECRChecks(s.ecrClient),                                                            // CIS 13.1-13.3
+		checks.NewDynamoDBChecks(s.dynamodbClient),                                                  // CIS 14.1-14.3
+		checks.NewCloudFormationChecks(s.cloudFormationClient),                                      // CIS 15.1-15.2
+		checks.NewACMChecks(s.acmClient),                                                            // CIS 16.1-16.2
+		checks.NewIAMExtendedChecks(s.iamClient),                                                    // CIS 17.1-17.2
+		checks.NewAuroraChecks(s.rdsClient),                                                         // CIS 18.1
+		checks.NewLambdaChecks(s.lambdaClient),                                                      // Lambda best practices
+		checks.NewECSChecks(s.ecsClient),                                                            // ECS best practices
+		checks.NewEKSChecks(s.eksClient),                                                            // EKS best practices
+		checks.NewNetworkFirewallChecks(s.nfwClient, s.ec2Client),                                   // Network Firewall
+		checks.NewSecurityServicesChecks(s.gdClient, s.macieClient, s.shClient, s.inspector2Client), // Additional security
 		// Data Analytics & ML Services (January 2026)
-		checks.NewSageMakerChecks(s.sagemakerClient),                                                  // SageMaker ML security
-		checks.NewRedshiftChecks(s.redshiftClient),                                                    // Redshift data warehouse
-		checks.NewElastiCacheChecks(s.elasticacheClient),                                              // ElastiCache/Redis
-		checks.NewOpenSearchChecks(s.opensearchClient),                                                // OpenSearch/Elasticsearch
+		checks.NewSageMakerChecks(s.sagemakerClient),     // SageMaker ML security
+		checks.NewRedshiftChecks(s.redshiftClient),       // Redshift data warehouse
+		checks.NewElastiCacheChecks(s.elasticacheClient), // ElastiCache/Redis
+		checks.NewOpenSearchChecks(s.opensearchClient),   // OpenSearch/Elasticsearch
 	}
-	
+
 	for _, check := range soc2Checks {
 		if verbose {
 			fmt.Printf("  Running %s ...\n", check.Name())
 		}
-		
+
 		checkResults, err := check.Run(ctx)
 		if err != nil && verbose {
 			fmt.Printf("    Warning in %s: %v\n", check.Name(), err)
 		}
-		
+
 		// Convert CheckResult to ScanResult
 		for _, cr := range checkResults {
 			results = append(results, ScanResult{
@@ -500,25 +500,25 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 			})
 		}
 	}
-	
+
 	return results
 }
 
 func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResult {
 	var results []ScanResult
-	
+
 	// Check if pci_dss.go exists, if not fall back to basic checks with PCI mappings
 	pciChecks := checks.NewPCIDSSChecks(s.iamClient, s.ec2Client, s.s3Client, s.ctClient, s.configClient)
-	
+
 	if verbose {
 		fmt.Printf("  Running PCI-DSS v4.0 requirements...\n")
 	}
-	
+
 	checkResults, err := pciChecks.Run(ctx)
 	if err != nil && verbose {
 		fmt.Printf("    Warning in PCI-DSS checks: %v\n", err)
 	}
-	
+
 	// Convert CheckResult to ScanResult
 	for _, cr := range checkResults {
 		results = append(results, ScanResult{
@@ -533,15 +533,15 @@ func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 			Frameworks:        cr.Frameworks,
 		})
 	}
-	
+
 	// Also run basic checks but filter for PCI relevance
 	basicChecks := []checks.Check{
-		checks.NewIAMChecks(s.iamClient),      // For password policy, MFA, key rotation
-		checks.NewS3Checks(s.s3Client),        // For encryption requirements
-		checks.NewEC2Checks(s.ec2Client),      // For network segmentation
+		checks.NewIAMChecks(s.iamClient),       // For password policy, MFA, key rotation
+		checks.NewS3Checks(s.s3Client),         // For encryption requirements
+		checks.NewEC2Checks(s.ec2Client),       // For network segmentation
 		checks.NewCloudTrailChecks(s.ctClient), // For logging requirements
 	}
-	
+
 	for _, check := range basicChecks {
 		checkResults, _ := check.Run(ctx)
 		for _, cr := range checkResults {
@@ -561,6 +561,6 @@ func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 			}
 		}
 	}
-	
+
 	return results
 }

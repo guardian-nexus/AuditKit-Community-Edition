@@ -29,10 +29,10 @@ type IntegrationResult struct {
 
 // MappingFile represents contributor's framework mappings
 type MappingFile struct {
-	Version     string                   `json:"version"`
-	Domain      string                   `json:"domain"`      // "aad", "sharepoint", etc.
-	LastUpdated time.Time                `json:"last_updated"`
-	Rules       map[string]MappingRule   `json:"rules"`       // Rule ID -> mapping info
+	Version     string                 `json:"version"`
+	Domain      string                 `json:"domain"` // "aad", "sharepoint", etc.
+	LastUpdated time.Time              `json:"last_updated"`
+	Rules       map[string]MappingRule `json:"rules"` // Rule ID -> mapping info
 }
 
 // MappingRule maps external tool rules to compliance frameworks

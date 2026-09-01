@@ -448,12 +448,12 @@ func (c *CloudTrailChecks) CheckS3ObjectLevelLoggingWrite(ctx context.Context) (
 
 	if len(trails.Trails) == 0 {
 		return CheckResult{
-			Control:           "[CIS-3.10]",
-			Name:              "S3 Object-Level Logging (Write)",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          "No CloudTrail trails configured | Cannot log S3 object-level events | Violates CIS 3.10",
-			Remediation:       "Configure CloudTrail with S3 data events for write operations",
+			Control:     "[CIS-3.10]",
+			Name:        "S3 Object-Level Logging (Write)",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    "No CloudTrail trails configured | Cannot log S3 object-level events | Violates CIS 3.10",
+			Remediation: "Configure CloudTrail with S3 data events for write operations",
 			RemediationDetail: `# Create event selector for S3 write events
 aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '[{
   "ReadWriteType": "WriteOnly",
@@ -473,11 +473,11 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
     "Values": ["arn:aws:s3:::*/*"]
   }]
 }]'`,
-			ScreenshotGuide:   "CloudTrail → Trails → Data events → Screenshot showing S3 'Write' events logging enabled",
-			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/home#/trails",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "3.10", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
+			ScreenshotGuide: "CloudTrail → Trails → Data events → Screenshot showing S3 'Write' events logging enabled",
+			ConsoleURL:      "https://console.aws.amazon.com/cloudtrail/home#/trails",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "3.10", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
 		}, nil
 	}
 
@@ -511,12 +511,12 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 
 	if len(trailsWithS3WriteLogging) == 0 {
 		return CheckResult{
-			Control:           "[CIS-3.10]",
-			Name:              "S3 Object-Level Logging (Write)",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d CloudTrail trails found, but NONE log S3 write events | Violates CIS 3.10", len(trails.Trails)),
-			Remediation:       "Enable S3 data event logging for write operations on at least one trail",
+			Control:     "[CIS-3.10]",
+			Name:        "S3 Object-Level Logging (Write)",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("%d CloudTrail trails found, but NONE log S3 write events | Violates CIS 3.10", len(trails.Trails)),
+			Remediation: "Enable S3 data event logging for write operations on at least one trail",
 			RemediationDetail: `aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '[{
   "ReadWriteType": "WriteOnly",
   "IncludeManagementEvents": false,
@@ -525,11 +525,11 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
     "Values": ["arn:aws:s3:::*/*"]
   }]
 }]'`,
-			ScreenshotGuide:   "CloudTrail → Trails → Data events → Screenshot showing S3 'Write' events enabled",
-			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/home#/trails",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "3.10", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
+			ScreenshotGuide: "CloudTrail → Trails → Data events → Screenshot showing S3 'Write' events enabled",
+			ConsoleURL:      "https://console.aws.amazon.com/cloudtrail/home#/trails",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "3.10", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
 		}, nil
 	}
 
@@ -561,12 +561,12 @@ func (c *CloudTrailChecks) CheckS3ObjectLevelLoggingRead(ctx context.Context) (C
 
 	if len(trails.Trails) == 0 {
 		return CheckResult{
-			Control:           "[CIS-3.11]",
-			Name:              "S3 Object-Level Logging (Read)",
-			Status:            "FAIL",
-			Severity:          "MEDIUM",
-			Evidence:          "No CloudTrail trails configured | Cannot log S3 object-level events | Violates CIS 3.11",
-			Remediation:       "Configure CloudTrail with S3 data events for read operations",
+			Control:     "[CIS-3.11]",
+			Name:        "S3 Object-Level Logging (Read)",
+			Status:      "FAIL",
+			Severity:    "MEDIUM",
+			Evidence:    "No CloudTrail trails configured | Cannot log S3 object-level events | Violates CIS 3.11",
+			Remediation: "Configure CloudTrail with S3 data events for read operations",
 			RemediationDetail: `# Create event selector for S3 read events
 aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '[{
   "ReadWriteType": "ReadOnly",
@@ -586,11 +586,11 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
     "Values": ["arn:aws:s3:::*/*"]
   }]
 }]'`,
-			ScreenshotGuide:   "CloudTrail → Trails → Data events → Screenshot showing S3 'Read' events logging enabled",
-			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/home#/trails",
-			Priority:          PriorityMedium,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "3.11", "SOC2": "CC7.2", "PCI-DSS": "10.3"},
+			ScreenshotGuide: "CloudTrail → Trails → Data events → Screenshot showing S3 'Read' events logging enabled",
+			ConsoleURL:      "https://console.aws.amazon.com/cloudtrail/home#/trails",
+			Priority:        PriorityMedium,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "3.11", "SOC2": "CC7.2", "PCI-DSS": "10.3"},
 		}, nil
 	}
 
@@ -624,12 +624,12 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 
 	if len(trailsWithS3ReadLogging) == 0 {
 		return CheckResult{
-			Control:           "[CIS-3.11]",
-			Name:              "S3 Object-Level Logging (Read)",
-			Status:            "FAIL",
-			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("%d CloudTrail trails found, but NONE log S3 read events | Violates CIS 3.11", len(trails.Trails)),
-			Remediation:       "Enable S3 data event logging for read operations on at least one trail",
+			Control:     "[CIS-3.11]",
+			Name:        "S3 Object-Level Logging (Read)",
+			Status:      "FAIL",
+			Severity:    "MEDIUM",
+			Evidence:    fmt.Sprintf("%d CloudTrail trails found, but NONE log S3 read events | Violates CIS 3.11", len(trails.Trails)),
+			Remediation: "Enable S3 data event logging for read operations on at least one trail",
 			RemediationDetail: `aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '[{
   "ReadWriteType": "ReadOnly",
   "IncludeManagementEvents": false,
@@ -638,11 +638,11 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
     "Values": ["arn:aws:s3:::*/*"]
   }]
 }]'`,
-			ScreenshotGuide:   "CloudTrail → Trails → Data events → Screenshot showing S3 'Read' events enabled",
-			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/home#/trails",
-			Priority:          PriorityMedium,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "3.11", "SOC2": "CC7.2", "PCI-DSS": "10.3"},
+			ScreenshotGuide: "CloudTrail → Trails → Data events → Screenshot showing S3 'Read' events enabled",
+			ConsoleURL:      "https://console.aws.amazon.com/cloudtrail/home#/trails",
+			Priority:        PriorityMedium,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "3.11", "SOC2": "CC7.2", "PCI-DSS": "10.3"},
 		}, nil
 	}
 

@@ -33,14 +33,14 @@ func (c *GCPCC1Checks) Run(ctx context.Context) ([]CheckResult, error) {
 
 	// CC1.1: Integrity and Ethical Values
 	results = append(results, CheckResult{
-		Control:     "CC1.1",
-		Name:        "Integrity and Ethical Values",
-		Status:      "INFO",
-		Evidence:    "Manual review required: Verify code of conduct and ethics policies are documented",
-		Severity:    "INFO",
-		Priority:    PriorityInfo,
-		Timestamp:   time.Now(),
-		Remediation: "Document and publish organizational code of conduct",
+		Control:         "CC1.1",
+		Name:            "Integrity and Ethical Values",
+		Status:          "INFO",
+		Evidence:        "Manual review required: Verify code of conduct and ethics policies are documented",
+		Severity:        "INFO",
+		Priority:        PriorityInfo,
+		Timestamp:       time.Now(),
+		Remediation:     "Document and publish organizational code of conduct",
 		ScreenshotGuide: "Provide evidence of ethics policy documentation and training records",
 		Frameworks: map[string]string{
 			"SOC2": "CC1.1",
@@ -49,14 +49,14 @@ func (c *GCPCC1Checks) Run(ctx context.Context) ([]CheckResult, error) {
 
 	// CC1.2: Board Oversight
 	results = append(results, CheckResult{
-		Control:     "CC1.2",
-		Name:        "Board Oversight Responsibility",
-		Status:      "INFO",
-		Evidence:    "Manual review required: Verify board oversight of security program",
-		Severity:    "INFO",
-		Priority:    PriorityInfo,
-		Timestamp:   time.Now(),
-		Remediation: "Document board meeting minutes discussing security oversight",
+		Control:         "CC1.2",
+		Name:            "Board Oversight Responsibility",
+		Status:          "INFO",
+		Evidence:        "Manual review required: Verify board oversight of security program",
+		Severity:        "INFO",
+		Priority:        PriorityInfo,
+		Timestamp:       time.Now(),
+		Remediation:     "Document board meeting minutes discussing security oversight",
 		ScreenshotGuide: "Provide board charter and meeting minutes related to security governance",
 		Frameworks: map[string]string{
 			"SOC2": "CC1.2",
@@ -68,14 +68,14 @@ func (c *GCPCC1Checks) Run(ctx context.Context) ([]CheckResult, error) {
 
 	// CC1.4: Commitment to Competence
 	results = append(results, CheckResult{
-		Control:     "CC1.4",
-		Name:        "Commitment to Competence",
-		Status:      "INFO",
-		Evidence:    "Manual review required: Verify security training and competency programs",
-		Severity:    "INFO",
-		Priority:    PriorityInfo,
-		Timestamp:   time.Now(),
-		Remediation: "Implement security awareness training program",
+		Control:         "CC1.4",
+		Name:            "Commitment to Competence",
+		Status:          "INFO",
+		Evidence:        "Manual review required: Verify security training and competency programs",
+		Severity:        "INFO",
+		Priority:        PriorityInfo,
+		Timestamp:       time.Now(),
+		Remediation:     "Implement security awareness training program",
 		ScreenshotGuide: "Provide training records and certification documentation",
 		Frameworks: map[string]string{
 			"SOC2": "CC1.4",
@@ -93,13 +93,13 @@ func (c *GCPCC1Checks) CheckCC1_3_OrganizationalStructure(ctx context.Context) C
 	crmService, err := cloudresourcemanager.NewService(ctx)
 	if err != nil {
 		return CheckResult{
-			Control:     "CC1.3",
-			Name:        "Organizational Structure and Authority",
-			Status:      "ERROR",
-			Evidence:    fmt.Sprintf("Unable to check IAM roles: %v", err),
-			Severity:    "MEDIUM",
-			Priority:    PriorityMedium,
-			Timestamp:   time.Now(),
+			Control:   "CC1.3",
+			Name:      "Organizational Structure and Authority",
+			Status:    "ERROR",
+			Evidence:  fmt.Sprintf("Unable to check IAM roles: %v", err),
+			Severity:  "MEDIUM",
+			Priority:  PriorityMedium,
+			Timestamp: time.Now(),
 			Frameworks: map[string]string{
 				"SOC2": "CC1.3",
 			},
@@ -109,13 +109,13 @@ func (c *GCPCC1Checks) CheckCC1_3_OrganizationalStructure(ctx context.Context) C
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
 		return CheckResult{
-			Control:     "CC1.3",
-			Name:        "Organizational Structure and Authority",
-			Status:      "ERROR",
-			Evidence:    fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
-			Severity:    "MEDIUM",
-			Priority:    PriorityMedium,
-			Timestamp:   time.Now(),
+			Control:   "CC1.3",
+			Name:      "Organizational Structure and Authority",
+			Status:    "ERROR",
+			Evidence:  fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
+			Severity:  "MEDIUM",
+			Priority:  PriorityMedium,
+			Timestamp: time.Now(),
 			Frameworks: map[string]string{
 				"SOC2": "CC1.3",
 			},
@@ -172,13 +172,13 @@ func (c *GCPCC1Checks) CheckCC1_5_Accountability(ctx context.Context) CheckResul
 	crmService, err := cloudresourcemanager.NewService(ctx)
 	if err != nil {
 		return CheckResult{
-			Control:    "CC1.5",
-			Name:       "Accountability Enforcement",
-			Status:     "ERROR",
-			Evidence:   "Unable to verify accountability controls",
-			Severity:   "MEDIUM",
-			Priority:   PriorityMedium,
-			Timestamp:  time.Now(),
+			Control:   "CC1.5",
+			Name:      "Accountability Enforcement",
+			Status:    "ERROR",
+			Evidence:  "Unable to verify accountability controls",
+			Severity:  "MEDIUM",
+			Priority:  PriorityMedium,
+			Timestamp: time.Now(),
 			Frameworks: map[string]string{
 				"SOC2": "CC1.5",
 			},
@@ -188,13 +188,13 @@ func (c *GCPCC1Checks) CheckCC1_5_Accountability(ctx context.Context) CheckResul
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
 		return CheckResult{
-			Control:    "CC1.5",
-			Name:       "Accountability Enforcement",
-			Status:     "ERROR",
-			Evidence:   "Unable to verify accountability controls",
-			Severity:   "MEDIUM",
-			Priority:   PriorityMedium,
-			Timestamp:  time.Now(),
+			Control:   "CC1.5",
+			Name:      "Accountability Enforcement",
+			Status:    "ERROR",
+			Evidence:  "Unable to verify accountability controls",
+			Severity:  "MEDIUM",
+			Priority:  PriorityMedium,
+			Timestamp: time.Now(),
 			Frameworks: map[string]string{
 				"SOC2": "CC1.5",
 			},
@@ -218,13 +218,13 @@ func (c *GCPCC1Checks) CheckCC1_5_Accountability(ctx context.Context) CheckResul
 	}
 
 	return CheckResult{
-		Control:    "CC1.5",
-		Name:       "Accountability Enforcement",
-		Status:     "INFO",
-		Evidence:   "Manual review of accountability procedures required",
-		Severity:   "INFO",
-		Priority:   PriorityInfo,
-		Timestamp:  time.Now(),
+		Control:   "CC1.5",
+		Name:      "Accountability Enforcement",
+		Status:    "INFO",
+		Evidence:  "Manual review of accountability procedures required",
+		Severity:  "INFO",
+		Priority:  PriorityInfo,
+		Timestamp: time.Now(),
 		Frameworks: map[string]string{
 			"SOC2": "CC1.5",
 		},

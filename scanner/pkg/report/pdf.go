@@ -66,7 +66,7 @@ func GeneratePDF(result ComplianceResult, outputPath string) error {
 		pdf.SetY(-20)
 		pdf.SetFont("Arial", "", 8)
 		pdf.SetTextColor(108, 117, 125)
-		
+
 		// First line: License, Report ID, Timestamp
 		if lastEight != "" {
 			pdf.CellFormat(0, 4, fmt.Sprintf("AuditKit Pro | License: ***-%s | Report ID: %s | %s",
@@ -75,14 +75,14 @@ func GeneratePDF(result ComplianceResult, outputPath string) error {
 			pdf.CellFormat(0, 4, fmt.Sprintf("AuditKit | Report ID: %s | %s",
 				reportID, timestamp), "", 1, "C", false, 0, "")
 		}
-		
+
 		// Second line: Warning (only for Pro)
 		if lastEight != "" {
 			pdf.SetFont("Arial", "", 7)
 			pdf.SetTextColor(220, 53, 69)
 			pdf.CellFormat(0, 4, "This report is licensed to subscriber only - Unauthorized distribution prohibited", "", 1, "C", false, 0, "")
 		}
-		
+
 		// Third line: Support
 		pdf.SetFont("Arial", "", 7)
 		pdf.SetTextColor(108, 117, 125)

@@ -433,11 +433,11 @@ func (c *IAMChecks) CheckAPIKeysExist(ctx context.Context) []CheckResult {
 	// Note: API keys can't be directly listed via IAM client
 	// This requires the API Keys API which isn't in standard Cloud SDK
 	results = append(results, CheckResult{
-		Control:  "CIS GCP 1.12",
-		Name:     "[CIS GCP 1.12-1.14] API Keys Usage",
-		Status:   "MANUAL",
-		Severity: "HIGH",
-		Evidence: "MANUAL CHECK: Verify API keys are not in use, or if required, are properly restricted",
+		Control:     "CIS GCP 1.12",
+		Name:        "[CIS GCP 1.12-1.14] API Keys Usage",
+		Status:      "MANUAL",
+		Severity:    "HIGH",
+		Evidence:    "MANUAL CHECK: Verify API keys are not in use, or if required, are properly restricted",
 		Remediation: "Prefer service accounts over API keys. If API keys required, apply application and API restrictions",
 		RemediationDetail: `# List API keys
 gcloud services api-keys list
@@ -616,11 +616,11 @@ func (c *IAMChecks) CheckWorkloadIdentity(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
 	results = append(results, CheckResult{
-		Control:  "CIS GCP 1.15",
-		Name:     "[CIS GCP 1.15] GKE Workload Identity",
-		Status:   "MANUAL",
-		Severity: "MEDIUM",
-		Evidence: "MANUAL CHECK: If using GKE, verify Workload Identity is enabled instead of Compute Engine default service account",
+		Control:     "CIS GCP 1.15",
+		Name:        "[CIS GCP 1.15] GKE Workload Identity",
+		Status:      "MANUAL",
+		Severity:    "MEDIUM",
+		Evidence:    "MANUAL CHECK: If using GKE, verify Workload Identity is enabled instead of Compute Engine default service account",
 		Remediation: "Enable Workload Identity on GKE clusters for enhanced security",
 		RemediationDetail: `# Enable Workload Identity on existing cluster
 gcloud container clusters update CLUSTER_NAME \
@@ -705,12 +705,12 @@ func (c *IAMChecks) CheckDefaultServiceAccountDisabled(ctx context.Context) []Ch
 	}
 
 	return []CheckResult{{
-		Control:           "CIS-1.7",
-		Name:              "[CIS GCP 1.7] Default Service Account Disabled",
-		Status:            "FAIL",
-		Severity:          "CRITICAL",
-		Evidence:          fmt.Sprintf("Default Compute Engine service account (%s) is ENABLED | Violates CIS GCP 1.7 (default service account is overly permissive)", defaultSA.Email),
-		Remediation:       "Disable or delete the default Compute Engine service account",
+		Control:     "CIS-1.7",
+		Name:        "[CIS GCP 1.7] Default Service Account Disabled",
+		Status:      "FAIL",
+		Severity:    "CRITICAL",
+		Evidence:    fmt.Sprintf("Default Compute Engine service account (%s) is ENABLED | Violates CIS GCP 1.7 (default service account is overly permissive)", defaultSA.Email),
+		Remediation: "Disable or delete the default Compute Engine service account",
 		RemediationDetail: fmt.Sprintf(`# Option 1: Disable the default service account (recommended)
 gcloud iam service-accounts disable %s --project=%s
 
@@ -749,11 +749,11 @@ func (c *IAMChecks) CheckAPIKeyRotation(ctx context.Context) []CheckResult {
 	// Note: API Keys in GCP are managed through API Keys service, not IAM
 	// This is a manual check as the API Keys service requires separate client
 	return []CheckResult{{
-		Control:  "CIS GCP 1.11",
-		Name:     "[CIS GCP 1.11] API Keys Rotated Every 90 Days",
-		Status:   "MANUAL",
-		Severity: "MEDIUM",
-		Evidence: "MANUAL CHECK: Verify API keys are rotated every 90 days",
+		Control:     "CIS GCP 1.11",
+		Name:        "[CIS GCP 1.11] API Keys Rotated Every 90 Days",
+		Status:      "MANUAL",
+		Severity:    "MEDIUM",
+		Evidence:    "MANUAL CHECK: Verify API keys are rotated every 90 days",
 		Remediation: "Rotate API keys every 90 days and delete unused keys",
 		RemediationDetail: `# List all API keys
 gcloud services api-keys list --project=` + c.projectID + `
@@ -884,11 +884,11 @@ func (c *IAMChecks) CheckKMSKeysPublicAccess(ctx context.Context) []CheckResult 
 	// Note: This requires KMS API client to check key policies
 	// Implementing as manual check for now
 	return []CheckResult{{
-		Control:  "CIS GCP 1.8",
-		Name:     "[CIS GCP 1.8] KMS Keys Not Publicly Accessible",
-		Status:   "MANUAL",
-		Severity: "CRITICAL",
-		Evidence: "MANUAL CHECK: Verify KMS cryptokeys are not accessible by allUsers or allAuthenticatedUsers",
+		Control:     "CIS GCP 1.8",
+		Name:        "[CIS GCP 1.8] KMS Keys Not Publicly Accessible",
+		Status:      "MANUAL",
+		Severity:    "CRITICAL",
+		Evidence:    "MANUAL CHECK: Verify KMS cryptokeys are not accessible by allUsers or allAuthenticatedUsers",
 		Remediation: "Remove public access from all KMS cryptokeys",
 		RemediationDetail: `# List KMS keys
 gcloud kms keys list --location=LOCATION --keyring=KEYRING --project=` + c.projectID + `
@@ -1095,11 +1095,11 @@ func (c *IAMChecks) CheckIAMUserRoles(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:  "CIS GCP 1.6",
-			Name:     "[CIS GCP 1.6] Service Account Roles at Project Level",
-			Status:   "FAIL",
-			Severity: "HIGH",
-			Evidence: fmt.Sprintf("CIS 1.6: %d users have Service Account User/Token Creator roles at project level (should be service account-level only): %s", len(violatingBindings), strings.Join(displayBindings, ", ")),
+			Control:     "CIS GCP 1.6",
+			Name:        "[CIS GCP 1.6] Service Account Roles at Project Level",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("CIS 1.6: %d users have Service Account User/Token Creator roles at project level (should be service account-level only): %s", len(violatingBindings), strings.Join(displayBindings, ", ")),
 			Remediation: "Grant Service Account User and Token Creator roles at the individual service account level, not project level",
 			RemediationDetail: fmt.Sprintf(`# Remove project-level role binding
 gcloud projects remove-iam-policy-binding %s \

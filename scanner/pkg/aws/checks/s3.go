@@ -71,13 +71,13 @@ func (c *S3Checks) CheckPublicAccess(ctx context.Context) (CheckResult, error) {
 	resp, err := c.client.ListBuckets(ctx, &s3.ListBucketsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:   "CC6.2",
-			Name:      "S3 Public Access Block",
-			Status:    "FAIL",
-			Evidence:  fmt.Sprintf("Unable to check S3 buckets: %v", err),
-			Severity:  "HIGH",
-			Priority:  PriorityHigh,
-			Timestamp: time.Now(),
+			Control:    "CC6.2",
+			Name:       "S3 Public Access Block",
+			Status:     "FAIL",
+			Evidence:   fmt.Sprintf("Unable to check S3 buckets: %v", err),
+			Severity:   "HIGH",
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("S3_PUBLIC_ACCESS"),
 		}, err
 	}
@@ -477,12 +477,12 @@ func (c *S3Checks) CheckAccountPublicAccessBlock(ctx context.Context) (CheckResu
 		// If error is "NoSuchPublicAccessBlockConfiguration", it means it's not configured
 		if strings.Contains(err.Error(), "NoSuchPublicAccessBlockConfiguration") {
 			return CheckResult{
-				Control:           "[CIS-2.1.7]",
-				Name:              "S3 Account Public Access Block",
-				Status:            "FAIL",
-				Severity:          "CRITICAL",
-				Evidence:          "S3 Block Public Access is NOT configured at account level | Violates CIS 2.1.7 (account-wide protection missing)",
-				Remediation:       "Enable S3 Block Public Access for the entire AWS account",
+				Control:     "[CIS-2.1.7]",
+				Name:        "S3 Account Public Access Block",
+				Status:      "FAIL",
+				Severity:    "CRITICAL",
+				Evidence:    "S3 Block Public Access is NOT configured at account level | Violates CIS 2.1.7 (account-wide protection missing)",
+				Remediation: "Enable S3 Block Public Access for the entire AWS account",
 				RemediationDetail: `# Enable S3 Block Public Access at account level
 aws s3control put-public-access-block \
   --account-id $(aws sts get-caller-identity --query Account --output text) \
@@ -490,11 +490,11 @@ aws s3control put-public-access-block \
     BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
 
 # This protects all S3 buckets in the account from public access`,
-				ScreenshotGuide:   "S3 Console → Block Public Access settings for this account → Screenshot showing ALL 4 settings enabled",
-				ConsoleURL:        "https://s3.console.aws.amazon.com/s3/settings",
-				Priority:          PriorityCritical,
-				Timestamp:         time.Now(),
-				Frameworks:        map[string]string{"CIS-AWS": "2.1.7", "SOC2": "CC6.1", "PCI-DSS": "1.2.1"},
+				ScreenshotGuide: "S3 Console → Block Public Access settings for this account → Screenshot showing ALL 4 settings enabled",
+				ConsoleURL:      "https://s3.console.aws.amazon.com/s3/settings",
+				Priority:        PriorityCritical,
+				Timestamp:       time.Now(),
+				Frameworks:      map[string]string{"CIS-AWS": "2.1.7", "SOC2": "CC6.1", "PCI-DSS": "1.2.1"},
 			}, nil
 		}
 
@@ -532,21 +532,21 @@ aws s3control put-public-access-block \
 		}
 
 		return CheckResult{
-			Control:           "[CIS-2.1.7]",
-			Name:              "S3 Account Public Access Block",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("S3 Block Public Access not fully enabled: %s | Violates CIS 2.1.7", strings.Join(settings, ", ")),
-			Remediation:       "Enable all 4 Block Public Access settings at account level",
+			Control:     "[CIS-2.1.7]",
+			Name:        "S3 Account Public Access Block",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("S3 Block Public Access not fully enabled: %s | Violates CIS 2.1.7", strings.Join(settings, ", ")),
+			Remediation: "Enable all 4 Block Public Access settings at account level",
 			RemediationDetail: `aws s3control put-public-access-block \
   --account-id $(aws sts get-caller-identity --query Account --output text) \
   --public-access-block-configuration \
     BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true`,
-			ScreenshotGuide:   "S3 Console → Block Public Access settings → Screenshot showing ALL 4 checkboxes enabled",
-			ConsoleURL:        "https://s3.console.aws.amazon.com/s3/settings",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "2.1.7", "SOC2": "CC6.1", "PCI-DSS": "1.2.1"},
+			ScreenshotGuide: "S3 Console → Block Public Access settings → Screenshot showing ALL 4 checkboxes enabled",
+			ConsoleURL:      "https://s3.console.aws.amazon.com/s3/settings",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "2.1.7", "SOC2": "CC6.1", "PCI-DSS": "1.2.1"},
 		}, nil
 	}
 

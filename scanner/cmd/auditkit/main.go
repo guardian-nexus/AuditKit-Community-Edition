@@ -10,19 +10,19 @@ import (
 	"strings"
 	"time"
 
-	gcpScanner "github.com/guardian-nexus/auditkit/scanner/pkg/gcp"
 	awsScanner "github.com/guardian-nexus/auditkit/scanner/pkg/aws"
 	azureScanner "github.com/guardian-nexus/auditkit/scanner/pkg/azure"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/cli"
+	gcpScanner "github.com/guardian-nexus/auditkit/scanner/pkg/gcp"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/integrations"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/integrations/prowler"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/integrations/scubagear"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/offline"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/remediation"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/report"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/tracker"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/updater"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
 )
 
 var CurrentVersion = "v0.8.3"
@@ -73,16 +73,16 @@ type ScorePoint struct {
 
 func main() {
 	var (
-		provider  = flag.String("provider", "aws", "Cloud provider: aws, azure, gcp")
-		profile   = flag.String("profile", "default", "AWS profile, Azure subscription, or GCP project ID")
-		framework = flag.String("framework", "all", "Compliance framework: soc2, pci, cmmc, hipaa, gdpr, nist-csf, all")
-		format    = flag.String("format", "text", "Output format (text, json, html, pdf, csv)")
-		output    = flag.String("output", "", "Output file (default: stdout)")
-		verbose   = flag.Bool("verbose", false, "Verbose output")
-		full      = flag.Bool("full", false, "Show all controls in text output (default: truncated for readability)")
-		services  = flag.String("services", "all", "Comma-separated services to scan")
-		source    = flag.String("source", "", "Integration source: scubagear, prowler")
-		file      = flag.String("file", "", "Integration file to parse")
+		provider    = flag.String("provider", "aws", "Cloud provider: aws, azure, gcp")
+		profile     = flag.String("profile", "default", "AWS profile, Azure subscription, or GCP project ID")
+		framework   = flag.String("framework", "all", "Compliance framework: soc2, pci, cmmc, hipaa, gdpr, nist-csf, all")
+		format      = flag.String("format", "text", "Output format (text, json, html, pdf, csv)")
+		output      = flag.String("output", "", "Output file (default: stdout)")
+		verbose     = flag.Bool("verbose", false, "Verbose output")
+		full        = flag.Bool("full", false, "Show all controls in text output (default: truncated for readability)")
+		services    = flag.String("services", "all", "Comma-separated services to scan")
+		source      = flag.String("source", "", "Integration source: scubagear, prowler")
+		file        = flag.String("file", "", "Integration file to parse")
 		offlineMode = flag.Bool("offline", false, "Use cached scan results (no cloud API calls)")
 		cacheFile   = flag.String("cache-file", "", "Load scan from specific cache file")
 	)
@@ -212,7 +212,7 @@ func runIntegration(source, file, format, output string, verbose bool) {
 		}
 
 		mappingsDir := filepath.Join("mappings", "scubagear")
-		
+
 		if _, err := os.Stat(mappingsDir); os.IsNotExist(err) {
 			fmt.Fprintf(os.Stderr, "Error: ScubaGear mappings not found at %s\n", mappingsDir)
 			fmt.Fprintf(os.Stderr, "Make sure entra.json exists in mappings/scubagear/\n")
@@ -220,7 +220,7 @@ func runIntegration(source, file, format, output string, verbose bool) {
 		}
 
 		integration := scubagear.NewScubaGearIntegration(mappingsDir)
-		
+
 		if verbose {
 			fmt.Fprintf(os.Stderr, "Loading mappings from %s...\n", mappingsDir)
 		}
@@ -454,7 +454,7 @@ func printIntegrationSummary(result ComplianceResult) {
 	fmt.Printf("Provider: %s\n", result.Provider)
 	fmt.Printf("Scan Time: %s\n", result.Timestamp.Format("2006-01-02 15:04:05"))
 	fmt.Printf("\n")
-	
+
 	scoreColor := "\033[32m"
 	if result.Score < 80 {
 		scoreColor = "\033[33m"
@@ -764,7 +764,7 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 	}
 
 	if verbose {
-		fmt.Fprintf(os.Stderr, "Starting %s compliance scan for %s...\n", 
+		fmt.Fprintf(os.Stderr, "Starting %s compliance scan for %s...\n",
 			strings.ToUpper(framework), provider)
 	}
 
@@ -791,26 +791,26 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 
 	if result.Score >= 90 {
 		fmt.Printf("\nCONGRATULATIONS! %.1f%% of automated checks passed!\n", result.Score)
-		
+
 		if manualChecks > 0 {
 			fmt.Printf("\n⚠️  NOTE: %d additional manual controls require documentation.\n", manualChecks)
 			fmt.Printf("   Use 'auditkit evidence' to generate collection checklist.\n")
 		}
 	} else if result.Score >= 70 {
 		fmt.Printf("\nGetting there! %.1f%% of automated checks passed.\n", result.Score)
-		
+
 		if manualChecks > 0 {
 			fmt.Printf("\n⚠️  NOTE: %d additional manual controls require documentation.\n", manualChecks)
 			fmt.Printf("   Use 'auditkit evidence' to generate collection checklist.\n")
 		}
-		
+
 		fmt.Println("Run 'auditkit compare' to see your progress over time.")
 	} else {
-		fmt.Printf("\nAutomated Check Score: %.1f%% (%d/%d passed)\n", 
+		fmt.Printf("\nAutomated Check Score: %.1f%% (%d/%d passed)\n",
 			result.Score, result.PassedControls, automatedChecks)
-		
+
 		if manualChecks > 0 {
-			fmt.Printf("\n⚠️  IMPORTANT: Only %d of %d total controls are automated.\n", 
+			fmt.Printf("\n⚠️  IMPORTANT: Only %d of %d total controls are automated.\n",
 				automatedChecks, automatedChecks+manualChecks)
 			fmt.Printf("   %d controls require manual documentation and evidence.\n", manualChecks)
 			fmt.Printf("   Use 'auditkit evidence' to track what you need to collect.\n")
@@ -839,9 +839,9 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 		}
 
 		if output == "" {
-			output = fmt.Sprintf("auditkit-%s-%s-report-%s.pdf", 
+			output = fmt.Sprintf("auditkit-%s-%s-report-%s.pdf",
 				provider,
-				strings.ToLower(framework), 
+				strings.ToLower(framework),
 				time.Now().Format("2006-01-02-150405"))
 		}
 
@@ -879,7 +879,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 
 	// CIS CHANGE: Normalize framework name
 	framework = strings.ToLower(strings.TrimSpace(framework))
-	
+
 	// CIS CHANGE: Handle CIS framework auto-detection
 	if framework == "cis" {
 		switch provider {
@@ -894,7 +894,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 			fmt.Printf("Auto-detected CIS framework: %s\n", framework)
 		}
 	}
-	
+
 	switch provider {
 	case "aws":
 		scanner, err := awsScanner.NewScanner(profile)
@@ -904,28 +904,28 @@ func performScan(provider, profile, framework string, verbose bool, services str
 			fmt.Fprintf(os.Stderr, "  aws configure --profile %s\n", profile)
 			os.Exit(1)
 		}
-		
+
 		accountID = scanner.GetAccountID(ctx)
-		
+
 		if verbose {
 			fmt.Fprintf(os.Stderr, "Scanning AWS Account: %s\n", accountID)
 			fmt.Fprintf(os.Stderr, "Framework: %s\n", strings.ToUpper(framework))
 		}
-		
+
 		serviceList := strings.Split(services, ",")
 		if services == "all" {
 			serviceList = []string{"s3", "iam", "ec2", "cloudtrail", "rds"}
 		}
-		
+
 		awsResults, err := scanner.ScanServices(ctx, serviceList, verbose, framework)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Warning during scan: %v\n", err)
 		}
-		
+
 		for _, r := range awsResults {
 			scanResults = append(scanResults, r)
 		}
-		
+
 	case "azure":
 		// Get subscription ID from environment variable
 		subscriptionID := os.Getenv("AZURE_SUBSCRIPTION_ID")
@@ -944,28 +944,28 @@ func performScan(provider, profile, framework string, verbose bool, services str
 			fmt.Fprintf(os.Stderr, "  export AZURE_TENANT_ID=<tenant-id>\n")
 			os.Exit(1)
 		}
-		
+
 		accountID = scanner.GetAccountID(ctx)
-		
+
 		if verbose {
 			fmt.Fprintf(os.Stderr, "Scanning Azure Subscription: %s\n", accountID)
 			fmt.Fprintf(os.Stderr, "Framework: %s\n", strings.ToUpper(framework))
 		}
-		
+
 		serviceList := strings.Split(services, ",")
 		if services == "all" {
 			serviceList = []string{"storage", "aad", "network", "compute", "sql"}
 		}
-		
+
 		azureResults, err := scanner.ScanServices(ctx, serviceList, verbose, framework)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Warning during scan: %v\n", err)
 		}
-		
+
 		for _, r := range azureResults {
 			scanResults = append(scanResults, r)
 		}
-		
+
 	case "gcp":
 		// Get GCP project ID from profile flag or environment
 		projectID := profile
@@ -1008,20 +1008,20 @@ func performScan(provider, profile, framework string, verbose bool, services str
 		for _, r := range gcpResults {
 			scanResults = append(scanResults, r)
 		}
-		
+
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown provider: %s\n", provider)
 		fmt.Fprintf(os.Stderr, "Supported providers: aws, azure, gcp\n")
 		os.Exit(1)
 	}
-	
+
 	// Convert scan results to ComplianceResult format
 	controls := []ControlResult{}
 	passed := 0
 	failed := 0
 	critical := 0
 	high := 0
-	
+
 	// Load crosswalk once if needed for 800-53 or FedRAMP
 	var crosswalk *mappings.Crosswalk
 	var crosswalkErr error
@@ -1052,64 +1052,64 @@ func performScan(provider, profile, framework string, verbose bool, services str
 
 	for _, result := range scanResults {
 		var control ControlResult
-		
+
 		// Type assertion based on provider
 		switch provider {
 		case "aws":
 			awsResult := result.(awsScanner.ScanResult)
-				priority, impact := getPriorityAndImpact(awsResult.Control, awsResult.Severity, awsResult.Status, framework)
-				control = ControlResult{
-					ID:                awsResult.Control,
-					Name:              getControlName(awsResult.Control),
-					Category:          getControlCategory(awsResult.Control),
-					Severity:          awsResult.Severity,
-					Status:            awsResult.Status,
-					Evidence:          awsResult.Evidence,
-					Remediation:       awsResult.Remediation,
-					RemediationDetail: awsResult.RemediationDetail,
-					Priority:          priority,
-					Impact:            impact,
-					ScreenshotGuide:   awsResult.ScreenshotGuide,
-					ConsoleURL:        awsResult.ConsoleURL,
-					Frameworks:        awsResult.Frameworks,
+			priority, impact := getPriorityAndImpact(awsResult.Control, awsResult.Severity, awsResult.Status, framework)
+			control = ControlResult{
+				ID:                awsResult.Control,
+				Name:              getControlName(awsResult.Control),
+				Category:          getControlCategory(awsResult.Control),
+				Severity:          awsResult.Severity,
+				Status:            awsResult.Status,
+				Evidence:          awsResult.Evidence,
+				Remediation:       awsResult.Remediation,
+				RemediationDetail: awsResult.RemediationDetail,
+				Priority:          priority,
+				Impact:            impact,
+				ScreenshotGuide:   awsResult.ScreenshotGuide,
+				ConsoleURL:        awsResult.ConsoleURL,
+				Frameworks:        awsResult.Frameworks,
 			}
 		case "azure":
 			azureResult := result.(azureScanner.ScanResult)
-				priority, impact := getPriorityAndImpact(azureResult.Control, azureResult.Severity, azureResult.Status, framework)
-				control = ControlResult{
-					ID:                azureResult.Control,
-					Name:              getControlName(azureResult.Control),
-					Category:          getControlCategory(azureResult.Control),
-					Severity:          azureResult.Severity,
-					Status:            azureResult.Status,
-					Evidence:          azureResult.Evidence,
-					Remediation:       azureResult.Remediation,
-					RemediationDetail: azureResult.RemediationDetail,
-					Priority:          priority,
-					Impact:            impact,
-					ScreenshotGuide:   azureResult.ScreenshotGuide,
-					ConsoleURL:        azureResult.ConsoleURL,
-					Frameworks:        azureResult.Frameworks,
+			priority, impact := getPriorityAndImpact(azureResult.Control, azureResult.Severity, azureResult.Status, framework)
+			control = ControlResult{
+				ID:                azureResult.Control,
+				Name:              getControlName(azureResult.Control),
+				Category:          getControlCategory(azureResult.Control),
+				Severity:          azureResult.Severity,
+				Status:            azureResult.Status,
+				Evidence:          azureResult.Evidence,
+				Remediation:       azureResult.Remediation,
+				RemediationDetail: azureResult.RemediationDetail,
+				Priority:          priority,
+				Impact:            impact,
+				ScreenshotGuide:   azureResult.ScreenshotGuide,
+				ConsoleURL:        azureResult.ConsoleURL,
+				Frameworks:        azureResult.Frameworks,
 			}
 		case "gcp":
 			gcpResult := result.(gcpScanner.ScanResult)
-				priority, impact := getPriorityAndImpact(gcpResult.Control, gcpResult.Severity, gcpResult.Status, framework)
-				control = ControlResult{
-					ID:                gcpResult.Control,
-					Name:              getControlName(gcpResult.Control),
-					Category:          getControlCategory(gcpResult.Control),
-					Severity:          gcpResult.Severity,
-					Status:            gcpResult.Status,
-					Evidence:          gcpResult.Evidence,
-					Remediation:       gcpResult.Remediation,
-					RemediationDetail: gcpResult.RemediationDetail,
-					Priority:          priority,
-					Impact:            impact,
-					ScreenshotGuide:   gcpResult.ScreenshotGuide,
-					ConsoleURL:        gcpResult.ConsoleURL,
-					Frameworks:        gcpResult.Frameworks,
-				}
+			priority, impact := getPriorityAndImpact(gcpResult.Control, gcpResult.Severity, gcpResult.Status, framework)
+			control = ControlResult{
+				ID:                gcpResult.Control,
+				Name:              getControlName(gcpResult.Control),
+				Category:          getControlCategory(gcpResult.Control),
+				Severity:          gcpResult.Severity,
+				Status:            gcpResult.Status,
+				Evidence:          gcpResult.Evidence,
+				Remediation:       gcpResult.Remediation,
+				RemediationDetail: gcpResult.RemediationDetail,
+				Priority:          priority,
+				Impact:            impact,
+				ScreenshotGuide:   gcpResult.ScreenshotGuide,
+				ConsoleURL:        gcpResult.ConsoleURL,
+				Frameworks:        gcpResult.Frameworks,
 			}
+		}
 		// Filter by framework if not "all"
 		if framework != "all" {
 			hasRequestedFramework := false
@@ -1241,7 +1241,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 		}
 
 		controls = append(controls, control)
-		
+
 		if control.Status == "PASS" {
 			passed++
 		} else if control.Status == "FAIL" {
@@ -1253,13 +1253,13 @@ func performScan(provider, profile, framework string, verbose bool, services str
 			}
 		}
 	}
-	
+
 	score := 0.0
 	automatedChecks := passed + failed
 	if automatedChecks > 0 {
 		score = float64(passed) / float64(automatedChecks) * 100
 	}
-	
+
 	return ComplianceResult{
 		Timestamp:       time.Now(),
 		Provider:        provider,
@@ -1277,9 +1277,9 @@ func performScan(provider, profile, framework string, verbose bool, services str
 func saveProgress(accountID string, score float64, controls []ControlResult, framework string) error {
 	homeDir, _ := os.UserHomeDir()
 	dataPath := filepath.Join(homeDir, ".auditkit", accountID+".json")
-	
+
 	os.MkdirAll(filepath.Dir(dataPath), 0755)
-	
+
 	var progress ProgressData
 	if data, err := os.ReadFile(dataPath); err == nil {
 		json.Unmarshal(data, &progress)
@@ -1291,7 +1291,7 @@ func saveProgress(accountID string, score float64, controls []ControlResult, fra
 			ScoreHistory: []ScorePoint{},
 		}
 	}
-	
+
 	progress.LastScan = time.Now()
 	progress.ScanCount++
 	progress.ScoreHistory = append(progress.ScoreHistory, ScorePoint{
@@ -1299,13 +1299,13 @@ func saveProgress(accountID string, score float64, controls []ControlResult, fra
 		Score:     score,
 		Framework: framework,
 	})
-	
+
 	for _, control := range controls {
 		if control.Status == "PASS" {
 			progress.FixedIssues[control.ID] = true
 		}
 	}
-	
+
 	data, _ := json.MarshalIndent(progress, "", "  ")
 	return os.WriteFile(dataPath, data, 0644)
 }
@@ -1313,7 +1313,7 @@ func saveProgress(accountID string, score float64, controls []ControlResult, fra
 func showProgress(provider, profile string) {
 	var accountID string
 	ctx := context.Background()
-	
+
 	switch provider {
 	case "aws":
 		scanner, err := awsScanner.NewScanner(profile)
@@ -1350,35 +1350,35 @@ func showProgress(provider, profile string) {
 		defer scanner.Close()
 		accountID = scanner.GetAccountID(ctx)
 	}
-	
+
 	homeDir, _ := os.UserHomeDir()
 	dataPath := filepath.Join(homeDir, ".auditkit", accountID+".json")
-	
+
 	data, err := os.ReadFile(dataPath)
 	if err != nil {
 		fmt.Println("No previous scans found. Run 'auditkit scan' first!")
 		return
 	}
-	
+
 	var progress ProgressData
 	json.Unmarshal(data, &progress)
-	
+
 	fmt.Println("\nYour Compliance Journey Progress")
 	fmt.Println("===================================")
 	fmt.Printf("Account: %s\n", progress.AccountID)
 	fmt.Printf("First scan: %s\n", progress.FirstScan.Format("Jan 2, 2006"))
 	fmt.Printf("Total scans: %d\n", progress.ScanCount)
 	fmt.Printf("Issues fixed: %d\n", len(progress.FixedIssues))
-	
+
 	if len(progress.ScoreHistory) > 1 {
 		first := progress.ScoreHistory[0].Score
 		last := progress.ScoreHistory[len(progress.ScoreHistory)-1].Score
 		improvement := last - first
-		
+
 		if improvement > 0 {
 			fmt.Printf("Score improvement: +%.1f%% (%.1f%% → %.1f%%)\n", improvement, first, last)
 		}
-		
+
 		fmt.Println("\nScore Trend:")
 		startIdx := 0
 		if len(progress.ScoreHistory) > 5 {
@@ -1398,14 +1398,14 @@ func showProgress(provider, profile string) {
 				point.Score)
 		}
 	}
-	
+
 	fmt.Println("\nTip: Run 'auditkit scan -framework 800-53' to check NIST 800-53 compliance")
 }
 
 func compareScan(provider, profile string) {
 	var accountID string
 	ctx := context.Background()
-	
+
 	switch provider {
 	case "aws":
 		scanner, err := awsScanner.NewScanner(profile)
@@ -1442,32 +1442,32 @@ func compareScan(provider, profile string) {
 		defer scanner.Close()
 		accountID = scanner.GetAccountID(ctx)
 	}
-	
+
 	homeDir, _ := os.UserHomeDir()
 	dataPath := filepath.Join(homeDir, ".auditkit", accountID+".json")
-	
+
 	data, err := os.ReadFile(dataPath)
 	if err != nil {
 		fmt.Println("Need at least 2 scans to compare. Run 'auditkit scan' first!")
 		return
 	}
-	
+
 	var progress ProgressData
 	json.Unmarshal(data, &progress)
-	
+
 	if len(progress.ScoreHistory) < 2 {
 		fmt.Println("Need at least 2 scans to compare.")
 		return
 	}
-	
+
 	prev := progress.ScoreHistory[len(progress.ScoreHistory)-2]
 	curr := progress.ScoreHistory[len(progress.ScoreHistory)-1]
-	
+
 	fmt.Println("\nCompliance Progress Report")
 	fmt.Println("============================")
 	fmt.Printf("Previous: %.1f%% [%s] (%s)\n", prev.Score, prev.Framework, prev.Date.Format("Jan 2, 3:04 PM"))
 	fmt.Printf("Current:  %.1f%% [%s] (%s)\n", curr.Score, curr.Framework, curr.Date.Format("Jan 2, 3:04 PM"))
-	
+
 	improvement := curr.Score - prev.Score
 	if improvement > 0 {
 		fmt.Printf("\nImproved by %.1f%%!\n", improvement)
@@ -1476,18 +1476,18 @@ func compareScan(provider, profile string) {
 	} else {
 		fmt.Println("\nNo change")
 	}
-	
+
 	fmt.Println("\nTo see what changed, run:")
 	fmt.Println("  auditkit scan -verbose")
 }
 
 func generateFixScript(provider, profile, output string) {
 	fmt.Println("Generating remediation script...")
-	
+
 	ctx := context.Background()
 	var accountID string
 	var controls []remediation.ControlResult
-	
+
 	switch provider {
 	case "aws":
 		scanner, err := awsScanner.NewScanner(profile)
@@ -1497,10 +1497,10 @@ func generateFixScript(provider, profile, output string) {
 		}
 		accountID = scanner.GetAccountID(ctx)
 		fmt.Printf("Scanning AWS Account %s to identify fixes...\n", accountID)
-		
+
 		services := []string{"s3", "iam", "ec2", "cloudtrail", "rds"}
 		scanResults, _ := scanner.ScanServices(ctx, services, false, "soc2")
-		
+
 		for _, result := range scanResults {
 			controls = append(controls, remediation.ControlResult{
 				Control:           result.Control,
@@ -1549,31 +1549,31 @@ func generateFixScript(provider, profile, output string) {
 		defer scanner.Close()
 		accountID = scanner.GetAccountID(ctx)
 		fmt.Printf("Scanning GCP Project %s to identify fixes...\n", accountID)
-		
+
 		services := []string{"storage", "iam", "network", "sql"}
 		scanResults, _ := scanner.ScanServices(ctx, services, false, "soc2")
-		
+
 		for _, result := range scanResults {
 			gcpResult := result
-				controls = append(controls, remediation.ControlResult{
-					Control:           gcpResult.Control,
-					Status:            gcpResult.Status,
-					Severity:          gcpResult.Severity,
-					RemediationDetail: gcpResult.RemediationDetail,
-				})
+			controls = append(controls, remediation.ControlResult{
+				Control:           gcpResult.Control,
+				Status:            gcpResult.Status,
+				Severity:          gcpResult.Severity,
+				RemediationDetail: gcpResult.RemediationDetail,
+			})
 		}
 	}
-	
+
 	if output == "" {
 		output = fmt.Sprintf("auditkit-%s-fixes.sh", provider)
 	}
-	
+
 	err := remediation.GenerateFixScript(controls, output)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error generating fix script: %v\n", err)
 		os.Exit(1)
 	}
-	
+
 	fmt.Printf("Fix script generated: %s\n", output)
 	fmt.Println("REVIEW CAREFULLY before running!")
 	fmt.Printf("   chmod +x %s\n", output)
@@ -1582,11 +1582,11 @@ func generateFixScript(provider, profile, output string) {
 
 func runEvidenceTracker(provider, profile, output string) {
 	fmt.Println("Generating evidence collection tracker...")
-	
+
 	ctx := context.Background()
 	var accountID string
 	var controls []tracker.ControlResult
-	
+
 	switch provider {
 	case "aws":
 		scanner, err := awsScanner.NewScanner(profile)
@@ -1596,10 +1596,10 @@ func runEvidenceTracker(provider, profile, output string) {
 		}
 		accountID = scanner.GetAccountID(ctx)
 		fmt.Printf("Scanning AWS Account %s...\n", accountID)
-		
+
 		services := []string{"s3", "iam", "ec2", "cloudtrail", "rds"}
 		scanResults, _ := scanner.ScanServices(ctx, services, false, "soc2")
-		
+
 		for _, result := range scanResults {
 			controls = append(controls, tracker.ControlResult{
 				Control: result.Control,
@@ -1619,10 +1619,10 @@ func runEvidenceTracker(provider, profile, output string) {
 		}
 		accountID = scanner.GetAccountID(ctx)
 		fmt.Printf("Scanning Azure Subscription %s...\n", accountID)
-		
+
 		services := []string{"storage", "aad", "network"}
 		scanResults, _ := scanner.ScanServices(ctx, services, false, "soc2")
-		
+
 		for _, result := range scanResults {
 			controls = append(controls, tracker.ControlResult{
 				Control: result.Control,
@@ -1645,30 +1645,30 @@ func runEvidenceTracker(provider, profile, output string) {
 		defer scanner.Close()
 		accountID = scanner.GetAccountID(ctx)
 		fmt.Printf("Scanning GCP Project %s...\n", accountID)
-		
+
 		services := []string{"storage", "iam", "network", "sql"}
 		scanResults, _ := scanner.ScanServices(ctx, services, false, "soc2")
-		
+
 		for _, result := range scanResults {
 			gcpResult := result
-				controls = append(controls, tracker.ControlResult{
-					Control: gcpResult.Control,
-					Status:  gcpResult.Status,
-				})
-			}
+			controls = append(controls, tracker.ControlResult{
+				Control: gcpResult.Control,
+				Status:  gcpResult.Status,
+			})
 		}
-		
+	}
+
 	if output == "" {
 		output = "evidence-tracker.html"
 	}
-	
+
 	html := generateEvidenceTrackerHTML(controls, accountID)
 	err := os.WriteFile(output, []byte(html), 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error generating tracker: %v\n", err)
 		os.Exit(1)
 	}
-	
+
 	fmt.Printf("Evidence tracker saved to %s\n", output)
 	fmt.Println("Open this file in your browser and check off evidence as you collect it!")
 }
@@ -1677,7 +1677,7 @@ func getPriorityAndImpact(controlID, severity, status, framework string) (string
 	if status == "PASS" {
 		return "PASSED", "Control is properly configured"
 	}
-	
+
 	criticalByFramework := map[string]map[string]bool{
 		"pci": {
 			"CC6.2": true,
@@ -1696,16 +1696,16 @@ func getPriorityAndImpact(controlID, severity, status, framework string) (string
 			"CC6.1": true,
 		},
 	}
-	
+
 	if framework != "all" && framework != "" {
 		if frameworkCritical, exists := criticalByFramework[strings.ToLower(framework)]; exists {
 			if frameworkCritical[controlID] && severity == "CRITICAL" {
-				return fmt.Sprintf("%s CRITICAL", strings.ToUpper(framework)), 
+				return fmt.Sprintf("%s CRITICAL", strings.ToUpper(framework)),
 					fmt.Sprintf("%s AUDIT BLOCKER - Fix immediately or fail %s", strings.ToUpper(framework), strings.ToUpper(framework))
 			}
 		}
 	}
-	
+
 	if severity == "CRITICAL" {
 		return "CRITICAL", "AUDIT BLOCKER - Fix immediately or fail compliance"
 	} else if severity == "HIGH" {
@@ -1734,7 +1734,7 @@ func printTextSummary(result ComplianceResult, full bool) {
 		result.TotalControls,
 	))
 	fmt.Printf("Scan Time: %s\n", result.Timestamp.Format("2006-01-02 15:04:05"))
-	
+
 	criticalCount := 0
 	highCount := 0
 	mediumCount := 0
@@ -1762,7 +1762,7 @@ func printTextSummary(result ComplianceResult, full bool) {
 		}
 	}
 	fmt.Println()
-	
+
 	if result.FailedControls > 0 {
 		hasCritical := false
 		criticalShown := 0
@@ -1784,7 +1784,7 @@ func printTextSummary(result ComplianceResult, full bool) {
 
 				fmt.Printf("\n%s %s%s%s - %s\n", cli.Fail(), cli.Bold, control.ID, cli.Reset, control.Name)
 				fmt.Printf("  %sIssue:%s %s\n", cli.Dim, cli.Reset, control.Evidence)
-				
+
 				if control.Remediation != "" {
 					fmt.Printf("  %sFix:%s %s\n", cli.Green, cli.Reset, control.Remediation)
 				}
@@ -1838,7 +1838,7 @@ func printTextSummary(result ComplianceResult, full bool) {
 				highShown++
 			}
 		}
-		
+
 		hasOther := false
 		otherShown := 0
 		otherCount := 0
@@ -1847,7 +1847,7 @@ func printTextSummary(result ComplianceResult, full bool) {
 				otherCount++
 			}
 		}
-		
+
 		for _, control := range result.Controls {
 			if control.Status == "FAIL" && !strings.Contains(control.Priority, "CRITICAL") && !strings.Contains(control.Priority, "HIGH") {
 				if !hasOther {
@@ -1957,7 +1957,7 @@ func printTextSummary(result ComplianceResult, full bool) {
 
 func generatePrioritizedRecommendations(controls []ControlResult, criticalCount, highCount int, framework string) []string {
 	recs := []string{}
-	
+
 	if framework == "pci" {
 		if criticalCount > 0 {
 			recs = append(recs, fmt.Sprintf("PCI-DSS URGENT: Fix %d CRITICAL issues - QSA will fail your assessment", criticalCount))
@@ -1973,14 +1973,14 @@ func generatePrioritizedRecommendations(controls []ControlResult, criticalCount,
 			recs = append(recs, fmt.Sprintf("URGENT: Fix %d CRITICAL issues immediately - these WILL fail your audit", criticalCount))
 		}
 	}
-	
+
 	hasPublicS3 := false
 	hasNoMFA := false
 	hasOpenPorts := false
 	hasOldKeys := false
 	hasNoLogging := false
 	hasNoEncryption := false
-	
+
 	for _, control := range controls {
 		if control.Status == "FAIL" {
 			switch control.ID {
@@ -1999,7 +1999,7 @@ func generatePrioritizedRecommendations(controls []ControlResult, criticalCount,
 			}
 		}
 	}
-	
+
 	if hasNoMFA {
 		if framework == "pci" {
 			recs = append(recs, "PCI-DSS 8.3.1: Enable MFA for all console access immediately")
@@ -2036,7 +2036,7 @@ func generatePrioritizedRecommendations(controls []ControlResult, criticalCount,
 			recs = append(recs, "HIGH: Enable audit logging - required for compliance")
 		}
 	}
-	
+
 	recs = append(recs, "Enable continuous compliance monitoring")
 	recs = append(recs, "Document your security policies and procedures")
 	recs = append(recs, "Set up automated alerting for security events")
@@ -2044,11 +2044,11 @@ func generatePrioritizedRecommendations(controls []ControlResult, criticalCount,
 		recs = append(recs, "Schedule quarterly vulnerability scans (PCI-DSS 11.2)")
 	}
 	recs = append(recs, "Schedule quarterly access reviews")
-	
+
 	if strings.HasPrefix(strings.ToLower(framework), "cis") {
 		recs = append(recs, "CIS Note: Some controls require manual verification")
 		recs = append(recs, "CIS Level 1 included in FREE (basic security)")
-		
+
 		// Provider-specific CIS guidance
 		switch strings.ToLower(framework) {
 		case "cis", "cis-aws":
@@ -2087,65 +2087,65 @@ func convertControlsForPDF(controls []ControlResult) []report.ControlResult {
 
 func getControlName(controlID string) string {
 	controlNames := map[string]string{
-		"CC1.1": "Organizational Governance",
-		"CC1.2": "Board Oversight",
-		"CC1.3": "Organizational Structure",
-		"CC1.4": "Commitment to Competence",
-		"CC1.5": "Accountability",
-		"CC2.1": "Information and Communication",
-		"CC2.2": "Internal Communication",
-		"CC2.3": "External Communication",
-		"CC3.1": "Risk Assessment Process",
-		"CC3.2": "Risk Identification",
-		"CC3.3": "Risk Analysis",
-		"CC3.4": "Risk Management",
-		"CC4.1": "Monitoring Activities",
-		"CC4.2": "Evaluation of Deficiencies",
-		"CC5.1": "Control Activities",
-		"CC5.2": "Technology Controls",
-		"CC5.3": "Policy Implementation",
-		"CC6.1": "Logical and Physical Access Controls",
-		"CC6.2": "Network Security",
-		"CC6.3": "Encryption at Rest",
-		"CC6.6": "Authentication Controls",
-		"CC6.7": "Password Policy",
-		"CC6.8": "Access Key Rotation",
-		"CC7.1": "Security Monitoring and Logging",
-		"CC7.2": "Incident Detection and Response",
-		"CC7.3": "Security Event Analysis",
-		"CC7.4": "Performance Monitoring",
-		"CC7.5": "Vulnerability Management",
-		"CC8.1": "Change Management Process",
-		"CC9.1": "Risk Mitigation",
-		"CC9.2": "Vendor Management",
-		"A1.1":  "Availability Monitoring",
-		"A1.2":  "Backup and Recovery",
-		"A1.3":  "Disaster Recovery",
-		"PI1.1": "Privacy Controls",
-		"PI1.2": "Data Subject Rights",
-		"PI1.3": "Data Retention",
-		"PI1.4": "Data Disposal",
-		"PI1.5": "Privacy Notice",
-		"PI1.6": "Data Quality",
-		"C1.1":  "Confidentiality Controls",
-		"C1.2":  "Data Classification",
-		"PCI-1.2.1": "Network Segmentation",
-		"PCI-1.3.1": "No Direct Public Access",
-		"PCI-2.2.2": "Default Configuration Changes",
-		"PCI-3.4":   "Encryption at Rest",
-		"PCI-3.5":   "Encryption Key Management",
-		"PCI-4.1":   "Encryption in Transit",
-		"PCI-7.1":   "Least Privilege Access",
-		"PCI-8.1.4": "Remove Inactive Users",
-		"PCI-8.1.8": "Session Timeout",
-		"PCI-8.2.3": "Password Strength",
-		"PCI-8.2.4": "Password Rotation",
-		"PCI-8.3.1": "MFA for All Access",
-		"PCI-10.1":  "Audit Trail Implementation",
+		"CC1.1":      "Organizational Governance",
+		"CC1.2":      "Board Oversight",
+		"CC1.3":      "Organizational Structure",
+		"CC1.4":      "Commitment to Competence",
+		"CC1.5":      "Accountability",
+		"CC2.1":      "Information and Communication",
+		"CC2.2":      "Internal Communication",
+		"CC2.3":      "External Communication",
+		"CC3.1":      "Risk Assessment Process",
+		"CC3.2":      "Risk Identification",
+		"CC3.3":      "Risk Analysis",
+		"CC3.4":      "Risk Management",
+		"CC4.1":      "Monitoring Activities",
+		"CC4.2":      "Evaluation of Deficiencies",
+		"CC5.1":      "Control Activities",
+		"CC5.2":      "Technology Controls",
+		"CC5.3":      "Policy Implementation",
+		"CC6.1":      "Logical and Physical Access Controls",
+		"CC6.2":      "Network Security",
+		"CC6.3":      "Encryption at Rest",
+		"CC6.6":      "Authentication Controls",
+		"CC6.7":      "Password Policy",
+		"CC6.8":      "Access Key Rotation",
+		"CC7.1":      "Security Monitoring and Logging",
+		"CC7.2":      "Incident Detection and Response",
+		"CC7.3":      "Security Event Analysis",
+		"CC7.4":      "Performance Monitoring",
+		"CC7.5":      "Vulnerability Management",
+		"CC8.1":      "Change Management Process",
+		"CC9.1":      "Risk Mitigation",
+		"CC9.2":      "Vendor Management",
+		"A1.1":       "Availability Monitoring",
+		"A1.2":       "Backup and Recovery",
+		"A1.3":       "Disaster Recovery",
+		"PI1.1":      "Privacy Controls",
+		"PI1.2":      "Data Subject Rights",
+		"PI1.3":      "Data Retention",
+		"PI1.4":      "Data Disposal",
+		"PI1.5":      "Privacy Notice",
+		"PI1.6":      "Data Quality",
+		"C1.1":       "Confidentiality Controls",
+		"C1.2":       "Data Classification",
+		"PCI-1.2.1":  "Network Segmentation",
+		"PCI-1.3.1":  "No Direct Public Access",
+		"PCI-2.2.2":  "Default Configuration Changes",
+		"PCI-3.4":    "Encryption at Rest",
+		"PCI-3.5":    "Encryption Key Management",
+		"PCI-4.1":    "Encryption in Transit",
+		"PCI-7.1":    "Least Privilege Access",
+		"PCI-8.1.4":  "Remove Inactive Users",
+		"PCI-8.1.8":  "Session Timeout",
+		"PCI-8.2.3":  "Password Strength",
+		"PCI-8.2.4":  "Password Rotation",
+		"PCI-8.3.1":  "MFA for All Access",
+		"PCI-10.1":   "Audit Trail Implementation",
 		"PCI-10.5.3": "Log Retention",
 		"PCI-11.2.2": "Quarterly Vulnerability Scans",
 	}
-	
+
 	if name, ok := controlNames[controlID]; ok {
 		return name
 	}
@@ -2173,7 +2173,7 @@ func outputTextToFile(result ComplianceResult, output string) {
 	if result.Framework != "" && result.Framework != "all" {
 		frameworkLabel = strings.ToUpper(result.Framework)
 	}
-	
+
 	sb.WriteString(fmt.Sprintf("AuditKit %s Compliance Report\n", frameworkLabel))
 	sb.WriteString(fmt.Sprintf("==========================\n"))
 	sb.WriteString(fmt.Sprintf("Generated: %s\n", result.Timestamp.Format("2006-01-02 15:04:05")))
@@ -2183,7 +2183,7 @@ func outputTextToFile(result ComplianceResult, output string) {
 	sb.WriteString(fmt.Sprintf("COMPLIANCE SCORE: %.1f%%\n", result.Score))
 	sb.WriteString(fmt.Sprintf("Controls Passed: %d/%d\n", result.PassedControls, result.TotalControls))
 	sb.WriteString(fmt.Sprintf("Controls Failed: %d\n\n", result.FailedControls))
-	
+
 	sb.WriteString("FAILED CONTROLS:\n")
 	sb.WriteString("----------------\n")
 	for _, control := range result.Controls {
@@ -2196,13 +2196,13 @@ func outputTextToFile(result ComplianceResult, output string) {
 			}
 		}
 	}
-	
+
 	sb.WriteString("\n\nRECOMMENDATIONS:\n")
 	sb.WriteString("----------------\n")
 	for i, rec := range result.Recommendations {
 		sb.WriteString(fmt.Sprintf("%d. %s\n", i+1, rec))
 	}
-	
+
 	err := os.WriteFile(output, []byte(sb.String()), 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error writing to file: %v\n", err)
@@ -2217,7 +2217,7 @@ func outputJSON(result ComplianceResult, output string) {
 		fmt.Fprintf(os.Stderr, "Error formatting JSON: %v\n", err)
 		os.Exit(1)
 	}
-	
+
 	if output != "" {
 		err = os.WriteFile(output, data, 0644)
 		if err != nil {
@@ -2243,13 +2243,13 @@ func outputHTML(result ComplianceResult, output string) {
 		Recommendations: result.Recommendations,
 		Framework:       result.Framework,
 	}
-	
+
 	html := report.GenerateHTML(htmlResult)
 
 	if output == "" {
-		output = fmt.Sprintf("auditkit-%s-%s-report-%s.html", 
+		output = fmt.Sprintf("auditkit-%s-%s-report-%s.html",
 			strings.ToLower(result.Provider),
-			strings.ToLower(result.Framework), 
+			strings.ToLower(result.Framework),
 			time.Now().Format("2006-01-02-150405"))
 	}
 
@@ -2628,4 +2628,3 @@ func generateEvidenceTrackerHTML(controls []tracker.ControlResult, accountID str
 
 	return html
 }
-

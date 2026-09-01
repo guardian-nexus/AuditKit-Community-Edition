@@ -37,14 +37,14 @@ func (c *BigQueryChecks) CheckPublicDatasets(ctx context.Context, bqService *big
 	datasetList, err := bqService.Datasets.List(c.projectID).Context(ctx).Do()
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS GCP 7.1",
-			Name:       "[CIS GCP 7.1] BigQuery Datasets Not Public",
-			Status:     "FAIL",
-			Evidence:   fmt.Sprintf("Unable to check BigQuery datasets: %v", err),
+			Control:     "CIS GCP 7.1",
+			Name:        "[CIS GCP 7.1] BigQuery Datasets Not Public",
+			Status:      "FAIL",
+			Evidence:    fmt.Sprintf("Unable to check BigQuery datasets: %v", err),
 			Remediation: "Verify BigQuery API is enabled",
-			Priority:   PriorityHigh,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("BIGQUERY_PUBLIC_DATASETS"),
+			Priority:    PriorityHigh,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("BIGQUERY_PUBLIC_DATASETS"),
 		}}
 	}
 
@@ -126,14 +126,14 @@ func (c *BigQueryChecks) CheckDatasetEncryption(ctx context.Context, bqService *
 	datasetList, err := bqService.Datasets.List(c.projectID).Context(ctx).Do()
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS GCP 7.2",
-			Name:       "[CIS GCP 7.2/7.3] BigQuery CMEK Encryption",
-			Status:     "FAIL",
-			Evidence:   fmt.Sprintf("Unable to check BigQuery encryption: %v", err),
+			Control:     "CIS GCP 7.2",
+			Name:        "[CIS GCP 7.2/7.3] BigQuery CMEK Encryption",
+			Status:      "FAIL",
+			Evidence:    fmt.Sprintf("Unable to check BigQuery encryption: %v", err),
 			Remediation: "Verify BigQuery API is enabled",
-			Priority:   PriorityMedium,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("BIGQUERY_ENCRYPTION"),
+			Priority:    PriorityMedium,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("BIGQUERY_ENCRYPTION"),
 		}}
 	}
 

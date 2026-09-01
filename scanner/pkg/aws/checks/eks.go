@@ -108,12 +108,12 @@ func (c *EKSChecks) CheckEKSEndpointAccess(ctx context.Context) (CheckResult, er
 		}
 
 		return CheckResult{
-			Control:           "[CIS-8.1]",
-			Name:              "EKS Cluster Endpoint Access",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d EKS clusters with unrestricted public endpoint access: %v | CIS 8.1", len(clustersWithPublicAccess), displayClusters),
-			Remediation:       "Restrict EKS cluster endpoint access",
+			Control:     "[CIS-8.1]",
+			Name:        "EKS Cluster Endpoint Access",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("%d EKS clusters with unrestricted public endpoint access: %v | CIS 8.1", len(clustersWithPublicAccess), displayClusters),
+			Remediation: "Restrict EKS cluster endpoint access",
 			RemediationDetail: `# Disable public access and enable private:
 aws eks update-cluster-config \
   --name CLUSTER_NAME \
@@ -123,11 +123,11 @@ aws eks update-cluster-config \
 aws eks update-cluster-config \
   --name CLUSTER_NAME \
   --resources-vpc-config endpointPublicAccess=true,publicAccessCidrs="10.0.0.0/8,192.168.0.0/16"`,
-			ScreenshotGuide:   "EKS Console → Clusters → Networking → Screenshot showing restricted endpoint access",
-			ConsoleURL:        "https://console.aws.amazon.com/eks/home#/clusters",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "8.1", "SOC2": "CC6.6", "PCI-DSS": "1.2.1"},
+			ScreenshotGuide: "EKS Console → Clusters → Networking → Screenshot showing restricted endpoint access",
+			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "8.1", "SOC2": "CC6.6", "PCI-DSS": "1.2.1"},
 		}, nil
 	}
 
@@ -205,20 +205,20 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 		}
 
 		return CheckResult{
-			Control:           "[CIS-8.2]",
-			Name:              "EKS Cluster Logging",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d/%d EKS clusters without complete logging: %v | CIS 8.2", len(clustersWithoutLogging), len(clusters.Clusters), displayClusters),
-			Remediation:       "Enable all EKS cluster logging types",
+			Control:     "[CIS-8.2]",
+			Name:        "EKS Cluster Logging",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("%d/%d EKS clusters without complete logging: %v | CIS 8.2", len(clustersWithoutLogging), len(clusters.Clusters), displayClusters),
+			Remediation: "Enable all EKS cluster logging types",
 			RemediationDetail: `aws eks update-cluster-config \
   --name CLUSTER_NAME \
   --logging '{"clusterLogging":[{"types":["api","audit","authenticator","controllerManager","scheduler"],"enabled":true}]}'`,
-			ScreenshotGuide:   "EKS Console → Clusters → Logging → Screenshot showing all 5 log types enabled",
-			ConsoleURL:        "https://console.aws.amazon.com/eks/home#/clusters",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "8.2", "SOC2": "CC7.2", "PCI-DSS": "10.2.2"},
+			ScreenshotGuide: "EKS Console → Clusters → Logging → Screenshot showing all 5 log types enabled",
+			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "8.2", "SOC2": "CC7.2", "PCI-DSS": "10.2.2"},
 		}, nil
 	}
 
@@ -279,12 +279,12 @@ func (c *EKSChecks) CheckEKSEncryption(ctx context.Context) (CheckResult, error)
 		}
 
 		return CheckResult{
-			Control:           "[CIS-8.3]",
-			Name:              "EKS Cluster Encryption",
-			Status:            "FAIL",
-			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("%d/%d EKS clusters without encryption: %v | CIS 8.3", len(clustersWithoutEncryption), len(clusters.Clusters), displayClusters),
-			Remediation:       "Enable encryption for EKS clusters (must be set at creation time)",
+			Control:     "[CIS-8.3]",
+			Name:        "EKS Cluster Encryption",
+			Status:      "FAIL",
+			Severity:    "CRITICAL",
+			Evidence:    fmt.Sprintf("%d/%d EKS clusters without encryption: %v | CIS 8.3", len(clustersWithoutEncryption), len(clusters.Clusters), displayClusters),
+			Remediation: "Enable encryption for EKS clusters (must be set at creation time)",
 			RemediationDetail: `# Encryption must be enabled at cluster creation:
 aws eks create-cluster \
   --name CLUSTER_NAME \
@@ -292,11 +292,11 @@ aws eks create-cluster \
   ...
 
 # For existing clusters, you must create a new cluster with encryption enabled and migrate workloads`,
-			ScreenshotGuide:   "EKS Console → Clusters → Configuration → Secrets encryption → Screenshot showing KMS key",
-			ConsoleURL:        "https://console.aws.amazon.com/eks/home#/clusters",
-			Priority:          PriorityCritical,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "8.3", "SOC2": "CC6.7", "PCI-DSS": "3.4"},
+			ScreenshotGuide: "EKS Console → Clusters → Configuration → Secrets encryption → Screenshot showing KMS key",
+			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "8.3", "SOC2": "CC6.7", "PCI-DSS": "3.4"},
 		}, nil
 	}
 
@@ -333,22 +333,22 @@ func (c *EKSChecks) CheckEKSNetworkPolicy(ctx context.Context) (CheckResult, err
 	// Network policy enforcement requires manual verification or add-on checks
 	// This is a manual check as network policy is typically implemented via Calico or other CNI plugins
 	return CheckResult{
-		Control:           "[CIS-8.4]",
-		Name:              "EKS Network Policy",
-		Status:            "MANUAL",
-		Severity:          "MEDIUM",
-		Evidence:          fmt.Sprintf("%d EKS clusters require manual verification of network policy | CIS 8.4", len(clusters.Clusters)),
-		Remediation:       "Implement network policies using Calico or AWS VPC CNI",
+		Control:     "[CIS-8.4]",
+		Name:        "EKS Network Policy",
+		Status:      "MANUAL",
+		Severity:    "MEDIUM",
+		Evidence:    fmt.Sprintf("%d EKS clusters require manual verification of network policy | CIS 8.4", len(clusters.Clusters)),
+		Remediation: "Implement network policies using Calico or AWS VPC CNI",
 		RemediationDetail: `# Install Calico network policy engine:
 kubectl apply -f https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/master/config/master/calico-operator.yaml
 kubectl apply -f https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/master/config/master/calico-crs.yaml
 
 # Then create NetworkPolicy resources for your namespaces`,
-		ScreenshotGuide:   "kubectl get networkpolicies --all-namespaces → Screenshot showing network policies",
-		ConsoleURL:        "https://console.aws.amazon.com/eks/home#/clusters",
-		Priority:          PriorityMedium,
-		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"CIS-AWS": "8.4", "SOC2": "CC6.6"},
+		ScreenshotGuide: "kubectl get networkpolicies --all-namespaces → Screenshot showing network policies",
+		ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
+		Priority:        PriorityMedium,
+		Timestamp:       time.Now(),
+		Frameworks:      map[string]string{"CIS-AWS": "8.4", "SOC2": "CC6.6"},
 	}, nil
 }
 
@@ -374,12 +374,12 @@ func (c *EKSChecks) CheckEKSPodSecurityPolicy(ctx context.Context) (CheckResult,
 	// Pod Security Policy is deprecated in K8s 1.25+, replaced by Pod Security Standards
 	// This requires manual verification of PSP or PSS implementation
 	return CheckResult{
-		Control:           "[CIS-8.5]",
-		Name:              "EKS Pod Security Policy",
-		Status:            "MANUAL",
-		Severity:          "HIGH",
-		Evidence:          fmt.Sprintf("%d EKS clusters require manual verification of Pod Security Standards | CIS 8.5 | Note: PSP deprecated in K8s 1.25+", len(clusters.Clusters)),
-		Remediation:       "Implement Pod Security Standards (PSS) or Pod Security Admission",
+		Control:     "[CIS-8.5]",
+		Name:        "EKS Pod Security Policy",
+		Status:      "MANUAL",
+		Severity:    "HIGH",
+		Evidence:    fmt.Sprintf("%d EKS clusters require manual verification of Pod Security Standards | CIS 8.5 | Note: PSP deprecated in K8s 1.25+", len(clusters.Clusters)),
+		Remediation: "Implement Pod Security Standards (PSS) or Pod Security Admission",
 		RemediationDetail: `# For K8s 1.23+, use Pod Security Standards:
 # Label namespaces with pod security levels:
 kubectl label namespace default pod-security.kubernetes.io/enforce=restricted
@@ -388,11 +388,11 @@ kubectl label namespace default pod-security.kubernetes.io/warn=restricted
 
 # Verify:
 kubectl get namespace default -o yaml | grep pod-security`,
-		ScreenshotGuide:   "kubectl get psp → Screenshot showing pod security policies OR namespace labels for PSS",
-		ConsoleURL:        "https://console.aws.amazon.com/eks/home#/clusters",
-		Priority:          PriorityHigh,
-		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"CIS-AWS": "8.5", "SOC2": "CC8.1", "PCI-DSS": "2.2"},
+		ScreenshotGuide: "kubectl get psp → Screenshot showing pod security policies OR namespace labels for PSS",
+		ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
+		Priority:        PriorityHigh,
+		Timestamp:       time.Now(),
+		Frameworks:      map[string]string{"CIS-AWS": "8.5", "SOC2": "CC8.1", "PCI-DSS": "2.2"},
 	}, nil
 }
 
@@ -418,12 +418,12 @@ func (c *EKSChecks) CheckEKSRBAC(ctx context.Context) (CheckResult, error) {
 	// RBAC configuration requires kubectl access to verify
 	// This is a manual check
 	return CheckResult{
-		Control:           "[CIS-8.6]",
-		Name:              "EKS RBAC Configuration",
-		Status:            "MANUAL",
-		Severity:          "HIGH",
-		Evidence:          fmt.Sprintf("%d EKS clusters require manual RBAC audit | CIS 8.6", len(clusters.Clusters)),
-		Remediation:       "Review and restrict RBAC permissions following least privilege",
+		Control:     "[CIS-8.6]",
+		Name:        "EKS RBAC Configuration",
+		Status:      "MANUAL",
+		Severity:    "HIGH",
+		Evidence:    fmt.Sprintf("%d EKS clusters require manual RBAC audit | CIS 8.6", len(clusters.Clusters)),
+		Remediation: "Review and restrict RBAC permissions following least privilege",
 		RemediationDetail: `# Audit cluster roles and role bindings:
 kubectl get clusterrolebindings -o wide
 kubectl get rolebindings --all-namespaces -o wide
@@ -433,11 +433,11 @@ kubectl get clusterrolebindings -o json | jq '.items[] | select(.roleRef.name ==
 
 # Remove unnecessary admin permissions:
 kubectl delete clusterrolebinding NAME`,
-		ScreenshotGuide:   "kubectl get clusterrolebindings → Screenshot showing no unnecessary admin bindings",
-		ConsoleURL:        "https://console.aws.amazon.com/eks/home#/clusters",
-		Priority:          PriorityHigh,
-		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"CIS-AWS": "8.6", "SOC2": "CC6.3", "PCI-DSS": "7.1.2"},
+		ScreenshotGuide: "kubectl get clusterrolebindings → Screenshot showing no unnecessary admin bindings",
+		ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
+		Priority:        PriorityHigh,
+		Timestamp:       time.Now(),
+		Frameworks:      map[string]string{"CIS-AWS": "8.6", "SOC2": "CC6.3", "PCI-DSS": "7.1.2"},
 	}, nil
 }
 
@@ -506,20 +506,20 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 		}
 
 		return CheckResult{
-			Control:           "[CIS-8.8]",
-			Name:              "EKS Audit Logging",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d/%d EKS clusters without audit logging: %v | CIS 8.8", len(clustersWithoutAuditLog), len(clusters.Clusters), displayClusters),
-			Remediation:       "Enable audit logging for EKS clusters",
+			Control:     "[CIS-8.8]",
+			Name:        "EKS Audit Logging",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("%d/%d EKS clusters without audit logging: %v | CIS 8.8", len(clustersWithoutAuditLog), len(clusters.Clusters), displayClusters),
+			Remediation: "Enable audit logging for EKS clusters",
 			RemediationDetail: `aws eks update-cluster-config \
   --name CLUSTER_NAME \
   --logging '{"clusterLogging":[{"types":["audit"],"enabled":true}]}'`,
-			ScreenshotGuide:   "EKS Console → Clusters → Logging → Screenshot showing audit log type enabled",
-			ConsoleURL:        "https://console.aws.amazon.com/eks/home#/clusters",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "8.8", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
+			ScreenshotGuide: "EKS Console → Clusters → Logging → Screenshot showing audit log type enabled",
+			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "8.8", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
 		}, nil
 	}
 

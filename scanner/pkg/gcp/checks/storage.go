@@ -254,18 +254,18 @@ func (c *StorageChecks) CheckBucketVersioning(ctx context.Context) []CheckResult
 
 		if !bucketAttrs.VersioningEnabled {
 			results = append(results, CheckResult{
-				Control:     "A1.2",
-				Name:        fmt.Sprintf("GCS Bucket Versioning - %s", attrs.Name),
-				Status:      "FAIL",
-				Severity:    "MEDIUM",
-				Evidence:    fmt.Sprintf("Bucket %s does not have versioning enabled for data recovery", attrs.Name),
-				Remediation: "Enable versioning for accidental deletion protection",
+				Control:           "A1.2",
+				Name:              fmt.Sprintf("GCS Bucket Versioning - %s", attrs.Name),
+				Status:            "FAIL",
+				Severity:          "MEDIUM",
+				Evidence:          fmt.Sprintf("Bucket %s does not have versioning enabled for data recovery", attrs.Name),
+				Remediation:       "Enable versioning for accidental deletion protection",
 				RemediationDetail: fmt.Sprintf(`gcloud storage buckets update gs://%s --versioning`, attrs.Name),
-				Priority:        PriorityMedium,
-				Timestamp:       time.Now(),
-				ScreenshotGuide: fmt.Sprintf("Google Cloud Console → Storage → Browser → %s → Protection tab → Screenshot versioning status", attrs.Name),
-				ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/storage/browser/%s", attrs.Name),
-				Frameworks:      GetFrameworkMappings("GCS_BUCKET_VERSIONING"),
+				Priority:          PriorityMedium,
+				Timestamp:         time.Now(),
+				ScreenshotGuide:   fmt.Sprintf("Google Cloud Console → Storage → Browser → %s → Protection tab → Screenshot versioning status", attrs.Name),
+				ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/storage/browser/%s", attrs.Name),
+				Frameworks:        GetFrameworkMappings("GCS_BUCKET_VERSIONING"),
 			})
 		} else {
 			results = append(results, CheckResult{
@@ -418,18 +418,18 @@ func (c *StorageChecks) CheckUniformBucketLevelAccess(ctx context.Context) []Che
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 5.2",
-			Name:        "GCS Uniform Bucket-Level Access",
-			Status:      "FAIL",
-			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 5.2: %d buckets use legacy ACLs instead of uniform bucket-level access: %v", len(bucketsWithACLs), displayBuckets),
-			Remediation: "Enable uniform bucket-level access to simplify IAM management",
+			Control:           "CIS GCP 5.2",
+			Name:              "GCS Uniform Bucket-Level Access",
+			Status:            "FAIL",
+			Severity:          "HIGH",
+			Evidence:          fmt.Sprintf("CIS 5.2: %d buckets use legacy ACLs instead of uniform bucket-level access: %v", len(bucketsWithACLs), displayBuckets),
+			Remediation:       "Enable uniform bucket-level access to simplify IAM management",
 			RemediationDetail: fmt.Sprintf(`gcloud storage buckets update gs://%s --uniform-bucket-level-access`, bucketsWithACLs[0]),
-			Priority:        PriorityHigh,
-			Timestamp:       time.Now(),
-			ScreenshotGuide: fmt.Sprintf("Storage → Browser → %s → Permissions → Screenshot showing 'Uniform' access enabled", bucketsWithACLs[0]),
-			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/storage/browser/%s", bucketsWithACLs[0]),
-			Frameworks:      GetFrameworkMappings("GCS_UNIFORM_ACCESS"),
+			Priority:          PriorityHigh,
+			Timestamp:         time.Now(),
+			ScreenshotGuide:   fmt.Sprintf("Storage → Browser → %s → Permissions → Screenshot showing 'Uniform' access enabled", bucketsWithACLs[0]),
+			ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/storage/browser/%s", bucketsWithACLs[0]),
+			Frameworks:        GetFrameworkMappings("GCS_UNIFORM_ACCESS"),
 		})
 	} else if totalBuckets > 0 {
 		results = append(results, CheckResult{
@@ -483,18 +483,18 @@ func (c *StorageChecks) CheckBucketRetentionPolicy(ctx context.Context) []CheckR
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 5.1",
-			Name:        "GCS Bucket Retention Policy",
-			Status:      "INFO",
-			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("CIS 5.1: %d buckets do not have retention policies configured: %v", len(bucketsWithoutRetention), displayBuckets),
-			Remediation: "Configure retention policies for compliance and data retention requirements",
+			Control:           "CIS GCP 5.1",
+			Name:              "GCS Bucket Retention Policy",
+			Status:            "INFO",
+			Severity:          "MEDIUM",
+			Evidence:          fmt.Sprintf("CIS 5.1: %d buckets do not have retention policies configured: %v", len(bucketsWithoutRetention), displayBuckets),
+			Remediation:       "Configure retention policies for compliance and data retention requirements",
 			RemediationDetail: fmt.Sprintf(`gcloud storage buckets update gs://%s --retention-period=90d`, bucketsWithoutRetention[0]),
-			Priority:        PriorityMedium,
-			Timestamp:       time.Now(),
-			ScreenshotGuide: fmt.Sprintf("Storage → Browser → %s → Retention policy tab → Screenshot retention settings", bucketsWithoutRetention[0]),
-			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/storage/browser/%s", bucketsWithoutRetention[0]),
-			Frameworks:      GetFrameworkMappings("GCS_RETENTION_POLICY"),
+			Priority:          PriorityMedium,
+			Timestamp:         time.Now(),
+			ScreenshotGuide:   fmt.Sprintf("Storage → Browser → %s → Retention policy tab → Screenshot retention settings", bucketsWithoutRetention[0]),
+			ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/storage/browser/%s", bucketsWithoutRetention[0]),
+			Frameworks:        GetFrameworkMappings("GCS_RETENTION_POLICY"),
 		})
 	} else if totalBuckets > 0 {
 		results = append(results, CheckResult{

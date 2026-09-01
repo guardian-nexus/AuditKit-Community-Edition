@@ -12,9 +12,9 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/keyvault/armkeyvault"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/security/armsecurity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/sql/armsql"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
-	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/security/armsecurity"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/azure/checks"
 	msgraphsdk "github.com/microsoftgraph/msgraph-sdk-go"
 )
@@ -36,9 +36,9 @@ type AzureScanner struct {
 	monitorClient       *armmonitor.ActivityLogsClient
 	roleClient          *armauthorization.RoleAssignmentsClient
 	roleDefClient       *armauthorization.RoleDefinitionsClient
-	securityClient      *armsecurity.PricingsClient               // For Defender checks
+	securityClient      *armsecurity.PricingsClient                 // For Defender checks
 	autoProvisionClient *armsecurity.AutoProvisioningSettingsClient // For auto-provisioning
-	contactsClient      *armsecurity.ContactsClient               // For security contacts
+	contactsClient      *armsecurity.ContactsClient                 // For security contacts
 }
 
 type ScanResult struct {

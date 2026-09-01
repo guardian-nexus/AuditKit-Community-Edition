@@ -21,16 +21,16 @@ type EntraMappingFile struct {
 }
 
 type EntraRule struct {
-	RuleID             string                       `json:"rule_id"`
-	Product            string                       `json:"product"`
-	Title              string                       `json:"title"`
-	Mappings           map[string][]FrameworkMapping `json:"mappings"`
-	Severity           string                       `json:"severity"`
-	RemediationSteps   []string                     `json:"remediation_steps"`
-	EvidenceGuidance   []string                     `json:"evidence_guidance"`
-	ConsoleURL         string                       `json:"console_url"`
-	FallbackNotes      string                       `json:"fallback_notes"`
-	References         []string                     `json:"references"`
+	RuleID           string                        `json:"rule_id"`
+	Product          string                        `json:"product"`
+	Title            string                        `json:"title"`
+	Mappings         map[string][]FrameworkMapping `json:"mappings"`
+	Severity         string                        `json:"severity"`
+	RemediationSteps []string                      `json:"remediation_steps"`
+	EvidenceGuidance []string                      `json:"evidence_guidance"`
+	ConsoleURL       string                        `json:"console_url"`
+	FallbackNotes    string                        `json:"fallback_notes"`
+	References       []string                      `json:"references"`
 }
 
 type FrameworkMapping struct {
@@ -205,7 +205,7 @@ func (s *ScubaGearIntegration) convertStatus(passed bool, severity string) strin
 
 func (s *ScubaGearIntegration) formatEvidence(finding ScubaFinding, rule *EntraRule) string {
 	var evidence strings.Builder
-	
+
 	if finding.Result {
 		evidence.WriteString(fmt.Sprintf("[PASS] %s: ", rule.Title))
 	} else {
@@ -231,7 +231,7 @@ func (s *ScubaGearIntegration) formatEvidence(finding ScubaFinding, rule *EntraR
 
 func (s *ScubaGearIntegration) generateRemediation(rule *EntraRule) string {
 	var remediation strings.Builder
-	
+
 	if len(rule.RemediationSteps) > 0 {
 		remediation.WriteString("Remediation Steps:\n")
 		for i, step := range rule.RemediationSteps {
@@ -279,17 +279,17 @@ func (s *ScubaGearIntegration) generateScreenshotGuide(rule *EntraRule) string {
 
 func (s *ScubaGearIntegration) convertFrameworks(mappings map[string][]FrameworkMapping) map[string]string {
 	result := make(map[string]string)
-	
+
 	for framework, controls := range mappings {
 		// Combine all control IDs for this framework
 		var controlIDs []string
 		for _, control := range controls {
 			controlIDs = append(controlIDs, control.ID)
 		}
-		
+
 		// Store as comma-separated list matching AuditKit format
 		result[strings.ToUpper(framework)] = strings.Join(controlIDs, ", ")
 	}
-	
+
 	return result
 }

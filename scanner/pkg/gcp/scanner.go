@@ -9,10 +9,10 @@ import (
 	"cloud.google.com/go/kms/apiv1"
 	"cloud.google.com/go/logging/apiv2"
 	"cloud.google.com/go/storage"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/gcp/checks"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/container/v1"
 	"google.golang.org/api/sqladmin/v1"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/gcp/checks"
 )
 
 type GCPScanner struct {
@@ -294,13 +294,13 @@ func (s *GCPScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 
 func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResult {
 	var results []ScanResult
-	
+
 	if verbose {
 		fmt.Println("Running CIS Google Cloud Platform Foundation Benchmark v4.0")
 		fmt.Println("Using existing checks with CIS control mappings...")
 		fmt.Println("")
 	}
-	
+
 	// Run existing GCP check modules - they return results with Frameworks map
 	checkModules := []checks.Check{
 		checks.NewIAMChecks(s.iamClient, s.projectID),
@@ -308,34 +308,34 @@ func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 		checks.NewComputeChecks(s.computeService, s.projectID),
 		checks.NewNetworkChecks(s.computeService, s.projectID),
 		checks.NewSQLChecks(s.sqlService, s.projectID),
-		checks.NewKMSChecks(s.kmsClient, s.projectID),           // CIS 1.9, 1.10 - KMS security
-		checks.NewLoggingChecks(s.loggingClient, s.projectID),   // CIS 2.2, 2.3, 2.13 - Logging
-		checks.NewBigQueryChecks(s.projectID),                   // CIS 7.1, 7.2, 7.3 - BigQuery security
-		checks.NewGCPCISManualChecks(s.projectID),               // CIS manual controls (Section 2 - Logging/Monitoring alerts)
-		checks.NewGKEChecks(s.gkeService, s.projectID),          // CIS 8.1-8.5 - GKE/Kubernetes security
+		checks.NewKMSChecks(s.kmsClient, s.projectID),         // CIS 1.9, 1.10 - KMS security
+		checks.NewLoggingChecks(s.loggingClient, s.projectID), // CIS 2.2, 2.3, 2.13 - Logging
+		checks.NewBigQueryChecks(s.projectID),                 // CIS 7.1, 7.2, 7.3 - BigQuery security
+		checks.NewGCPCISManualChecks(s.projectID),             // CIS manual controls (Section 2 - Logging/Monitoring alerts)
+		checks.NewGKEChecks(s.gkeService, s.projectID),        // CIS 8.1-8.5 - GKE/Kubernetes security
 	}
-	
+
 	// Track which CIS sections we're covering
 	sectionCounts := make(map[string]int)
-	
+
 	for _, check := range checkModules {
 		if verbose {
 			fmt.Printf("  Running CIS check module...\n")
 		}
-		
+
 		checkResults, checkErr := check.Run(ctx)
 		if checkErr != nil && verbose {
 			fmt.Printf("    Warning: %v\n", checkErr)
 		}
-		
+
 		for _, cr := range checkResults {
 			// Check if this control has CIS-GCP mapping in Frameworks
 			if cr.Frameworks != nil && cr.Frameworks["CIS-GCP"] != "" {
 				cisControls := cr.Frameworks["CIS-GCP"]
-				
+
 				// Enhance control name with CIS numbers
 				enhancedName := fmt.Sprintf("[CIS GCP %s] %s", cisControls, cr.Control)
-				
+
 				// Track section coverage (extract first digit from control number)
 				if len(cisControls) > 0 {
 					section := string(cisControls[0])
@@ -358,7 +358,7 @@ func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 						sectionCounts["GKE/Kubernetes"]++
 					}
 				}
-				
+
 				results = append(results, ScanResult{
 					Control:           enhancedName,
 					Status:            cr.Status,
@@ -373,7 +373,7 @@ func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 			}
 		}
 	}
-	
+
 	if verbose {
 		fmt.Printf("\nCIS GCP scan complete: %d controls tested\n", len(results))
 		if len(sectionCounts) > 0 {
@@ -386,6 +386,6 @@ func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 		fmt.Println("This scan covers controls automatable via GCP API")
 		fmt.Println("")
 	}
-	
+
 	return results
 }

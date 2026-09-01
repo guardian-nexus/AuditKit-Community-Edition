@@ -57,12 +57,12 @@ func (c *AzureCISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *AzureCISManualChecks) checkMonitorAlertAuthChanges() CheckResult {
 	return CheckResult{
-		Control:  "CIS-5.2.1",
-		Name:     "[CIS Azure 5.2.1] Create Alert for Authorization Changes",
-		Status:   "INFO",
-		Severity: "MEDIUM",
-		Priority: PriorityMedium,
-		Evidence: fmt.Sprintf("MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for authorization changes in subscription %s", c.subscriptionID),
+		Control:     "CIS-5.2.1",
+		Name:        "[CIS Azure 5.2.1] Create Alert for Authorization Changes",
+		Status:      "INFO",
+		Severity:    "MEDIUM",
+		Priority:    PriorityMedium,
+		Evidence:    fmt.Sprintf("MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for authorization changes in subscription %s", c.subscriptionID),
 		Remediation: "Create Azure Monitor alert for authorization operations",
 		RemediationDetail: `Create an alert rule for authorization changes:
 
@@ -94,12 +94,12 @@ az monitor activity-log alert create \
 
 func (c *AzureCISManualChecks) checkMonitorAlertPolicyChanges() CheckResult {
 	return CheckResult{
-		Control:  "CIS-5.2.2",
-		Name:     "[CIS Azure 5.2.2] Create Alert for Policy Assignment Changes",
-		Status:   "INFO",
-		Severity: "MEDIUM",
-		Priority: PriorityMedium,
-		Evidence: "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for policy assignment changes",
+		Control:     "CIS-5.2.2",
+		Name:        "[CIS Azure 5.2.2] Create Alert for Policy Assignment Changes",
+		Status:      "INFO",
+		Severity:    "MEDIUM",
+		Priority:    PriorityMedium,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for policy assignment changes",
 		Remediation: "Create Azure Monitor alert for policy operations",
 		RemediationDetail: `Create an alert rule for policy changes:
 
@@ -128,12 +128,12 @@ Operations to monitor:
 
 func (c *AzureCISManualChecks) checkMonitorAlertNSGChanges() CheckResult {
 	return CheckResult{
-		Control:  "CIS-5.2.3",
-		Name:     "[CIS Azure 5.2.3] Create Alert for NSG Changes",
-		Status:   "INFO",
-		Severity: "HIGH",
-		Priority: PriorityHigh,
-		Evidence: "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for Network Security Group changes",
+		Control:     "CIS-5.2.3",
+		Name:        "[CIS Azure 5.2.3] Create Alert for NSG Changes",
+		Status:      "INFO",
+		Severity:    "HIGH",
+		Priority:    PriorityHigh,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for Network Security Group changes",
 		Remediation: "Create Azure Monitor alert for NSG operations",
 		RemediationDetail: `Create an alert rule for NSG changes:
 
@@ -161,12 +161,12 @@ Also monitor:
 
 func (c *AzureCISManualChecks) checkMonitorAlertSecurityGroupChanges() CheckResult {
 	return CheckResult{
-		Control:  "CIS-5.2.4",
-		Name:     "[CIS Azure 5.2.4] Create Alert for Security Group Changes",
-		Status:   "INFO",
-		Severity: "HIGH",
-		Priority: PriorityHigh,
-		Evidence: "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for security group modifications",
+		Control:     "CIS-5.2.4",
+		Name:        "[CIS Azure 5.2.4] Create Alert for Security Group Changes",
+		Status:      "INFO",
+		Severity:    "HIGH",
+		Priority:    PriorityHigh,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for security group modifications",
 		Remediation: "Create Azure Monitor alert for security group operations",
 		RemediationDetail: `Create an alert rule for security group changes:
 
@@ -189,12 +189,12 @@ az monitor activity-log alert create \
 
 func (c *AzureCISManualChecks) checkMonitorAlertSecuritySolutions() CheckResult {
 	return CheckResult{
-		Control:  "CIS-5.2.5",
-		Name:     "[CIS Azure 5.2.5] Create Alert for Security Solutions Changes",
-		Status:   "INFO",
-		Severity: "MEDIUM",
-		Priority: PriorityMedium,
-		Evidence: "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for security solution changes",
+		Control:     "CIS-5.2.5",
+		Name:        "[CIS Azure 5.2.5] Create Alert for Security Solutions Changes",
+		Status:      "INFO",
+		Severity:    "MEDIUM",
+		Priority:    PriorityMedium,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for security solution changes",
 		Remediation: "Create Azure Monitor alert for security solution operations",
 		RemediationDetail: `Create an alert rule for security solution changes:
 
@@ -220,12 +220,12 @@ Monitor operations:
 
 func (c *AzureCISManualChecks) checkMonitorAlertSQLFirewall() CheckResult {
 	return CheckResult{
-		Control:  "CIS-5.2.6",
-		Name:     "[CIS Azure 5.2.6] Create Alert for SQL Firewall Changes",
-		Status:   "INFO",
-		Severity: "HIGH",
-		Priority: PriorityHigh,
-		Evidence: "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for SQL firewall rule changes",
+		Control:     "CIS-5.2.6",
+		Name:        "[CIS Azure 5.2.6] Create Alert for SQL Firewall Changes",
+		Status:      "INFO",
+		Severity:    "HIGH",
+		Priority:    PriorityHigh,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for SQL firewall rule changes",
 		Remediation: "Create Azure Monitor alert for SQL firewall operations",
 		RemediationDetail: `Create an alert rule for SQL firewall changes:
 
@@ -252,12 +252,12 @@ Monitor operations:
 
 func (c *AzureCISManualChecks) checkMonitorAlertKeyVaultDeletion() CheckResult {
 	return CheckResult{
-		Control:  "CIS-5.2.7",
-		Name:     "[CIS Azure 5.2.7] Create Alert for Key Vault Deletion",
-		Status:   "INFO",
-		Severity: "CRITICAL",
-		Priority: PriorityCritical,
-		Evidence: "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for Key Vault deletion operations",
+		Control:     "CIS-5.2.7",
+		Name:        "[CIS Azure 5.2.7] Create Alert for Key Vault Deletion",
+		Status:      "INFO",
+		Severity:    "CRITICAL",
+		Priority:    PriorityCritical,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for Key Vault deletion operations",
 		Remediation: "Create Azure Monitor alert for Key Vault deletions",
 		RemediationDetail: `Create an alert rule for Key Vault deletion:
 
@@ -280,12 +280,12 @@ az monitor activity-log alert create \
 
 func (c *AzureCISManualChecks) checkMonitorAlertStorageAccountDeletion() CheckResult {
 	return CheckResult{
-		Control:  "CIS-5.2.8",
-		Name:     "[CIS Azure 5.2.8] Create Alert for Storage Account Deletion",
-		Status:   "INFO",
-		Severity: "HIGH",
-		Priority: PriorityHigh,
-		Evidence: "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for Storage Account deletion",
+		Control:     "CIS-5.2.8",
+		Name:        "[CIS Azure 5.2.8] Create Alert for Storage Account Deletion",
+		Status:      "INFO",
+		Severity:    "HIGH",
+		Priority:    PriorityHigh,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for Storage Account deletion",
 		Remediation: "Create Azure Monitor alert for Storage Account deletions",
 		RemediationDetail: `Create an alert rule for Storage Account deletion:
 
@@ -310,12 +310,12 @@ az monitor activity-log alert create \
 
 func (c *AzureCISManualChecks) checkAppRegistrationOwnership() CheckResult {
 	return CheckResult{
-		Control:  "CIS-1.5",
-		Name:     "[CIS Azure 1.5] App Registration Owner Requirements",
-		Status:   "INFO",
-		Severity: "MEDIUM",
-		Priority: PriorityMedium,
-		Evidence: "MANUAL CHECK REQUIRED: Verify all App Registrations have at least one owner assigned",
+		Control:     "CIS-1.5",
+		Name:        "[CIS Azure 1.5] App Registration Owner Requirements",
+		Status:      "INFO",
+		Severity:    "MEDIUM",
+		Priority:    PriorityMedium,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify all App Registrations have at least one owner assigned",
 		Remediation: "Ensure every App Registration has assigned owners",
 		RemediationDetail: `CIS Azure 1.5: Ensure that 'Owners' are defined for each registered application
 
@@ -343,12 +343,12 @@ az ad app list --query "[].{DisplayName:displayName, AppId:appId}" -o table
 
 func (c *AzureCISManualChecks) checkGuestInviteSettings() CheckResult {
 	return CheckResult{
-		Control:  "CIS-1.11",
-		Name:     "[CIS Azure 1.11] Guest Invite Restrictions",
-		Status:   "INFO",
-		Severity: "MEDIUM",
-		Priority: PriorityMedium,
-		Evidence: "MANUAL CHECK REQUIRED: Verify guest invite settings are restricted per CIS requirements",
+		Control:     "CIS-1.11",
+		Name:        "[CIS Azure 1.11] Guest Invite Restrictions",
+		Status:      "INFO",
+		Severity:    "MEDIUM",
+		Priority:    PriorityMedium,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify guest invite settings are restricted per CIS requirements",
 		Remediation: "Configure guest user access and invitation settings",
 		RemediationDetail: `CIS Azure 1.11: Ensure that 'Guest invite restrictions' is set to 'Only users assigned to specific admin roles can invite guest users'
 
@@ -369,12 +369,12 @@ This prevents regular users from inviting external guests.`,
 
 func (c *AzureCISManualChecks) checkSecurityDefaults() CheckResult {
 	return CheckResult{
-		Control:  "CIS-1.12",
-		Name:     "[CIS Azure 1.12] Security Defaults or Conditional Access",
-		Status:   "INFO",
-		Severity: "CRITICAL",
-		Priority: PriorityCritical,
-		Evidence: "MANUAL CHECK REQUIRED: Verify Security Defaults OR Conditional Access policies are enabled",
+		Control:     "CIS-1.12",
+		Name:        "[CIS Azure 1.12] Security Defaults or Conditional Access",
+		Status:      "INFO",
+		Severity:    "CRITICAL",
+		Priority:    PriorityCritical,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify Security Defaults OR Conditional Access policies are enabled",
 		Remediation: "Enable Security Defaults or implement Conditional Access policies",
 		RemediationDetail: `CIS Azure 1.12: Ensure Either Security Defaults is Enabled OR Conditional Access Policies are Configured
 
@@ -407,12 +407,12 @@ az rest --method GET --url https://graph.microsoft.com/v1.0/policies/identitySec
 
 func (c *AzureCISManualChecks) checkRDPRestricted() CheckResult {
 	return CheckResult{
-		Control:  "CIS-6.2",
-		Name:     "[CIS Azure 6.2] RDP Access from Internet Restricted",
-		Status:   "INFO",
-		Severity: "CRITICAL",
-		Priority: PriorityCritical,
-		Evidence: "MANUAL CHECK REQUIRED: Verify NO Network Security Groups allow RDP (port 3389) from Internet (0.0.0.0/0)",
+		Control:     "CIS-6.2",
+		Name:        "[CIS Azure 6.2] RDP Access from Internet Restricted",
+		Status:      "INFO",
+		Severity:    "CRITICAL",
+		Priority:    PriorityCritical,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify NO Network Security Groups allow RDP (port 3389) from Internet (0.0.0.0/0)",
 		Remediation: "Remove any NSG rules allowing RDP from 0.0.0.0/0",
 		RemediationDetail: `CIS Azure 6.2: Ensure that RDP access from the Internet is evaluated and restricted
 
@@ -440,12 +440,12 @@ az network nsg rule delete --name <rule-name> --nsg-name <nsg-name> --resource-g
 
 func (c *AzureCISManualChecks) checkSSHRestricted() CheckResult {
 	return CheckResult{
-		Control:  "CIS-6.3",
-		Name:     "[CIS Azure 6.3] SSH Access from Internet Restricted",
-		Status:   "INFO",
-		Severity: "CRITICAL",
-		Priority: PriorityCritical,
-		Evidence: "MANUAL CHECK REQUIRED: Verify NO Network Security Groups allow SSH (port 22) from Internet",
+		Control:     "CIS-6.3",
+		Name:        "[CIS Azure 6.3] SSH Access from Internet Restricted",
+		Status:      "INFO",
+		Severity:    "CRITICAL",
+		Priority:    PriorityCritical,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify NO Network Security Groups allow SSH (port 22) from Internet",
 		Remediation: "Remove any NSG rules allowing SSH from 0.0.0.0/0",
 		RemediationDetail: `CIS Azure 6.3: Ensure that SSH access from the Internet is evaluated and restricted
 
@@ -468,12 +468,12 @@ az network nsg rule list --nsg-name <nsg-name> --resource-group <rg> --query "[?
 
 func (c *AzureCISManualChecks) checkSQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:  "CIS-6.4",
-		Name:     "[CIS Azure 6.4] SQL Server Port Access Restricted",
-		Status:   "INFO",
-		Severity: "CRITICAL",
-		Priority: PriorityCritical,
-		Evidence: "MANUAL CHECK REQUIRED: Verify NO NSGs allow SQL Server port (1433) from Internet",
+		Control:     "CIS-6.4",
+		Name:        "[CIS Azure 6.4] SQL Server Port Access Restricted",
+		Status:      "INFO",
+		Severity:    "CRITICAL",
+		Priority:    PriorityCritical,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify NO NSGs allow SQL Server port (1433) from Internet",
 		Remediation: "Remove any NSG rules allowing port 1433 from 0.0.0.0/0",
 		RemediationDetail: `CIS Azure 6.4: Ensure that SQL Server port (1433) access from the Internet is restricted
 
@@ -493,16 +493,16 @@ Check all NSGs for rules allowing:
 
 func (c *AzureCISManualChecks) checkPostgreSQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:  "CIS-6.5",
-		Name:     "[CIS Azure 6.5] PostgreSQL Port Access Restricted",
-		Status:   "INFO",
-		Severity: "HIGH",
-		Priority: PriorityHigh,
-		Evidence: "MANUAL CHECK REQUIRED: Verify NO NSGs allow PostgreSQL port (5432) from Internet",
-		Remediation: "Remove any NSG rules allowing port 5432 from 0.0.0.0/0",
+		Control:           "CIS-6.5",
+		Name:              "[CIS Azure 6.5] PostgreSQL Port Access Restricted",
+		Status:            "INFO",
+		Severity:          "HIGH",
+		Priority:          PriorityHigh,
+		Evidence:          "MANUAL CHECK REQUIRED: Verify NO NSGs allow PostgreSQL port (5432) from Internet",
+		Remediation:       "Remove any NSG rules allowing port 5432 from 0.0.0.0/0",
 		RemediationDetail: `CIS Azure 6.5: Ensure that PostgreSQL port (5432) access from the Internet is restricted`,
-		ScreenshotGuide: "Network security groups → Inbound rules → NO rules allowing 5432 from Internet",
-		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
+		ScreenshotGuide:   "Network security groups → Inbound rules → NO rules allowing 5432 from Internet",
+		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
 			"CIS-Azure": "6.5",
 			"SOC2":      "CC6.1",
@@ -513,16 +513,16 @@ func (c *AzureCISManualChecks) checkPostgreSQLPortRestricted() CheckResult {
 
 func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:  "CIS-6.6",
-		Name:     "[CIS Azure 6.6] MySQL Port Access Restricted",
-		Status:   "INFO",
-		Severity: "HIGH",
-		Priority: PriorityHigh,
-		Evidence: "MANUAL CHECK REQUIRED: Verify NO NSGs allow MySQL port (3306) from Internet",
-		Remediation: "Remove any NSG rules allowing port 3306 from 0.0.0.0/0",
+		Control:           "CIS-6.6",
+		Name:              "[CIS Azure 6.6] MySQL Port Access Restricted",
+		Status:            "INFO",
+		Severity:          "HIGH",
+		Priority:          PriorityHigh,
+		Evidence:          "MANUAL CHECK REQUIRED: Verify NO NSGs allow MySQL port (3306) from Internet",
+		Remediation:       "Remove any NSG rules allowing port 3306 from 0.0.0.0/0",
 		RemediationDetail: `CIS Azure 6.6: Ensure that MySQL port (3306) access from the Internet is restricted`,
-		ScreenshotGuide: "Network security groups → Inbound rules → NO rules allowing 3306 from Internet",
-		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
+		ScreenshotGuide:   "Network security groups → Inbound rules → NO rules allowing 3306 from Internet",
+		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
 			"CIS-Azure": "6.6",
 			"SOC2":      "CC6.1",
@@ -535,12 +535,12 @@ func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 
 func (c *AzureCISManualChecks) checkKeyVaultRecoveryLevel() CheckResult {
 	return CheckResult{
-		Control:  "CIS-8.1",
-		Name:     "[CIS Azure 8.1] Key Vault Recoverable",
-		Status:   "INFO",
-		Severity: "HIGH",
-		Priority: PriorityHigh,
-		Evidence: "MANUAL CHECK REQUIRED: Verify all Key Vaults have soft-delete and purge protection enabled",
+		Control:     "CIS-8.1",
+		Name:        "[CIS Azure 8.1] Key Vault Recoverable",
+		Status:      "INFO",
+		Severity:    "HIGH",
+		Priority:    PriorityHigh,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify all Key Vaults have soft-delete and purge protection enabled",
 		Remediation: "Enable soft-delete and purge protection for all Key Vaults",
 		RemediationDetail: `CIS Azure 8.1: Ensure that the key vault is recoverable
 
@@ -567,12 +567,12 @@ az keyvault update --name <vault-name> --enable-purge-protection true`,
 
 func (c *AzureCISManualChecks) checkKeyVaultKeyExpiration() CheckResult {
 	return CheckResult{
-		Control:  "CIS-8.2",
-		Name:     "[CIS Azure 8.2] Key Vault Keys Have Expiration Dates",
-		Status:   "INFO",
-		Severity: "MEDIUM",
-		Priority: PriorityMedium,
-		Evidence: "MANUAL CHECK REQUIRED: Verify all cryptographic keys have expiration dates set",
+		Control:     "CIS-8.2",
+		Name:        "[CIS Azure 8.2] Key Vault Keys Have Expiration Dates",
+		Status:      "INFO",
+		Severity:    "MEDIUM",
+		Priority:    PriorityMedium,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify all cryptographic keys have expiration dates set",
 		Remediation: "Set expiration dates for all keys in Key Vaults",
 		RemediationDetail: `CIS Azure 8.2: Ensure that key vault keys have an expiration date set
 
@@ -593,12 +593,12 @@ az keyvault key set-attributes --vault-name <vault-name> --name <key-name> --exp
 
 func (c *AzureCISManualChecks) checkKeyVaultSecretExpiration() CheckResult {
 	return CheckResult{
-		Control:  "CIS-8.4",
-		Name:     "[CIS Azure 8.4] Key Vault Secrets Have Expiration Dates",
-		Status:   "INFO",
-		Severity: "MEDIUM",
-		Priority: PriorityMedium,
-		Evidence: "MANUAL CHECK REQUIRED: Verify all secrets have expiration dates set",
+		Control:     "CIS-8.4",
+		Name:        "[CIS Azure 8.4] Key Vault Secrets Have Expiration Dates",
+		Status:      "INFO",
+		Severity:    "MEDIUM",
+		Priority:    PriorityMedium,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify all secrets have expiration dates set",
 		Remediation: "Set expiration dates for all secrets in Key Vaults",
 		RemediationDetail: `CIS Azure 8.4: Ensure that secrets in Azure Key Vault have an expiration date set
 
@@ -619,12 +619,12 @@ az keyvault secret set-attributes --vault-name <vault-name> --name <secret-name>
 
 func (c *AzureCISManualChecks) checkKeyVaultCertificateExpiration() CheckResult {
 	return CheckResult{
-		Control:  "CIS-8.6",
-		Name:     "[CIS Azure 8.6] Key Vault Certificates Auto-Renew",
-		Status:   "INFO",
-		Severity: "MEDIUM",
-		Priority: PriorityMedium,
-		Evidence: "MANUAL CHECK REQUIRED: Verify certificates have auto-renewal configured",
+		Control:     "CIS-8.6",
+		Name:        "[CIS Azure 8.6] Key Vault Certificates Auto-Renew",
+		Status:      "INFO",
+		Severity:    "MEDIUM",
+		Priority:    PriorityMedium,
+		Evidence:    "MANUAL CHECK REQUIRED: Verify certificates have auto-renewal configured",
 		Remediation: "Configure auto-renewal for certificates in Key Vaults",
 		RemediationDetail: `CIS Azure 8.6: Ensure that certificate auto-renewal is enabled for certificates stored in Azure Key Vault
 

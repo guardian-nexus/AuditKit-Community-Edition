@@ -151,7 +151,7 @@ func (c *Crosswalk) Get800_53ByControlID(controlID string) []string {
 	if controls, found := c.SOC2ToCIS[controlID]; found {
 		return controls
 	}
-	
+
 	// Try PCI mapping (e.g., "PCI-1.2.1" or "1.2.1")
 	if strings.HasPrefix(controlID, "PCI-") {
 		if controls, found := c.PCIToCIS[controlID]; found {
@@ -163,12 +163,12 @@ func (c *Crosswalk) Get800_53ByControlID(controlID string) []string {
 			return controls
 		}
 	}
-	
+
 	// Try CMMC mapping
 	if controls, found := c.CMMCToCIS[controlID]; found {
 		return controls
 	}
-	
+
 	// Try HIPAA mapping
 	if controls, found := c.HIPAAToCIS[controlID]; found {
 		return controls
@@ -208,12 +208,12 @@ func (c *Crosswalk) ControlHas800_53(frameworks map[string]string, controlID str
 	if len(c.Get800_53Controls(frameworks)) > 0 {
 		return true
 	}
-	
+
 	// Fallback: try direct control ID lookup
 	if len(c.Get800_53ByControlID(controlID)) > 0 {
 		return true
 	}
-	
+
 	return false
 }
 

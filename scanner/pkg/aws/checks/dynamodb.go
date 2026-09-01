@@ -76,8 +76,8 @@ func (c *DynamoDBChecks) CheckPointInTimeRecovery(ctx context.Context) (CheckRes
 		}
 
 		if pitr.ContinuousBackupsDescription != nil &&
-		   pitr.ContinuousBackupsDescription.PointInTimeRecoveryDescription != nil &&
-		   pitr.ContinuousBackupsDescription.PointInTimeRecoveryDescription.PointInTimeRecoveryStatus == "ENABLED" {
+			pitr.ContinuousBackupsDescription.PointInTimeRecoveryDescription != nil &&
+			pitr.ContinuousBackupsDescription.PointInTimeRecoveryDescription.PointInTimeRecoveryStatus == "ENABLED" {
 			with++
 		} else {
 			without = append(without, tableName)

@@ -70,20 +70,20 @@ func (c *LambdaChecks) CheckLambdaInVPC(ctx context.Context) (CheckResult, error
 		}
 
 		return CheckResult{
-			Control:           "[CIS-6.1]",
-			Name:              "Lambda Functions in VPC",
-			Status:            "INFO",
-			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("%d/%d Lambda functions not in VPC: %v | INFO: Only required if accessing VPC resources", len(functionsNotInVPC), totalFunctions, displayFunctions),
-			Remediation:       "Configure Lambda functions to run in VPC if they need to access VPC resources",
+			Control:     "[CIS-6.1]",
+			Name:        "Lambda Functions in VPC",
+			Status:      "INFO",
+			Severity:    "MEDIUM",
+			Evidence:    fmt.Sprintf("%d/%d Lambda functions not in VPC: %v | INFO: Only required if accessing VPC resources", len(functionsNotInVPC), totalFunctions, displayFunctions),
+			Remediation: "Configure Lambda functions to run in VPC if they need to access VPC resources",
 			RemediationDetail: `aws lambda update-function-configuration \
   --function-name FUNCTION_NAME \
   --vpc-config SubnetIds=subnet-xxx,SecurityGroupIds=sg-xxx`,
-			ScreenshotGuide:   "Lambda Console → Functions → Configuration → VPC → Screenshot showing VPC configuration",
-			ConsoleURL:        "https://console.aws.amazon.com/lambda/home#/functions",
-			Priority:          PriorityMedium,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "6.1", "SOC2": "CC6.6"},
+			ScreenshotGuide: "Lambda Console → Functions → Configuration → VPC → Screenshot showing VPC configuration",
+			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
+			Priority:        PriorityMedium,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "6.1", "SOC2": "CC6.6"},
 		}, nil
 	}
 
@@ -124,12 +124,12 @@ func (c *LambdaChecks) CheckLambdaEnvironmentEncryption(ctx context.Context) (Ch
 		}
 
 		return CheckResult{
-			Control:           "[CIS-6.2]",
-			Name:              "Lambda Environment Encryption",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d/%d functions with environment variables not encrypted with customer KMS key: %v | CIS 6.2", len(functionsWithoutKMS), totalWithEnvVars, displayFunctions),
-			Remediation:       "Encrypt Lambda environment variables with customer-managed KMS keys",
+			Control:     "[CIS-6.2]",
+			Name:        "Lambda Environment Encryption",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("%d/%d functions with environment variables not encrypted with customer KMS key: %v | CIS 6.2", len(functionsWithoutKMS), totalWithEnvVars, displayFunctions),
+			Remediation: "Encrypt Lambda environment variables with customer-managed KMS keys",
 			RemediationDetail: `# Create KMS key first
 aws kms create-key --description "Lambda environment variables"
 
@@ -137,11 +137,11 @@ aws kms create-key --description "Lambda environment variables"
 aws lambda update-function-configuration \
   --function-name FUNCTION_NAME \
   --kms-key-arn arn:aws:kms:region:account:key/KEY_ID`,
-			ScreenshotGuide:   "Lambda Console → Functions → Configuration → Environment variables → Encryption → Screenshot showing KMS key",
-			ConsoleURL:        "https://console.aws.amazon.com/lambda/home#/functions",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "6.2", "SOC2": "CC6.7", "PCI-DSS": "3.4"},
+			ScreenshotGuide: "Lambda Console → Functions → Configuration → Environment variables → Encryption → Screenshot showing KMS key",
+			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "6.2", "SOC2": "CC6.7", "PCI-DSS": "3.4"},
 		}, nil
 	}
 
@@ -194,12 +194,12 @@ func (c *LambdaChecks) CheckLambdaExecutionRole(ctx context.Context) (CheckResul
 		}
 
 		return CheckResult{
-			Control:           "[CIS-6.3]",
-			Name:              "Lambda Execution Role Permissions",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d functions with overly permissive roles: %v | CIS 6.3", len(functionsWithBroadRoles), displayFunctions),
-			Remediation:       "Use least privilege IAM roles for Lambda execution",
+			Control:     "[CIS-6.3]",
+			Name:        "Lambda Execution Role Permissions",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("%d functions with overly permissive roles: %v | CIS 6.3", len(functionsWithBroadRoles), displayFunctions),
+			Remediation: "Use least privilege IAM roles for Lambda execution",
 			RemediationDetail: `# Create custom role with only required permissions
 aws iam create-role --role-name LambdaExecutionRole --assume-role-policy-document file://trust-policy.json
 aws iam put-role-policy --role-name LambdaExecutionRole --policy-name LambdaPolicy --policy-document file://lambda-policy.json
@@ -208,11 +208,11 @@ aws iam put-role-policy --role-name LambdaExecutionRole --policy-name LambdaPoli
 aws lambda update-function-configuration \
   --function-name FUNCTION_NAME \
   --role arn:aws:iam::ACCOUNT:role/LambdaExecutionRole`,
-			ScreenshotGuide:   "Lambda Console → Functions → Configuration → Permissions → Screenshot showing least-privilege role",
-			ConsoleURL:        "https://console.aws.amazon.com/lambda/home#/functions",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "6.3", "SOC2": "CC6.3", "PCI-DSS": "7.1.2"},
+			ScreenshotGuide: "Lambda Console → Functions → Configuration → Permissions → Screenshot showing least-privilege role",
+			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "6.3", "SOC2": "CC6.3", "PCI-DSS": "7.1.2"},
 		}, nil
 	}
 
@@ -262,20 +262,20 @@ func (c *LambdaChecks) CheckLambdaPublicAccess(ctx context.Context) (CheckResult
 		}
 
 		return CheckResult{
-			Control:           "[CIS-6.4]",
-			Name:              "Lambda Functions Not Public",
-			Status:            "FAIL",
-			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("%d Lambda functions are publicly accessible: %v | CIS 6.4", len(publicFunctions), displayFunctions),
-			Remediation:       "Remove public access from Lambda function policies",
+			Control:     "[CIS-6.4]",
+			Name:        "Lambda Functions Not Public",
+			Status:      "FAIL",
+			Severity:    "CRITICAL",
+			Evidence:    fmt.Sprintf("%d Lambda functions are publicly accessible: %v | CIS 6.4", len(publicFunctions), displayFunctions),
+			Remediation: "Remove public access from Lambda function policies",
 			RemediationDetail: `aws lambda remove-permission \
   --function-name FUNCTION_NAME \
   --statement-id AllowPublicInvoke`,
-			ScreenshotGuide:   "Lambda Console → Functions → Configuration → Permissions → Resource-based policy → Screenshot showing no public access",
-			ConsoleURL:        "https://console.aws.amazon.com/lambda/home#/functions",
-			Priority:          PriorityCritical,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "6.4", "SOC2": "CC6.1", "PCI-DSS": "1.2.1"},
+			ScreenshotGuide: "Lambda Console → Functions → Configuration → Permissions → Resource-based policy → Screenshot showing no public access",
+			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "6.4", "SOC2": "CC6.1", "PCI-DSS": "1.2.1"},
 		}, nil
 	}
 
@@ -313,20 +313,20 @@ func (c *LambdaChecks) CheckLambdaTracing(ctx context.Context) (CheckResult, err
 		}
 
 		return CheckResult{
-			Control:           "[CIS-6.5]",
-			Name:              "Lambda X-Ray Tracing Enabled",
-			Status:            "FAIL",
-			Severity:          "LOW",
-			Evidence:          fmt.Sprintf("%d/%d functions without X-Ray tracing: %v | CIS 6.5", len(functionsWithoutTracing), totalFunctions, displayFunctions),
-			Remediation:       "Enable X-Ray tracing for Lambda functions",
+			Control:     "[CIS-6.5]",
+			Name:        "Lambda X-Ray Tracing Enabled",
+			Status:      "FAIL",
+			Severity:    "LOW",
+			Evidence:    fmt.Sprintf("%d/%d functions without X-Ray tracing: %v | CIS 6.5", len(functionsWithoutTracing), totalFunctions, displayFunctions),
+			Remediation: "Enable X-Ray tracing for Lambda functions",
 			RemediationDetail: `aws lambda update-function-configuration \
   --function-name FUNCTION_NAME \
   --tracing-config Mode=Active`,
-			ScreenshotGuide:   "Lambda Console → Functions → Configuration → Monitoring → Screenshot showing X-Ray tracing enabled",
-			ConsoleURL:        "https://console.aws.amazon.com/lambda/home#/functions",
-			Priority:          PriorityLow,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "6.5", "SOC2": "CC7.2"},
+			ScreenshotGuide: "Lambda Console → Functions → Configuration → Monitoring → Screenshot showing X-Ray tracing enabled",
+			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
+			Priority:        PriorityLow,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "6.5", "SOC2": "CC7.2"},
 		}, nil
 	}
 

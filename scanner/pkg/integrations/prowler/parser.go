@@ -28,25 +28,25 @@ type FindingsCount struct {
 
 // ProwlerResult represents a single Prowler finding
 type ProwlerResult struct {
-	CheckID        string            `json:"CheckID"`
-	CheckTitle     string            `json:"CheckTitle"`
-	CheckType      []string          `json:"CheckType"`
-	ServiceName    string            `json:"ServiceName"`
-	SubServiceName string            `json:"SubServiceName"`
-	Status         string            `json:"Status"`
-	StatusExtended string            `json:"StatusExtended"`
-	Severity       string            `json:"Severity"`
-	Region         string            `json:"Region"`
-	ResourceID     string            `json:"ResourceId"`
-	ResourceArn    string            `json:"ResourceArn"`
-	ResourceTags   map[string]string `json:"ResourceTags"`
-	Description    string            `json:"Description"`
-	Risk           string            `json:"Risk"`
-	Notes          string            `json:"Notes"`
-	Remediation    ProwlerRemediation `json:"Remediation"`
+	CheckID        string              `json:"CheckID"`
+	CheckTitle     string              `json:"CheckTitle"`
+	CheckType      []string            `json:"CheckType"`
+	ServiceName    string              `json:"ServiceName"`
+	SubServiceName string              `json:"SubServiceName"`
+	Status         string              `json:"Status"`
+	StatusExtended string              `json:"StatusExtended"`
+	Severity       string              `json:"Severity"`
+	Region         string              `json:"Region"`
+	ResourceID     string              `json:"ResourceId"`
+	ResourceArn    string              `json:"ResourceArn"`
+	ResourceTags   map[string]string   `json:"ResourceTags"`
+	Description    string              `json:"Description"`
+	Risk           string              `json:"Risk"`
+	Notes          string              `json:"Notes"`
+	Remediation    ProwlerRemediation  `json:"Remediation"`
 	Compliance     map[string][]string `json:"Compliance"`
-	AccountID      string            `json:"AccountId"`
-	Provider       string            `json:"Provider"`
+	AccountID      string              `json:"AccountId"`
+	Provider       string              `json:"Provider"`
 }
 
 type ProwlerRemediation struct {
@@ -321,23 +321,23 @@ func (p *ProwlerIntegration) convertCompliance(compliance map[string][]string) m
 
 	// Map Prowler compliance keys to AuditKit framework names
 	frameworkMap := map[string]string{
-		"SOC2":              "SOC2",
-		"PCI-DSS":           "PCI-DSS",
-		"PCI":               "PCI-DSS",
-		"HIPAA":             "HIPAA",
-		"ISO27001":          "ISO27001",
-		"ISO-27001":         "ISO27001",
-		"NIST-800-53":       "NIST-800-53",
-		"NIST800-53":        "NIST-800-53",
-		"CIS":               "CIS",
-		"CIS-AWS":           "CIS-AWS",
-		"CIS-Azure":         "CIS-Azure",
-		"CIS-GCP":           "CIS-GCP",
-		"CMMC":              "CMMC",
-		"GDPR":              "GDPR",
-		"FedRAMP":           "FedRAMP",
-		"FedRAMP-Moderate":  "FedRAMP",
-		"FedRAMP-Low":       "FedRAMP",
+		"SOC2":                 "SOC2",
+		"PCI-DSS":              "PCI-DSS",
+		"PCI":                  "PCI-DSS",
+		"HIPAA":                "HIPAA",
+		"ISO27001":             "ISO27001",
+		"ISO-27001":            "ISO27001",
+		"NIST-800-53":          "NIST-800-53",
+		"NIST800-53":           "NIST-800-53",
+		"CIS":                  "CIS",
+		"CIS-AWS":              "CIS-AWS",
+		"CIS-Azure":            "CIS-Azure",
+		"CIS-GCP":              "CIS-GCP",
+		"CMMC":                 "CMMC",
+		"GDPR":                 "GDPR",
+		"FedRAMP":              "FedRAMP",
+		"FedRAMP-Moderate":     "FedRAMP",
+		"FedRAMP-Low":          "FedRAMP",
 		"AWS-Well-Architected": "AWS-WAF",
 	}
 

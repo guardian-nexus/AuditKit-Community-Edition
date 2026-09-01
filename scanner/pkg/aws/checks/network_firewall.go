@@ -134,12 +134,12 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.
 
 	if len(firewallsWithMissingAZs) > 0 {
 		return CheckResult{
-			Control:           "[CIS-5.15]",
-			Name:              "Network Firewall AZ Deployment",
-			Status:            "FAIL",
-			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("%d/%d firewalls not deployed in all AZs: %v | CIS 5.15", len(firewallsWithMissingAZs), len(firewalls.Firewalls), firewallsWithMissingAZs),
-			Remediation:       "Deploy Network Firewall in all availability zones",
+			Control:     "[CIS-5.15]",
+			Name:        "Network Firewall AZ Deployment",
+			Status:      "FAIL",
+			Severity:    "MEDIUM",
+			Evidence:    fmt.Sprintf("%d/%d firewalls not deployed in all AZs: %v | CIS 5.15", len(firewallsWithMissingAZs), len(firewalls.Firewalls), firewallsWithMissingAZs),
+			Remediation: "Deploy Network Firewall in all availability zones",
 			RemediationDetail: `# Update firewall subnet mappings to include all AZs:
 aws network-firewall update-subnet-change-protection \
   --firewall-name FIREWALL_NAME \
@@ -148,11 +148,11 @@ aws network-firewall update-subnet-change-protection \
 aws network-firewall associate-subnets \
   --firewall-name FIREWALL_NAME \
   --subnet-mappings SubnetId=subnet-xxx`,
-			ScreenshotGuide:   "Network Firewall Console → Firewalls → Subnets → Screenshot showing subnet in each AZ",
-			ConsoleURL:        "https://console.aws.amazon.com/vpc/home#NetworkFirewalls",
-			Priority:          PriorityMedium,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "5.15", "SOC2": "CC6.6"},
+			ScreenshotGuide: "Network Firewall Console → Firewalls → Subnets → Screenshot showing subnet in each AZ",
+			ConsoleURL:      "https://console.aws.amazon.com/vpc/home#NetworkFirewalls",
+			Priority:        PriorityMedium,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "5.15", "SOC2": "CC6.6"},
 		}, nil
 	}
 
@@ -229,12 +229,12 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallPolicyRules(ctx context.Cont
 		}
 
 		return CheckResult{
-			Control:           "[CIS-5.16]",
-			Name:              "Network Firewall Policy Rules",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d/%d policies without stateful rule groups: %v | CIS 5.16", len(policiesWithoutRules), len(policies.FirewallPolicies), displayPolicies),
-			Remediation:       "Add stateful rule groups to Network Firewall policies",
+			Control:     "[CIS-5.16]",
+			Name:        "Network Firewall Policy Rules",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("%d/%d policies without stateful rule groups: %v | CIS 5.16", len(policiesWithoutRules), len(policies.FirewallPolicies), displayPolicies),
+			Remediation: "Add stateful rule groups to Network Firewall policies",
 			RemediationDetail: `# Create a stateful rule group:
 aws network-firewall create-rule-group \
   --rule-group-name my-stateful-rules \
@@ -245,11 +245,11 @@ aws network-firewall create-rule-group \
 aws network-firewall update-firewall-policy \
   --firewall-policy-name POLICY_NAME \
   --firewall-policy StatefulRuleGroupReferences='[{"ResourceArn":"arn:aws:network-firewall:..."}]'`,
-			ScreenshotGuide:   "Network Firewall Console → Firewall policies → Rule groups → Screenshot showing stateful rules",
-			ConsoleURL:        "https://console.aws.amazon.com/vpc/home#FirewallPolicies",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "5.16", "SOC2": "CC6.1", "PCI-DSS": "1.2"},
+			ScreenshotGuide: "Network Firewall Console → Firewall policies → Rule groups → Screenshot showing stateful rules",
+			ConsoleURL:      "https://console.aws.amazon.com/vpc/home#FirewallPolicies",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "5.16", "SOC2": "CC6.1", "PCI-DSS": "1.2"},
 		}, nil
 	}
 
@@ -324,12 +324,12 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallLogging(ctx context.Context)
 		}
 
 		return CheckResult{
-			Control:           "[CIS-5.17]",
-			Name:              "Network Firewall Logging",
-			Status:            "FAIL",
-			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("%d/%d firewalls without logging enabled: %v | CIS 5.17", len(firewallsWithoutLogging), len(firewalls.Firewalls), displayFirewalls),
-			Remediation:       "Enable logging for Network Firewalls",
+			Control:     "[CIS-5.17]",
+			Name:        "Network Firewall Logging",
+			Status:      "FAIL",
+			Severity:    "HIGH",
+			Evidence:    fmt.Sprintf("%d/%d firewalls without logging enabled: %v | CIS 5.17", len(firewallsWithoutLogging), len(firewalls.Firewalls), displayFirewalls),
+			Remediation: "Enable logging for Network Firewalls",
 			RemediationDetail: `# Configure logging to CloudWatch:
 aws network-firewall update-logging-configuration \
   --firewall-name FIREWALL_NAME \
@@ -345,11 +345,11 @@ aws network-firewall update-logging-configuration \
       "LogDestination": {"logGroup": "/aws/networkfirewall/flow"}
     }]
   }'`,
-			ScreenshotGuide:   "Network Firewall Console → Firewalls → Logging → Screenshot showing logging enabled",
-			ConsoleURL:        "https://console.aws.amazon.com/vpc/home#NetworkFirewalls",
-			Priority:          PriorityHigh,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "5.17", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
+			ScreenshotGuide: "Network Firewall Console → Firewalls → Logging → Screenshot showing logging enabled",
+			ConsoleURL:      "https://console.aws.amazon.com/vpc/home#NetworkFirewalls",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "5.17", "SOC2": "CC7.2", "PCI-DSS": "10.2"},
 		}, nil
 	}
 

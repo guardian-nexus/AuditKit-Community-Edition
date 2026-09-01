@@ -2,8 +2,8 @@ package checks
 
 import (
 	"context"
-	"time"
 	"fmt"
+	"time"
 )
 
 // Framework constants
@@ -182,9 +182,9 @@ var FrameworkMappings = map[string]map[string]string{
 		FrameworkCIS:   "1.8",
 	},
 	"ROUTE53_DNSSEC": {
-		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "4.1",
-		FrameworkCIS:   "5.19",
+		FrameworkSOC2: "CC6.1",
+		FrameworkPCI:  "4.1",
+		FrameworkCIS:  "5.19",
 	},
 	"EBS_ENCRYPTION": {
 		FrameworkSOC2:  "CC6.3",
@@ -561,111 +561,111 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 	// Section 11 - AWS Organizations
 	"ORGANIZATIONS_SCPS_ENABLED": {
-		FrameworkSOC2:  "CC5.2",
-		FrameworkPCI:   "7.1",
-		FrameworkCIS:   "11.1",
+		FrameworkSOC2: "CC5.2",
+		FrameworkPCI:  "7.1",
+		FrameworkCIS:  "11.1",
 	},
 	"ORGANIZATIONS_MULTI_ACCOUNT": {
-		FrameworkSOC2:  "CC5.2",
-		FrameworkPCI:   "6.5.3",
-		FrameworkCIS:   "11.2",
+		FrameworkSOC2: "CC5.2",
+		FrameworkPCI:  "6.5.3",
+		FrameworkCIS:  "11.2",
 	},
 	"ORGANIZATIONS_TRAIL": {
-		FrameworkSOC2:  "CC7.2",
-		FrameworkPCI:   "10.2",
-		FrameworkCIS:   "11.3",
+		FrameworkSOC2: "CC7.2",
+		FrameworkPCI:  "10.2",
+		FrameworkCIS:  "11.3",
 	},
 	"ORGANIZATIONS_SCPS_CONFIGURED": {
-		FrameworkSOC2:  "CC5.2",
-		FrameworkPCI:   "7.1",
-		FrameworkCIS:   "11.4",
+		FrameworkSOC2: "CC5.2",
+		FrameworkPCI:  "7.1",
+		FrameworkCIS:  "11.4",
 	},
 	// Section 12 - Secrets Manager
 	"SECRETS_ROTATION": {
-		FrameworkSOC2:  "CC6.7",
-		FrameworkPCI:   "8.2.4",
-		FrameworkCIS:   "12.1",
+		FrameworkSOC2: "CC6.7",
+		FrameworkPCI:  "8.2.4",
+		FrameworkCIS:  "12.1",
 	},
 	"SECRETS_ENCRYPTION": {
-		FrameworkSOC2:  "CC6.3",
-		FrameworkPCI:   "3.4",
-		FrameworkCIS:   "12.2",
+		FrameworkSOC2: "CC6.3",
+		FrameworkPCI:  "3.4",
+		FrameworkCIS:  "12.2",
 	},
 	"SECRETS_UNUSED": {
-		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "7.2",
-		FrameworkCIS:   "12.3",
+		FrameworkSOC2: "CC6.1",
+		FrameworkPCI:  "7.2",
+		FrameworkCIS:  "12.3",
 	},
 	// Section 13 - ECR
 	"ECR_IMAGE_SCANNING": {
-		FrameworkSOC2:  "CC7.2",
-		FrameworkPCI:   "6.3.2",
-		FrameworkCIS:   "13.1",
+		FrameworkSOC2: "CC7.2",
+		FrameworkPCI:  "6.3.2",
+		FrameworkCIS:  "13.1",
 	},
 	"ECR_IMMUTABLE_TAGS": {
-		FrameworkSOC2:  "CC8.1",
-		FrameworkPCI:   "6.3.2",
-		FrameworkCIS:   "13.2",
+		FrameworkSOC2: "CC8.1",
+		FrameworkPCI:  "6.3.2",
+		FrameworkCIS:  "13.2",
 	},
 	"ECR_ENCRYPTION": {
-		FrameworkSOC2:  "CC6.3",
-		FrameworkPCI:   "3.4",
-		FrameworkCIS:   "13.3",
+		FrameworkSOC2: "CC6.3",
+		FrameworkPCI:  "3.4",
+		FrameworkCIS:  "13.3",
 	},
 	// Section 14 - DynamoDB
 	"DYNAMODB_PITR": {
-		FrameworkSOC2:  "A1.2",
-		FrameworkPCI:   "9.5",
-		FrameworkCIS:   "14.1",
+		FrameworkSOC2: "A1.2",
+		FrameworkPCI:  "9.5",
+		FrameworkCIS:  "14.1",
 	},
 	"DYNAMODB_ENCRYPTION": {
-		FrameworkSOC2:  "CC6.3",
-		FrameworkPCI:   "3.4",
-		FrameworkCIS:   "14.2",
+		FrameworkSOC2: "CC6.3",
+		FrameworkPCI:  "3.4",
+		FrameworkCIS:  "14.2",
 	},
 	"DYNAMODB_AUTOSCALING": {
-		FrameworkSOC2:  "A1.2",
-		FrameworkPCI:   "10.5",
-		FrameworkCIS:   "14.3",
+		FrameworkSOC2: "A1.2",
+		FrameworkPCI:  "10.5",
+		FrameworkCIS:  "14.3",
 	},
 	// Section 15 - CloudFormation
 	"CFN_STACK_POLICY": {
-		FrameworkSOC2:  "CC5.2",
-		FrameworkPCI:   "7.1",
-		FrameworkCIS:   "15.1",
+		FrameworkSOC2: "CC5.2",
+		FrameworkPCI:  "7.1",
+		FrameworkCIS:  "15.1",
 	},
 	"CFN_DRIFT_DETECTION": {
-		FrameworkSOC2:  "CC7.2",
-		FrameworkPCI:   "11.5",
-		FrameworkCIS:   "15.2",
+		FrameworkSOC2: "CC7.2",
+		FrameworkPCI:  "11.5",
+		FrameworkCIS:  "15.2",
 	},
 	// Section 16 - ACM
 	"ACM_RENEWAL": {
-		FrameworkSOC2:  "CC6.3",
-		FrameworkPCI:   "4.1",
-		FrameworkCIS:   "16.1",
+		FrameworkSOC2: "CC6.3",
+		FrameworkPCI:  "4.1",
+		FrameworkCIS:  "16.1",
 	},
 	"ACM_IN_USE": {
-		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "2.2.2",
-		FrameworkCIS:   "16.2",
+		FrameworkSOC2: "CC6.1",
+		FrameworkPCI:  "2.2.2",
+		FrameworkCIS:  "16.2",
 	},
 	// Section 17 - Advanced IAM
 	"IAM_SERVICE_LINKED_ROLES": {
-		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "7.1",
-		FrameworkCIS:   "17.1",
+		FrameworkSOC2: "CC6.1",
+		FrameworkPCI:  "7.1",
+		FrameworkCIS:  "17.1",
 	},
 	"IAM_PERMISSION_BOUNDARIES": {
-		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "7.1",
-		FrameworkCIS:   "17.2",
+		FrameworkSOC2: "CC6.1",
+		FrameworkPCI:  "7.1",
+		FrameworkCIS:  "17.2",
 	},
 	// Section 18 - Aurora
 	"AURORA_BACKTRACK": {
-		FrameworkSOC2:  "A1.2",
-		FrameworkPCI:   "9.5",
-		FrameworkCIS:   "18.1",
+		FrameworkSOC2: "A1.2",
+		FrameworkPCI:  "9.5",
+		FrameworkCIS:  "18.1",
 	},
 	// SageMaker Security
 	"SAGEMAKER_ENCRYPTION": {
@@ -806,7 +806,7 @@ func FormatFrameworkRequirements(frameworks map[string]string) string {
 	if len(frameworks) == 0 {
 		return ""
 	}
-	
+
 	result := " | Requirements: "
 	for fw, requirement := range frameworks {
 		result += fmt.Sprintf("%s %s, ", fw, requirement)

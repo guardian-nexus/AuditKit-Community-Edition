@@ -649,12 +649,12 @@ func (c *EC2Checks) CheckInstanceIAMRoles(ctx context.Context) (CheckResult, err
 		}
 
 		return CheckResult{
-			Control:           "[CIS-1.18]",
-			Name:              "EC2 Instance IAM Roles",
-			Status:            "FAIL",
-			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("%d/%d running EC2 instances do not use IAM roles: %s | Violates CIS 1.18 (may use embedded credentials)", len(instancesWithoutRoles), totalRunningInstances, strings.Join(displayInstances, ", ")),
-			Remediation:       "Attach IAM instance profiles to EC2 instances",
+			Control:     "[CIS-1.18]",
+			Name:        "EC2 Instance IAM Roles",
+			Status:      "FAIL",
+			Severity:    "MEDIUM",
+			Evidence:    fmt.Sprintf("%d/%d running EC2 instances do not use IAM roles: %s | Violates CIS 1.18 (may use embedded credentials)", len(instancesWithoutRoles), totalRunningInstances, strings.Join(displayInstances, ", ")),
+			Remediation: "Attach IAM instance profiles to EC2 instances",
 			RemediationDetail: fmt.Sprintf(`# Create IAM role for EC2
 aws iam create-role --role-name EC2-App-Role --assume-role-policy-document '{
   "Version": "2012-10-17",
@@ -678,11 +678,11 @@ aws iam add-role-to-instance-profile --instance-profile-name EC2-App-Profile --r
 aws ec2 associate-iam-instance-profile --instance-id %s --iam-instance-profile Name=EC2-App-Profile
 
 # Remove any embedded credentials from instance after testing role works`, instancesWithoutRoles[0]),
-			ScreenshotGuide:   "EC2 → Instances → Select instance → Security tab → Screenshot showing 'IAM Role' assigned",
-			ConsoleURL:        "https://console.aws.amazon.com/ec2/v2/home#Instances",
-			Priority:          PriorityMedium,
-			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.18", "SOC2": "CC6.1", "PCI-DSS": "7.1"},
+			ScreenshotGuide: "EC2 → Instances → Select instance → Security tab → Screenshot showing 'IAM Role' assigned",
+			ConsoleURL:      "https://console.aws.amazon.com/ec2/v2/home#Instances",
+			Priority:        PriorityMedium,
+			Timestamp:       time.Now(),
+			Frameworks:      map[string]string{"CIS-AWS": "1.18", "SOC2": "CC6.1", "PCI-DSS": "7.1"},
 		}, nil
 	}
 

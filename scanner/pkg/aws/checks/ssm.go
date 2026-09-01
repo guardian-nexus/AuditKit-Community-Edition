@@ -237,9 +237,9 @@ Required permissions:
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to get patch compliance status: %v", err),
 			Remediation: "Verify patch compliance permissions",
-			Priority:   PriorityMedium,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("SSM_PATCH_COMPLIANCE"),
+			Priority:    PriorityMedium,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("SSM_PATCH_COMPLIANCE"),
 		}, nil
 	}
 

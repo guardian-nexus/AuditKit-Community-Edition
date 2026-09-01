@@ -105,10 +105,10 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsEnabled(ctx context.Context) (Che
 			Status:      "FAIL",
 			Evidence:    "AWS Organizations enabled but SCPs are not available",
 			Remediation: "Enable Service Control Policies in Organizations",
-			Severity:   "HIGH",
-			Priority:   PriorityHigh,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("ORGANIZATIONS_SCPS_ENABLED"),
+			Severity:    "HIGH",
+			Priority:    PriorityHigh,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("ORGANIZATIONS_SCPS_ENABLED"),
 		}, nil
 	}
 
@@ -188,14 +188,14 @@ func (c *OrganizationsAdvancedChecks) CheckOrganizationTrail(ctx context.Context
 	trails, err := c.ctClient.DescribeTrails(ctx, &cloudtrail.DescribeTrailsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-11.3",
-			Name:       "Organization-wide CloudTrail",
-			Status:     "ERROR",
-			Evidence:   "Cannot check CloudTrail configuration",
+			Control:     "CIS-11.3",
+			Name:        "Organization-wide CloudTrail",
+			Status:      "ERROR",
+			Evidence:    "Cannot check CloudTrail configuration",
 			Remediation: "Verify CloudTrail permissions",
-			Priority:   PriorityLow,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("ORGANIZATIONS_TRAIL"),
+			Priority:    PriorityLow,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("ORGANIZATIONS_TRAIL"),
 		}, nil
 	}
 
@@ -248,14 +248,14 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsConfigured(ctx context.Context) (
 	})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-11.4",
-			Name:       "Service Control Policies Configured",
-			Status:     "INFO",
-			Evidence:   "Cannot list SCPs - not using Organizations or no permissions",
+			Control:     "CIS-11.4",
+			Name:        "Service Control Policies Configured",
+			Status:      "INFO",
+			Evidence:    "Cannot list SCPs - not using Organizations or no permissions",
 			Remediation: "N/A",
-			Priority:   PriorityLow,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("ORGANIZATIONS_SCPS_CONFIGURED"),
+			Priority:    PriorityLow,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("ORGANIZATIONS_SCPS_CONFIGURED"),
 		}, nil
 	}
 

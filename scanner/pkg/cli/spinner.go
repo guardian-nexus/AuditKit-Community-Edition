@@ -10,13 +10,13 @@ import (
 
 // Spinner provides a terminal spinner for long-running operations
 type Spinner struct {
-	message   string
-	frames    []string
-	interval  time.Duration
-	stopCh    chan struct{}
-	doneCh    chan struct{}
-	mu        sync.Mutex
-	running   bool
+	message  string
+	frames   []string
+	interval time.Duration
+	stopCh   chan struct{}
+	doneCh   chan struct{}
+	mu       sync.Mutex
+	running  bool
 }
 
 // Common spinner styles
@@ -136,11 +136,11 @@ func (s *Spinner) UpdateMessage(message string) {
 
 // ProgressBar represents a simple progress bar
 type ProgressBar struct {
-	total     int
-	current   int
-	width     int
-	message   string
-	mu        sync.Mutex
+	total   int
+	current int
+	width   int
+	message string
+	mu      sync.Mutex
 }
 
 // NewProgressBar creates a new progress bar
@@ -200,4 +200,3 @@ func (p *ProgressBar) Finish() {
 	p.render()
 	fmt.Fprintln(os.Stderr)
 }
-

@@ -148,14 +148,14 @@ func (c *MonitoringChecks) CheckSecurityHubEnabled(ctx context.Context) (CheckRe
 	if err != nil {
 		// Check if the error is because Security Hub is not enabled
 		if strings.Contains(err.Error(), "not subscribed") ||
-		   strings.Contains(err.Error(), "InvalidAccessException") ||
-		   strings.Contains(err.Error(), "ResourceNotFoundException") {
+			strings.Contains(err.Error(), "InvalidAccessException") ||
+			strings.Contains(err.Error(), "ResourceNotFoundException") {
 			return CheckResult{
-				Control:    "[CIS-4.16]",
-				Name:       "AWS Security Hub Enabled",
-				Status:     "FAIL",
-				Severity:   "MEDIUM",
-				Evidence:   "AWS Security Hub is NOT enabled in this region",
+				Control:     "[CIS-4.16]",
+				Name:        "AWS Security Hub Enabled",
+				Status:      "FAIL",
+				Severity:    "MEDIUM",
+				Evidence:    "AWS Security Hub is NOT enabled in this region",
 				Remediation: "Enable AWS Security Hub to centralize security findings",
 				RemediationDetail: `AWS Security Hub aggregates, organizes, and prioritizes security findings from AWS services and third-party products.
 
@@ -211,15 +211,15 @@ Also consider enabling:
 	// Security Hub is enabled - check if it's active
 	if hub.HubArn == nil || *hub.HubArn == "" {
 		return CheckResult{
-			Control:    "[CIS-4.16]",
-			Name:       "AWS Security Hub Enabled",
-			Status:     "FAIL",
-			Severity:   "MEDIUM",
-			Evidence:   "Security Hub is enabled but Hub ARN is missing",
+			Control:     "[CIS-4.16]",
+			Name:        "AWS Security Hub Enabled",
+			Status:      "FAIL",
+			Severity:    "MEDIUM",
+			Evidence:    "Security Hub is enabled but Hub ARN is missing",
 			Remediation: "Verify Security Hub configuration",
-			Priority:   PriorityMedium,
-			Timestamp:  time.Now(),
-			Frameworks: GetFrameworkMappings("SECURITY_HUB"),
+			Priority:    PriorityMedium,
+			Timestamp:   time.Now(),
+			Frameworks:  GetFrameworkMappings("SECURITY_HUB"),
 		}, nil
 	}
 

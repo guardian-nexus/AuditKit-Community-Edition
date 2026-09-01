@@ -192,9 +192,9 @@ func (c *KMSChecks) CheckKMSSeparationOfDuties(ctx context.Context) []CheckResul
 			if role == "roles/cloudkms.admin" {
 				hasAdmin = true
 			}
-			if role == "roles/cloudkms.cryptoKeyEncrypterDecrypter" || 
-			   role == "roles/cloudkms.cryptoKeyEncrypter" ||
-			   role == "roles/cloudkms.cryptoKeyDecrypter" {
+			if role == "roles/cloudkms.cryptoKeyEncrypterDecrypter" ||
+				role == "roles/cloudkms.cryptoKeyEncrypter" ||
+				role == "roles/cloudkms.cryptoKeyDecrypter" {
 				hasCryptoKey = true
 			}
 		}

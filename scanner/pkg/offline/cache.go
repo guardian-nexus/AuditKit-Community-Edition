@@ -10,17 +10,17 @@ import (
 
 // CachedScan represents a cached scan result
 type CachedScan struct {
-	Timestamp       time.Time         `json:"timestamp"`
-	Provider        string            `json:"provider"`
-	Framework       string            `json:"framework"`
-	AccountID       string            `json:"account_id"`
-	Score           float64           `json:"score"`
-	TotalControls   int               `json:"total_controls"`
-	PassedControls  int               `json:"passed_controls"`
-	FailedControls  int               `json:"failed_controls"`
-	Controls        []CachedControl   `json:"controls"`
-	Recommendations []string          `json:"recommendations"`
-	Version         string            `json:"version"`
+	Timestamp       time.Time       `json:"timestamp"`
+	Provider        string          `json:"provider"`
+	Framework       string          `json:"framework"`
+	AccountID       string          `json:"account_id"`
+	Score           float64         `json:"score"`
+	TotalControls   int             `json:"total_controls"`
+	PassedControls  int             `json:"passed_controls"`
+	FailedControls  int             `json:"failed_controls"`
+	Controls        []CachedControl `json:"controls"`
+	Recommendations []string        `json:"recommendations"`
+	Version         string          `json:"version"`
 }
 
 // CachedControl represents a cached control result

@@ -69,16 +69,16 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 	crmService, err := cloudresourcemanager.NewService(ctx)
 	if err != nil {
 		return CheckResult{
-			Control:     "AC.L1-3.1.1",
-			Name:        "[CMMC L1] Limit System Access",
-			Status:      "FAIL",
-			Evidence:    fmt.Sprintf("Unable to verify IAM bindings: %v", err),
-			Remediation: "Enable GCP IAM and configure role bindings for authorized users",
-			Priority:    PriorityCritical,
-			Timestamp:   time.Now(),
+			Control:         "AC.L1-3.1.1",
+			Name:            "[CMMC L1] Limit System Access",
+			Status:          "FAIL",
+			Evidence:        fmt.Sprintf("Unable to verify IAM bindings: %v", err),
+			Remediation:     "Enable GCP IAM and configure role bindings for authorized users",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
 			ScreenshotGuide: "Google Cloud Console → IAM & Admin → IAM → Screenshot role assignments",
-			ConsoleURL: fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks: map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
 		}
 	}
 
@@ -92,36 +92,36 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 			Remediation: "Configure GCP IAM with appropriate role assignments",
 			Priority:    PriorityCritical,
 			Timestamp:   time.Now(),
-			Frameworks: map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+			Frameworks:  map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
 		}
 	}
 
 	if len(policy.Bindings) == 0 {
 		return CheckResult{
-			Control:     "AC.L1-3.1.1",
-			Name:        "[CMMC L1] Limit System Access",
-			Status:      "FAIL",
-			Evidence:    "No IAM bindings found - access control not configured",
-			Remediation: "Configure GCP IAM with appropriate role assignments for authorized users",
-			Priority:    PriorityCritical,
-			Timestamp:   time.Now(),
+			Control:         "AC.L1-3.1.1",
+			Name:            "[CMMC L1] Limit System Access",
+			Status:          "FAIL",
+			Evidence:        "No IAM bindings found - access control not configured",
+			Remediation:     "Configure GCP IAM with appropriate role assignments for authorized users",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
 			ScreenshotGuide: "IAM & Admin → IAM → Add members → Screenshot",
-			ConsoleURL: fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks: map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
 		}
 	}
 
 	return CheckResult{
-		Control:     "AC.L1-3.1.1",
-		Name:        "[CMMC L1] Limit System Access",
-		Status:      "PASS",
-		Evidence:    fmt.Sprintf("GCP IAM configured with %d role bindings", len(policy.Bindings)),
-		Remediation: "Continue reviewing IAM bindings regularly for least privilege",
-		Priority:    PriorityInfo,
-		Timestamp:   time.Now(),
+		Control:         "AC.L1-3.1.1",
+		Name:            "[CMMC L1] Limit System Access",
+		Status:          "PASS",
+		Evidence:        fmt.Sprintf("GCP IAM configured with %d role bindings", len(policy.Bindings)),
+		Remediation:     "Continue reviewing IAM bindings regularly for least privilege",
+		Priority:        PriorityInfo,
+		Timestamp:       time.Now(),
 		ScreenshotGuide: "IAM & Admin → IAM → Screenshot showing role assignments",
-		ConsoleURL: fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-		Frameworks: map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+		ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
+		Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
 	}
 }
 
@@ -130,12 +130,12 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 	crmService, err := cloudresourcemanager.NewService(ctx)
 	if err != nil {
 		return CheckResult{
-			Control:     "AC.L1-3.1.2",
-			Name:        "[CMMC L1] Limit Access to Authorized Types",
-			Status:      "FAIL",
-			Evidence:    "Unable to verify role assignments",
-			Priority:    PriorityCritical,
-			Timestamp:   time.Now(),
+			Control:    "AC.L1-3.1.2",
+			Name:       "[CMMC L1] Limit Access to Authorized Types",
+			Status:     "FAIL",
+			Evidence:   "Unable to verify role assignments",
+			Priority:   PriorityCritical,
+			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
 		}
 	}
@@ -143,12 +143,12 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
 		return CheckResult{
-			Control:     "AC.L1-3.1.2",
-			Name:        "[CMMC L1] Limit Access to Authorized Types",
-			Status:      "FAIL",
-			Evidence:    "Unable to retrieve IAM policy",
-			Priority:    PriorityCritical,
-			Timestamp:   time.Now(),
+			Control:    "AC.L1-3.1.2",
+			Name:       "[CMMC L1] Limit Access to Authorized Types",
+			Status:     "FAIL",
+			Evidence:   "Unable to retrieve IAM policy",
+			Priority:   PriorityCritical,
+			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
 		}
 	}
@@ -162,26 +162,26 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 
 	if ownerCount > 3 {
 		return CheckResult{
-			Control:     "AC.L1-3.1.2",
-			Name:        "[CMMC L1] Limit Access to Authorized Types",
-			Status:      "FAIL",
-			Evidence:    fmt.Sprintf("Found %d Owner role assignments - may violate least privilege", ownerCount),
-			Remediation: "Review Owner assignments and use more restrictive roles where possible",
-			Priority:    PriorityHigh,
-			Timestamp:   time.Now(),
+			Control:         "AC.L1-3.1.2",
+			Name:            "[CMMC L1] Limit Access to Authorized Types",
+			Status:          "FAIL",
+			Evidence:        fmt.Sprintf("Found %d Owner role assignments - may violate least privilege", ownerCount),
+			Remediation:     "Review Owner assignments and use more restrictive roles where possible",
+			Priority:        PriorityHigh,
+			Timestamp:       time.Now(),
 			ScreenshotGuide: "IAM & Admin → IAM → Screenshot showing limited Owner assignments",
-			ConsoleURL: fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks: map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
+			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
 		}
 	}
 
 	return CheckResult{
-		Control:     "AC.L1-3.1.2",
-		Name:        "[CMMC L1] Limit Access to Authorized Types",
-		Status:      "PASS",
-		Evidence:    fmt.Sprintf("IAM configured with appropriate role assignments (%d Owner roles)", ownerCount),
-		Priority:    PriorityInfo,
-		Timestamp:   time.Now(),
+		Control:    "AC.L1-3.1.2",
+		Name:       "[CMMC L1] Limit Access to Authorized Types",
+		Status:     "PASS",
+		Evidence:   fmt.Sprintf("IAM configured with appropriate role assignments (%d Owner roles)", ownerCount),
+		Priority:   PriorityInfo,
+		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
 	}
 }
@@ -191,12 +191,12 @@ func (c *GCPCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 	crmService, err := cloudresourcemanager.NewService(ctx)
 	if err != nil {
 		return CheckResult{
-			Control:     "IA.L1-3.5.1",
-			Name:        "[CMMC L1] Identify Users",
-			Status:      "FAIL",
-			Evidence:    "Unable to verify user identities",
-			Priority:    PriorityCritical,
-			Timestamp:   time.Now(),
+			Control:    "IA.L1-3.5.1",
+			Name:       "[CMMC L1] Identify Users",
+			Status:     "FAIL",
+			Evidence:   "Unable to verify user identities",
+			Priority:   PriorityCritical,
+			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"CMMC": "IA.L1-3.5.1", "NIST 800-171": "3.5.1"},
 		}
 	}
@@ -204,12 +204,12 @@ func (c *GCPCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
 		return CheckResult{
-			Control:     "IA.L1-3.5.1",
-			Name:        "[CMMC L1] Identify Users",
-			Status:      "FAIL",
-			Evidence:    "Unable to retrieve IAM policy",
-			Priority:    PriorityCritical,
-			Timestamp:   time.Now(),
+			Control:    "IA.L1-3.5.1",
+			Name:       "[CMMC L1] Identify Users",
+			Status:     "FAIL",
+			Evidence:   "Unable to retrieve IAM policy",
+			Priority:   PriorityCritical,
+			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"CMMC": "IA.L1-3.5.1", "NIST 800-171": "3.5.1"},
 		}
 	}
@@ -229,23 +229,23 @@ func (c *GCPCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 
 	if len(userAccounts) == 0 {
 		return CheckResult{
-			Control:     "IA.L1-3.5.1",
-			Name:        "[CMMC L1] Identify Users",
-			Status:      "INFO",
-			Evidence:    "No user accounts found (only service accounts) - verify individual user identities exist",
-			Priority:    PriorityMedium,
-			Timestamp:   time.Now(),
+			Control:    "IA.L1-3.5.1",
+			Name:       "[CMMC L1] Identify Users",
+			Status:     "INFO",
+			Evidence:   "No user accounts found (only service accounts) - verify individual user identities exist",
+			Priority:   PriorityMedium,
+			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"CMMC": "IA.L1-3.5.1", "NIST 800-171": "3.5.1"},
 		}
 	}
 
 	return CheckResult{
-		Control:     "IA.L1-3.5.1",
-		Name:        "[CMMC L1] Identify Users",
-		Status:      "PASS",
-		Evidence:    fmt.Sprintf("Found %d individual user accounts with unique identities", len(userAccounts)),
-		Priority:    PriorityInfo,
-		Timestamp:   time.Now(),
+		Control:    "IA.L1-3.5.1",
+		Name:       "[CMMC L1] Identify Users",
+		Status:     "PASS",
+		Evidence:   fmt.Sprintf("Found %d individual user accounts with unique identities", len(userAccounts)),
+		Priority:   PriorityInfo,
+		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"CMMC": "IA.L1-3.5.1", "NIST 800-171": "3.5.1"},
 	}
 }
@@ -253,17 +253,17 @@ func (c *GCPCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 // IA.L1-3.5.2 - Authenticate Users
 func (c *GCPCMMCLevel1Checks) CheckIA_L1_002(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:         "IA.L1-3.5.2",
-		Name:            "[CMMC L1] Authenticate Users",
-		Status:          "INFO",
-		Evidence:        "MANUAL: Verify 2-Step Verification is enabled for all users via Google Workspace admin console",
-		Remediation:     "Enable 2-Step Verification for all users in Google Workspace",
+		Control:           "IA.L1-3.5.2",
+		Name:              "[CMMC L1] Authenticate Users",
+		Status:            "INFO",
+		Evidence:          "MANUAL: Verify 2-Step Verification is enabled for all users via Google Workspace admin console",
+		Remediation:       "Enable 2-Step Verification for all users in Google Workspace",
 		RemediationDetail: "admin.google.com → Security → 2-Step Verification → Enforce immediately",
-		Priority:        PriorityCritical,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "Google Admin Console → Security → 2-Step Verification → Screenshot enforcement status",
-		ConsoleURL:      "https://admin.google.com/ac/security/2sv",
-		Frameworks:      map[string]string{"CMMC": "IA.L1-3.5.2", "NIST 800-171": "3.5.2"},
+		Priority:          PriorityCritical,
+		Timestamp:         time.Now(),
+		ScreenshotGuide:   "Google Admin Console → Security → 2-Step Verification → Screenshot enforcement status",
+		ConsoleURL:        "https://admin.google.com/ac/security/2sv",
+		Frameworks:        map[string]string{"CMMC": "IA.L1-3.5.2", "NIST 800-171": "3.5.2"},
 	}
 }
 
@@ -364,7 +364,7 @@ func (c *GCPCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult {
 			Remediation: "Configure VPC firewall rules",
 			Priority:    PriorityCritical,
 			Timestamp:   time.Now(),
-			Frameworks: map[string]string{"CMMC": "SC.L1-3.13.1", "NIST 800-171": "3.13.1"},
+			Frameworks:  map[string]string{"CMMC": "SC.L1-3.13.1", "NIST 800-171": "3.13.1"},
 		}
 	}
 

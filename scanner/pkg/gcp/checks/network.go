@@ -425,18 +425,18 @@ func (c *NetworkChecks) CheckDNSSEC(ctx context.Context) []CheckResult {
 
 	// Cloud DNS DNSSEC requires DNS API which isn't in compute service
 	results = append(results, CheckResult{
-		Control:  "CIS GCP 3.3",
-		Name:     "[CIS GCP 3.3] DNSSEC on Cloud DNS",
-		Status:   "MANUAL",
-		Severity: "MEDIUM",
-		Evidence: "MANUAL CHECK: Verify DNSSEC is enabled on Cloud DNS managed zones",
-		Remediation: "Enable DNSSEC for DNS security",
+		Control:           "CIS GCP 3.3",
+		Name:              "[CIS GCP 3.3] DNSSEC on Cloud DNS",
+		Status:            "MANUAL",
+		Severity:          "MEDIUM",
+		Evidence:          "MANUAL CHECK: Verify DNSSEC is enabled on Cloud DNS managed zones",
+		Remediation:       "Enable DNSSEC for DNS security",
 		RemediationDetail: `gcloud dns managed-zones update ZONE_NAME --dnssec-state=on`,
-		Priority:        PriorityMedium,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "Network Services → Cloud DNS → DNSSEC column showing 'On'",
-		ConsoleURL:      "https://console.cloud.google.com/net-services/dns/zones",
-		Frameworks:      GetFrameworkMappings("DNSSEC_ENABLED"),
+		Priority:          PriorityMedium,
+		Timestamp:         time.Now(),
+		ScreenshotGuide:   "Network Services → Cloud DNS → DNSSEC column showing 'On'",
+		ConsoleURL:        "https://console.cloud.google.com/net-services/dns/zones",
+		Frameworks:        GetFrameworkMappings("DNSSEC_ENABLED"),
 	})
 
 	return results
@@ -447,11 +447,11 @@ func (c *NetworkChecks) CheckLoadBalancerLogging(ctx context.Context) []CheckRes
 	var results []CheckResult
 
 	results = append(results, CheckResult{
-		Control:  "CIS GCP 3.10",
-		Name:     "[CIS GCP 3.10] Load Balancer Logging",
-		Status:   "MANUAL",
-		Severity: "MEDIUM",
-		Evidence: "MANUAL CHECK: Verify HTTP(S) load balancers have request logging enabled",
+		Control:     "CIS GCP 3.10",
+		Name:        "[CIS GCP 3.10] Load Balancer Logging",
+		Status:      "MANUAL",
+		Severity:    "MEDIUM",
+		Evidence:    "MANUAL CHECK: Verify HTTP(S) load balancers have request logging enabled",
 		Remediation: "Enable logging on all load balancers for traffic analysis",
 		RemediationDetail: `# Enable logging on backend service
 gcloud compute backend-services update BACKEND_SERVICE \

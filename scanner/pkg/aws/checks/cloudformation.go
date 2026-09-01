@@ -128,14 +128,14 @@ func (c *CloudFormationChecks) CheckDriftDetection(ctx context.Context) (CheckRe
 	}
 
 	return CheckResult{
-		Control:    "CIS-15.2",
-		Name:       "CloudFormation Drift Detection",
-		Status:     "MANUAL",
-		Evidence:   fmt.Sprintf("MANUAL CHECK: Run drift detection on %d stacks regularly", len(stacks.Stacks)),
+		Control:     "CIS-15.2",
+		Name:        "CloudFormation Drift Detection",
+		Status:      "MANUAL",
+		Evidence:    fmt.Sprintf("MANUAL CHECK: Run drift detection on %d stacks regularly", len(stacks.Stacks)),
 		Remediation: "Run drift detection monthly to detect manual changes",
-		Priority:   PriorityMedium,
-		Timestamp:  time.Now(),
-		ConsoleURL: "https://console.aws.amazon.com/cloudformation/home#/stacks",
-		Frameworks: GetFrameworkMappings("CFN_DRIFT_DETECTION"),
+		Priority:    PriorityMedium,
+		Timestamp:   time.Now(),
+		ConsoleURL:  "https://console.aws.amazon.com/cloudformation/home#/stacks",
+		Frameworks:  GetFrameworkMappings("CFN_DRIFT_DETECTION"),
 	}, nil
 }
