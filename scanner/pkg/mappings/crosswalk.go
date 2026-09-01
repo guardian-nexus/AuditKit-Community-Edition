@@ -99,6 +99,10 @@ func (c *Crosswalk) Get800_53Controls(frameworks map[string]string) []string {
 		pciIDs := strings.Split(pciID, ",")
 		for _, id := range pciIDs {
 			id = strings.TrimSpace(id)
+			// Checks write the requirement either bare ("5.2.1") or prefixed
+			// ("Req 5.2.1"); the crosswalk is keyed on the bare number, so a
+			// prefixed value would never resolve.
+			id = strings.TrimPrefix(id, "Req ")
 			if controls, found := c.PCIToCIS[fmt.Sprintf("PCI-%s", id)]; found {
 				for _, ctrl := range controls {
 					controlSet[ctrl] = true

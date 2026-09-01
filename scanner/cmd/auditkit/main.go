@@ -2917,16 +2917,14 @@ func runEvidenceImport(args []string) {
 	account := fs.String("account", "", "Account ID")
 	by := fs.String("by", "", "Who collected the evidence")
 	_ = fs.Parse(args)
-	if fs.NArg() > 0 {
-		_ = fs.Parse(fs.Args()[1:])
-	}
-
 	// Same two-pass parse as collect: scanning raw argv for the first non-flag
 	// token picks up a flag's value instead, so "import -by alice file.json"
-	// would try to read a file called "alice".
+	// would try to read a file called "alice". Read the positional before the
+	// second pass consumes it.
 	path := ""
 	if fs.NArg() > 0 {
 		path = fs.Arg(0)
+		_ = fs.Parse(fs.Args()[1:])
 	}
 	if path == "" {
 		fmt.Fprintf(os.Stderr, "Usage: %s evidence import PROGRESS.json [-by name]\n", binaryName())

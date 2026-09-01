@@ -54,9 +54,39 @@ soc2_to_800_53:
   # Risk Mitigation (CC9)
   CC9.1: [CP-9, CP-10]          # Backup and recovery
   CC9.2: [SA-9]                 # Third-party risk
+  A1.1: [CP-2, SC-5, AU-4]      # Capacity and demand management
+  A1.2: [CP-9, CP-10, CP-6]     # Backup and recovery infrastructure
+  A1.3: [CP-4, CP-10]           # Recovery testing
+  C1.1: [MP-2, RA-2, SC-28]     # Confidential data identification
+  C1.2: [MP-6, SI-12]           # Confidential data disposal
 
 # PCI-DSS v4.0 → NIST 800-53 Rev 5
 pci_to_800_53:
+  PCI-1.2.1: [CM-6, AC-4, SC-7]         # NSC ruleset configuration standards
+  PCI-1.3.1: [AC-4, SC-7(5)]            # Inbound traffic to CDE restricted
+  PCI-1.3.2: [AC-4, SC-7(5)]            # Outbound traffic from CDE restricted
+  PCI-1.4.1: [SC-7, SC-7(3)]            # NSCs between trusted and untrusted networks
+  PCI-3.2.1: [SI-12, MP-6]              # Account data storage minimised
+  PCI-3.7.4: [SC-12, SC-12(1)]          # Key changes at end of cryptoperiod
+  PCI-4.2.1.1: [SC-12, SC-17]           # Inventory of trusted keys and certificates
+  PCI-7.2.2: [AC-6, AC-2(7)]            # Least privilege by job function
+  PCI-8.2.1: [IA-2, IA-4]               # Unique user IDs
+  PCI-8.2.2: [IA-2, AC-2]               # Shared IDs only when necessary
+  PCI-8.3.4: [AC-7]                     # Lockout after invalid attempts
+  PCI-8.6.1: [AC-2, IA-2]               # Interactive use of system accounts
+  PCI-8.6.2: [IA-5, IA-5(7)]            # No hardcoded credentials
+  PCI-8.6.3: [IA-5, IA-5(1)]            # System account passwords rotated
+  PCI-9.5.1: [PE-3, MA-2]               # POI device protection
+  PCI-10.2.1.2: [AU-2, AU-12]           # Log all administrative actions
+  PCI-10.2.1.5: [AU-2, AC-2(4)]         # Log credential changes
+  PCI-10.2.1.7: [AU-2, AU-12]           # Log object creation and deletion
+  PCI-10.3.2: [AU-9]                    # Audit logs protected from modification
+  PCI-10.3.3: [AU-9(2), AU-4]           # Audit logs backed up centrally
+  PCI-10.4.1: [AU-6]                    # Daily audit log review
+  PCI-10.4.1.1: [AU-6(1), AU-6(3)]      # Automated log review mechanisms
+  PCI-10.6.1: [AU-8, AU-8(1)]           # Time synchronisation
+  PCI-10.7.2: [SI-4, AU-5]              # Security control failures detected
+  PCI-10.7.3: [IR-4, SI-4]              # Security control failures responded to
   # Requirement 1: Network Security
   PCI-1.4.2: [SC-7, SC-7(3)]    # Network segmentation
   

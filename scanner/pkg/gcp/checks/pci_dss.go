@@ -116,14 +116,14 @@ func (c *GCPPCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 
 	if len(results) == 0 {
 		results = append(results, CheckResult{
-			Control:   "PCI-1.4.2",
+			Control:   "PCI-1.4.1",
 			Name:      "[PCI-DSS] Network Segmentation",
 			Status:    "PASS",
 			Evidence:  "VPC firewall rules properly configured for network segmentation | Meets PCI DSS 1.4.2",
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "1.4.2",
+				"PCI-DSS": "1.4.1",
 			},
 		})
 	}
@@ -159,7 +159,7 @@ func (c *GCPPCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []CheckR
 			Timestamp:         time.Now(),
 			ScreenshotGuide:   "Storage → Bucket → Encryption showing CMEK",
 			Frameworks: map[string]string{
-				"PCI-DSS": "3.4, 3.4.1",
+				"PCI-DSS": "3.5.1",
 			},
 		})
 	} else {
@@ -363,7 +363,7 @@ func (c *GCPPCIChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 		ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/compute/instances?project=%s", c.projectID),
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 2.2.2, 2.2",
+			"PCI-DSS": "2.2.2",
 		},
 	})
 
@@ -379,7 +379,7 @@ func (c *GCPPCIChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 		ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/networking/firewalls/list?project=%s", c.projectID),
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 2.2.4",
+			"PCI-DSS": "2.2.4",
 		},
 	})
 
@@ -402,7 +402,7 @@ func (c *GCPPCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/security/command-center?project=%s", c.projectID),
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.2.1",
+			"PCI-DSS": "5.2.1",
 		},
 	})
 
@@ -417,7 +417,7 @@ func (c *GCPPCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Anti-malware console → Show automatic updates enabled and recent scan logs",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.1",
+			"PCI-DSS": "5.3.1",
 		},
 	})
 
@@ -432,7 +432,7 @@ func (c *GCPPCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Show anti-malware logs with retention policy and review documentation",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.4",
+			"PCI-DSS": "5.3.4",
 		},
 	})
 
@@ -455,7 +455,7 @@ func (c *GCPPCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 		ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/compute/osconfig?project=%s", c.projectID),
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 6.3.3",
+			"PCI-DSS": "6.3.3",
 		},
 	})
 
@@ -471,7 +471,7 @@ func (c *GCPPCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 		ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/cloud-build?project=%s", c.projectID),
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 6.2.1, 6.5",
+			"PCI-DSS": "6.2.1",
 		},
 	})
 
@@ -487,7 +487,7 @@ func (c *GCPPCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 		ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/net-security/securitypolicies/list?project=%s", c.projectID),
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 6.4.2",
+			"PCI-DSS": "6.4.2",
 		},
 	})
 
@@ -510,7 +510,7 @@ func (c *GCPPCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/security/compliance?project=%s", c.projectID),
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.1.1",
+			"PCI-DSS": "9.1.1",
 		},
 	})
 
@@ -525,7 +525,7 @@ func (c *GCPPCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ScreenshotGuide:   "Document physical access control procedures, visitor logs, and badge system",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.2.1, 9.3",
+			"PCI-DSS": "9.2.1",
 		},
 	})
 
@@ -540,7 +540,7 @@ func (c *GCPPCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ScreenshotGuide:   "Show backup media inventory, secure storage documentation, and destruction procedures",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.4.1, 9.5, 9.8",
+			"PCI-DSS": "9.4.1",
 		},
 	})
 
@@ -563,7 +563,7 @@ func (c *GCPPCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 		ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/security/command-center?project=%s", c.projectID),
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.3.2",
+			"PCI-DSS": "11.3.2",
 		},
 	})
 
@@ -578,7 +578,7 @@ func (c *GCPPCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 		ScreenshotGuide:   "Document penetration test reports with dates and findings",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.4.3",
+			"PCI-DSS": "11.4.3",
 		},
 	})
 
@@ -593,7 +593,7 @@ func (c *GCPPCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 		ScreenshotGuide:   "Show FIM configuration and monitoring for critical system files",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.5.2",
+			"PCI-DSS": "11.5.2",
 		},
 	})
 
@@ -609,7 +609,7 @@ func (c *GCPPCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 		ConsoleURL:        fmt.Sprintf("https://console.cloud.google.com/security/command-center?project=%s", c.projectID),
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.5.2",
+			"PCI-DSS": "11.5.2",
 		},
 	})
 
@@ -631,7 +631,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document current security policy, annual review dates, and communication records",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.1.1",
+			"PCI-DSS": "12.1.1",
 		},
 	})
 
@@ -646,7 +646,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document risk assessments with dates, findings, and mitigation plans",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.3.1",
+			"PCI-DSS": "12.3.1",
 		},
 	})
 
@@ -661,7 +661,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document acceptable use policies, approval records, and technology inventory",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.2.1",
+			"PCI-DSS": "12.2.1",
 		},
 	})
 
@@ -676,7 +676,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document organizational chart showing security responsibilities",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.1.4, 12.5.1",
+			"PCI-DSS": "12.1.4",
 		},
 	})
 
@@ -691,7 +691,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document training program, completion records, and acknowledgments",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.6.1, 12.6.2",
+			"PCI-DSS": "12.6.1",
 		},
 	})
 
@@ -706,7 +706,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document service provider list, contracts, and annual compliance verification",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.8.1, 12.8.2",
+			"PCI-DSS": "12.8.1",
 		},
 	})
 
@@ -721,7 +721,7 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document incident response plan, test results, and update history",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.10.1",
+			"PCI-DSS": "12.10.1",
 		},
 	})
 
@@ -746,7 +746,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		ScreenshotGuide:   "Certificate Manager showing issued certificates, plus the maintained inventory document",
 		ConsoleURL:        "https://console.cloud.google.com/security/ccm/list/lbCertificates",
 		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"PCI-DSS": "Req 4.2.1.1"},
+		Frameworks:        map[string]string{"PCI-DSS": "4.2.1.1"},
 	})
 
 	// 8.6.1 and 8.6.3 - service accounts with user-managed keys are the GCP
@@ -794,7 +794,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Evidence:   fmt.Sprintf("Unable to list service accounts: %s", iamErr),
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.1"},
+			Frameworks: map[string]string{"PCI-DSS": "8.6.1"},
 		})
 	} else if len(withUserKeys) > 0 {
 		shown := withUserKeys
@@ -812,7 +812,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			ScreenshotGuide:   "IAM service account showing no user-managed keys",
 			ConsoleURL:        "https://console.cloud.google.com/iam-admin/serviceaccounts",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.1"},
+			Frameworks:        map[string]string{"PCI-DSS": "8.6.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -822,7 +822,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Evidence:   "PCI-DSS Req 8.6.1: no service account holds user-managed keys",
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.1"},
+			Frameworks: map[string]string{"PCI-DSS": "8.6.1"},
 		})
 	}
 
@@ -838,7 +838,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		ScreenshotGuide:   "Secret Manager inventory, plus evidence of secret scanning in CI",
 		ConsoleURL:        "https://console.cloud.google.com/security/secret-manager",
 		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.2"},
+		Frameworks:        map[string]string{"PCI-DSS": "8.6.2"},
 	})
 
 	if iamErr != "" {
@@ -849,7 +849,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Evidence:   fmt.Sprintf("Service account enumeration failed (%s), so key ages could not be assessed", iamErr),
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.3"},
+			Frameworks: map[string]string{"PCI-DSS": "8.6.3"},
 		})
 	} else if len(staleKeys) > 0 {
 		shown := staleKeys
@@ -867,7 +867,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			ScreenshotGuide:   "Service account key list showing ages within your defined rotation period",
 			ConsoleURL:        "https://console.cloud.google.com/iam-admin/serviceaccounts",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.3"},
+			Frameworks:        map[string]string{"PCI-DSS": "8.6.3"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -877,7 +877,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Evidence:   "PCI-DSS Req 8.6.3: no user-managed service account key is older than 90 days",
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.3"},
+			Frameworks: map[string]string{"PCI-DSS": "8.6.3"},
 		})
 	}
 
@@ -915,7 +915,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Evidence:   fmt.Sprintf("Could not list log sinks (%s), so automated log review could not be assessed", sinkErr),
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+			Frameworks: map[string]string{"PCI-DSS": "10.4.1.1"},
 		})
 	} else if len(sinks) > 0 {
 		results = append(results, CheckResult{
@@ -928,7 +928,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Priority:          PriorityHigh,
 			ScreenshotGuide:   "Log sinks plus the alerting policies defined on log-based metrics",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+			Frameworks:        map[string]string{"PCI-DSS": "10.4.1.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -942,7 +942,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			ScreenshotGuide:   "Logging sink configuration and the alerting policies defined on it",
 			ConsoleURL:        "https://console.cloud.google.com/logs/router",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+			Frameworks:        map[string]string{"PCI-DSS": "10.4.1.1"},
 		})
 	}
 
@@ -960,7 +960,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		ScreenshotGuide:   "Alerting policies covering logging configuration changes and sink deletion",
 		ConsoleURL:        "https://console.cloud.google.com/monitoring/alerting",
 		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
+		Frameworks:        map[string]string{"PCI-DSS": "10.7.2"},
 	})
 
 	results = append(results, CheckResult{
@@ -973,7 +973,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		Priority:          PriorityMedium,
 		ScreenshotGuide:   "The documented procedure, plus a worked example from a real or exercised failure",
 		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.3"},
+		Frameworks:        map[string]string{"PCI-DSS": "10.7.3"},
 	})
 
 	return results

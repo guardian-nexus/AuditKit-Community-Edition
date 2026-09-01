@@ -87,7 +87,7 @@ func (c *IdentityChecks) checkPrivilegedRoles(ctx context.Context) CheckResult {
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
 			"SOC2":    "CC6.1",
-			"PCI-DSS": "7.1, 7.1.2",
+			"PCI-DSS": "7.2.1, 7.2.2",
 			"HIPAA":   "164.308(a)(4)",
 		},
 	}

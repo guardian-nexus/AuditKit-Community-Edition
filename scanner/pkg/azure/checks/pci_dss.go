@@ -127,7 +127,7 @@ func (c *AzurePCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Ch
 
 	if nsgCount == 0 {
 		results = append(results, CheckResult{
-			Control:           "PCI-1.4.2",
+			Control:           "PCI-1.4.1",
 			Name:              "[PCI-DSS] Network Segmentation",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -139,7 +139,7 @@ func (c *AzurePCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Ch
 			ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FvirtualNetworks",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "1.4.2",
+				"PCI-DSS": "1.4.1",
 			},
 		})
 	} else if subnetAssociations < nsgCount {
@@ -159,14 +159,14 @@ func (c *AzurePCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Ch
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:   "PCI-1.4.2",
+			Control:   "PCI-1.4.1",
 			Name:      "[PCI-DSS] Network Segmentation",
 			Status:    "PASS",
 			Evidence:  fmt.Sprintf("%d NSGs with %d subnet associations configured", nsgCount, subnetAssociations),
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "1.4.2",
+				"PCI-DSS": "1.4.1",
 			},
 		})
 	}
@@ -220,7 +220,7 @@ func (c *AzurePCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []Chec
 			ScreenshotGuide:   "Storage account → Encryption → Show encryption enabled",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "3.4, 3.4.1",
+				"PCI-DSS": "3.5.1",
 			},
 		})
 	}
@@ -236,7 +236,7 @@ func (c *AzurePCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []Chec
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "3.5, 3.6",
+				"PCI-DSS": "3.6.1",
 			},
 		})
 	}
@@ -363,7 +363,7 @@ func (c *AzurePCIChecks) CheckReq7_AccessControl(ctx context.Context) []CheckRes
 			ScreenshotGuide:   "Subscription → Access control → Show minimal privileged users",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "7.1, 7.1.2",
+				"PCI-DSS": "7.2.1",
 			},
 		})
 	} else {
@@ -453,7 +453,7 @@ func (c *AzurePCIChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 		Priority:          PriorityHigh,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "10.1, 10.2.1",
+			"PCI-DSS": "10.2.1",
 		},
 	})
 
@@ -490,7 +490,7 @@ func (c *AzurePCIChecks) CheckReq2_DefaultPasswords(ctx context.Context) []Check
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Compute/VirtualMachinesMenuBlade/overview",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 2.2.2, 2.2",
+			"PCI-DSS": "2.2.2",
 		},
 	})
 
@@ -506,7 +506,7 @@ func (c *AzurePCIChecks) CheckReq2_DefaultPasswords(ctx context.Context) []Check
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FnetworkSecurityGroups",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 2.2.4",
+			"PCI-DSS": "2.2.4",
 		},
 	})
 
@@ -529,7 +529,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Security/SecurityMenuBlade/0",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.2.1",
+			"PCI-DSS": "5.2.1",
 		},
 	})
 
@@ -544,7 +544,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 		ScreenshotGuide:   "Defender for Cloud → Show automatic updates enabled and recent scan logs",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.1",
+			"PCI-DSS": "5.3.1",
 		},
 	})
 
@@ -559,7 +559,7 @@ func (c *AzurePCIChecks) CheckReq5_MalwareProtection(ctx context.Context) []Chec
 		ScreenshotGuide:   "Show anti-malware logs with retention policy and review documentation",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.4",
+			"PCI-DSS": "5.3.4",
 		},
 	})
 
@@ -582,7 +582,7 @@ func (c *AzurePCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckRes
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Automation/AutomationMenuBlade/updateManagement",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 6.3.3",
+			"PCI-DSS": "6.3.3",
 		},
 	})
 
@@ -598,7 +598,7 @@ func (c *AzurePCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckRes
 		ConsoleURL:        "https://dev.azure.com/",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 6.2.1, 6.5",
+			"PCI-DSS": "6.2.1",
 		},
 	})
 
@@ -614,7 +614,7 @@ func (c *AzurePCIChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckRes
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FapplicationGateways",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 6.4.2",
+			"PCI-DSS": "6.4.2",
 		},
 	})
 
@@ -637,7 +637,7 @@ func (c *AzurePCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckRe
 		ConsoleURL:        "https://servicetrust.microsoft.com/",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.1.1",
+			"PCI-DSS": "9.1.1",
 		},
 	})
 
@@ -652,7 +652,7 @@ func (c *AzurePCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckRe
 		ScreenshotGuide:   "Document physical access control procedures, visitor logs, and badge system",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.2.1, 9.3",
+			"PCI-DSS": "9.2.1",
 		},
 	})
 
@@ -667,7 +667,7 @@ func (c *AzurePCIChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckRe
 		ScreenshotGuide:   "Show backup media inventory, secure storage documentation, and destruction procedures",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.4.1, 9.5, 9.8",
+			"PCI-DSS": "9.4.1",
 		},
 	})
 
@@ -690,7 +690,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Security/SecurityMenuBlade/22",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.3.2",
+			"PCI-DSS": "11.3.2",
 		},
 	})
 
@@ -705,7 +705,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 		ScreenshotGuide:   "Document penetration test reports with dates and findings",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.4.3",
+			"PCI-DSS": "11.4.3",
 		},
 	})
 
@@ -721,7 +721,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Security/SecurityMenuBlade/18",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.5.2",
+			"PCI-DSS": "11.5.2",
 		},
 	})
 
@@ -737,7 +737,7 @@ func (c *AzurePCIChecks) CheckReq11_SecurityTesting(ctx context.Context) []Check
 		ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Policy/PolicyMenuBlade/Compliance",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.5.2",
+			"PCI-DSS": "11.5.2",
 		},
 	})
 
@@ -759,7 +759,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document current security policy, annual review dates, and communication records",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.1.1",
+			"PCI-DSS": "12.1.1",
 		},
 	})
 
@@ -774,7 +774,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document risk assessments with dates, findings, and mitigation plans",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.3.1",
+			"PCI-DSS": "12.3.1",
 		},
 	})
 
@@ -789,7 +789,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document acceptable use policies, approval records, and technology inventory",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.2.1",
+			"PCI-DSS": "12.2.1",
 		},
 	})
 
@@ -804,7 +804,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document organizational chart showing security responsibilities and role assignments",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.1.4, 12.5.1",
+			"PCI-DSS": "12.1.4",
 		},
 	})
 
@@ -819,7 +819,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document training program, completion records, and acknowledgment forms",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.6.1, 12.6.2",
+			"PCI-DSS": "12.6.1",
 		},
 	})
 
@@ -834,7 +834,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document service provider list, contracts, and annual compliance verification",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.8.1, 12.8.2",
+			"PCI-DSS": "12.8.1",
 		},
 	})
 
@@ -849,7 +849,7 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Document incident response plan, test results, and update history",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.10.1",
+			"PCI-DSS": "12.10.1",
 		},
 	})
 
@@ -876,7 +876,7 @@ func (c *AzurePCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			ScreenshotGuide:   "Key Vault certificate list, plus the maintained inventory document",
 			ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 4.2.1.1"},
+			Frameworks:        map[string]string{"PCI-DSS": "4.2.1.1"},
 		},
 		{
 			Control:           "PCI-8.6.2",
@@ -889,7 +889,7 @@ func (c *AzurePCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			ScreenshotGuide:   "Key Vault secret inventory, plus evidence of secret scanning in CI",
 			ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.2"},
+			Frameworks:        map[string]string{"PCI-DSS": "8.6.2"},
 		},
 		{
 			Control:           "PCI-10.7.3",
@@ -901,7 +901,7 @@ func (c *AzurePCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Priority:          PriorityMedium,
 			ScreenshotGuide:   "The documented procedure, plus a worked example from a real or exercised failure",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.3"},
+			Frameworks:        map[string]string{"PCI-DSS": "10.7.3"},
 		},
 	}
 
@@ -918,7 +918,7 @@ func (c *AzurePCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		ScreenshotGuide:   "Activity log alert rules covering diagnostic settings and security control changes",
 		ConsoleURL:        "https://portal.azure.com/#view/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade",
 		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
+		Frameworks:        map[string]string{"PCI-DSS": "10.7.2"},
 	})
 	return results
 }
@@ -941,7 +941,7 @@ func (c *AzurePCIChecks) checkAppCredentials(ctx context.Context) []CheckResult 
 				ScreenshotGuide:   "App registrations showing no client secrets, or documented exceptions",
 				ConsoleURL:        "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
 				Timestamp:         time.Now(),
-				Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.1"},
+				Frameworks:        map[string]string{"PCI-DSS": "8.6.1"},
 			},
 		}
 	}
@@ -994,7 +994,7 @@ func (c *AzurePCIChecks) checkAppCredentials(ctx context.Context) []CheckResult 
 			ScreenshotGuide:   "App registration showing no client secrets",
 			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.1"},
+			Frameworks:        map[string]string{"PCI-DSS": "8.6.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -1004,7 +1004,7 @@ func (c *AzurePCIChecks) checkAppCredentials(ctx context.Context) []CheckResult 
 			Evidence:   "PCI-DSS Req 8.6.1: no app registration holds a client secret",
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.1"},
+			Frameworks: map[string]string{"PCI-DSS": "8.6.1"},
 		})
 	}
 
@@ -1024,7 +1024,7 @@ func (c *AzurePCIChecks) checkAppCredentials(ctx context.Context) []CheckResult 
 			ScreenshotGuide:   "App registration credential list showing ages within your defined rotation period",
 			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.3"},
+			Frameworks:        map[string]string{"PCI-DSS": "8.6.3"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -1034,7 +1034,7 @@ func (c *AzurePCIChecks) checkAppCredentials(ctx context.Context) []CheckResult 
 			Evidence:   "PCI-DSS Req 8.6.3: no client secret is older than 90 days",
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.3"},
+			Frameworks: map[string]string{"PCI-DSS": "8.6.3"},
 		})
 	}
 	return results
@@ -1057,7 +1057,7 @@ func (c *AzurePCIChecks) checkDiagnosticRouting(ctx context.Context) []CheckResu
 				ScreenshotGuide:   "Diagnostic settings sending to Log Analytics, plus the alert rules defined on it",
 				ConsoleURL:        "https://portal.azure.com/#view/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade",
 				Timestamp:         time.Now(),
-				Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+				Frameworks:        map[string]string{"PCI-DSS": "10.4.1.1"},
 			},
 		}
 	}
@@ -1102,7 +1102,7 @@ func (c *AzurePCIChecks) checkDiagnosticRouting(ctx context.Context) []CheckResu
 			Priority:          PriorityHigh,
 			ScreenshotGuide:   "Log Analytics alert rules defined against the routed activity logs",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+			Frameworks:        map[string]string{"PCI-DSS": "10.4.1.1"},
 		},
 	}
 }

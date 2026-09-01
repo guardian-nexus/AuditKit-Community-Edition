@@ -343,7 +343,7 @@ NOTE: PCI-DSS compliance REQUIRES this expense. Budget accordingly.`,
 		Priority:        PriorityCritical,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS":   "10.5.3, 10.7",
+			"PCI-DSS":   "10.3.3, 10.5.1",
 			"CIS-Azure": "5.2, 5.3",
 			"SOC2":      "CC7.1",
 		},

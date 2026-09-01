@@ -138,7 +138,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			Priority:  PriorityCritical,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.4.2",
+				"PCI-DSS": "1.4.1",
 			},
 		})
 	}
@@ -158,7 +158,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			ConsoleURL:        "https://console.aws.amazon.com/vpc/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.4.2",
+				"PCI-DSS": "1.4.1",
 			},
 		})
 	} else {
@@ -170,7 +170,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.4.2",
+				"PCI-DSS": "1.4.1",
 			},
 		})
 	}
@@ -187,7 +187,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			Priority:  PriorityHigh,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.4.2",
+				"PCI-DSS": "1.4.2",
 			},
 		})
 	}
@@ -222,7 +222,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			ConsoleURL:        "https://console.aws.amazon.com/ec2/v2/home#SecurityGroups",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.4.2",
+				"PCI-DSS": "1.4.2",
 			},
 		})
 	} else {
@@ -234,7 +234,7 @@ func (c *PCIDSSChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 1.4.2",
+				"PCI-DSS": "1.4.2",
 			},
 		})
 	}
@@ -260,7 +260,7 @@ func (c *PCIDSSChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 2.2.4",
+				"PCI-DSS": "2.2.4",
 			},
 		})
 	}
@@ -286,7 +286,7 @@ func (c *PCIDSSChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 			ConsoleURL:        "https://console.aws.amazon.com/ec2/v2/home#SecurityGroups",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 2.2.4",
+				"PCI-DSS": "2.2.4",
 			},
 		})
 	} else {
@@ -298,7 +298,7 @@ func (c *PCIDSSChecks) CheckReq2_DefaultPasswords(ctx context.Context) []CheckRe
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 2.2.4",
+				"PCI-DSS": "2.2.4",
 			},
 		})
 	}
@@ -322,7 +322,7 @@ func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 			Priority:  PriorityCritical,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 3.5.1",
+				"PCI-DSS": "3.5.1",
 			},
 		})
 	}
@@ -362,7 +362,7 @@ func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 			ConsoleURL:        "https://s3.console.aws.amazon.com/s3/buckets/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 3.5.1, 3.4.1",
+				"PCI-DSS": "3.5.1",
 			},
 		})
 	} else if totalBuckets > 0 {
@@ -374,7 +374,7 @@ func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 3.5.1, 3.4.1",
+				"PCI-DSS": "3.5.1",
 			},
 		})
 	}
@@ -398,7 +398,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 			Priority:  PriorityCritical,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 4.2.1",
+				"PCI-DSS": "4.2.1",
 			},
 		})
 	}
@@ -444,7 +444,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 			ConsoleURL:        "https://console.aws.amazon.com/ec2/v2/home#SecurityGroups",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 4.2.1, 4.1.1",
+				"PCI-DSS": "4.2.1",
 			},
 		})
 	} else {
@@ -456,7 +456,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 4.2.1",
+				"PCI-DSS": "4.2.1",
 			},
 		})
 	}
@@ -497,7 +497,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 4.2.1",
+				"PCI-DSS": "4.2.1",
 			},
 		})
 	}
@@ -521,7 +521,7 @@ func (c *PCIDSSChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 			Priority:  PriorityHigh,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 6.3.3",
+				"PCI-DSS": "6.3.3",
 			},
 		})
 	}
@@ -562,7 +562,7 @@ func (c *PCIDSSChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 			ConsoleURL:        "https://console.aws.amazon.com/systems-manager/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 6.3.3",
+				"PCI-DSS": "6.3.3",
 			},
 		})
 	}
@@ -603,7 +603,7 @@ func (c *PCIDSSChecks) CheckReq6_SecureSystems(ctx context.Context) []CheckResul
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 6.4.2",
+				"PCI-DSS": "6.4.2",
 			},
 		})
 	}
@@ -627,7 +627,7 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 			Priority:  PriorityHigh,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 7.2.1",
+				"PCI-DSS": "7.2.1",
 			},
 		})
 	}
@@ -663,7 +663,7 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/users",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 7.2.1, 7.1.2",
+				"PCI-DSS": "7.2.1",
 			},
 		})
 	}
@@ -679,7 +679,7 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 		Priority:          PriorityMedium,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 7.2.2",
+			"PCI-DSS": "7.2.2",
 		},
 	})
 
@@ -707,7 +707,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.3.9",
+				"PCI-DSS": "8.3.9",
 			},
 		})
 	} else {
@@ -731,7 +731,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 				Timestamp:         time.Now(),
 				Frameworks: map[string]string{
-					"PCI-DSS": "Req 8.3.9",
+					"PCI-DSS": "8.3.9",
 				},
 			})
 		} else {
@@ -743,7 +743,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				Priority:  PriorityInfo,
 				Timestamp: time.Now(),
 				Frameworks: map[string]string{
-					"PCI-DSS": "Req 8.3.9",
+					"PCI-DSS": "8.3.9",
 				},
 			})
 		}
@@ -765,7 +765,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				Priority:          PriorityHigh,
 				Timestamp:         time.Now(),
 				Frameworks: map[string]string{
-					"PCI-DSS": "Req 8.3.6",
+					"PCI-DSS": "8.3.6",
 				},
 			})
 		} else {
@@ -777,7 +777,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				Priority:  PriorityInfo,
 				Timestamp: time.Now(),
 				Frameworks: map[string]string{
-					"PCI-DSS": "Req 8.3.6",
+					"PCI-DSS": "8.3.6",
 				},
 			})
 		}
@@ -796,7 +796,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				Priority:          PriorityHigh,
 				Timestamp:         time.Now(),
 				Frameworks: map[string]string{
-					"PCI-DSS": "Req 8.3.7",
+					"PCI-DSS": "8.3.7",
 				},
 			})
 		}
@@ -813,7 +813,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.3.4",
+				"PCI-DSS": "8.3.4",
 			},
 		})
 	}
@@ -830,7 +830,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Priority:  PriorityCritical,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.4.2",
+				"PCI-DSS": "8.4.2",
 			},
 		})
 	}
@@ -875,7 +875,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/users",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.4.2",
+				"PCI-DSS": "8.4.2",
 			},
 		})
 	} else if totalUsers > 0 {
@@ -887,7 +887,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.4.2",
+				"PCI-DSS": "8.4.2",
 			},
 		})
 	}
@@ -930,7 +930,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/users",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.3.9",
+				"PCI-DSS": "8.4.2",
 			},
 		})
 	} else {
@@ -942,7 +942,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 8.3.9",
+				"PCI-DSS": "8.4.2",
 			},
 		})
 	}
@@ -959,7 +959,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 		ScreenshotGuide:   "IAM → Account settings → Show 15-minute session timeout configured",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 8.2.8",
+			"PCI-DSS": "8.2.8",
 		},
 	})
 
@@ -982,7 +982,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			Priority:  PriorityCritical,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.2.1",
+				"PCI-DSS": "10.2.1",
 			},
 		})
 	}
@@ -1001,7 +1001,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.2.1",
+				"PCI-DSS": "10.2.1",
 			},
 		})
 	} else {
@@ -1021,7 +1021,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.2.1",
+				"PCI-DSS": "10.2.1",
 			},
 		})
 
@@ -1038,7 +1038,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			ConsoleURL:        "https://s3.console.aws.amazon.com/s3/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.5.1",
+				"PCI-DSS": "10.5.1",
 			},
 		})
 
@@ -1053,7 +1053,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.3.2, 10.5.5",
+				"PCI-DSS": "10.3.2",
 			},
 		})
 
@@ -1068,7 +1068,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 10.6.1",
+				"PCI-DSS": "10.6.1",
 			},
 		})
 	}
@@ -1092,7 +1092,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 			Priority:  PriorityHigh,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 11.5.2",
+				"PCI-DSS": "11.5.2",
 			},
 		})
 	}
@@ -1111,7 +1111,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 			ConsoleURL:        "https://console.aws.amazon.com/config/",
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 11.5.2",
+				"PCI-DSS": "11.5.2",
 			},
 		})
 	} else {
@@ -1123,7 +1123,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 			Priority:  PriorityInfo,
 			Timestamp: time.Now(),
 			Frameworks: map[string]string{
-				"PCI-DSS": "Req 11.5.2",
+				"PCI-DSS": "11.5.2",
 			},
 		})
 	}
@@ -1140,7 +1140,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 		ScreenshotGuide:   "Document ASV scan reports dated within last 90 days",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.3.2",
+			"PCI-DSS": "11.3.2",
 		},
 	})
 
@@ -1155,7 +1155,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 		Priority:          PriorityMedium,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.4.3",
+			"PCI-DSS": "11.4.3",
 		},
 	})
 
@@ -1170,7 +1170,7 @@ func (c *PCIDSSChecks) CheckReq11_SecurityTesting(ctx context.Context) []CheckRe
 		Priority:          PriorityMedium,
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 11.5.2",
+			"PCI-DSS": "11.5.2",
 		},
 	})
 
@@ -1194,7 +1194,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ConsoleURL:        "https://console.aws.amazon.com/guardduty/",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.2.1",
+			"PCI-DSS": "5.2.1",
 		},
 	})
 
@@ -1209,7 +1209,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Anti-malware console → Show automatic updates enabled and recent scan logs",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.1",
+			"PCI-DSS": "5.3.1",
 		},
 	})
 
@@ -1224,7 +1224,7 @@ func (c *PCIDSSChecks) CheckReq5_MalwareProtection(ctx context.Context) []CheckR
 		ScreenshotGuide:   "Show anti-malware logs with retention policy and review documentation",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 5.3.4",
+			"PCI-DSS": "5.3.4",
 		},
 	})
 
@@ -1248,7 +1248,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ConsoleURL:        "https://console.aws.amazon.com/artifact/home",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.1.1",
+			"PCI-DSS": "9.1.1",
 		},
 	})
 
@@ -1263,7 +1263,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ScreenshotGuide:   "Document physical access control procedures, visitor logs, and badge system",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.2.1, 9.3",
+			"PCI-DSS": "9.2.1",
 		},
 	})
 
@@ -1278,7 +1278,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ScreenshotGuide:   "Show backup media inventory, secure storage documentation, and destruction procedures",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.4.1, 9.5, 9.8",
+			"PCI-DSS": "9.4.1",
 		},
 	})
 
@@ -1293,7 +1293,7 @@ func (c *PCIDSSChecks) CheckReq9_PhysicalAccess(ctx context.Context) []CheckResu
 		ScreenshotGuide:   "Document POI device inventory, inspection schedules, and training records",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 9.5.1, 9.9.1",
+			"PCI-DSS": "9.5.1",
 		},
 	})
 
@@ -1316,7 +1316,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document current security policy, annual review dates, and communication records",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.1.1",
+			"PCI-DSS": "12.1.1",
 		},
 	})
 
@@ -1331,7 +1331,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document risk assessments with dates, findings, and mitigation plans",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.3.1",
+			"PCI-DSS": "12.3.1",
 		},
 	})
 
@@ -1346,7 +1346,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document acceptable use policies, approval records, and technology inventory",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.2.1",
+			"PCI-DSS": "12.2.1",
 		},
 	})
 
@@ -1361,7 +1361,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document organizational chart showing security responsibilities and role assignments",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.1.4, 12.5.1",
+			"PCI-DSS": "12.1.4",
 		},
 	})
 
@@ -1376,7 +1376,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document training program, completion records, and acknowledgment forms",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.6.1, 12.6.2",
+			"PCI-DSS": "12.6.1",
 		},
 	})
 
@@ -1391,7 +1391,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document service provider list, contracts, and annual compliance verification",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.8.1, 12.8.2",
+			"PCI-DSS": "12.8.1",
 		},
 	})
 
@@ -1406,7 +1406,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		ScreenshotGuide:   "Document incident response plan, test results, and update history",
 		Timestamp:         time.Now(),
 		Frameworks: map[string]string{
-			"PCI-DSS": "Req 12.10.1",
+			"PCI-DSS": "12.10.1",
 		},
 	})
 
@@ -1436,7 +1436,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		ScreenshotGuide:   "ACM console showing issued certificates, plus the maintained inventory document",
 		ConsoleURL:        "https://console.aws.amazon.com/acm/home#/certificates/list",
 		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"PCI-DSS": "Req 4.2.1.1"},
+		Frameworks:        map[string]string{"PCI-DSS": "4.2.1.1"},
 	})
 
 	users, err := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
@@ -1448,7 +1448,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Evidence:   fmt.Sprintf("Unable to check IAM users: %v", err),
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.1"},
+			Frameworks: map[string]string{"PCI-DSS": "8.6.1"},
 		})
 		return results
 	}
@@ -1497,7 +1497,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			ScreenshotGuide:   "IAM console showing the account has no console password",
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/users",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.1"},
+			Frameworks:        map[string]string{"PCI-DSS": "8.6.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -1507,7 +1507,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Evidence:   "PCI-DSS Req 8.6.1: no account holds both access keys and a console password",
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.1"},
+			Frameworks: map[string]string{"PCI-DSS": "8.6.1"},
 		})
 	}
 
@@ -1524,7 +1524,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		ScreenshotGuide:   "Secrets Manager inventory, plus evidence of secret scanning in CI",
 		ConsoleURL:        "https://console.aws.amazon.com/secretsmanager/",
 		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.2"},
+		Frameworks:        map[string]string{"PCI-DSS": "8.6.2"},
 	})
 
 	if len(staleServiceKeys) > 0 {
@@ -1543,7 +1543,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			ScreenshotGuide:   "IAM credential report showing key ages within your defined rotation period",
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/users",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.3"},
+			Frameworks:        map[string]string{"PCI-DSS": "8.6.3"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -1553,7 +1553,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Evidence:   "PCI-DSS Req 8.6.3: no active access key is older than 90 days",
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.3"},
+			Frameworks: map[string]string{"PCI-DSS": "8.6.3"},
 		})
 	}
 
@@ -1574,7 +1574,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 			Evidence:   fmt.Sprintf("Unable to check CloudTrail: %v", err),
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+			Frameworks: map[string]string{"PCI-DSS": "10.4.1.1"},
 		})
 	}
 
@@ -1599,7 +1599,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 			Priority:          PriorityHigh,
 			ScreenshotGuide:   "CloudWatch metric filters and alarms defined against the CloudTrail log group",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+			Frameworks:        map[string]string{"PCI-DSS": "10.4.1.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -1613,7 +1613,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 			ScreenshotGuide:   "CloudTrail trail configuration showing a CloudWatch Logs group, and the alarms defined on it",
 			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/home#/trails",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+			Frameworks:        map[string]string{"PCI-DSS": "10.4.1.1"},
 		})
 	}
 
@@ -1661,7 +1661,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 			ScreenshotGuide:   "CloudTrail and Config showing active status, plus the EventBridge rule alerting on stoppage",
 			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/home#/trails",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
+			Frameworks:        map[string]string{"PCI-DSS": "10.7.2"},
 		})
 	}
 
@@ -1677,7 +1677,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 			ScreenshotGuide:   "CloudTrail and Config showing active status, plus the EventBridge rule alerting on stoppage",
 			ConsoleURL:        "https://console.aws.amazon.com/cloudtrail/home#/trails",
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
+			Frameworks:        map[string]string{"PCI-DSS": "10.7.2"},
 		})
 	} else {
 		results = append(results, CheckResult{
@@ -1689,7 +1689,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 			RemediationDetail: "Add an EventBridge rule for StopLogging and StopConfigurationRecorder so a future failure raises an alert.",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
+			Frameworks:        map[string]string{"PCI-DSS": "10.7.2"},
 		})
 	}
 
@@ -1704,7 +1704,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 		Priority:          PriorityMedium,
 		ScreenshotGuide:   "The documented procedure, plus a worked example from a real or exercised failure",
 		Timestamp:         time.Now(),
-		Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.3"},
+		Frameworks:        map[string]string{"PCI-DSS": "10.7.3"},
 	})
 
 	return results
