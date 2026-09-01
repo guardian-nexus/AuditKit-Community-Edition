@@ -1,0 +1,6 @@
+# Revisions to skip in git blame. Apply locally with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+# GitHub honours this file automatically.
+
+# gofmt -w across scanner/ (whitespace and alignment only, no behaviour change)
+cd539eb7dde90c3cb19da8463119113f082e9dcb
