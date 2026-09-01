@@ -7,10 +7,13 @@ import (
 	"time"
 
 	"cloud.google.com/go/iam/admin/apiv1"
+	"cloud.google.com/go/iam/admin/apiv1/adminpb"
 	"cloud.google.com/go/kms/apiv1"
 	"cloud.google.com/go/logging/apiv2"
+	"cloud.google.com/go/logging/apiv2/loggingpb"
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/sqladmin/v1"
 )
 
@@ -78,6 +81,9 @@ func (c *GCPPCIChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 	// Requirement 9: Physical Access Controls
 	results = append(results, c.CheckReq9_PhysicalAccess(ctx)...)
+
+	// v4.x requirements that became mandatory on 31 March 2025
+	results = append(results, c.CheckFutureDated(ctx)...)
 
 	// Requirement 10: Logging
 	results = append(results, c.CheckReq10_Logging(ctx)...)
@@ -717,6 +723,226 @@ func (c *GCPPCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 		Frameworks: map[string]string{
 			"PCI-DSS": "Req 12.10.1, 12.10.1",
 		},
+	})
+
+	return results
+}
+
+// CheckFutureDated covers the PCI DSS v4.x requirements that became mandatory on
+// 31 March 2025 and can be assessed from GCP configuration.
+func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
+	results := []CheckResult{}
+
+	// 4.2.1.1 - inventory of trusted keys and certificates protecting PAN in
+	// transit. Certificate Manager is not among this scanner's clients.
+	results = append(results, CheckResult{
+		Control:           "PCI-4.2.1.1",
+		Name:              "[PCI-DSS] Trusted Key and Certificate Inventory",
+		Status:            "INFO",
+		Evidence:          "PCI-DSS Req 4.2.1.1 (mandatory since 31 Mar 2025): maintain an inventory of trusted keys and certificates used to protect PAN in transit",
+		Remediation:       "Maintain a documented certificate inventory",
+		RemediationDetail: "1. List certificates: gcloud certificate-manager certificates list\n2. Record issuer, expiry and the service each protects\n3. Review at least annually and on renewal",
+		Priority:          PriorityMedium,
+		ScreenshotGuide:   "Certificate Manager showing issued certificates, plus the maintained inventory document",
+		ConsoleURL:        "https://console.cloud.google.com/security/ccm/list/lbCertificates",
+		Timestamp:         time.Now(),
+		Frameworks:        map[string]string{"PCI-DSS": "Req 4.2.1.1"},
+	})
+
+	// 8.6.1 and 8.6.3 - service accounts with user-managed keys are the GCP
+	// equivalent of long-lived application credentials. System-managed keys are
+	// rotated by Google and are not in scope here.
+	withUserKeys := []string{}
+	staleKeys := []string{}
+	it := c.iamClient.ListServiceAccounts(ctx, &adminpb.ListServiceAccountsRequest{
+		Name: fmt.Sprintf("projects/%s", c.projectID),
+	})
+	iamErr := ""
+	for {
+		sa, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			iamErr = err.Error()
+			break
+		}
+		keyResp, err := c.iamClient.ListServiceAccountKeys(ctx, &adminpb.ListServiceAccountKeysRequest{Name: sa.Name})
+		if err != nil {
+			continue
+		}
+		for _, key := range keyResp.Keys {
+			if key.KeyType != adminpb.ListServiceAccountKeysRequest_USER_MANAGED {
+				continue
+			}
+			withUserKeys = append(withUserKeys, sa.Email)
+			if key.ValidAfterTime != nil {
+				if days := int(time.Since(key.ValidAfterTime.AsTime()).Hours() / 24); days > 90 {
+					staleKeys = append(staleKeys, fmt.Sprintf("%s (%d days)", sa.Email, days))
+				}
+			}
+		}
+	}
+
+	if iamErr != "" {
+		results = append(results, CheckResult{
+			Control:    "PCI-8.6.1",
+			Name:       "[PCI-DSS] Application Account Credential Management",
+			Status:     "ERROR",
+			Evidence:   fmt.Sprintf("Unable to list service accounts: %s", iamErr),
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.1"},
+		})
+	} else if len(withUserKeys) > 0 {
+		shown := withUserKeys
+		if len(shown) > 3 {
+			shown = shown[:3]
+		}
+		results = append(results, CheckResult{
+			Control:           "PCI-8.6.1",
+			Name:              "[PCI-DSS] Application Account Credential Management",
+			Status:            "FAIL",
+			Evidence:          fmt.Sprintf("PCI-DSS Req 8.6.1 (mandatory since 31 Mar 2025): %d service account(s) hold user-managed keys, which are long-lived credentials usable outside GCP: %s", len(withUserKeys), strings.Join(shown, ", ")),
+			Remediation:       "Replace user-managed keys with workload identity",
+			RemediationDetail: "1. Use Workload Identity Federation or attached service accounts instead of exported keys\n2. Delete the key: gcloud iam service-accounts keys delete KEY_ID --iam-account=EMAIL\n3. Where a key is unavoidable, document the exceptional circumstance",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "IAM service account showing no user-managed keys",
+			ConsoleURL:        "https://console.cloud.google.com/iam-admin/serviceaccounts",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.1"},
+		})
+	} else {
+		results = append(results, CheckResult{
+			Control:    "PCI-8.6.1",
+			Name:       "[PCI-DSS] Application Account Credential Management",
+			Status:     "PASS",
+			Evidence:   "PCI-DSS Req 8.6.1: no service account holds user-managed keys",
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.1"},
+		})
+	}
+
+	// 8.6.2 - credentials must not be hard coded. Not visible from configuration.
+	results = append(results, CheckResult{
+		Control:           "PCI-8.6.2",
+		Name:              "[PCI-DSS] No Hardcoded Application Credentials",
+		Status:            "INFO",
+		Evidence:          "PCI-DSS Req 8.6.2 (mandatory since 31 Mar 2025): passwords for application and system accounts must not be hard coded in scripts, configuration files or source code",
+		Remediation:       "Move credentials to Secret Manager",
+		RemediationDetail: "1. Scan repositories for embedded service account keys\n2. Move secrets to Secret Manager\n3. Grant access via workload identity rather than exported keys",
+		Priority:          PriorityHigh,
+		ScreenshotGuide:   "Secret Manager inventory, plus evidence of secret scanning in CI",
+		ConsoleURL:        "https://console.cloud.google.com/security/secret-manager",
+		Timestamp:         time.Now(),
+		Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.2"},
+	})
+
+	if len(staleKeys) > 0 {
+		shown := staleKeys
+		if len(shown) > 3 {
+			shown = shown[:3]
+		}
+		results = append(results, CheckResult{
+			Control:           "PCI-8.6.3",
+			Name:              "[PCI-DSS] Application Account Credential Rotation",
+			Status:            "FAIL",
+			Evidence:          fmt.Sprintf("PCI-DSS Req 8.6.3 (mandatory since 31 Mar 2025): %d user-managed key(s) older than 90 days: %s", len(staleKeys), strings.Join(shown, ", ")),
+			Remediation:       "Rotate or eliminate long-lived service account keys",
+			RemediationDetail: "1. Prefer removing the key entirely in favour of workload identity\n2. Otherwise create a replacement, update consumers, then delete the old key\n3. Set the rotation frequency from your targeted risk analysis (Req 12.3.1)",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "Service account key list showing ages within your defined rotation period",
+			ConsoleURL:        "https://console.cloud.google.com/iam-admin/serviceaccounts",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.3"},
+		})
+	} else {
+		results = append(results, CheckResult{
+			Control:    "PCI-8.6.3",
+			Name:       "[PCI-DSS] Application Account Credential Rotation",
+			Status:     "PASS",
+			Evidence:   "PCI-DSS Req 8.6.3: no user-managed service account key is older than 90 days",
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"PCI-DSS": "Req 8.6.3"},
+		})
+	}
+
+	// 10.4.1.1 - automated log review. A log sink exporting to BigQuery, Pub/Sub
+	// or storage is the mechanism that makes automated review possible.
+	sinks := []string{}
+	sit := c.loggingClient.ListSinks(ctx, &loggingpb.ListSinksRequest{
+		Parent: fmt.Sprintf("projects/%s", c.projectID),
+	})
+	for {
+		sink, err := sit.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			break
+		}
+		sinks = append(sinks, sink.Name)
+	}
+
+	if len(sinks) > 0 {
+		results = append(results, CheckResult{
+			Control:           "PCI-10.4.1.1",
+			Name:              "[PCI-DSS] Automated Audit Log Review",
+			Status:            "PASS",
+			Evidence:          fmt.Sprintf("PCI-DSS Req 10.4.1.1: %d log sink(s) configured: %s", len(sinks), strings.Join(sinks, ", ")),
+			Remediation:       "Confirm alerting policies act on the exported logs",
+			RemediationDetail: "Export alone is not review. Ensure log-based metrics and alerting policies exist for the events your risk analysis identifies.",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "Log sinks plus the alerting policies defined on log-based metrics",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+		})
+	} else {
+		results = append(results, CheckResult{
+			Control:           "PCI-10.4.1.1",
+			Name:              "[PCI-DSS] Automated Audit Log Review",
+			Status:            "FAIL",
+			Evidence:          "PCI-DSS Req 10.4.1.1 (mandatory since 31 Mar 2025): no log sink is configured, so log review is not automated",
+			Remediation:       "Export logs and alert on them",
+			RemediationDetail: "1. gcloud logging sinks create NAME DESTINATION\n2. Create log-based metrics for the events your risk analysis identifies\n3. Attach alerting policies with a notification channel",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "Logging sink configuration and the alerting policies defined on it",
+			ConsoleURL:        "https://console.cloud.google.com/logs/router",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+		})
+	}
+
+	// 10.7.2 / 10.7.3 - detecting and responding to failures of critical security
+	// control systems. Whether alerting exists on control failure is not visible
+	// from the clients available here.
+	results = append(results, CheckResult{
+		Control:           "PCI-10.7.2",
+		Name:              "[PCI-DSS] Security Control Failure Detection",
+		Status:            "INFO",
+		Evidence:          "PCI-DSS Req 10.7.2 (mandatory since 31 Mar 2025): failures of critical security control systems must be detected and alerted on, including logging, network controls and change detection",
+		Remediation:       "Alert on the disabling of security controls",
+		RemediationDetail: "1. Create log-based metrics for audit log configuration changes and sink deletion\n2. Attach alerting policies with a notification channel\n3. Include firewall and org policy changes",
+		Priority:          PriorityHigh,
+		ScreenshotGuide:   "Alerting policies covering logging configuration changes and sink deletion",
+		ConsoleURL:        "https://console.cloud.google.com/monitoring/alerting",
+		Timestamp:         time.Now(),
+		Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
+	})
+
+	results = append(results, CheckResult{
+		Control:           "PCI-10.7.3",
+		Name:              "[PCI-DSS] Security Control Failure Response",
+		Status:            "INFO",
+		Evidence:          "PCI-DSS Req 10.7.3 (mandatory since 31 Mar 2025): document how security control failures are responded to, including restoring the function and recording the duration and cause",
+		Remediation:       "Document the failure response procedure",
+		RemediationDetail: "Record: how the failure is identified, who restores the control, the start and end time of the outage, the cause, and what was changed to prevent recurrence.",
+		Priority:          PriorityMedium,
+		ScreenshotGuide:   "The documented procedure, plus a worked example from a real or exercised failure",
+		Timestamp:         time.Now(),
+		Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.3"},
 	})
 
 	return results

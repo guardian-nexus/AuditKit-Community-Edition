@@ -78,6 +78,9 @@ func (c *AzurePCIChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	// Requirement 11: Security Testing
 	results = append(results, c.CheckReq11_SecurityTesting(ctx)...)
 
+	// v4.x requirements that became mandatory on 31 March 2025
+	results = append(results, c.CheckFutureDated(ctx)...)
+
 	// Requirement 12: Information Security Policy
 	results = append(results, c.CheckReq12_SecurityPolicy(ctx)...)
 
@@ -839,4 +842,107 @@ func (c *AzurePCIChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckR
 	})
 
 	return results
+}
+
+// CheckFutureDated covers the PCI DSS v4.x requirements that became mandatory on
+// 31 March 2025.
+//
+// These are documentation checks on Azure. The clients available here cover
+// storage, network security groups, role assignments, SQL and activity logs -
+// not Entra ID or diagnostic settings - so service account credentials and log
+// review automation cannot be read from configuration. They are surfaced as
+// MANUAL so they appear in the report rather than being silently absent.
+func (c *AzurePCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
+	return []CheckResult{
+		{
+			Control:           "PCI-4.2.1.1",
+			Name:              "[PCI-DSS] Trusted Key and Certificate Inventory",
+			Status:            "INFO",
+			Evidence:          "PCI-DSS Req 4.2.1.1 (mandatory since 31 Mar 2025): maintain an inventory of trusted keys and certificates used to protect PAN in transit",
+			Remediation:       "Maintain a documented certificate inventory",
+			RemediationDetail: "1. List certificates: az keyvault certificate list --vault-name NAME\n2. Record issuer, expiry and the service each protects\n3. Review at least annually and on renewal",
+			Priority:          PriorityMedium,
+			ScreenshotGuide:   "Key Vault certificate list, plus the maintained inventory document",
+			ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 4.2.1.1"},
+		},
+		{
+			Control:           "PCI-8.6.1",
+			Name:              "[PCI-DSS] Application Account Credential Management",
+			Status:            "INFO",
+			Evidence:          "PCI-DSS Req 8.6.1 (mandatory since 31 Mar 2025): service principals usable for interactive login must be restricted to exceptional, time-boxed circumstances",
+			Remediation:       "Review service principals for interactive use",
+			RemediationDetail: "1. az ad sp list --all --query \"[].{name:displayName,id:appId}\"\n2. Confirm none are used for interactive sign-in\n3. Where unavoidable, document the circumstance and time-box it",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "Entra ID sign-in logs filtered to service principal interactive sign-ins",
+			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_AAD_IAM/StartboardApplicationsMenuBlade",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.1"},
+		},
+		{
+			Control:           "PCI-8.6.2",
+			Name:              "[PCI-DSS] No Hardcoded Application Credentials",
+			Status:            "INFO",
+			Evidence:          "PCI-DSS Req 8.6.2 (mandatory since 31 Mar 2025): passwords for application and system accounts must not be hard coded in scripts, configuration files or source code",
+			Remediation:       "Move credentials to Key Vault",
+			RemediationDetail: "1. Scan repositories for embedded client secrets\n2. Move them to Key Vault\n3. Use managed identities rather than client secrets where possible",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "Key Vault secret inventory, plus evidence of secret scanning in CI",
+			ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.2"},
+		},
+		{
+			Control:           "PCI-8.6.3",
+			Name:              "[PCI-DSS] Application Account Credential Rotation",
+			Status:            "INFO",
+			Evidence:          "PCI-DSS Req 8.6.3 (mandatory since 31 Mar 2025): credentials for application and system accounts must be rotated at a frequency set by your targeted risk analysis (Req 12.3.1)",
+			Remediation:       "Rotate service principal credentials",
+			RemediationDetail: "1. az ad sp credential list --id APP_ID\n2. Replace secrets approaching their defined rotation age\n3. Prefer managed identities, which remove the credential entirely",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "Service principal credential list showing ages within your defined rotation period",
+			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 8.6.3"},
+		},
+		{
+			Control:           "PCI-10.4.1.1",
+			Name:              "[PCI-DSS] Automated Audit Log Review",
+			Status:            "INFO",
+			Evidence:          "PCI-DSS Req 10.4.1.1 (mandatory since 31 Mar 2025): audit log reviews must be performed by automated mechanisms, not read by hand",
+			Remediation:       "Route logs to Log Analytics and alert on them",
+			RemediationDetail: "1. Configure diagnostic settings to a Log Analytics workspace\n2. Create alert rules for the events your risk analysis identifies\n3. Attach an action group so alerts reach someone",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "Diagnostic settings sending to Log Analytics, plus the alert rules defined on it",
+			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 10.4.1.1"},
+		},
+		{
+			Control:           "PCI-10.7.2",
+			Name:              "[PCI-DSS] Security Control Failure Detection",
+			Status:            "INFO",
+			Evidence:          "PCI-DSS Req 10.7.2 (mandatory since 31 Mar 2025): failures of critical security control systems must be detected and alerted on, including logging, network controls and change detection",
+			Remediation:       "Alert on the disabling of security controls",
+			RemediationDetail: "1. Create activity log alerts for diagnostic setting deletion and NSG rule changes\n2. Alert on Defender for Cloud plans being turned off\n3. Attach an action group with a notification target",
+			Priority:          PriorityHigh,
+			ScreenshotGuide:   "Activity log alert rules covering diagnostic settings and security control changes",
+			ConsoleURL:        "https://portal.azure.com/#view/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.2"},
+		},
+		{
+			Control:           "PCI-10.7.3",
+			Name:              "[PCI-DSS] Security Control Failure Response",
+			Status:            "INFO",
+			Evidence:          "PCI-DSS Req 10.7.3 (mandatory since 31 Mar 2025): document how security control failures are responded to, including restoring the function and recording the duration and cause",
+			Remediation:       "Document the failure response procedure",
+			RemediationDetail: "Record: how the failure is identified, who restores the control, the start and end time of the outage, the cause, and what was changed to prevent recurrence.",
+			Priority:          PriorityMedium,
+			ScreenshotGuide:   "The documented procedure, plus a worked example from a real or exercised failure",
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"PCI-DSS": "Req 10.7.3"},
+		},
+	}
 }

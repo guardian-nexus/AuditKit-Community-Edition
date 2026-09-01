@@ -22,9 +22,10 @@ import (
 // "v3.2.1 to v4.0 Summary of Changes" where it gives an explicit mapping, and by
 // matching check content against the v4.0.1 standard text otherwise.
 //
-// The cloud-testable future-dated requirements are implemented in
+// The cloud-testable v4.x requirements are implemented in
 // CheckFutureDated below: 4.2.1.1, 8.6.1, 8.6.2, 8.6.3, 10.4.1.1, 10.7.2 and
-// 10.7.3. AWS only for now; Azure and GCP do not yet carry them.
+// 10.7.3, across AWS, Azure and GCP. Coverage depth varies by provider: see
+// each provider's CheckFutureDated for what is automated versus documented.
 //
 // Still uncovered - payment-page and process controls a cloud config scanner
 // cannot assess. These should surface as MANUAL rather than be omitted:
@@ -97,7 +98,7 @@ func (c *PCIDSSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	// Requirement 12: Information Security Policy
 	results = append(results, c.CheckReq12_SecurityPolicy(ctx)...)
 
-	// v4.x future-dated requirements (mandatory since 31 March 2025)
+	// v4.x requirements that became mandatory on 31 March 2025
 	results = append(results, c.CheckFutureDated(ctx)...)
 
 	return results, nil
@@ -1390,7 +1391,7 @@ func (c *PCIDSSChecks) CheckReq12_SecurityPolicy(ctx context.Context) []CheckRes
 	return results
 }
 
-// CheckFutureDated covers the PCI DSS v4.x future-dated requirements that can be
+// CheckFutureDated covers the PCI DSS v4.x v4.x requirements that can be
 // assessed from cloud configuration.
 //
 // "Future-dated" is the PCI SSC term for requirements introduced in v4.0 with a
@@ -1406,7 +1407,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		Control:           "PCI-4.2.1.1",
 		Name:              "[PCI-DSS] Trusted Key and Certificate Inventory",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS Req 4.2.1.1 (future-dated, mandatory since 31 Mar 2025): maintain an inventory of trusted keys and certificates used to protect PAN in transit",
+		Evidence:          "PCI-DSS Req 4.2.1.1 (mandatory since 31 Mar 2025): maintain an inventory of trusted keys and certificates used to protect PAN in transit",
 		Remediation:       "Maintain a documented certificate inventory",
 		RemediationDetail: "1. List certificates: aws acm list-certificates\n2. Record issuer, expiry and the service each protects\n3. Review at least annually and on renewal",
 		Priority:          PriorityMedium,
@@ -1463,7 +1464,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Control:           "PCI-8.6.1",
 			Name:              "[PCI-DSS] System Account Interactive Login",
 			Status:            "FAIL",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 8.6.1 (future-dated, mandatory since 31 Mar 2025): %d account(s) hold both access keys and a console password: %s", len(interactive), strings.Join(shown, ", ")),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 8.6.1 (mandatory since 31 Mar 2025): %d account(s) hold both access keys and a console password: %s", len(interactive), strings.Join(shown, ", ")),
 			Remediation:       "Prevent interactive login for service accounts",
 			RemediationDetail: "1. Confirm whether each account is a service account\n2. Remove the console password: aws iam delete-login-profile --user-name NAME\n3. Where interactive use is genuinely needed, document the exceptional circumstance and time-box it",
 			Priority:          PriorityHigh,
@@ -1490,7 +1491,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		Control:           "PCI-8.6.2",
 		Name:              "[PCI-DSS] No Hardcoded Application Credentials",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS Req 8.6.2 (future-dated, mandatory since 31 Mar 2025): passwords for application and system accounts must not be hard coded in scripts, configuration files or source code",
+		Evidence:          "PCI-DSS Req 8.6.2 (mandatory since 31 Mar 2025): passwords for application and system accounts must not be hard coded in scripts, configuration files or source code",
 		Remediation:       "Move credentials to a secrets manager",
 		RemediationDetail: "1. Scan repositories for embedded secrets\n2. Move them to AWS Secrets Manager or Parameter Store\n3. Grant access via IAM roles rather than long-lived keys",
 		Priority:          PriorityHigh,
@@ -1509,7 +1510,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Control:           "PCI-8.6.3",
 			Name:              "[PCI-DSS] Application Account Credential Rotation",
 			Status:            "FAIL",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 8.6.3 (future-dated, mandatory since 31 Mar 2025): %d access key(s) older than 90 days: %s", len(staleServiceKeys), strings.Join(shown, ", ")),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 8.6.3 (mandatory since 31 Mar 2025): %d access key(s) older than 90 days: %s", len(staleServiceKeys), strings.Join(shown, ", ")),
 			Remediation:       "Rotate application and system account credentials",
 			RemediationDetail: "1. Create a replacement key\n2. Update consumers\n3. Deactivate then delete the old key\n4. Set the rotation frequency from your targeted risk analysis (Req 12.3.1)",
 			Priority:          PriorityHigh,
@@ -1579,7 +1580,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 			Control:           "PCI-10.4.1.1",
 			Name:              "[PCI-DSS] Automated Audit Log Review",
 			Status:            "FAIL",
-			Evidence:          "PCI-DSS Req 10.4.1.1 (future-dated, mandatory since 31 Mar 2025): no CloudTrail trail delivers to CloudWatch Logs, so log review is not automated",
+			Evidence:          "PCI-DSS Req 10.4.1.1 (mandatory since 31 Mar 2025): no CloudTrail trail delivers to CloudWatch Logs, so log review is not automated",
 			Remediation:       "Send CloudTrail to CloudWatch Logs and alarm on it",
 			RemediationDetail: "1. aws cloudtrail update-trail --name NAME --cloud-watch-logs-log-group-arn ARN --cloud-watch-logs-role-arn ROLE\n2. Add metric filters for the events your risk analysis identifies\n3. Attach alarms with a notification target",
 			Priority:          PriorityHigh,
@@ -1614,7 +1615,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 			Control:           "PCI-10.7.2",
 			Name:              "[PCI-DSS] Security Control Failure Detection",
 			Status:            "FAIL",
-			Evidence:          fmt.Sprintf("PCI-DSS Req 10.7.2 (future-dated, mandatory since 31 Mar 2025): %d critical security control system(s) are not running: %s", len(stopped), strings.Join(stopped, ", ")),
+			Evidence:          fmt.Sprintf("PCI-DSS Req 10.7.2 (mandatory since 31 Mar 2025): %d critical security control system(s) are not running: %s", len(stopped), strings.Join(stopped, ", ")),
 			Remediation:       "Restore the stopped controls and alert on future failures",
 			RemediationDetail: "1. Restart the trail or Config recorder\n2. Add an EventBridge rule for StopLogging and StopConfigurationRecorder\n3. Route it to a notification target so the next failure is detected rather than discovered",
 			Priority:          PriorityCritical,
@@ -1642,7 +1643,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 		Control:           "PCI-10.7.3",
 		Name:              "[PCI-DSS] Security Control Failure Response",
 		Status:            "INFO",
-		Evidence:          "PCI-DSS Req 10.7.3 (future-dated, mandatory since 31 Mar 2025): document how security control failures are responded to, including restoring the function and recording the duration and cause",
+		Evidence:          "PCI-DSS Req 10.7.3 (mandatory since 31 Mar 2025): document how security control failures are responded to, including restoring the function and recording the duration and cause",
 		Remediation:       "Document the failure response procedure",
 		RemediationDetail: "Record: how the failure is identified, who restores the control, the start and end time of the outage, the cause, and what was changed to prevent recurrence.",
 		Priority:          PriorityMedium,
