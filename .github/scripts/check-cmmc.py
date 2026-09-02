@@ -25,54 +25,37 @@ ROOT = os.environ.get("AUDITKIT_ROOT") or os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", ".."))
 CAN = canonical()
 PRACTICE = re.compile(r"^[A-Z]{2}\.L[12]-(3\.\d+\.\d+)$")
+ANYWHERE = re.compile(r"\b([A-Z]{2})\.(L[12])-(3\.\d+\.\d+)\b")
 # A bare level marks a check as in scope for a level without claiming a
 # specific practice. It resolves to nothing in the crosswalk, by design.
 LEVEL_ONLY = {"L1", "L2"}
 
 
 def problems():
+    """Any practice-shaped string anywhere in the scanner source must be canonical.
+
+    Earlier versions of this guard matched only two syntactic forms, the Control
+    field and the framework tag. That missed a table-driven check written as a
+    positional slice literal, the CMMC checklist printed into every PDF report,
+    the Azure Arc scanner, and a set of comments. Matching the pattern wherever
+    it appears is the only version of this check that holds.
+    """
     found = []
-    for prov in ("aws", "azure", "gcp"):
-        for f in sorted(glob.glob(os.path.join(ROOT, "scanner", "pkg", prov, "checks", "*.go"))):
-            text = open(f, encoding="utf-8", errors="ignore").read()
-            # The Control field is what a report displays, and it carried more
-            # invalid ids than the framework tags did.
-            for m in re.finditer(r'Control:\s*"([A-Z]{2}\.L[12]-3\.\d+\.\d+)"', text):
-                line = text[: m.start()].count("\n") + 1
-                e = m.group(1)
+    roots = [os.path.join(ROOT, "scanner")]
+    for root in roots:
+        for dirpath, _dirs, files in os.walk(root):
+            for fn in sorted(files):
+                if not fn.endswith((".go", ".yaml", ".yml")):
+                    continue
+                f = os.path.join(dirpath, fn)
                 rel = os.path.relpath(f, ROOT)
-                num = PRACTICE.match(e).group(1)
-                if num not in CAN:
-                    found.append(f"{rel}:{line}: Control {e} is not in 800-171 Rev 2")
-                elif CAN[num] != e:
-                    found.append(f"{rel}:{line}: Control {e} should be {CAN[num]}")
-
-            for m in re.finditer(r'(?:"CMMC"|FrameworkCMMC)\s*:\s*"([^"]+)"', text):
-                line = text[: m.start()].count("\n") + 1
-                for e in m.group(1).split(","):
-                    e = e.strip()
-                    if not e or e in LEVEL_ONLY:
-                        continue
-                    pm = PRACTICE.match(e)
-                    rel = os.path.relpath(f, ROOT)
-                    if not pm:
-                        found.append(f"{rel}:{line}: {e} is not a practice id")
-                    elif pm.group(1) not in CAN:
-                        found.append(f"{rel}:{line}: {e} is not in 800-171 Rev 2")
-                    elif CAN[pm.group(1)] != e:
-                        found.append(f"{rel}:{line}: {e} should be {CAN[pm.group(1)]}")
-
-    cw = os.path.join(ROOT, "scanner", "pkg", "mappings", "framework-crosswalk.yaml")
-    if os.path.exists(cw):
-        text = open(cw, encoding="utf-8").read()
-        for m in re.finditer(r"^\s{2}([A-Z]{2}\.L[12]-3\.\d+\.\d+):", text, re.M):
-            line = text[: m.start()].count("\n") + 1
-            key = m.group(1)
-            num = PRACTICE.match(key).group(1)
-            if num not in CAN:
-                found.append(f"framework-crosswalk.yaml:{line}: {key} is not in 800-171 Rev 2")
-            elif CAN[num] != key:
-                found.append(f"framework-crosswalk.yaml:{line}: {key} should be {CAN[num]}")
+                for i, line in enumerate(open(f, encoding="utf-8", errors="ignore"), 1):
+                    for m in ANYWHERE.finditer(line):
+                        num = m.group(3)
+                        if num not in CAN:
+                            found.append(f"{rel}:{i}: {m.group(0)} is not in 800-171 Rev 2")
+                        elif CAN[num] != m.group(0):
+                            found.append(f"{rel}:{i}: {m.group(0)} should be {CAN[num]}")
     return found
 
 

@@ -849,13 +849,12 @@ func getFrameworkChecklist(framework string, totalControls int) []string {
 		if totalControls <= 17 {
 			// CMMC Level 1
 			return []string{
-				"[ ] Access Control Policy (AC.L1-3.1.1 - 3.1.2)",
-				"[ ] Identification and Authentication (IA.L1-3.5.1 - 3.5.2)",
-				"[ ] Media Protection (MP.L1-3.8.3)",
-				"[ ] Physical Protection (PE.L1-3.10.1 - 3.10.5)",
-				"[ ] Personnel Security (PS.L1-3.9.1 - 3.9.2)",
-				"[ ] System and Communications Protection (SC.L1-3.13.1 - 3.13.16)",
-				"[ ] System and Information Integrity (SI.L1-3.14.1 - 3.14.5)",
+				"[ ] Access Control Policy (3.1.1, 3.1.2, 3.1.20, 3.1.22)",
+				"[ ] Identification and Authentication (3.5.1, 3.5.2)",
+				"[ ] Media Protection (3.8.3)",
+				"[ ] Physical Protection (3.10.1, 3.10.3, 3.10.4, 3.10.5)",
+				"[ ] System and Communications Protection (3.13.1, 3.13.5)",
+				"[ ] System and Information Integrity (3.14.1, 3.14.2, 3.14.4, 3.14.5)",
 				"",
 				"For CMMC Level 2 (CUI Protection - 110 additional practices):",
 				"Visit auditkit.io/pro",
@@ -863,20 +862,20 @@ func getFrameworkChecklist(framework string, totalControls int) []string {
 		} else {
 			// CMMC Level 2
 			return []string{
-				"[ ] Access Control Policy (AC.L2-3.1.1 - 3.1.22)",
-				"[ ] Awareness and Training Records (AT.L2-3.2.1 - 3.2.3)",
-				"[ ] Audit and Accountability Logs (AU.L2-3.3.1 - 3.3.9)",
-				"[ ] Configuration Management Documentation (CM.L2-3.4.1 - 3.4.9)",
-				"[ ] Identification and Authentication (IA.L2-3.5.1 - 3.5.11)",
-				"[ ] Incident Response Plan (IR.L2-3.6.1 - 3.6.3)",
-				"[ ] Maintenance Documentation (MA.L2-3.7.1 - 3.7.6)",
-				"[ ] Media Protection Procedures (MP.L2-3.8.1 - 3.8.9)",
-				"[ ] Personnel Security (PS.L2-3.9.1 - 3.9.2)",
-				"[ ] Physical Protection (PE.L2-3.10.1 - 3.10.6)",
-				"[ ] Risk Assessment Documentation (RA.L2-3.11.1 - 3.11.4)",
-				"[ ] Security Assessment Reports (CA.L2-3.12.1 - 3.12.5)",
-				"[ ] System and Communications Protection (SC.L2-3.13.1 - 3.13.16)",
-				"[ ] System and Information Integrity (SI.L2-3.14.1 - 3.14.7)",
+				"[ ] Access Control Policy (3.1.1 - 3.1.22)",
+				"[ ] Awareness and Training Records (3.2.1 - 3.2.3)",
+				"[ ] Audit and Accountability Logs (3.3.1 - 3.3.9)",
+				"[ ] Configuration Management Documentation (3.4.1 - 3.4.9)",
+				"[ ] Identification and Authentication (3.5.1 - 3.5.11)",
+				"[ ] Incident Response Plan (3.6.1 - 3.6.3)",
+				"[ ] Maintenance Documentation (3.7.1 - 3.7.6)",
+				"[ ] Media Protection Procedures (3.8.1 - 3.8.9)",
+				"[ ] Personnel Security (3.9.1 - 3.9.2)",
+				"[ ] Physical Protection (3.10.1 - 3.10.6)",
+				"[ ] Risk Assessment Documentation (3.11.1 - 3.11.3)",
+				"[ ] Security Assessment Reports (3.12.1 - 3.12.4)",
+				"[ ] System and Communications Protection (3.13.1 - 3.13.16)",
+				"[ ] System and Information Integrity (3.14.1 - 3.14.7)",
 			}
 		}
 	default:

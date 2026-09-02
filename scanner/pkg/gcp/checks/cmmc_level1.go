@@ -296,11 +296,11 @@ func (c *GCPCMMCLevel1Checks) CheckPE_L1_001_006(ctx context.Context) []CheckRes
 		action  string
 	}{
 		{"PE.L1-3.10.1", "3.10.1", "Limit Physical Access", "limit physical access"},
-		{"PE.L1-3.10.2", "3.10.2", "Protect Physical Facility", "have physical protection"},
+		{"PE.L2-3.10.2", "3.10.2", "Protect Physical Facility", "have physical protection"},
 		{"PE.L1-3.10.3", "3.10.3", "Escort Visitors", "escort all visitors"},
 		{"PE.L1-3.10.4", "3.10.4", "Physical Access Logs", "maintain physical access logs"},
 		{"PE.L1-3.10.5", "3.10.5", "Control Access Devices", "control physical access devices"},
-		{"PE.L1-3.10.6", "3.10.6", "Safeguard CUI", "enforce physical safeguards"},
+		{"PE.L2-3.10.6", "3.10.6", "Safeguard CUI", "enforce physical safeguards"},
 	}
 
 	results := []CheckResult{}
