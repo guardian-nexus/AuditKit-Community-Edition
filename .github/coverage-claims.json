@@ -310,6 +310,36 @@
       "file": "site/docs/frameworks/nist-800-53.md",
       "metric": "nist80053.total",
       "pattern": "\\| NIST 800-53 \\| ~1,000 \\| (\\d+) \\("
+    },
+    {
+      "file": "README.md",
+      "metric": "cmmc_l1.aws",
+      "pattern": "\\*\\*CMMC Level 1\\*\\* \\| (\\d+) of 17"
+    },
+    {
+      "file": "README.md",
+      "metric": "cmmc_l1.azure",
+      "pattern": "\\*\\*CMMC Level 1\\*\\* \\| \\d+ of 17 \\| (\\d+) of 17"
+    },
+    {
+      "file": "README.md",
+      "metric": "cmmc_l1.gcp",
+      "pattern": "\\*\\*CMMC Level 1\\*\\* \\| \\d+ of 17 \\| \\d+ of 17 \\| (\\d+) of 17"
+    },
+    {
+      "file": "site/pricing.md",
+      "metric": "cmmc_l1.total",
+      "pattern": "- CMMC Level 1 \\((\\d+) of 17 practices\\)"
+    },
+    {
+      "file": "site/pricing.md",
+      "metric": "cmmc_l1.total",
+      "pattern": "\\| CMMC Level 1 \\| (\\d+) of 17 practices"
+    },
+    {
+      "file": "site/docs/frameworks/README.md",
+      "metric": "cmmc_l1.total",
+      "pattern": "\\*\\*\\[CMMC Level 1\\]\\(\\./cmmc\\.md\\)\\*\\* \\| Production \\| (\\d+) of 17 practices"
     }
   ]
 }

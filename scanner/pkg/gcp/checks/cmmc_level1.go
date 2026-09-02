@@ -335,7 +335,7 @@ func (c *GCPCMMCLevel1Checks) CheckPS_L1_001_002(ctx context.Context) []CheckRes
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "HR Documentation → Screenshot showing personnel screening procedures and background check records",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CMMC": "PS.L1-3.9.1", "NIST 800-171": "3.9.1"},
+			Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.1", "NIST 800-171": "3.9.1"},
 		},
 		{
 			Control:         "PS.L1-3.9.2",
@@ -347,7 +347,7 @@ func (c *GCPCMMCLevel1Checks) CheckPS_L1_001_002(ctx context.Context) []CheckRes
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Documentation → Screenshot showing CUI access authorization procedures and approval records",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CMMC": "PS.L1-3.9.2", "NIST 800-171": "3.9.2"},
+			Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.2", "NIST 800-171": "3.9.2"},
 		},
 	}
 }

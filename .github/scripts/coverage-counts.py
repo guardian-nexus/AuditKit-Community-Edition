@@ -132,6 +132,7 @@ def measure():
 
     m = {}
     all_n53, all_pci = set(), set()
+    all_cmmc_l1, all_cmmc_l2 = set(), set()
     for p in PROVIDERS:
         files = go_sources(p)
         if not files:
@@ -153,6 +154,7 @@ def measure():
         m["soc2.%s" % p] = len(soc2)
         m["pci.%s" % p] = len(pci)
         m["cmmc_l1.%s" % p] = len([c for c in cmmc if ".L1-" in c])
+        m["cmmc_l2.%s" % p] = len([c for c in cmmc if ".L2-" in c])
         m["cis.%s" % p] = len(cis)
 
         # 800-53 reachable from this provider. Framework tags first, then the
@@ -169,10 +171,15 @@ def measure():
         m["nist80053.%s" % p] = len(n53)
 
         all_pci |= pci
+        all_cmmc_l1 |= {c for c in cmmc if ".L1-" in c}
+        all_cmmc_l2 |= {c for c in cmmc if ".L2-" in c}
         all_n53 |= n53
         for name in ("iso27001", "gdpr", "nistcsf", "hipaa"):
             m["%s.%s" % (name, p)] = len({t for c in n53 for t in rev[name].get(c, ())})
 
+    m["cmmc_l1.total"] = len(all_cmmc_l1)
+    m["cmmc_l2.total"] = len(all_cmmc_l2)
+    m["cmmc.total"] = len(all_cmmc_l1 | all_cmmc_l2)
     m["pci.total"] = len(all_pci)
     m["nist80053.total"] = len(all_n53)
     m["soc2.criteria"] = len(cw.get("soc2_to_800_53", {}))

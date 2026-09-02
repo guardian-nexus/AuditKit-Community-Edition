@@ -32,6 +32,10 @@ jobs:
         working-directory: .
         run: .github/scripts/check-statuses.sh
 
+      - name: Verify CMMC practice ids match the standard
+        working-directory: .
+        run: .github/scripts/check-cmmc.py
+
       - name: go vet
         run: go vet ./...
 

@@ -359,7 +359,7 @@ func (c *AWSCMMCLevel1Checks) CheckPE_L1_005(ctx context.Context) CheckResult {
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "AWS Artifact → Screenshot SOC 2 report showing physical monitoring controls",
 		ConsoleURL:      "https://console.aws.amazon.com/artifact/home",
-		Frameworks:      map[string]string{"CMMC": "PE.L1-3.10.2", "NIST 800-171": "3.10.2"},
+		Frameworks:      map[string]string{"CMMC": "PE.L2-3.10.2", "NIST 800-171": "3.10.2"},
 	}
 }
 
@@ -374,7 +374,7 @@ func (c *AWSCMMCLevel1Checks) CheckPE_L1_006(ctx context.Context) CheckResult {
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "AWS Artifact → Screenshot showing physical safeguarding measures",
 		ConsoleURL:      "https://console.aws.amazon.com/artifact/home",
-		Frameworks:      map[string]string{"CMMC": "PE.L1-3.10.6", "NIST 800-171": "3.10.6"},
+		Frameworks:      map[string]string{"CMMC": "PE.L2-3.10.6", "NIST 800-171": "3.10.6"},
 	}
 }
 
@@ -390,7 +390,7 @@ func (c *AWSCMMCLevel1Checks) CheckPS_L1_001(ctx context.Context) CheckResult {
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "HR Documentation → Screenshot showing personnel screening procedures and background check records",
 		ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
-		Frameworks:      map[string]string{"CMMC": "PS.L1-3.9.1", "NIST 800-171": "3.9.1"},
+		Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.1", "NIST 800-171": "3.9.1"},
 	}
 }
 
@@ -405,7 +405,7 @@ func (c *AWSCMMCLevel1Checks) CheckPS_L1_002(ctx context.Context) CheckResult {
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "Documentation → Screenshot showing CUI access authorization procedures and approval records",
 		ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
-		Frameworks:      map[string]string{"CMMC": "PS.L1-3.9.2", "NIST 800-171": "3.9.2"},
+		Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.2", "NIST 800-171": "3.9.2"},
 	}
 }
 

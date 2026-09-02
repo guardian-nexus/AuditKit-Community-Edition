@@ -67,7 +67,7 @@ measured from the checks themselves.
 |-----------|-----|-------|-----|---------|
 | **SOC2 Type II** | 38 of 38 | 37 of 38 | 32 of 38 | SaaS customer requirements |
 | **PCI DSS v4.0.1** | 59 | 59 | 49 | Payment card processing |
-| **CMMC Level 1** | 17 of 17 | 17 of 17 | 11 of 17 | DoW contractor compliance (FCI) |
+| **CMMC Level 1** | 13 of 17 | 13 of 17 | 9 of 17 | DoW contractor compliance (FCI) |
 | **CMMC Level 2** | - | - | - | 110 practices, [AuditKit Pro](https://auditkit.io/) only |
 
 69 distinct PCI DSS v4.0.1 requirements are assessed across the three providers.
@@ -80,9 +80,9 @@ assessed.
 
 | Framework | AWS | Azure | GCP | Unit |
 |-----------|-----|-------|-----|------|
-| **NIST 800-53 Rev 5** | 86 | 82 | 82 | controls (94 across all providers) |
+| **NIST 800-53 Rev 5** | 88 | 84 | 83 | controls (96 across all providers) |
 | **ISO 27001:2022** | 48 | 46 | 46 | controls |
-| **NIST CSF 2.0** | 86 | 82 | 83 | subcategories |
+| **NIST CSF 2.0** | 87 | 83 | 83 | subcategories |
 | **HIPAA Security Rule** | 17 | 17 | 17 | safeguards |
 | **GDPR** | 14 | 14 | 14 | articles |
 

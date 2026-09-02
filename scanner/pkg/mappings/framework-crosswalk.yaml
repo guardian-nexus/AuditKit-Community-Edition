@@ -225,7 +225,7 @@ cmmc_to_800_53:
   
   # Media Protection (MP)
   MP.L1-3.8.3: [MP-6]                   # Media sanitization
-  MP.L1-3.8.2: [MP-2]                   # Media access control
+  MP.L2-3.8.2: [MP-2]                   # Media access control
   MP.L2-3.8.1: [MP-3]                   # Media marking
   MP.L2-3.8.4: [MP-4]                   # Media storage
   MP.L2-3.8.5: [MP-5]                   # Media transport
@@ -243,10 +243,10 @@ cmmc_to_800_53:
   PE.L2-3.10.6: [PE-6]                  # Monitoring physical access
   
   # Recovery (RE)
-  RE.L2-3.13.1: [CP-6, CP-7]            # Alternate processing site
-  RE.L2-3.13.2: [CP-2]                  # Contingency plan
-  RE.L2-3.13.3: [CP-3]                  # Contingency training
-  RE.L2-3.13.4: [CP-4]                  # Contingency testing
+  SC.L1-3.13.1: [CP-6, CP-7, SC-7]            # Alternate processing site
+  SC.L2-3.13.2: [CP-2, SC-2]                  # Contingency plan
+  SC.L2-3.13.3: [CP-3, SC-4]                  # Contingency training
+  SC.L2-3.13.4: [CP-4, SC-7(4)]                  # Contingency testing
   
   # Risk Assessment (RA)
   RA.L2-3.11.1: [RA-3]                  # Risk assessments
@@ -260,13 +260,8 @@ cmmc_to_800_53:
   CA.L2-3.12.4: [CA-7]                  # Security status
   
   # System and Communications Protection (SC)
-  SC.L1-3.13.1: [SC-7]                  # Boundary protection
   SC.L1-3.13.5: [AC-17, SC-7(3)]        # Deny by default
-  SC.L1-3.13.16: [SC-28]                # Data at rest protection
-  SC.L1-3.13.17: [SC-23]                # Session identifiers
-  SC.L2-3.13.2: [SC-2]                  # Separate functions
-  SC.L2-3.13.3: [SC-4]                  # Shared resources
-  SC.L2-3.13.4: [SC-7(4)]               # External boundary
+  SC.L2-3.13.16: [SC-28]                # Data at rest protection
   SC.L2-3.13.6: [SC-7(7)]               # Split tunneling
   SC.L2-3.13.7: [SC-8]                  # Transmission confidentiality
   SC.L2-3.13.8: [SC-13]                 # Cryptographic protection

@@ -321,7 +321,7 @@ func (c *AzureCMMCLevel1Checks) CheckPE_L1_002(ctx context.Context) CheckResult 
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "Azure Trust Center → Screenshot physical protection controls",
 		ConsoleURL:      "https://servicetrust.microsoft.com/",
-		Frameworks:      map[string]string{"CMMC": "PE.L1-3.10.2", "NIST 800-171": "3.10.2"},
+		Frameworks:      map[string]string{"CMMC": "PE.L2-3.10.2", "NIST 800-171": "3.10.2"},
 	}
 }
 
@@ -381,7 +381,7 @@ func (c *AzureCMMCLevel1Checks) CheckPE_L1_006(ctx context.Context) CheckResult 
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "Azure Trust Center → Screenshot safeguarding controls",
 		ConsoleURL:      "https://servicetrust.microsoft.com/",
-		Frameworks:      map[string]string{"CMMC": "PE.L1-3.10.6", "NIST 800-171": "3.10.6"},
+		Frameworks:      map[string]string{"CMMC": "PE.L2-3.10.6", "NIST 800-171": "3.10.6"},
 	}
 }
 
@@ -397,7 +397,7 @@ func (c *AzureCMMCLevel1Checks) CheckPS_L1_001(ctx context.Context) CheckResult 
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "HR Documentation → Screenshot showing personnel screening procedures and background check records",
 		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Overview",
-		Frameworks:      map[string]string{"CMMC": "PS.L1-3.9.1", "NIST 800-171": "3.9.1"},
+		Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.1", "NIST 800-171": "3.9.1"},
 	}
 }
 
@@ -412,7 +412,7 @@ func (c *AzureCMMCLevel1Checks) CheckPS_L1_002(ctx context.Context) CheckResult 
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "Documentation → Screenshot showing CUI access authorization procedures and approval records",
 		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Overview",
-		Frameworks:      map[string]string{"CMMC": "PS.L1-3.9.2", "NIST 800-171": "3.9.2"},
+		Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.2", "NIST 800-171": "3.9.2"},
 	}
 }
 

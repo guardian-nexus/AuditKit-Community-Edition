@@ -58,7 +58,7 @@ FedRAMP defines three security impact levels based on FIPS 199:
 **Timeline:** 3-6 months for initial authorization
 **Cost:** $50,000 - $150,000 (3PAO + infrastructure)
 
-**AuditKit Coverage:** 94 technical controls that can be verified via cloud APIs
+**AuditKit Coverage:** 96 technical controls that can be verified via cloud APIs
 
 ### Moderate Impact (325 controls total, ~150 automatable)
 
@@ -76,7 +76,7 @@ FedRAMP defines three security impact levels based on FIPS 199:
 **Timeline:** 6-12 months for initial authorization
 **Cost:** $250,000 - $500,000 (3PAO + infrastructure)
 
-**AuditKit Coverage:** 94 technical controls
+**AuditKit Coverage:** 96 technical controls
 
 ### High Impact (421 controls total, ~200 automatable)
 
