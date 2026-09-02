@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliance Frameworks - AuditKit</title>
+    <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+<body>
+
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <nav class="site-nav" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <img src="../../auditkit-logo-dark.svg" alt="AuditKit">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+            <div class="nav-links">
+                <a href="/#features">Features</a>
+                <a href="/docs/frameworks/">Frameworks</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/docs/">Docs</a>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="nav-cta" onclick="if (window.auditKitConsent && window.auditKitConsent.marketing && typeof gtag === 'function') { gtag('event', 'conversion', {'send_to': 'AW-17730440946/q5TvCL37jsAbEPKdxIZC', 'value': 297.0, 'currency': 'USD'}); } return true;">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Compliance Frameworks</h1>
+            <p class="subtitle">What AuditKit assesses, and how much of each</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container-prose">
+            <h2>Assessed directly</h2>
+            <p>These are checked against your cloud configuration. Counts are
+            distinct criteria, requirements or practices per provider.</p>
+            <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr><th>Framework</th><th>AWS</th><th>Azure</th><th>GCP</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><a href="/docs/frameworks/soc2.html">SOC 2 Type II</a></td><td>38 of 38</td><td>37 of 38</td><td>32 of 38</td></tr>
+                    <tr><td><a href="/docs/frameworks/pci-dss.html">PCI DSS v4.0.1</a></td><td>59</td><td>59</td><td>49</td></tr>
+                    <tr><td><a href="/docs/frameworks/cmmc.html">CMMC Level 1</a></td><td>17 of 17</td><td>17 of 17</td><td>11 of 17</td></tr>
+                    <tr><td><a href="/docs/frameworks/cis-benchmarks.html">CIS Benchmarks</a></td><td>125</td><td>108</td><td>26</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <p>CMMC Level 2 (110 practices) is available in AuditKit Pro.</p>
+
+            <h2>Derived through the crosswalk</h2>
+            <p>These are not separate checks. Each is derived from the frameworks
+            above through NIST 800-53, so coverage follows from what the scanner
+            already assessed.</p>
+            <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr><th>Framework</th><th>AWS</th><th>Azure</th><th>GCP</th><th>Unit</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><a href="/docs/frameworks/nist-800-53.html">NIST 800-53 Rev 5</a></td><td>77</td><td>82</td><td>82</td><td>controls (144 across all providers)</td></tr>
+                    <tr><td><a href="/docs/frameworks/iso27001.html">ISO 27001:2022</a></td><td>46</td><td>46</td><td>46</td><td>controls</td></tr>
+                    <tr><td>NIST CSF 2.0</td><td>75</td><td>82</td><td>83</td><td>subcategories</td></tr>
+                    <tr><td><a href="/docs/frameworks/hipaa.html">HIPAA Security Rule</a></td><td>17</td><td>17</td><td>17</td><td>safeguards</td></tr>
+                    <tr><td>GDPR</td><td>13</td><td>14</td><td>14</td><td>articles</td></tr>
+                    <tr><td><a href="/docs/frameworks/fedramp.html">FedRAMP</a></td><td colspan="3">Low, Moderate and High baselines</td><td>filtered views of NIST 800-53</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <div class="callout">
+                <p><strong>Compliance versus hardening:</strong> the first table is
+                what an auditor asks for. CIS Benchmarks are security hardening,
+                which improves your posture but is not itself a certification.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p style="margin-bottom: 2rem; color: var(--slate-300); font-size: 1rem;">
+                <strong style="color: var(--white);">Built for compliance teams, by engineers who understand the audit process.</strong>
+            </p>
+
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/">AuditKit</a></li>
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/community.html">Community Edition (Open Source)</a></li>
+                        <li><a href="/about.html">About</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="/docs/getting-started.html">Quick Start Guide</a></li>
+                        <li><a href="/docs/installation.html">Installation</a></li>
+                        <li><a href="/docs/cli-reference.html">CLI Reference</a></li>
+                        <li><a href="/docs/faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Frameworks</h4>
+                    <ul>
+                        <li><a href="/docs/frameworks/cmmc.html">CMMC</a></li>
+                        <li><a href="/docs/frameworks/soc2.html">SOC2</a></li>
+                        <li><a href="/docs/frameworks/pci-dss.html">PCI-DSS</a></li>
+                        <li><a href="/docs/frameworks/hipaa.html">HIPAA</a></li>
+                        <li><a href="/docs/frameworks/nist-800-53.html">NIST 800-53</a></li>
+                        <li><a href="/docs/frameworks/iso27001.html">ISO 27001</a></li>
+                        <li><a href="/docs/frameworks/fedramp.html">FedRAMP</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/docs/setup/aws.html">AWS Setup</a></li>
+                        <li><a href="/docs/setup/azure.html">Azure Setup</a></li>
+                        <li><a href="/docs/setup/gcp.html">GCP Setup</a></li>
+                        <li><a href="/docs/setup/m365.html">M365 Setup</a></li>
+                        <li><a href="/examples/">Examples</a></li>
+                        <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition">GitHub</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>Community Edition is Apache 2.0. AuditKit is commercially licensed.</p>
+                <p>&copy; 2026 Guardian Nexus LLC</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../cookie-consent.js"></script>
+    <script src="../../main.js"></script>
+    <script>
+        (function() {
+            var toggle = document.querySelector('.nav-toggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function() {
+                    var open = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', open);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -16,7 +16,11 @@ auditkit
 # Test data
 *.pdf
 *.html
+# The rule above is for generated scan reports. Pages under site/ are source,
+# and without this every new one is silently skipped by git add.
+!site/**/*.html
 evidence-tracker.html
+site/**/evidence-tracker.html
 auditkit-fixes.sh
 auditkit-report-*
 
