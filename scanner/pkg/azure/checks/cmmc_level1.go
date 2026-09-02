@@ -312,7 +312,7 @@ func (c *AzureCMMCLevel1Checks) CheckPE_L1_001(ctx context.Context) CheckResult 
 
 func (c *AzureCMMCLevel1Checks) CheckPE_L1_002(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:         "PE.L1-3.10.2",
+		Control:         "PE.L2-3.10.2",
 		Name:            "[CMMC L1] Protect Physical Facility",
 		Status:          "INFO",
 		Evidence:        "Azure inherited: Microsoft data centers have physical protection",
@@ -372,7 +372,7 @@ func (c *AzureCMMCLevel1Checks) CheckPE_L1_005(ctx context.Context) CheckResult 
 
 func (c *AzureCMMCLevel1Checks) CheckPE_L1_006(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:         "PE.L1-3.10.6",
+		Control:         "PE.L2-3.10.6",
 		Name:            "[CMMC L1] Safeguard CUI",
 		Status:          "INFO",
 		Evidence:        "Azure inherited: Microsoft enforces physical safeguards",
@@ -388,7 +388,7 @@ func (c *AzureCMMCLevel1Checks) CheckPE_L1_006(ctx context.Context) CheckResult 
 // PS.L1 - Personnel Security (organizational controls)
 func (c *AzureCMMCLevel1Checks) CheckPS_L1_001(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:         "PS.L1-3.9.1",
+		Control:         "PS.L2-3.9.1",
 		Name:            "[CMMC L1] Screen Personnel",
 		Status:          "INFO",
 		Evidence:        "MANUAL: Document personnel screening procedures for CUI access",
@@ -403,7 +403,7 @@ func (c *AzureCMMCLevel1Checks) CheckPS_L1_001(ctx context.Context) CheckResult 
 
 func (c *AzureCMMCLevel1Checks) CheckPS_L1_002(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:         "PS.L1-3.9.2",
+		Control:         "PS.L2-3.9.2",
 		Name:            "[CMMC L1] Ensure CUI Access Authorization",
 		Status:          "INFO",
 		Evidence:        "MANUAL: Document authorization process for CUI access",

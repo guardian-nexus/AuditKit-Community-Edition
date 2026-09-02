@@ -35,6 +35,18 @@ def problems():
     for prov in ("aws", "azure", "gcp"):
         for f in sorted(glob.glob(os.path.join(ROOT, "scanner", "pkg", prov, "checks", "*.go"))):
             text = open(f, encoding="utf-8", errors="ignore").read()
+            # The Control field is what a report displays, and it carried more
+            # invalid ids than the framework tags did.
+            for m in re.finditer(r'Control:\s*"([A-Z]{2}\.L[12]-3\.\d+\.\d+)"', text):
+                line = text[: m.start()].count("\n") + 1
+                e = m.group(1)
+                rel = os.path.relpath(f, ROOT)
+                num = PRACTICE.match(e).group(1)
+                if num not in CAN:
+                    found.append(f"{rel}:{line}: Control {e} is not in 800-171 Rev 2")
+                elif CAN[num] != e:
+                    found.append(f"{rel}:{line}: Control {e} should be {CAN[num]}")
+
             for m in re.finditer(r'(?:"CMMC"|FrameworkCMMC)\s*:\s*"([^"]+)"', text):
                 line = text[: m.start()].count("\n") + 1
                 for e in m.group(1).split(","):

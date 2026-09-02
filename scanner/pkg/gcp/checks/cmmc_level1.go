@@ -326,7 +326,7 @@ func (c *GCPCMMCLevel1Checks) CheckPE_L1_001_006(ctx context.Context) []CheckRes
 func (c *GCPCMMCLevel1Checks) CheckPS_L1_001_002(ctx context.Context) []CheckResult {
 	return []CheckResult{
 		{
-			Control:         "PS.L1-3.9.1",
+			Control:         "PS.L2-3.9.1",
 			Name:            "[CMMC L1] Screen Personnel",
 			Status:          "INFO",
 			Evidence:        "MANUAL: Document personnel screening procedures for CUI access",
@@ -338,7 +338,7 @@ func (c *GCPCMMCLevel1Checks) CheckPS_L1_001_002(ctx context.Context) []CheckRes
 			Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.1", "NIST 800-171": "3.9.1"},
 		},
 		{
-			Control:         "PS.L1-3.9.2",
+			Control:         "PS.L2-3.9.2",
 			Name:            "[CMMC L1] Ensure CUI Access Authorization",
 			Status:          "INFO",
 			Evidence:        "MANUAL: Document authorization process for CUI access",
