@@ -80,11 +80,11 @@ assessed.
 
 | Framework | AWS | Azure | GCP | Unit |
 |-----------|-----|-------|-----|------|
-| **NIST 800-53 Rev 5** | 77 | 82 | 82 | controls (144 across all providers) |
-| **ISO 27001:2022** | 46 | 46 | 46 | controls |
-| **NIST CSF 2.0** | 75 | 82 | 83 | subcategories |
+| **NIST 800-53 Rev 5** | 86 | 82 | 82 | controls (94 across all providers) |
+| **ISO 27001:2022** | 48 | 46 | 46 | controls |
+| **NIST CSF 2.0** | 86 | 82 | 83 | subcategories |
 | **HIPAA Security Rule** | 17 | 17 | 17 | safeguards |
-| **GDPR** | 13 | 14 | 14 | articles |
+| **GDPR** | 14 | 14 | 14 | articles |
 
 FedRAMP Low, Moderate and High are filtered views of the NIST 800-53 coverage
 above rather than separate control sets.
