@@ -14,7 +14,7 @@ What AuditKit scans in Amazon Web Services.
 - PCI-DSS v4.0.1 (69 requirements)
 - CMMC Level 1 (17 practices) and Level 2 (110 practices - Pro)
 - NIST 800-53 Rev 5 (144 controls, derived via crosswalk)
-- HIPAA (experimental - ~10 controls)
+- HIPAA (17 safeguards, derived via crosswalk)
 
 ---
 

@@ -10,7 +10,7 @@ Payment Card Industry Data Security Standard guide.
 
 **Who needs it:** Merchants, service providers, payment processors, anyone handling credit/debit card data
 **Status in AuditKit:** Production
-**Coverage:** All 12 requirements (60+ controls across AWS, Azure, GCP)
+**Coverage:** 69 requirements across all 12 groups (AWS 59, Azure 59, GCP 49)
 **What's covered:** Technical controls for network security, encryption, access control, monitoring, testing, and policy
 
 ---

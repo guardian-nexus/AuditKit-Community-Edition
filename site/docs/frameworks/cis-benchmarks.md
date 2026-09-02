@@ -40,7 +40,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
   - CIS-5.8: VPC peering routing least access (NEW)
   - CIS-5.20: VPC endpoints for S3 (NEW)
 - **Sections 6-18:** Service-specific controls across EC2, RDS, Lambda, and more
-- **Total Coverage:** 126+ controls (up from 58)
+- **Total Coverage:** AWS 125, Azure 108, GCP 26 benchmark controls
 
 ---
 

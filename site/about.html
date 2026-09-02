@@ -85,7 +85,7 @@
                 </div>
                 <div class="card text-center">
                     <h4>Providers</h4>
-                    <p class="mb-0 text-muted">AWS (90+ checks), Azure (64+), GCP (170+), Microsoft 365 (29+ via ScubaGear)</p>
+                    <p class="mb-0 text-muted">AWS (229 controls), Azure (178), GCP (135), Microsoft 365 (29+ via ScubaGear)</p>
                 </div>
                 <div class="card text-center">
                     <h4>Output Formats</h4>
@@ -103,7 +103,7 @@
                 AuditKit uses read-only API calls to inspect your cloud configuration. It never modifies your infrastructure. The scanner runs locally on your machine, connects to your cloud provider using your existing credentials, evaluates each compliance control, and generates a report.
             </p>
             <p>
-                Each scan result maps to one or more compliance framework controls. A single check -- like verifying S3 bucket encryption -- simultaneously satisfies SOC2 CC6.3, PCI-DSS 3.4, HIPAA 164.312(a)(2)(iv), and CMMC SC.L2-3.13.11. This cross-framework mapping eliminates duplicate work when you need multiple certifications.
+                Each scan result maps to one or more compliance framework controls. A single check -- like verifying S3 bucket encryption -- simultaneously satisfies SOC2 CC6.3, PCI-DSS 3.5.1, HIPAA 164.312(a)(2)(iv), and CMMC SC.L2-3.13.11. This cross-framework mapping eliminates duplicate work when you need multiple certifications.
             </p>
             <p>
                 All scanning happens locally. No data leaves your machine. No cloud account, no SaaS dashboard, no telemetry. The tool is a single Go binary that runs wherever you have credentials.

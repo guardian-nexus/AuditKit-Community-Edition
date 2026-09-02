@@ -129,7 +129,7 @@ Checks connectivity status of all Arc-enabled servers:
 - **PASS** - Agent connected and reporting
 - **FAIL** - Agent disconnected or expired
 
-**Frameworks:** PCI 10.1, SOC2 CC7.1, ISO 27001 A.12.4, CMMC AU.L2-3.3.1
+**Frameworks:** PCI 10.2.1, SOC2 CC7.1, ISO 27001 A.12.4, CMMC AU.L2-3.3.1
 
 ### 2. Defender for Cloud Assessments
 
@@ -137,13 +137,13 @@ Pulls security recommendations from Microsoft Defender:
 
 | Assessment Type | Framework Mapping |
 |-----------------|-------------------|
-| System updates missing | PCI 6.2, SOC2 CC7.1, CMMC SI.L2-3.14.1 |
-| Endpoint protection issues | PCI 5.1, SOC2 CC6.8, CMMC SI.L2-3.14.2 |
-| Disk encryption | PCI 3.4, SOC2 CC6.1, CMMC SC.L2-3.13.11 |
-| Vulnerability findings | PCI 11.2, SOC2 CC7.1, CMMC RA.L2-3.11.2 |
-| Network/firewall issues | PCI 1.3, SOC2 CC6.6, CMMC SC.L2-3.13.1 |
-| Access control issues | PCI 8.2, SOC2 CC6.1, CMMC AC.L2-3.1.1 |
-| Logging/monitoring gaps | PCI 10.2, SOC2 CC7.2, CMMC AU.L2-3.3.1 |
+| System updates missing | PCI 6.3.3, SOC2 CC7.1, CMMC SI.L2-3.14.1 |
+| Endpoint protection issues | PCI 5.2.1, SOC2 CC6.8, CMMC SI.L2-3.14.2 |
+| Disk encryption | PCI 3.5.1, SOC2 CC6.1, CMMC SC.L2-3.13.11 |
+| Vulnerability findings | PCI 11.3.1, SOC2 CC7.1, CMMC RA.L2-3.11.2 |
+| Network/firewall issues | PCI 1.4.4, SOC2 CC6.6, CMMC SC.L2-3.13.1 |
+| Access control issues | PCI 8.3.1, SOC2 CC6.1, CMMC AC.L2-3.1.1 |
+| Logging/monitoring gaps | PCI 10.2.1, SOC2 CC7.2, CMMC AU.L2-3.3.1 |
 
 ### 3. Guest Configuration Compliance
 

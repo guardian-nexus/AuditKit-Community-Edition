@@ -71,9 +71,9 @@ Compare to traditional costs:
 - M365 (Microsoft 365) via ScubaGear integration
 
 **Coverage:**
-- AWS: 64+ SOC2 controls, 30+ PCI-DSS, 17 CMMC L1, 110 CMMC L2 (Pro)
-- Azure: 64+ SOC2 controls, 30+ PCI-DSS, 17 CMMC L1, 110 CMMC L2 (Pro)
-- GCP: 170+ core checks (Free), +32 advanced checks (Pro)
+- AWS: 229 controls - 38 SOC2 criteria, 59 PCI-DSS requirements, 17 CMMC L1 practices; CMMC L2 is Pro
+- Azure: 178 controls - 37 SOC2 criteria, 59 PCI-DSS requirements, 17 CMMC L1 practices; CMMC L2 is Pro
+- GCP: 135 controls - 32 SOC2 criteria, 49 PCI-DSS requirements; GKE and Vertex AI (32 checks) are Pro
 - M365: 29+ Entra ID rules via ScubaGear
 
 ### Which GCP services are scanned?
@@ -102,7 +102,10 @@ Compare to traditional costs:
 | CMMC Level 1 | Production | 17 practices |
 | CMMC Level 2 | Pro only | 110 practices |
 | NIST 800-53 Rev 5 | Production | 144 technical controls |
-| HIPAA | Experimental | ~15 controls |
+| ISO 27001:2022 | Production | 46 controls, derived via crosswalk |
+| NIST CSF 2.0 | Production | 83 subcategories, derived via crosswalk |
+| GDPR | Production | 14 articles, derived via crosswalk |
+| HIPAA | Production | 17 safeguards, derived via crosswalk |
 
 **[Framework details →](./frameworks/)**
 
