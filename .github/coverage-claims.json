@@ -340,6 +340,21 @@
       "file": "site/docs/frameworks/README.md",
       "metric": "cmmc_l1.total",
       "pattern": "\\*\\*\\[CMMC Level 1\\]\\(\\./cmmc\\.md\\)\\*\\* \\| Production \\| (\\d+) of 17 practices"
+    },
+    {
+      "file": "README.md",
+      "metric": "nist80053.total",
+      "pattern": "\\| \\*\\*NIST 800-53 derived\\*\\* \\| (\\d+) controls"
+    },
+    {
+      "file": "README.md",
+      "metric": "gdpr.aws",
+      "pattern": "\\| \\*\\*GDPR / NIST CSF derived\\*\\* \\| (\\d+) articles"
+    },
+    {
+      "file": "README.md",
+      "metric": "nistcsf.aws",
+      "pattern": "\\| \\*\\*GDPR / NIST CSF derived\\*\\* \\| \\d+ articles, (\\d+) subcategories"
     }
   ]
 }

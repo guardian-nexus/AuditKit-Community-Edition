@@ -117,7 +117,9 @@ Level 2, estate-wide scanning, or a desktop interface.
 | **CMMC Level 1** | Yes | Yes |
 | **CMMC Level 2** | - | 110 practices (CUI handling) |
 | **CIS Benchmarks** | AWS, Azure and GCP | Same |
-| **Derived frameworks** | 800-53, ISO 27001, HIPAA, GDPR, NIST CSF, FedRAMP | Same |
+| **Derived frameworks** | 800-53, ISO 27001, HIPAA, GDPR, NIST CSF, FedRAMP | Same six, from a larger control set |
+| **NIST 800-53 derived** | 96 controls | 133 controls |
+| **GDPR / NIST CSF derived** | 14 articles, 87 subcategories (AWS) | 15 articles, 92 subcategories (AWS) |
 | **Reports** | PDF, HTML, CSV, JSON | Same |
 | **Evidence lifecycle** | Yes | Yes, plus a packaged audit deliverable |
 | **GKE and Vertex AI** | - | 32 checks |
