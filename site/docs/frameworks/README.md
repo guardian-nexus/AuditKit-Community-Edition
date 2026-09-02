@@ -12,10 +12,12 @@ AuditKit supports multiple compliance frameworks for automated technical control
 | **[PCI-DSS v4.0.1](./pci-dss.md)** | Production | 69 requirements across all 12 groups | AWS, Azure, GCP |
 | **[CMMC Level 1](./cmmc.md)** | Production | 17 practices | AWS, Azure, GCP |
 | **[CMMC Level 2](./cmmc.md)** | Pro Only | 110 practices | AWS, Azure, GCP |
-| **[CIS Benchmarks](./cis-benchmarks.md)** | Production | AWS: 126+, Azure: ~40+, GCP: 61 | AWS, Azure, GCP |
+| **[CIS Benchmarks](./cis-benchmarks.md)** | Production | AWS: 125, Azure: 108, GCP: 26 | AWS, Azure, GCP |
 | **[NIST 800-53 Rev 5](./nist-800-53.md)** | Production | 144 technical controls (covers FedRAMP) | AWS, Azure, GCP |
-| **[ISO 27001:2022](./iso27001.md)** | Production | ~60 technical controls | AWS, Azure, GCP |
-| **[HIPAA Security Rule](./hipaa.md)** | Production | Technical Safeguards (40-70 mappings) | AWS, Azure, GCP |
+| **[ISO 27001:2022](./iso27001.md)** | Production | 46 controls, derived | AWS, Azure, GCP |
+| **[NIST CSF 2.0](./nist-csf.md)** | Production | 83 subcategories, derived | AWS, Azure, GCP |
+| **[GDPR](./gdpr.md)** | Production | 14 articles, derived | AWS, Azure, GCP |
+| **[HIPAA Security Rule](./hipaa.md)** | Production | 17 safeguards, derived | AWS, Azure, GCP |
 
 ---
 
@@ -105,7 +107,7 @@ Requires AuditKit subscription:
 
 **Current Coverage:**
 - AWS: ~58 automated controls (Production)
-- Azure: ~40+ automated controls (Production)
+- Azure: 108 automated controls (Production)
 - GCP: ~30+ automated controls (Production)
 
 **[Learn more →](./cis-benchmarks.md)**

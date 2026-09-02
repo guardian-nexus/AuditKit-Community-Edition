@@ -20,7 +20,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 
 ### AWS Foundations Benchmark
 **Status:**  Production (v0.7.0) - **ENHANCED COVERAGE**
-**Controls:** 126+ unique controls implemented
+**Controls:** 125 unique AWS controls implemented
 **Command:** `./auditkit scan -provider aws -framework cis-aws`
 
 **What's Covered:**
@@ -46,7 +46,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 
 ### Azure Foundations Benchmark
 **Status:** Production (v0.7.0)
-**Automated Controls:** ~40+ checks (CIS Microsoft Azure Foundations Benchmark v3.0)
+**Automated Controls:** 108 checks (CIS Microsoft Azure Foundations Benchmark v3.0)
 **Command:** `./auditkit scan -provider azure -framework cis-azure`
 
 **Current Coverage:**
@@ -296,7 +296,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
 **A:** No, AuditKit complements them. We focus on compliance frameworks and provide auditor-friendly reports. For comprehensive AWS-specific security scanning, use both AuditKit (for compliance reporting) and Prowler (for deep AWS security checks).
 
 ### Q: Which CIS version should I use - v1.4 or v3.0?
-**A:** AuditKit combines both! v3.0 is newer and consolidated, but v1.4 has some additional checks that are still valuable. Our implementation gives you the best of both versions (126+ unique controls).
+**A:** AuditKit combines both! v3.0 is newer and consolidated, but v1.4 has some additional checks that are still valuable. Our implementation gives you the best of both versions (125 unique controls).
 
 ### Q: Can I export results to my SIEM or ticketing system?
 **A:** Yes! Use JSON output:

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compliance Frameworks - AuditKit</title>
+    <title>NIST CSF 2.0 - AuditKit</title>
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,56 +32,19 @@
 
     <section class="page-header">
         <div class="container">
-            <h1>Compliance Frameworks</h1>
-            <p class="subtitle">What AuditKit assesses, and how much of each</p>
+            <h1>NIST CSF 2.0</h1>
+            <p class="subtitle">Framework guide for AuditKit</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <h2>Assessed directly</h2>
-            <p>These are checked against your cloud configuration. Counts are
-            distinct criteria, requirements or practices per provider.</p>
-            <div style="overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr><th>Framework</th><th>AWS</th><th>Azure</th><th>GCP</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td><a href="/docs/frameworks/soc2.html">SOC 2 Type II</a></td><td>38 of 38</td><td>37 of 38</td><td>32 of 38</td></tr>
-                    <tr><td><a href="/docs/frameworks/pci-dss.html">PCI DSS v4.0.1</a></td><td>59</td><td>59</td><td>49</td></tr>
-                    <tr><td><a href="/docs/frameworks/cmmc.html">CMMC Level 1</a></td><td>17 of 17</td><td>17 of 17</td><td>11 of 17</td></tr>
-                    <tr><td><a href="/docs/frameworks/cis-benchmarks.html">CIS Benchmarks</a></td><td>125</td><td>108</td><td>26</td></tr>
-                </tbody>
-            </table>
-            </div>
-            <p>CMMC Level 2 (110 practices) is available in AuditKit Pro.</p>
-
-            <h2>Derived through the crosswalk</h2>
-            <p>These are not separate checks. Each is derived from the frameworks
-            above through NIST 800-53, so coverage follows from what the scanner
-            already assessed.</p>
-            <div style="overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr><th>Framework</th><th>AWS</th><th>Azure</th><th>GCP</th><th>Unit</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td><a href="/docs/frameworks/nist-800-53.html">NIST 800-53 Rev 5</a></td><td>77</td><td>82</td><td>82</td><td>controls (144 across all providers)</td></tr>
-                    <tr><td><a href="/docs/frameworks/iso27001.html">ISO 27001:2022</a></td><td>46</td><td>46</td><td>46</td><td>controls</td></tr>
-                    <tr><td><a href="/docs/frameworks/nist-csf.html">NIST CSF 2.0</a></td><td>75</td><td>82</td><td>83</td><td>subcategories</td></tr>
-                    <tr><td><a href="/docs/frameworks/hipaa.html">HIPAA Security Rule</a></td><td>17</td><td>17</td><td>17</td><td>safeguards</td></tr>
-                    <tr><td><a href="/docs/frameworks/gdpr.html">GDPR</a></td><td>13</td><td>14</td><td>14</td><td>articles</td></tr>
-                    <tr><td><a href="/docs/frameworks/fedramp.html">FedRAMP</a></td><td colspan="3">Low, Moderate and High baselines</td><td>filtered views of NIST 800-53</td></tr>
-                </tbody>
-            </table>
-            </div>
-
             <div class="callout">
-                <p><strong>Compliance versus hardening:</strong> the first table is
-                what an auditor asks for. CIS Benchmarks are security hardening,
-                which improves your posture but is not itself a certification.</p>
+                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/frameworks/nist-csf.md">View full NIST CSF 2.0 documentation on GitHub &rarr;</a></p>
             </div>
+            <p class="text-center text-lg" style="margin-top: 2rem;">
+                Detailed framework documentation is available on GitHub.
+            </p>
         </div>
     </section>
 
