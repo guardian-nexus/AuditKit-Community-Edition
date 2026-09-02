@@ -4,7 +4,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v0.8.4-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
+[![Version](https://img.shields.io/badge/version-v0.8.5-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://guardiannexus.substack.com)
 
 **Need CMMC Level 2, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
@@ -134,7 +134,26 @@ Everything in the Community column runs from this repository with no licence key
 
 ---
 
-## Recent Changes (v0.8.4)
+## Recent Changes (v0.8.5)
+
+**September 2026**
+
+Hotfix for v0.8.4 - the v0.8.4 binaries were built before the CMMC corrections below
+
+Fixes:
+- CMMC practice ids now match NIST SP 800-171 Rev 2; ten were claiming Level 1 for Level 2 controls
+- CMMC Level 1 coverage reads 13 of 17 practices, not 17 - the mislabelling had been inflating it
+- Crosswalk keys canonicalised, including four under `RE.L2-3.13.x` where RE is not a family
+- NIST 800-53 total corrected from 144 to 96; the old figure counted controls no check can reach
+- Site claimed AWS 90+ checks, Azure 64+, GCP 170+ against 229, 178 and 135
+- Sample report and Azure Arc page still cited PCI DSS v3.2.1 requirement numbers
+
+Added:
+- GDPR and NIST CSF 2.0 documentation pages; both returned results in v0.8.4 with nothing written about them
+- `check-cmmc.py` rejects non-conforming practice ids in CI
+- `coverage-counts.py` derives every documented count from the code and fails CI on drift
+
+### Previous: v0.8.4
 
 **September 2026**
 
@@ -393,20 +412,33 @@ prowler aws --output-formats json -o prowler-output     # Run Prowler first
 
 ---
 
-## What's New in v0.8.4
+## What's New in v0.8.5
+
+Hotfix for v0.8.4. The v0.8.4 binaries predate these corrections.
 
 ### Fixes
+- CMMC practice ids match NIST SP 800-171 Rev 2; Level 1 coverage is 13 of 17, not 17
+- NIST 800-53 total corrected from 144 to 96
+- Coverage counts across the site corrected against the code, and now enforced in CI
+
+### Added
+- GDPR and NIST CSF 2.0 documentation
+- CI guards for practice ids and documented coverage
+
+### Previous: v0.8.4
+
+#### Fixes
 - Absent and unreadable resources no longer count as passing controls - expect a lower, more accurate score
 - PCI requirements now resolve to NIST 800-53 (69 of 69, was 19 of 97), so ISO 27001, GDPR, NIST CSF and FedRAMP output is populated
 - `evidence import` works for the first time
 - Security service mappings corrected to what each service actually evidences
 
-### Added
+#### Added
 - SOC2 Availability and Confidentiality criteria on AWS, Azure and GCP
 - PCI DSS v4.0.1 requirements mandatory since 31 March 2025
 - Evidence lifecycle with staleness tracking
 
-### Previous: v0.8.3
+#### Previous: v0.8.3
 
 #### Fixes
 - Compliance score now matches between CLI output and PDF/HTML reports

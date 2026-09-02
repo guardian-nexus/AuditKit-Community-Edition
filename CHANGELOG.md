@@ -2,6 +2,38 @@
 
 All notable changes to AuditKit will be documented in this file.
 
+## [v0.8.5] - 2026-09-02
+
+Hotfix for v0.8.4. The v0.8.4 binaries were built before these corrections, so
+they report CMMC practice identifiers that do not match the standard.
+
+### Fixed
+- **CMMC practice identifiers now match NIST SP 800-171 Rev 2.** Ten claimed
+  Level 1 for controls that are Level 2, which made the scanner appear to cover
+  all 17 Level 1 practices. It covers 13.
+- Crosswalk keys canonicalised: six carried the wrong level or family, four of
+  them under `RE.L2-3.13.x`, and RE is not a family. One key was not in 800-171.
+  Merging the resulting duplicates is why NIST 800-53 coverage moved 94 to 96.
+- NIST 800-53 total corrected from 144 to 96. The old figure counted every
+  control named anywhere in the crosswalk, including entries no check can reach.
+- Coverage claims across the site corrected: AWS 90+ checks, Azure 64+ and GCP
+  170+ against 229, 178 and 135; CIS 126+/~40+/61 against 125/108/26; HIPAA
+  described as experimental against 17 derived safeguards.
+- The published sample report and the Azure Arc page cited PCI DSS v3.2.1
+  requirement numbers that v0.8.4 renumbered.
+- The homepage banner claimed all new DoW contracts require CMMC compliance.
+  Phase 1 requires self-assessment; Phase 2 was suspended on 13 July 2026.
+
+### Added
+- GDPR and NIST CSF 2.0 documentation. Both frameworks began returning results
+  in v0.8.4 and neither was documented.
+- A frameworks index at `/docs/frameworks/`, and navigation that leads with it
+  rather than with CMMC alone.
+- `.github/scripts/check-cmmc.py` rejects non-conforming practice identifiers in
+  CI, in both the `Control` field and the framework tags.
+- `.github/scripts/coverage-counts.py` derives every documented count from the
+  code and fails CI when a documented claim disagrees.
+
 ## [v0.8.4] - 2026-09-01
 
 ### Changed

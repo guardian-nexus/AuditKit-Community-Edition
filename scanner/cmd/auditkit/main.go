@@ -25,7 +25,7 @@ import (
 	"github.com/guardian-nexus/auditkit/scanner/pkg/updater"
 )
 
-var CurrentVersion = "v0.8.4"
+var CurrentVersion = "v0.8.5"
 
 type ComplianceResult struct {
 	Timestamp       time.Time       `json:"timestamp"`

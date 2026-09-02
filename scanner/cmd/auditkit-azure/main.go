@@ -13,7 +13,7 @@ import (
 	"github.com/guardian-nexus/auditkit/scanner/pkg/providers/azure"
 )
 
-var CurrentVersion = "v0.8.4"
+var CurrentVersion = "v0.8.5"
 
 func main() {
 	var (
