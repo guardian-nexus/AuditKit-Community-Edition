@@ -24,22 +24,15 @@ git clone https://github.com/guardian-nexus/AuditKit-Community-Edition
 cd AuditKit-Community-Edition/scanner
 go build ./cmd/auditkit
 
-# Scan AWS
+# Scan - swap aws for azure or gcp (and cis-aws for cis-azure or cis-gcp)
 ./auditkit scan -provider aws -framework soc2          # SOC2 compliance
 ./auditkit scan -provider aws -framework cis-aws       # CIS security hardening
 
-# Scan Azure
-./auditkit scan -provider azure -framework soc2        # SOC2 compliance
-./auditkit scan -provider azure -framework cis-azure   # CIS security hardening
-
-# Scan GCP
-./auditkit scan -provider gcp -framework soc2          # SOC2 compliance
-./auditkit scan -provider gcp -framework cis-gcp       # CIS security hardening
-
 # Generate reports (PDF, HTML, CSV, JSON)
 ./auditkit scan -provider aws -framework soc2 -format pdf -output aws-soc2.pdf
-./auditkit scan -provider gcp -framework pci -format html -output gcp-pci.html
 ```
+
+More in [Example Commands](#example-commands).
 
 **Setup:** [AWS](./site/docs/setup/aws.md) • [Azure](./site/docs/setup/azure.md) • [GCP](./site/docs/setup/gcp.md) • [M365](./site/docs/setup/m365.md)
 
@@ -233,27 +226,11 @@ Fixes:
 
 Scores may read higher than v0.8.2 on scans with manual controls. Pass/fail results are unchanged.
 
-### Previous: v0.8.2 (February 2026)
+### Earlier releases
 
-Fixes:
-- Removed stubbed `report` command from CLI (use `auditkit scan -format pdf` instead)
-- Fixed documentation for FedRAMP baseline filtering (was marked "coming soon" but fully works)
-- Updated HIPAA control count to ~15 (was understated)
-- Removed overclaimed features from website and docs
-
-### Previous: v0.8.1 (February 2026)
-
-New Features:
-- **Prowler Integration** - Import Prowler scan results and convert to AuditKit format with full framework mapping
-- **Azure Fix Scripts** - Generate remediation scripts for Azure (AWS and GCP already supported)
-- **Evidence Tracker HTML** - Interactive HTML checklist for evidence collection with progress tracking
-
-### Previous: v0.8.0 (January 2026)
-
-- **AWS Data Services** - Added SageMaker, Redshift, ElastiCache, OpenSearch checks
-- **Offline Mode** - Cache scan results for air-gapped environments
-- **GDPR/NIST CSF** - Added framework mappings via NIST 800-53 crosswalk
-- AWS service coverage increased to 90+ checks
+Full notes for every release, including v0.8.2 and earlier (January - February
+2026), are in the
+**[GitHub releases →](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)**
 
 ---
 
@@ -305,7 +282,7 @@ cp ~/Downloads/license.lic ~/.auditkit-pro/license.lic
 
 **For Startups:** Free SOC2 prep without $50K consultants  
 **For Security Teams:** CIS Benchmarks for proactive hardening  
-**For DoW Contractors:** all 110 CMMC Level 1 + 2 practices reported free, with Level 1 automated (13 of 17) and 8 Level 2 practices automated on GCP - [automated Level 2 across all providers in Pro](https://auditkit.io/)  
+**For DoW Contractors:** Full CMMC Level 1 + 2 scope reported free - [automated Level 2 across all providers in Pro](https://auditkit.io/)  
 **For Multi-Cloud:** Single tool for AWS + Azure + GCP, with M365 via ScubaGear import  
 **For DevOps:** JSON output for CI/CD integration
 
@@ -452,74 +429,6 @@ prowler aws --output-formats json -o prowler-output     # Run Prowler first
 - **[CLI Reference](./site/docs/cli-reference.md)** - All commands and flags
 - **[FAQ](./site/docs/faq.md)** - Common questions
 - **[Troubleshooting](./site/docs/faq.md#troubleshooting)** - Known issues and fixes
-
----
-
-## What's New in v0.8.7
-
-Version reporting fixes. No scanner, catalog or report changes.
-
-### Fixes
-- `auditkit update` no longer reports every install as v0.3.0
-- Version comparison is numeric, so v0.10.0 sorts above v0.9.0
-- All four binaries report the same version, and `make build` injects it
-
-## What's New in v0.8.6
-
-Coverage rebaseline and stability pass.
-
-### Changed
-- CMMC reports all 110 Level 1 + 2 practices; Level 1 is the automated set (13 of 17)
-- Framework control catalogs embedded and reported in full across all supported frameworks
-- Derived-framework scans run the complete check set
-
-### Refinements
-- CIS coverage rebaselined (AWS 158, Azure 108, GCP 71)
-- HIPAA catalog aligned to the published Security Rule
-- Control identifiers normalised across providers
-
-## What's New in v0.8.5
-
-Hotfix for v0.8.4. The v0.8.4 binaries predate these corrections.
-
-### Fixes
-- CMMC practice ids match NIST SP 800-171 Rev 2; Level 1 coverage is 13 of 17, not 17
-- NIST 800-53 total corrected from 144 to 96
-- Coverage counts across the site corrected against the code, and now enforced in CI
-
-### Added
-- GDPR and NIST CSF 2.0 documentation
-- CI guards for practice ids and documented coverage
-
-### Previous: v0.8.4
-
-#### Fixes
-- Absent and unreadable resources no longer count as passing controls - expect a lower, more accurate score
-- PCI requirements now resolve to NIST 800-53 (69 of 69, was 19 of 97), so ISO 27001, GDPR, NIST CSF and FedRAMP output is populated
-- `evidence import` works for the first time
-- Security service mappings corrected to what each service actually evidences
-
-#### Added
-- SOC2 Availability and Confidentiality criteria on AWS, Azure and GCP
-- PCI DSS v4.0.1 requirements mandatory since 31 March 2025
-- Evidence lifecycle with staleness tracking
-
-#### Previous: v0.8.3
-
-#### Fixes
-- Compliance score now matches between CLI output and PDF/HTML reports
-- Manual controls are no longer dropped from reports
-- Working download links for all platforms, including Linux ARM64
-- Correct version reported by provider-specific binaries
-
-#### Previous: v0.8.2
-
-- Removed broken `report` command stub (use `auditkit scan -format pdf`)
-- FedRAMP baseline filtering (`fedramp-low`, `fedramp-moderate`, `fedramp-high`) documented as working
-- Updated HIPAA control count to ~15 across AWS, Azure, and GCP
-- Cleaned up overclaimed features in docs and website
-
-**[Full Release Notes →](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest)**
 
 ---
 
