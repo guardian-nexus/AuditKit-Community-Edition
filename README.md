@@ -4,10 +4,12 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v0.8.6-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
+[![Version](https://img.shields.io/badge/version-v0.8.7-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://guardiannexus.substack.com)
 
-**New in v0.8.6:** CMMC Level 2 is now reported in the Community Edition - all 110 practices, with
+**New in v0.8.7:** `auditkit update` and the provider binaries now report the version they were actually built from.
+
+**CMMC Level 2 is reported in the Community Edition** - all 110 practices, with
 Level 1 automated (13 of 17 practices) and the remainder listed with evidence-collection guidance.
 
 **Need automated Level 2 checks, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
@@ -145,7 +147,18 @@ Everything in the Community column runs from this repository with no licence key
 
 ---
 
-## Recent Changes (v0.8.6)
+## Recent Changes (v0.8.7)
+
+**September 2026**
+
+Version reporting fixes. No scanner, catalog or report changes - coverage is identical to v0.8.6.
+
+Fixes:
+- `auditkit update` reported every install as v0.3.0; it now takes its version from the binary it is part of
+- Version comparison is numeric, so v0.10.0 is correctly newer than v0.9.0
+- The AWS, Azure and GCP binaries reported v0.8.5 while the universal one reported v0.8.6; all four now agree, and `make build` injects the version instead of leaving it unset
+
+### Previous: v0.8.6
 
 **September 2026**
 
@@ -441,6 +454,15 @@ prowler aws --output-formats json -o prowler-output     # Run Prowler first
 - **[Troubleshooting](./site/docs/faq.md#troubleshooting)** - Known issues and fixes
 
 ---
+
+## What's New in v0.8.7
+
+Version reporting fixes. No scanner, catalog or report changes.
+
+### Fixes
+- `auditkit update` no longer reports every install as v0.3.0
+- Version comparison is numeric, so v0.10.0 sorts above v0.9.0
+- All four binaries report the same version, and `make build` injects it
 
 ## What's New in v0.8.6
 
