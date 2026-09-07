@@ -62,7 +62,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 	detectors, err := c.guarddutyClient.ListDetectors(ctx, &guardduty.ListDetectorsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "[CIS-9.1]",
+			Control:           "CIS-9.1",
 			Name:              "GuardDuty Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -79,7 +79,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 
 	if len(detectors.DetectorIds) == 0 {
 		return CheckResult{
-			Control:           "[CIS-9.1]",
+			Control:           "CIS-9.1",
 			Name:              "GuardDuty Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -105,7 +105,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 
 	if detector.Status != "ENABLED" {
 		return CheckResult{
-			Control:           "[CIS-9.1]",
+			Control:           "CIS-9.1",
 			Name:              "GuardDuty Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -121,7 +121,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 	}
 
 	return CheckResult{
-		Control:    "[CIS-9.1]",
+		Control:    "CIS-9.1",
 		Name:       "GuardDuty Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("GuardDuty is enabled (Detector: %s) | Meets CIS 9.1", detectorId),
@@ -136,7 +136,7 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 	session, err := c.macieClient.GetMacieSession(ctx, &macie2.GetMacieSessionInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "[CIS-9.2]",
+			Control:           "CIS-9.2",
 			Name:              "Macie Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -153,7 +153,7 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 
 	if session.Status != "ENABLED" {
 		return CheckResult{
-			Control:           "[CIS-9.2]",
+			Control:           "CIS-9.2",
 			Name:              "Macie Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -169,7 +169,7 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 	}
 
 	return CheckResult{
-		Control:    "[CIS-9.2]",
+		Control:    "CIS-9.2",
 		Name:       "Macie Enabled",
 		Status:     "PASS",
 		Evidence:   "Amazon Macie is enabled for sensitive data discovery | Meets CIS 9.2",
@@ -184,7 +184,7 @@ func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (C
 	hub, err := c.securityHubClient.DescribeHub(ctx, &securityhub.DescribeHubInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "[CIS-9.3]",
+			Control:           "CIS-9.3",
 			Name:              "Security Hub Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -201,7 +201,7 @@ func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (C
 
 	if hub.HubArn == nil {
 		return CheckResult{
-			Control:           "[CIS-9.3]",
+			Control:           "CIS-9.3",
 			Name:              "Security Hub Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -217,7 +217,7 @@ func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (C
 	}
 
 	return CheckResult{
-		Control:    "[CIS-9.3]",
+		Control:    "CIS-9.3",
 		Name:       "Security Hub Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("AWS Security Hub is enabled | Meets CIS 9.3"),
@@ -232,7 +232,7 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 	status, err := c.inspectorClient.BatchGetAccountStatus(ctx, &inspector2.BatchGetAccountStatusInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "[CIS-9.4]",
+			Control:           "CIS-9.4",
 			Name:              "Inspector Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -249,7 +249,7 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 
 	if len(status.Accounts) == 0 {
 		return CheckResult{
-			Control:           "[CIS-9.4]",
+			Control:           "CIS-9.4",
 			Name:              "Inspector Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -267,7 +267,7 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 	account := status.Accounts[0]
 	if account.State.Status != "ENABLED" {
 		return CheckResult{
-			Control:           "[CIS-9.4]",
+			Control:           "CIS-9.4",
 			Name:              "Inspector Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -283,7 +283,7 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 	}
 
 	return CheckResult{
-		Control:    "[CIS-9.4]",
+		Control:    "CIS-9.4",
 		Name:       "Inspector Enabled",
 		Status:     "PASS",
 		Evidence:   "Amazon Inspector is enabled for vulnerability scanning | Meets CIS 9.4",

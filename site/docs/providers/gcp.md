@@ -6,13 +6,13 @@ What AuditKit scans in Google Cloud Platform.
 
 ## Overview
 
-**Community Edition:** 135 controls across 8 core services  
+**Community Edition:** 133 controls across 8 core services  
 **Pro version:** 210+ automated checks (178 core + 32 advanced)
 
 **Supported frameworks:**
 - SOC2 Type II
 - PCI-DSS v4.0.1
-- CMMC Level 1 and Level 2 (Pro)
+- CMMC Level 1 automated; all 110 Level 1 + 2 practices reported (Level 2 automated in Pro)
 - NIST 800-53 Rev 5
 - HIPAA (17 safeguards, derived via crosswalk)
 

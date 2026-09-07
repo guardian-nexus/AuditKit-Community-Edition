@@ -51,17 +51,11 @@ func (c *AzureCMMCLevel1Checks) Run(ctx context.Context) ([]CheckResult, error) 
 	// MEDIA PROTECTION - 1 INFO
 	results = append(results, c.CheckMP_L1_001(ctx))
 
-	// PHYSICAL PROTECTION - 6 INFO (Azure inherited)
+	// PHYSICAL PROTECTION - 4 INFO (Azure inherited)
 	results = append(results, c.CheckPE_L1_001(ctx))
-	results = append(results, c.CheckPE_L1_002(ctx))
 	results = append(results, c.CheckPE_L1_003(ctx))
 	results = append(results, c.CheckPE_L1_004(ctx))
 	results = append(results, c.CheckPE_L1_005(ctx))
-	results = append(results, c.CheckPE_L1_006(ctx))
-
-	// PERSONNEL SECURITY - 2 INFO (organizational controls)
-	results = append(results, c.CheckPS_L1_001(ctx))
-	results = append(results, c.CheckPS_L1_002(ctx))
 
 	// SYSTEM AND COMMUNICATIONS PROTECTION - 1 automated, 1 INFO
 	results = append(results, c.CheckSC_L1_001(ctx))
@@ -310,21 +304,6 @@ func (c *AzureCMMCLevel1Checks) CheckPE_L1_001(ctx context.Context) CheckResult 
 	}
 }
 
-func (c *AzureCMMCLevel1Checks) CheckPE_L1_002(ctx context.Context) CheckResult {
-	return CheckResult{
-		Control:         "PE.L2-3.10.2",
-		Name:            "[CMMC L1] Protect Physical Facility",
-		Status:          "INFO",
-		Evidence:        "Azure inherited: Microsoft data centers have physical protection",
-		Remediation:     "Review Azure compliance documentation",
-		Priority:        PriorityMedium,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "Azure Trust Center → Screenshot physical protection controls",
-		ConsoleURL:      "https://servicetrust.microsoft.com/",
-		Frameworks:      map[string]string{"CMMC": "PE.L2-3.10.2", "NIST 800-171": "3.10.2"},
-	}
-}
-
 func (c *AzureCMMCLevel1Checks) CheckPE_L1_003(ctx context.Context) CheckResult {
 	return CheckResult{
 		Control:         "PE.L1-3.10.3",
@@ -370,51 +349,7 @@ func (c *AzureCMMCLevel1Checks) CheckPE_L1_005(ctx context.Context) CheckResult 
 	}
 }
 
-func (c *AzureCMMCLevel1Checks) CheckPE_L1_006(ctx context.Context) CheckResult {
-	return CheckResult{
-		Control:         "PE.L2-3.10.6",
-		Name:            "[CMMC L1] Safeguard CUI",
-		Status:          "INFO",
-		Evidence:        "Azure inherited: Microsoft enforces physical safeguards",
-		Remediation:     "Review Azure compliance certifications",
-		Priority:        PriorityMedium,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "Azure Trust Center → Screenshot safeguarding controls",
-		ConsoleURL:      "https://servicetrust.microsoft.com/",
-		Frameworks:      map[string]string{"CMMC": "PE.L2-3.10.6", "NIST 800-171": "3.10.6"},
-	}
-}
-
 // PS.L1 - Personnel Security (organizational controls)
-func (c *AzureCMMCLevel1Checks) CheckPS_L1_001(ctx context.Context) CheckResult {
-	return CheckResult{
-		Control:         "PS.L2-3.9.1",
-		Name:            "[CMMC L1] Screen Personnel",
-		Status:          "INFO",
-		Evidence:        "MANUAL: Document personnel screening procedures for CUI access",
-		Remediation:     "Implement background checks for personnel with CUI access",
-		Priority:        PriorityHigh,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "HR Documentation → Screenshot showing personnel screening procedures and background check records",
-		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Overview",
-		Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.1", "NIST 800-171": "3.9.1"},
-	}
-}
-
-func (c *AzureCMMCLevel1Checks) CheckPS_L1_002(ctx context.Context) CheckResult {
-	return CheckResult{
-		Control:         "PS.L2-3.9.2",
-		Name:            "[CMMC L1] Ensure CUI Access Authorization",
-		Status:          "INFO",
-		Evidence:        "MANUAL: Document authorization process for CUI access",
-		Remediation:     "Implement formal authorization process before granting CUI access",
-		Priority:        PriorityHigh,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "Documentation → Screenshot showing CUI access authorization procedures and approval records",
-		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Overview",
-		Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.2", "NIST 800-171": "3.9.2"},
-	}
-}
 
 // SC.L1-3.13.1 - AUTOMATED (NSG check)
 func (c *AzureCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult {

@@ -98,7 +98,7 @@ AuditKit automates checks for these practices:
 
 ### What AuditKit Checks (Level 1)
 
-**Automated (8 practices):**
+**Queried automatically from your cloud configuration (5 of the 17):**
 - IAM password policy configuration
 - MFA enforcement
 - Access key rotation
@@ -259,7 +259,8 @@ Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14
 
 ### What AuditKit Checks (Level 2)
 
-**Automated (33 practices):**
+**Queried automatically from your cloud configuration (42 of the 110); the remaining 68 are
+assessed as structured evidence guidance, telling you what an assessor needs to see:**
 All technical controls across:
 - IAM and authentication
 - Network security
@@ -283,7 +284,7 @@ Organizational controls:
 - Risk assessments
 - Security assessments
 
-### Running Level 2 Scan (Pro Only)
+### Running a Level 2 Scan
 
 ```bash
 # Scan for CMMC Level 2 (requires Pro license)

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -25,7 +26,7 @@ import (
 	"github.com/guardian-nexus/auditkit/scanner/pkg/updater"
 )
 
-var CurrentVersion = "v0.8.5"
+var CurrentVersion = "v0.8.6"
 
 type ComplianceResult struct {
 	Timestamp       time.Time       `json:"timestamp"`
@@ -99,7 +100,7 @@ func main() {
 	case "scan":
 		runScan(*provider, *profile, *framework, *format, *output, *verbose, *full, *services, *offlineMode, *cacheFile)
 	case "integrate":
-		runIntegration(*source, *file, *format, *output, *verbose)
+		runIntegration(*source, *file, *format, *output, *framework, *verbose)
 	case "evidence":
 		if len(os.Args) > 2 {
 			switch os.Args[2] {
@@ -165,7 +166,7 @@ Options:
 Frameworks:
   soc2      SOC2 Type II Common Criteria (full coverage)
   pci       PCI-DSS v4.0.1 (full coverage)
-  cmmc      CMMC Level 1 (17 practices)
+  cmmc      CMMC Level 1 + 2 (all 110 practices reported; Level 1 automated)
   hipaa     HIPAA Security Rule (experimental)
   gdpr      GDPR Technical Controls (Articles 5, 25, 32, etc.)
   nist-csf  NIST Cybersecurity Framework 2.0 (ID, PR, DE, RS, RC)
@@ -209,7 +210,7 @@ Examples:
 For more information: https://github.com/guardian-nexus/auditkit`)
 }
 
-func runIntegration(source, file, format, output string, verbose bool) {
+func runIntegration(source, file, format, output, framework string, verbose bool) {
 	if source == "" || file == "" {
 		fmt.Fprintf(os.Stderr, "Error: Both -source and -file are required for integration\n")
 		fmt.Fprintf(os.Stderr, "Example: auditkit integrate -source scubagear -file ScubaResults.json\n")
@@ -257,11 +258,11 @@ func runIntegration(source, file, format, output string, verbose bool) {
 			fmt.Fprintf(os.Stderr, "Found %d M365 findings\n", len(results))
 		}
 
-		integrationResult := convertIntegrationResults(results, "M365")
+		integrationResult := convertIntegrationResults(results, "M365", framework)
 
 		switch format {
 		case "text":
-			printIntegrationSummary(integrationResult)
+			printIntegrationSummary(integrationResult, source)
 		case "json":
 			data, _ := json.MarshalIndent(integrationResult, "", "  ")
 			if output != "" {
@@ -302,9 +303,9 @@ func runIntegration(source, file, format, output string, verbose bool) {
 			fmt.Fprintf(os.Stderr, "Error: -file flag required for Prowler integration\n")
 			fmt.Fprintf(os.Stderr, "Usage: auditkit integrate -source prowler -file prowler-output.json\n")
 			fmt.Fprintf(os.Stderr, "\nGenerate Prowler output with:\n")
-			fmt.Fprintf(os.Stderr, "  prowler aws --output-formats json -o prowler-output\n")
-			fmt.Fprintf(os.Stderr, "  prowler azure --output-formats json -o prowler-output\n")
-			fmt.Fprintf(os.Stderr, "  prowler gcp --output-formats json -o prowler-output\n")
+			fmt.Fprintf(os.Stderr, "  prowler aws --output-formats json-ocsf -o prowler-output\n")
+			fmt.Fprintf(os.Stderr, "  prowler azure --output-formats json-ocsf -o prowler-output\n")
+			fmt.Fprintf(os.Stderr, "  prowler gcp --output-formats json-ocsf -o prowler-output\n")
 			os.Exit(1)
 		}
 
@@ -332,11 +333,11 @@ func runIntegration(source, file, format, output string, verbose bool) {
 			detectedProvider = "GCP"
 		}
 
-		integrationResult := convertIntegrationResults(results, detectedProvider)
+		integrationResult := convertIntegrationResults(results, detectedProvider, framework)
 
 		switch format {
 		case "text":
-			printIntegrationSummary(integrationResult)
+			printIntegrationSummary(integrationResult, source)
 		case "json":
 			data, _ := json.MarshalIndent(integrationResult, "", "  ")
 			if output != "" {
@@ -379,7 +380,7 @@ func runIntegration(source, file, format, output string, verbose bool) {
 	}
 }
 
-func convertIntegrationResults(results []integrations.IntegrationResult, provider string) ComplianceResult {
+func convertIntegrationResults(results []integrations.IntegrationResult, provider, framework string) ComplianceResult {
 	controls := []ControlResult{}
 	passed := 0
 	failed := 0
@@ -396,6 +397,15 @@ func convertIntegrationResults(results []integrations.IntegrationResult, provide
 			ScreenshotGuide: r.ScreenshotGuide,
 			ConsoleURL:      r.ConsoleURL,
 			Frameworks:      r.Frameworks,
+		}
+
+		// The framework flag labels the report, so it must also decide what the
+		// report covers. Without this an import scored every finding in the file
+		// while presenting itself as an assessment of one framework.
+		if fw := strings.ToLower(strings.TrimSpace(framework)); fw != "" && fw != "all" {
+			if !controlMatchesFramework(control, fw) {
+				continue
+			}
 		}
 
 		controls = append(controls, control)
@@ -416,14 +426,14 @@ func convertIntegrationResults(results []integrations.IntegrationResult, provide
 	return ComplianceResult{
 		Timestamp:       time.Now(),
 		Provider:        provider,
-		Framework:       "soc2",
-		AccountID:       "M365-tenant",
+		Framework:       integrationFramework(framework),
+		AccountID:       integrationAccountLabel(provider),
 		Score:           score,
 		TotalControls:   len(controls),
 		PassedControls:  passed,
 		FailedControls:  failed,
 		Controls:        controls,
-		Recommendations: generateIntegrationRecommendations(controls),
+		Recommendations: generateIntegrationRecommendations(controls, provider),
 	}
 }
 
@@ -438,7 +448,10 @@ func getSeverityFromStatus(status string) string {
 	}
 }
 
-func generateIntegrationRecommendations(controls []ControlResult) []string {
+// generateIntegrationRecommendations builds next steps for imported results.
+// The advice is provider-specific: an AWS Prowler import used to be told to
+// review Entra ID conditional access policies.
+func generateIntegrationRecommendations(controls []ControlResult, provider string) []string {
 	recs := []string{}
 	failedCount := 0
 
@@ -449,20 +462,30 @@ func generateIntegrationRecommendations(controls []ControlResult) []string {
 	}
 
 	if failedCount > 0 {
-		recs = append(recs, fmt.Sprintf("Fix %d failed M365 security controls", failedCount))
+		recs = append(recs, fmt.Sprintf("Fix %d failed %s security controls", failedCount, provider))
 	}
 
-	recs = append(recs, "Review Microsoft Entra ID conditional access policies")
-	recs = append(recs, "Ensure MFA is enforced for all users")
-	recs = append(recs, "Configure identity protection policies")
-	recs = append(recs, "Enable security defaults if not using conditional access")
+	switch strings.ToUpper(provider) {
+	case "M365":
+		recs = append(recs,
+			"Review Microsoft Entra ID conditional access policies",
+			"Ensure MFA is enforced for all users",
+			"Configure identity protection policies",
+			"Enable security defaults if not using conditional access")
+	default:
+		recs = append(recs,
+			fmt.Sprintf("Review %s identity and access policies for least privilege", provider),
+			"Ensure MFA is enforced for all human and privileged accounts",
+			"Confirm audit logging is enabled and centrally retained",
+			"Collect evidence for each failed control (use 'auditkit evidence')")
+	}
 
 	return recs
 }
 
-func printIntegrationSummary(result ComplianceResult) {
+func printIntegrationSummary(result ComplianceResult, source string) {
 	fmt.Printf("\n")
-	fmt.Printf("AuditKit M365 Integration Results\n")
+	fmt.Printf("AuditKit %s Integration Results\n", result.Provider)
 	fmt.Printf("===================================\n")
 	fmt.Printf("Provider: %s\n", result.Provider)
 	fmt.Printf("Scan Time: %s\n", result.Timestamp.Format("2006-01-02 15:04:05"))
@@ -480,11 +503,11 @@ func printIntegrationSummary(result ComplianceResult) {
 	fmt.Printf("\n")
 
 	if result.FailedControls > 0 {
-		fmt.Printf("\033[31mFailed M365 Controls:\033[0m\n")
+		fmt.Printf("\033[31mFailed %s Controls:\033[0m\n", result.Provider)
 		fmt.Printf("------------------------\n")
 		for _, control := range result.Controls {
 			if control.Status == "FAIL" {
-				fmt.Printf("\033[31m[FAIL]\033[0m %s - %s\n", control.ID, control.Name)
+				fmt.Printf("\033[31m[FAIL]\033[0m %s%s\n", control.ID, controlNameSuffix(control.ID, control.Name))
 				fmt.Printf("  Issue: %s\n", control.Evidence)
 				if control.Remediation != "" {
 					fmt.Printf("  Fix: %s\n", control.Remediation)
@@ -501,7 +524,7 @@ func printIntegrationSummary(result ComplianceResult) {
 	fmt.Printf("-------------------\n")
 	for _, control := range result.Controls {
 		if control.Status == "PASS" {
-			fmt.Printf("  - %s - %s\n", control.ID, control.Name)
+			fmt.Printf("  - %s%s\n", control.ID, controlNameSuffix(control.ID, control.Name))
 		}
 	}
 
@@ -514,7 +537,7 @@ func printIntegrationSummary(result ComplianceResult) {
 	}
 
 	fmt.Printf("\nFor detailed report:\n")
-	fmt.Printf("   auditkit integrate -source scubagear -file <file> -format pdf\n")
+	fmt.Printf("   auditkit integrate -source %s -file <file> -format pdf\n", source)
 	fmt.Printf("\n")
 }
 
@@ -546,6 +569,12 @@ func runOfflineScan(provider, profile, framework, format, output string, verbose
 
 		// Load latest cached scan
 		cachedScan, err = cache.LoadLatest(provider, accountID, framework)
+		if err != nil {
+			// The cache is keyed on the account id, which a caller holding only
+			// a profile name does not have. Fall back to the newest entry for
+			// this provider and framework.
+			cachedScan, err = cache.LoadLatestAny(provider, framework)
+		}
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "No cached scan found for %s/%s/%s\n", provider, accountID, framework)
 			fmt.Fprintf(os.Stderr, "\nTo create a cache, run a scan first:\n")
@@ -768,9 +797,9 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 
 	if !validFrameworks[strings.ToLower(framework)] {
 		fmt.Fprintf(os.Stderr, "Error: Invalid framework: %s\n", framework)
-		fmt.Fprintf(os.Stderr, "Valid options: soc2, pci, cmmc (Level 1), hipaa, gdpr, nist-csf, 800-53, fedramp-low, fedramp-moderate, fedramp-high, iso27001, cis, cis-aws, cis-azure, cis-gcp, all\n")
+		fmt.Fprintf(os.Stderr, "Valid options: soc2, pci, cmmc, hipaa, gdpr, nist-csf, 800-53, fedramp-low, fedramp-moderate, fedramp-high, iso27001, cis, cis-aws, cis-azure, cis-gcp, all\n")
 		fmt.Fprintf(os.Stderr, "\n")
-		fmt.Fprintf(os.Stderr, "CMMC Level 2 requires upgrade to Pro:\n")
+		fmt.Fprintf(os.Stderr, "Automated Level 2 practice checks and evidence packages are in Pro:\n")
 		fmt.Fprintf(os.Stderr, "  Visit: https://auditkit.io/pro\n")
 		fmt.Fprintf(os.Stderr, "  Email: sales@auditkit.io\n")
 		os.Exit(1)
@@ -796,9 +825,15 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 
 	automatedChecks := result.PassedControls + result.FailedControls
 	manualChecks := 0
+	erroredChecks := 0
 	for _, control := range result.Controls {
-		if control.Status == "MANUAL" || control.Status == "INFO" {
+		switch control.Status {
+		case "MANUAL", "INFO":
 			manualChecks++
+		case "ERROR":
+			// Could not run (usually a missing permission). Unscoreable, but it
+			// still has to appear in the totals or they will not reconcile.
+			erroredChecks++
 		}
 	}
 
@@ -806,14 +841,14 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 		fmt.Printf("\nCONGRATULATIONS! %.1f%% of automated checks passed!\n", result.Score)
 
 		if manualChecks > 0 {
-			fmt.Printf("\n⚠️  NOTE: %d additional manual controls require documentation.\n", manualChecks)
+			fmt.Printf("\nNOTE: %d additional manual controls require documentation.\n", manualChecks)
 			fmt.Printf("   Use 'auditkit evidence' to generate collection checklist.\n")
 		}
 	} else if result.Score >= 70 {
 		fmt.Printf("\nGetting there! %.1f%% of automated checks passed.\n", result.Score)
 
 		if manualChecks > 0 {
-			fmt.Printf("\n⚠️  NOTE: %d additional manual controls require documentation.\n", manualChecks)
+			fmt.Printf("\nNOTE: %d additional manual controls require documentation.\n", manualChecks)
 			fmt.Printf("   Use 'auditkit evidence' to generate collection checklist.\n")
 		}
 
@@ -823,11 +858,25 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 			result.Score, result.PassedControls, automatedChecks)
 
 		if manualChecks > 0 {
-			fmt.Printf("\n⚠️  IMPORTANT: Only %d of %d total controls are automated.\n",
-				automatedChecks, automatedChecks+manualChecks)
+			fmt.Printf("\nIMPORTANT: Only %d of %d total controls are automated.\n",
+				automatedChecks, automatedChecks+manualChecks+erroredChecks)
 			fmt.Printf("   %d controls require manual documentation and evidence.\n", manualChecks)
 			fmt.Printf("   Use 'auditkit evidence' to track what you need to collect.\n")
 		}
+	}
+
+	// A framework whose shipped catalog is smaller than the published standard
+	// must say so. Declaring it only in code let a PCI scan present 71 controls
+	// as though that were the whole standard.
+	if caveat, partial := mappings.PartialCatalogNote(framework); partial {
+		fmt.Printf("\nNOTE: coverage for this framework is incomplete - %s.\n", caveat)
+	}
+
+	if erroredChecks > 0 {
+		// Reported in every score band: these are excluded from the score, so
+		// staying silent about them would overstate coverage.
+		fmt.Printf("\n%d control(s) could not be checked and are excluded from the score.\n", erroredChecks)
+		fmt.Printf("   This usually means a missing IAM permission. Run with -verbose for detail.\n")
 	}
 
 	switch format {
@@ -1053,7 +1102,8 @@ func performScan(provider, profile, framework string, verbose bool, services str
 
 	if requestedUpper == "800-53" || requestedUpper == "NIST800-53" || strings.HasPrefix(requestedLower, "fedramp-") ||
 		requestedLower == "iso27001" || requestedLower == "iso-27001" ||
-		requestedLower == "gdpr" || requestedLower == "nist-csf" || requestedLower == "csf" {
+		requestedLower == "gdpr" || requestedLower == "nist-csf" || requestedLower == "csf" ||
+		requestedUpper == "HIPAA" {
 		crosswalk, crosswalkErr = mappings.GetCrosswalk()
 		if crosswalkErr != nil && verbose {
 			fmt.Fprintf(os.Stderr, "Warning: Could not load 800-53 crosswalk: %v\n", crosswalkErr)
@@ -1070,7 +1120,10 @@ func performScan(provider, profile, framework string, verbose bool, services str
 
 	// Stop spinner before processing results
 	if spinner != nil {
-		spinner.StopWithSuccess(fmt.Sprintf("Scanned %d controls", len(scanResults)))
+		// These are raw check results across every framework the provider ran.
+		// The summary below reports the distinct controls for the SELECTED
+		// framework, which is a smaller number - so call these checks, not controls.
+		spinner.StopWithSuccess(fmt.Sprintf("Ran %d checks", len(scanResults)))
 	}
 
 	// Nothing came back and the provider reported an error: the scan failed. A
@@ -1092,7 +1145,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 			priority, impact := getPriorityAndImpact(awsResult.Control, awsResult.Severity, awsResult.Status, framework)
 			control = ControlResult{
 				ID:                awsResult.Control,
-				Name:              getControlName(awsResult.Control),
+				Name:              controlDisplayName(awsResult.Name, awsResult.Control),
 				Category:          getControlCategory(awsResult.Control),
 				Severity:          awsResult.Severity,
 				Status:            awsResult.Status,
@@ -1110,7 +1163,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 			priority, impact := getPriorityAndImpact(azureResult.Control, azureResult.Severity, azureResult.Status, framework)
 			control = ControlResult{
 				ID:                azureResult.Control,
-				Name:              getControlName(azureResult.Control),
+				Name:              controlDisplayName(azureResult.Name, azureResult.Control),
 				Category:          getControlCategory(azureResult.Control),
 				Severity:          azureResult.Severity,
 				Status:            azureResult.Status,
@@ -1128,7 +1181,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 			priority, impact := getPriorityAndImpact(gcpResult.Control, gcpResult.Severity, gcpResult.Status, framework)
 			control = ControlResult{
 				ID:                gcpResult.Control,
-				Name:              getControlName(gcpResult.Control),
+				Name:              controlDisplayName(gcpResult.Name, gcpResult.Control),
 				Category:          getControlCategory(gcpResult.Control),
 				Severity:          gcpResult.Severity,
 				Status:            gcpResult.Status,
@@ -1143,6 +1196,10 @@ func performScan(provider, profile, framework string, verbose bool, services str
 			}
 		}
 		// Filter by framework if not "all"
+		// crosswalkIDs holds the atomic control IDs a crosswalk expanded into, so
+		// one source finding becomes one row per derived control instead of a
+		// single row whose ID is the string "AC-17, AC-6, AC-2, AC-3".
+		var crosswalkIDs []string
 		if framework != "all" {
 			hasRequestedFramework := false
 
@@ -1157,9 +1214,10 @@ func performScan(provider, profile, framework string, verbose bool, services str
 
 					// Replace control ID with 800-53 IDs
 					control.ID = nist80053IDs
+					crosswalkIDs = splitControlIDs(nist80053IDs)
 
 					// Update control name to show source
-					control.Name = fmt.Sprintf("%s (via %s)", control.Name, originalID)
+					control.Name = crosswalkName(control.Name, fmt.Sprintf("(via %s)", originalID))
 
 					// Add to frameworks map
 					if control.Frameworks == nil {
@@ -1169,7 +1227,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 					control.Frameworks["Source"] = originalID
 
 					if verbose {
-						fmt.Fprintf(os.Stderr, "✓ Mapped %s → %s\n", originalID, nist80053IDs)
+						fmt.Fprintf(os.Stderr, "Mapped %s -> %s\n", originalID, nist80053IDs)
 					}
 				}
 			} else if strings.HasPrefix(requestedLower, "fedramp-") && crosswalk != nil && fedRAMPBaselines != nil {
@@ -1177,27 +1235,27 @@ func performScan(provider, profile, framework string, verbose bool, services str
 				nist80053IDs := crosswalk.Get800_53String(control.Frameworks, control.ID)
 
 				if nist80053IDs != "" {
-					// Check if any of the 800-53 controls are in the requested FedRAMP baseline
-					controlList := strings.Split(nist80053IDs, ", ")
-					inBaseline := false
-
-					for _, ctrl := range controlList {
+					// Keep only the controls actually in the requested baseline.
+					// Expanding to every mapped control let controls outside the
+					// baseline score against it.
+					baselineControls := []string{}
+					for _, ctrl := range splitControlIDs(nist80053IDs) {
 						if fedRAMPBaselines.IsInFedRAMPBaseline(ctrl, requestedLower) {
-							inBaseline = true
-							break
+							baselineControls = append(baselineControls, ctrl)
 						}
 					}
 
-					if inBaseline {
+					if len(baselineControls) > 0 {
 						hasRequestedFramework = true
 						originalID := control.ID
 
-						// Replace control ID with 800-53 IDs
+						nist80053IDs = strings.Join(baselineControls, ", ")
 						control.ID = nist80053IDs
+						crosswalkIDs = baselineControls
 
 						// Update control name to show source and baseline
 						baselineName := strings.ToUpper(strings.Replace(requestedLower, "fedramp-", "FedRAMP ", 1))
-						control.Name = fmt.Sprintf("%s (via %s, %s)", control.Name, originalID, baselineName)
+						control.Name = crosswalkName(control.Name, fmt.Sprintf("(via %s, %s)", originalID, baselineName))
 
 						// Add to frameworks map
 						if control.Frameworks == nil {
@@ -1208,34 +1266,57 @@ func performScan(provider, profile, framework string, verbose bool, services str
 						control.Frameworks["Source"] = originalID
 
 						if verbose {
-							fmt.Fprintf(os.Stderr, "✓ Mapped %s → %s (%s)\n", originalID, nist80053IDs, baselineName)
+							fmt.Fprintf(os.Stderr, "Mapped %s -> %s (%s)\n", originalID, nist80053IDs, baselineName)
 						}
 					}
 				}
-			} else if (requestedLower == "iso27001" || requestedLower == "iso-27001") && crosswalk != nil {
-				// Special handling for ISO 27001
-				nist80053IDs := crosswalk.Get800_53String(control.Frameworks, control.ID)
+			} else if requestedUpper == "HIPAA" && crosswalk != nil {
+				// Report the Security Rule citation rather than the check's own id,
+				// so results line up with the HIPAA catalog.
+				hipaaIDs := crosswalk.GetHIPAAString(control.Frameworks, control.ID)
+				if existing, ok := control.Frameworks["HIPAA"]; ok && existing != "" {
+					hipaaIDs = existing
+				}
 
-				if nist80053IDs != "" {
+				if hipaaIDs != "" {
 					hasRequestedFramework = true
 					originalID := control.ID
 
-					// Replace control ID with 800-53 IDs
-					control.ID = nist80053IDs
+					control.ID = hipaaIDs
+					crosswalkIDs = splitControlIDs(hipaaIDs)
+					control.Name = crosswalkName(control.Name, fmt.Sprintf("(via %s, HIPAA)", originalID))
+
+					if control.Frameworks == nil {
+						control.Frameworks = make(map[string]string)
+					}
+					control.Frameworks["HIPAA"] = hipaaIDs
+					control.Frameworks["Source"] = originalID
+				}
+			} else if (requestedLower == "iso27001" || requestedLower == "iso-27001") && crosswalk != nil {
+				// An ISO 27001 scan must report Annex A control identifiers. It used
+				// to report the 800-53 ids the crosswalk passes through, so no result
+				// could be matched against the ISO catalog.
+				isoIDs := crosswalk.GetISO27001String(control.Frameworks, control.ID)
+
+				if isoIDs != "" {
+					hasRequestedFramework = true
+					originalID := control.ID
+
+					control.ID = isoIDs
+					crosswalkIDs = splitControlIDs(isoIDs)
 
 					// Update control name to show source and ISO 27001
-					control.Name = fmt.Sprintf("%s (via %s, ISO 27001)", control.Name, originalID)
+					control.Name = crosswalkName(control.Name, fmt.Sprintf("(via %s, ISO 27001)", originalID))
 
 					// Add to frameworks map
 					if control.Frameworks == nil {
 						control.Frameworks = make(map[string]string)
 					}
-					control.Frameworks["NIST800-53"] = nist80053IDs
-					control.Frameworks["ISO27001"] = "ISO 27001:2022"
+					control.Frameworks["ISO27001"] = isoIDs
 					control.Frameworks["Source"] = originalID
 
 					if verbose {
-						fmt.Fprintf(os.Stderr, "✓ Mapped %s → %s (ISO 27001)\n", originalID, nist80053IDs)
+						fmt.Fprintf(os.Stderr, "Mapped %s -> %s (ISO 27001)\n", originalID, isoIDs)
 					}
 				}
 			} else if requestedLower == "gdpr" && crosswalk != nil {
@@ -1247,7 +1328,8 @@ func performScan(provider, profile, framework string, verbose bool, services str
 					hasRequestedFramework = true
 					originalID := control.ID
 					control.ID = articles
-					control.Name = fmt.Sprintf("%s (via %s, GDPR)", control.Name, originalID)
+					crosswalkIDs = splitControlIDs(articles)
+					control.Name = crosswalkName(control.Name, fmt.Sprintf("(via %s, GDPR)", originalID))
 
 					if control.Frameworks == nil {
 						control.Frameworks = make(map[string]string)
@@ -1266,7 +1348,8 @@ func performScan(provider, profile, framework string, verbose bool, services str
 					hasRequestedFramework = true
 					originalID := control.ID
 					control.ID = subcategories
-					control.Name = fmt.Sprintf("%s (via %s, NIST CSF 2.0)", control.Name, originalID)
+					crosswalkIDs = splitControlIDs(subcategories)
+					control.Name = crosswalkName(control.Name, fmt.Sprintf("(via %s, NIST CSF 2.0)", originalID))
 
 					if control.Frameworks == nil {
 						control.Frameworks = make(map[string]string)
@@ -1278,15 +1361,67 @@ func performScan(provider, profile, framework string, verbose bool, services str
 						fmt.Fprintf(os.Stderr, "Mapped %s -> %s (NIST CSF 2.0)\n", originalID, subcategories)
 					}
 				}
+			} else if requestedUpper == "PCI" || requestedUpper == "PCI-DSS" {
+				// A PCI scan must report PCI-DSS requirement numbers. Checks record
+				// the requirement they satisfy in their Frameworks map but kept
+				// their own identifier in Control, so about half of all PCI findings
+				// arrived as SOC2 or CIS ids while the requirement they satisfy was
+				// filled in as unassessed.
+				if ids := nativeFrameworkIDs(frameworkTagValue(control.Frameworks, "PCI-DSS", "PCI"), "PCI-"); len(ids) > 0 {
+					hasRequestedFramework = true
+					originalID := control.ID
+					control.ID = strings.Join(ids, ", ")
+					crosswalkIDs = ids
+					if control.ID != originalID {
+						control.Name = crosswalkName(control.Name, fmt.Sprintf("(via %s, PCI-DSS)", originalID))
+					}
+					if control.Frameworks == nil {
+						control.Frameworks = make(map[string]string)
+					}
+					control.Frameworks["PCI-DSS"] = control.ID
+					control.Frameworks["Source"] = originalID
+				}
+			} else if requestedUpper == "SOC2" {
+				// Same for SOC2: report the Trust Services criterion the check is
+				// tagged with rather than the CIS recommendation it was written as.
+				if ids := nativeFrameworkIDs(frameworkTagValue(control.Frameworks, "SOC2"), ""); len(ids) > 0 {
+					hasRequestedFramework = true
+					originalID := control.ID
+					control.ID = strings.Join(ids, ", ")
+					crosswalkIDs = ids
+					if control.ID != originalID {
+						control.Name = crosswalkName(control.Name, fmt.Sprintf("(via %s, SOC2)", originalID))
+					}
+					if control.Frameworks == nil {
+						control.Frameworks = make(map[string]string)
+					}
+					control.Frameworks["SOC2"] = control.ID
+					control.Frameworks["Source"] = originalID
+				}
 			} else if strings.HasPrefix(framework, "cis") {
 				// CIS works via Frameworks map - check for CIS-AWS, CIS-Azure, CIS-GCP
 				if control.Frameworks != nil {
-					for fw := range control.Frameworks {
+					for fw, value := range control.Frameworks {
 						fwUpper := strings.ToUpper(fw)
-						if strings.HasPrefix(fwUpper, "CIS") {
-							hasRequestedFramework = true
-							break
+						if !strings.HasPrefix(fwUpper, "CIS") {
+							continue
 						}
+						hasRequestedFramework = true
+						// Report the CIS recommendation number as the control ID. It
+						// used to be the display string "[CIS AWS 1.5, 1.6] Root
+						// Account MFA", which is prose, not an identifier, so a
+						// reader could not filter or count by CIS control.
+						if ids := splitControlIDs(value); len(ids) > 0 {
+							if control.Name == "" {
+								control.Name = control.ID
+							}
+							for i := range ids {
+								ids[i] = fwUpper + "-" + ids[i]
+							}
+							control.ID = strings.Join(ids, ", ")
+							crosswalkIDs = ids
+						}
+						break
 					}
 				}
 			} else if control.Frameworks != nil && len(control.Frameworks) > 0 {
@@ -1307,22 +1442,107 @@ func performScan(provider, profile, framework string, verbose bool, services str
 				}
 			}
 
+			// A check that carries no framework tag is still part of a framework if
+			// its own identifier is in that framework's catalog. Without this,
+			// results whose Frameworks map was never populated were dropped from
+			// every framework-filtered scan.
+			if !hasRequestedFramework {
+				if catalog := mappings.CatalogFor(framework); catalog != nil {
+					if _, ok := catalog[mappings.NormalizeControlID(framework, control.ID)]; ok {
+						hasRequestedFramework = true
+					}
+				}
+			}
+
 			if !hasRequestedFramework {
 				continue
 			}
 		}
 
-		controls = append(controls, control)
-
-		if control.Status == "PASS" {
-			passed++
-		} else if control.Status == "FAIL" {
-			failed++
-			if control.Severity == "CRITICAL" {
-				critical++
-			} else if control.Severity == "HIGH" {
-				high++
+		expanded := []ControlResult{control}
+		if len(crosswalkIDs) > 1 {
+			expanded = expanded[:0]
+			for _, atomicID := range crosswalkIDs {
+				derived := control
+				derived.ID = atomicID
+				expanded = append(expanded, derived)
 			}
+		}
+
+		for _, derived := range expanded {
+			controls = append(controls, derived)
+
+			if derived.Status == "PASS" {
+				passed++
+			} else if derived.Status == "FAIL" {
+				failed++
+				if derived.Severity == "CRITICAL" {
+					critical++
+				} else if derived.Severity == "HIGH" {
+					high++
+				}
+			}
+		}
+	}
+
+	// One row per control before counting. Crosswalk expansion produces several
+	// rows per control, which skewed the score toward checks with a wide mapping.
+	if derivedFrameworks[strings.ToLower(framework)] {
+		controls = rollUpDerivedControls(controls)
+		passed, failed, critical, high = 0, 0, 0, 0
+		for _, control := range controls {
+			if control.Status == "PASS" {
+				passed++
+			} else if control.Status == "FAIL" {
+				failed++
+				if control.Severity == "CRITICAL" {
+					critical++
+				} else if control.Severity == "HIGH" {
+					high++
+				}
+			}
+		}
+	}
+
+	// Report on every control the framework defines. Anything the scan could not
+	// evaluate is emitted as MANUAL rather than omitted, so the control count is
+	// the framework's real denominator instead of "whatever we happened to check".
+	if framework != "all" {
+		reported := make([]string, 0, len(controls))
+		for _, control := range controls {
+			reported = append(reported, control.ID)
+			// A check often reports under its own id while carrying the framework's
+			// id in its tags (a CIS-numbered check tagged SOC2 CC6.1). Without the
+			// tag the control was counted as unevaluated and re-emitted as MANUAL
+			// next to the very result that covers it.
+			for _, key := range []string{framework, strings.ToUpper(framework)} {
+				if value, ok := control.Frameworks[key]; ok && value != "" {
+					reported = append(reported, splitControlIDs(value)...)
+				}
+			}
+		}
+		missing := mappings.MissingControls(framework, reported)
+		missingIDs := make([]string, 0, len(missing))
+		for id := range missing {
+			missingIDs = append(missingIDs, id)
+		}
+		// Map iteration order is randomised, which made two identical scans emit
+		// rows (and evidence folders) in a different order every run.
+		sort.Strings(missingIDs)
+		for _, id := range missingIDs {
+			title := missing[id]
+			controls = append(controls, ControlResult{
+				ID:              id,
+				Name:            title,
+				Category:        "Manual Documentation",
+				Severity:        "MEDIUM",
+				Status:          "MANUAL",
+				Evidence:        "MANUAL: No automated check covers this control. Document how it is satisfied and retain the evidence.",
+				Remediation:     "Collect the policy, procedure or configuration evidence that demonstrates this control, and store it with the audit package.",
+				Priority:        "MEDIUM",
+				ScreenshotGuide: "Capture the document or console view that demonstrates this control is implemented.",
+				Frameworks:      map[string]string{strings.ToUpper(framework): id},
+			})
 		}
 	}
 
@@ -1675,7 +1895,7 @@ func runEvidenceTracker(provider, profile, output string) {
 		for _, result := range scanResults {
 			controls = append(controls, tracker.ControlResult{
 				Control: result.Control,
-				Name:    getControlName(result.Control),
+				Name:    controlDisplayName(result.Name, result.Control),
 				Status:  result.Status,
 			})
 		}
@@ -1699,7 +1919,7 @@ func runEvidenceTracker(provider, profile, output string) {
 		for _, result := range scanResults {
 			controls = append(controls, tracker.ControlResult{
 				Control: result.Control,
-				Name:    getControlName(result.Control),
+				Name:    controlDisplayName(result.Name, result.Control),
 				Status:  result.Status,
 			})
 		}
@@ -1727,7 +1947,7 @@ func runEvidenceTracker(provider, profile, output string) {
 			gcpResult := result
 			controls = append(controls, tracker.ControlResult{
 				Control: gcpResult.Control,
-				Name:    getControlName(gcpResult.Control),
+				Name:    controlDisplayName(gcpResult.Name, gcpResult.Control),
 				Status:  gcpResult.Status,
 			})
 		}
@@ -1891,7 +2111,7 @@ func printTextSummary(result ComplianceResult, full bool) {
 					break
 				}
 
-				fmt.Printf("\n%s %s%s%s - %s\n", cli.Fail(), cli.Bold, control.ID, cli.Reset, control.Name)
+				fmt.Printf("\n%s %s%s%s%s\n", cli.Fail(), cli.Bold, control.ID, cli.Reset, controlNameSuffix(control.ID, control.Name))
 				fmt.Printf("  %sIssue:%s %s\n", cli.Dim, cli.Reset, control.Evidence)
 
 				if control.Remediation != "" {
@@ -1928,8 +2148,8 @@ func printTextSummary(result ComplianceResult, full bool) {
 					break
 				}
 
-				fmt.Printf("\n%s%s[FAIL]%s %s%s%s - %s\n",
-					cli.Yellow, cli.Bold, cli.Reset, cli.Bold, control.ID, cli.Reset, control.Name)
+				fmt.Printf("\n%s%s[FAIL]%s %s%s%s%s\n",
+					cli.Yellow, cli.Bold, cli.Reset, cli.Bold, control.ID, cli.Reset, controlNameSuffix(control.ID, control.Name))
 				fmt.Printf("  %sIssue:%s %s\n", cli.Dim, cli.Reset, control.Evidence)
 
 				if control.Remediation != "" {
@@ -1973,7 +2193,7 @@ func printTextSummary(result ComplianceResult, full bool) {
 					break
 				}
 
-				fmt.Printf("%s %s - %s\n", cli.Fail(), control.ID, control.Name)
+				fmt.Printf("%s %s%s\n", cli.Fail(), control.ID, controlNameSuffix(control.ID, control.Name))
 				fmt.Printf("  %sIssue:%s %s\n", cli.Dim, cli.Reset, control.Evidence)
 				if control.Remediation != "" {
 					fmt.Printf("  %sFix:%s %s\n", cli.Green, cli.Reset, control.Remediation)
@@ -2008,7 +2228,7 @@ func printTextSummary(result ComplianceResult, full bool) {
 					break
 				}
 
-				fmt.Printf("%s %s - %s\n", cli.Info(), control.ID, control.Name)
+				fmt.Printf("%s %s%s\n", cli.Info(), control.ID, controlNameSuffix(control.ID, control.Name))
 				fmt.Printf("  %sGuidance:%s %s\n", cli.Dim, cli.Reset, control.Evidence)
 				if control.ScreenshotGuide != "" {
 					fmt.Printf("  %sEvidence:%s %s\n", cli.Cyan, cli.Reset, control.ScreenshotGuide)
@@ -2019,12 +2239,37 @@ func printTextSummary(result ComplianceResult, full bool) {
 		}
 	}
 
+	// Controls that could not be evaluated. These are excluded from the score,
+	// but hiding them entirely would misrepresent coverage.
+	hasErrored := false
+	erroredShown := 0
+	for _, control := range result.Controls {
+		if control.Status != "ERROR" {
+			continue
+		}
+		if !hasErrored {
+			cli.SubHeader("Unable To Check")
+			hasErrored = true
+		}
+		if !full && erroredShown >= 10 {
+			fmt.Printf("  %s... and more controls could not be checked (use --full to see all)%s\n\n", cli.Dim, cli.Reset)
+			break
+		}
+		erroredShown++
+		fmt.Printf("%s %s%s\n", cli.Warn(), control.ID, controlNameSuffix(control.ID, control.Name))
+		fmt.Printf("  %sReason:%s %s\n", cli.Dim, cli.Reset, control.Evidence)
+		if control.Remediation != "" {
+			fmt.Printf("  %sFix:%s %s\n", cli.Green, cli.Reset, control.Remediation)
+		}
+		fmt.Println()
+	}
+
 	// Passed controls section
 	cli.SubHeader("Passed Controls")
 	passCount := 0
 	for _, control := range result.Controls {
 		if control.Status == "PASS" {
-			fmt.Printf("  %s %s - %s\n", cli.Pass(), control.ID, control.Name)
+			fmt.Printf("  %s %s%s\n", cli.Pass(), control.ID, controlNameSuffix(control.ID, control.Name))
 			passCount++
 			if !full && passCount >= 15 {
 				remaining := result.PassedControls - 15
@@ -2300,7 +2545,7 @@ func outputTextToFile(result ComplianceResult, output string) {
 	sb.WriteString("----------------\n")
 	for _, control := range result.Controls {
 		if control.Status == "FAIL" {
-			sb.WriteString(fmt.Sprintf("\n%s [%s] %s - %s\n", control.Priority, control.Severity, control.ID, control.Name))
+			sb.WriteString(fmt.Sprintf("\n%s [%s] %s%s\n", control.Priority, control.Severity, control.ID, controlNameSuffix(control.ID, control.Name)))
 			sb.WriteString(fmt.Sprintf("  Issue: %s\n", control.Evidence))
 			sb.WriteString(fmt.Sprintf("  Impact: %s\n", control.Impact))
 			if control.Remediation != "" {
@@ -3003,4 +3248,158 @@ func truncate(s string, n int) string {
 		return s[:n]
 	}
 	return s[:n-3] + "..."
+}
+
+// controlNameSuffix renders " - Name" for display, or "" when a control has no
+// distinct human-readable name. getControlName deliberately returns "" for
+// controls it has no mapping for, so formatting "%s - %s" unconditionally left a
+// dangling "ID - " on every unnamed control.
+func controlNameSuffix(id, name string) string {
+	if name == "" || name == id {
+		return ""
+	}
+	return " - " + name
+}
+
+// integrationAccountLabel names the scanned tenant/account for imported results.
+func integrationAccountLabel(provider string) string {
+	if strings.EqualFold(provider, "M365") {
+		return "M365-tenant"
+	}
+	return fmt.Sprintf("%s-account", strings.ToUpper(provider))
+}
+
+// crosswalkName appends the "(via SOURCE)" provenance a derived framework adds.
+// getControlName returns "" for controls outside its lookup table - which is the
+// normal case for crosswalk-derived frameworks - so concatenating unconditionally
+// produced names like " (via CC6.1)" that rendered as "CC6.1 -  (via CC6.1)".
+func crosswalkName(name, provenance string) string {
+	if name == "" {
+		return provenance
+	}
+	return name + " " + provenance
+}
+
+// integrationFramework picks the framework label for imported results. Imports
+// were previously always labelled "soc2", so a Prowler CIS import produced a
+// report titled as a SOC2 assessment.
+func integrationFramework(framework string) string {
+	framework = strings.ToLower(strings.TrimSpace(framework))
+	if framework == "" || framework == "all" {
+		return "all"
+	}
+	return framework
+}
+
+// frameworkTagValue returns the first non-empty value stored under any of the
+// given framework keys, matched case-insensitively.
+func frameworkTagValue(frameworks map[string]string, keys ...string) string {
+	for _, key := range keys {
+		for fw, value := range frameworks {
+			if strings.EqualFold(fw, key) && strings.TrimSpace(value) != "" {
+				return strings.TrimSpace(value)
+			}
+		}
+	}
+	return ""
+}
+
+// nativeFrameworkIDs turns a check's framework tag into the identifiers that
+// framework's catalog is keyed by, adding the catalog's prefix when the tag
+// carries a bare requirement number.
+func nativeFrameworkIDs(value, prefix string) []string {
+	ids := splitControlIDs(value)
+	for i, id := range ids {
+		id = strings.TrimSpace(strings.Trim(id, "[]"))
+		if prefix != "" && !strings.HasPrefix(strings.ToUpper(id), strings.ToUpper(prefix)) {
+			id = prefix + id
+		}
+		ids[i] = id
+	}
+	return ids
+}
+
+// splitControlIDs turns a crosswalk's comma-joined control list into atomic IDs.
+// The crosswalk returns strings like "AC-17, AC-6, AC-2, AC-3"; emitting that as
+// a single control ID meant an auditor filtering for AC-2 found nothing and the
+// framework's control count was meaningless.
+func splitControlIDs(joined string) []string {
+	parts := strings.Split(joined, ",")
+	ids := make([]string, 0, len(parts))
+	seen := make(map[string]bool, len(parts))
+
+	for _, part := range parts {
+		id := strings.TrimSpace(part)
+		if id == "" || seen[id] {
+			continue
+		}
+		seen[id] = true
+		ids = append(ids, id)
+	}
+
+	return ids
+}
+
+// derivedFrameworks are reported through the 800-53 crosswalk, where one check
+// fans out to several controls and several checks land on the same control.
+var derivedFrameworks = map[string]bool{
+	"800-53": true, "nist800-53": true, "nist-800-53": true,
+	"fedramp-low": true, "fedramp-moderate": true, "fedramp-high": true,
+	"iso27001": true, "iso-27001": true,
+	"nist-csf": true, "csf": true, "gdpr": true, "hipaa": true,
+}
+
+// rollUpDerivedControls removes the duplication crosswalk expansion creates
+// without discarding evidence. One check fans out to several controls and
+// several checks land on the same control, so the same (control, status) pair
+// arrived many times and weighted the score by how widely a check happened to
+// map. Collapsing instead to a single row per control was worse: with enough
+// fan-out every control caught at least one failing check, so every derived
+// framework scored zero regardless of the account.
+func rollUpDerivedControls(controls []ControlResult) []ControlResult {
+	seen := make(map[string]bool, len(controls))
+	rolled := make([]ControlResult, 0, len(controls))
+
+	for _, control := range controls {
+		key := control.ID + "\x00" + control.Status
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		rolled = append(rolled, control)
+	}
+
+	return rolled
+}
+
+// controlMatchesFramework reports whether an imported finding belongs to the
+// requested framework, by tag or by the framework's own catalog.
+func controlMatchesFramework(control ControlResult, framework string) bool {
+	for key, value := range control.Frameworks {
+		k := strings.ToUpper(key)
+		if k == strings.ToUpper(framework) ||
+			(framework == "pci" && k == "PCI-DSS") ||
+			(framework == "pci-dss" && k == "PCI") ||
+			strings.HasPrefix(k, strings.ToUpper(framework)) {
+			if value != "" {
+				return true
+			}
+		}
+	}
+	if catalog := mappings.CatalogFor(framework); catalog != nil {
+		if _, ok := catalog[mappings.NormalizeControlID(framework, control.ID)]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+// controlDisplayName prefers the name the check gave the finding. The scan
+// result used to drop it, so every control outside getControlName's lookup
+// table rendered with no name at all.
+func controlDisplayName(name, controlID string) string {
+	if strings.TrimSpace(name) != "" {
+		return name
+	}
+	return getControlName(controlID)
 }

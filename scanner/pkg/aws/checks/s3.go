@@ -8,14 +8,20 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3control"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
 type S3Checks struct {
 	client *s3.Client
+	// Account-level Block Public Access lives on the s3control API, not s3, and
+	// is keyed by account ID - hence the extra clients.
+	s3controlClient *s3control.Client
+	stsClient       *sts.Client
 }
 
-func NewS3Checks(client *s3.Client) *S3Checks {
-	return &S3Checks{client: client}
+func NewS3Checks(client *s3.Client, s3controlClient *s3control.Client, stsClient *sts.Client) *S3Checks {
+	return &S3Checks{client: client, s3controlClient: s3controlClient, stsClient: stsClient}
 }
 
 func (c *S3Checks) Name() string {
@@ -361,7 +367,7 @@ func (c *S3Checks) CheckMFADelete(ctx context.Context) (CheckResult, error) {
 
 	if len(bucketsWithoutMFADelete) > 0 {
 		return CheckResult{
-			Control:           "[CIS-2.1.2]",
+			Control:           "CIS-2.1.2",
 			Name:              "S3 MFA Delete",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -377,7 +383,7 @@ func (c *S3Checks) CheckMFADelete(ctx context.Context) (CheckResult, error) {
 	}
 
 	return CheckResult{
-		Control:    "[CIS-2.1.2]",
+		Control:    "CIS-2.1.2",
 		Name:       "S3 MFA Delete",
 		Status:     "PASS",
 		Evidence:   "All S3 buckets have MFA Delete enabled",
@@ -409,7 +415,7 @@ func (c *S3Checks) CheckServerAccessLogging(ctx context.Context) (CheckResult, e
 	if len(bucketsWithoutLogging) > 0 {
 		firstBucket := bucketsWithoutLogging[0]
 		return CheckResult{
-			Control:           "[CIS-2.1.4]",
+			Control:           "CIS-2.1.4",
 			Name:              "S3 Server Access Logging",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -425,7 +431,7 @@ func (c *S3Checks) CheckServerAccessLogging(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "[CIS-2.1.4]",
+		Control:    "CIS-2.1.4",
 		Name:       "S3 Server Access Logging",
 		Status:     "PASS",
 		Evidence:   "All S3 buckets have server access logging enabled",
@@ -438,7 +444,7 @@ func (c *S3Checks) CheckServerAccessLogging(ctx context.Context) (CheckResult, e
 // CIS 2.1.6 - Ensure S3 bucket has Object Lock enabled (for compliance)
 func (c *S3Checks) CheckObjectLock(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control:           "[CIS-2.1.6]",
+		Control:           "CIS-2.1.6",
 		Name:              "S3 Object Lock",
 		Status:            "INFO",
 		Evidence:          "MANUAL CHECK: Verify S3 Object Lock is enabled for buckets storing compliance data",
@@ -455,7 +461,9 @@ func (c *S3Checks) CheckObjectLock(ctx context.Context) (CheckResult, error) {
 // S3 Lifecycle Policies (informational)
 func (c *S3Checks) CheckS3LifecyclePolicy(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control:           "INFO",
+		// This field held the status string, so the control surfaced with the
+		// literal id "INFO". Its own framework tags identify it as SOC2 A1.2.
+		Control:           "A1.2",
 		Name:              "S3 Lifecycle Policies",
 		Status:            "INFO",
 		Evidence:          "MANUAL CHECK: Verify S3 buckets have appropriate lifecycle policies for data retention",
@@ -471,13 +479,26 @@ func (c *S3Checks) CheckS3LifecyclePolicy(ctx context.Context) (CheckResult, err
 
 // CheckAccountPublicAccessBlock verifies S3 Block Public Access is enabled at account level (CIS 2.1.7)
 func (c *S3Checks) CheckAccountPublicAccessBlock(ctx context.Context) (CheckResult, error) {
-	// Get account-level public access block configuration
-	config, err := c.client.GetPublicAccessBlock(ctx, &s3.GetPublicAccessBlockInput{})
+	// Account-level Block Public Access is an s3control API keyed by account ID.
+	// This previously called the bucket-level s3 API with an empty input, which
+	// always failed request validation and reported the control as failed.
+	if c.s3controlClient == nil || c.stsClient == nil {
+		return unavailableAccountPABResult("s3control/sts client not configured"), nil
+	}
+
+	identity, err := c.stsClient.GetCallerIdentity(ctx, &sts.GetCallerIdentityInput{})
+	if err != nil {
+		return unavailableAccountPABResult(fmt.Sprintf("unable to resolve account ID: %v", err)), nil
+	}
+
+	config, err := c.s3controlClient.GetPublicAccessBlock(ctx, &s3control.GetPublicAccessBlockInput{
+		AccountId: identity.Account,
+	})
 	if err != nil {
 		// If error is "NoSuchPublicAccessBlockConfiguration", it means it's not configured
 		if strings.Contains(err.Error(), "NoSuchPublicAccessBlockConfiguration") {
 			return CheckResult{
-				Control:     "[CIS-2.1.7]",
+				Control:     "CIS-2.1.7",
 				Name:        "S3 Account Public Access Block",
 				Status:      "FAIL",
 				Severity:    "CRITICAL",
@@ -498,15 +519,12 @@ aws s3control put-public-access-block \
 			}, nil
 		}
 
-		return CheckResult{
-			Control:    "[CIS-2.1.7]",
-			Name:       "S3 Account Public Access Block",
-			Status:     "FAIL",
-			Evidence:   fmt.Sprintf("Unable to check account-level public access block: %v", err),
-			Priority:   PriorityHigh,
-			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "2.1.7", "SOC2": "CC6.1"},
-		}, nil
+		return unavailableAccountPABResult(err.Error()), nil
+	}
+
+	// A malformed or empty response would otherwise panic on the field reads below.
+	if config == nil || config.PublicAccessBlockConfiguration == nil {
+		return unavailableAccountPABResult("account public access block configuration was empty"), nil
 	}
 
 	// Check if all 4 settings are enabled
@@ -532,7 +550,7 @@ aws s3control put-public-access-block \
 		}
 
 		return CheckResult{
-			Control:     "[CIS-2.1.7]",
+			Control:     "CIS-2.1.7",
 			Name:        "S3 Account Public Access Block",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -551,7 +569,7 @@ aws s3control put-public-access-block \
 	}
 
 	return CheckResult{
-		Control:    "[CIS-2.1.7]",
+		Control:    "CIS-2.1.7",
 		Name:       "S3 Account Public Access Block",
 		Status:     "PASS",
 		Evidence:   "S3 Block Public Access is enabled at account level (all 4 settings) | Meets CIS 2.1.7",
@@ -559,4 +577,21 @@ aws s3control put-public-access-block \
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"CIS-AWS": "2.1.7", "SOC2": "CC6.1", "PCI-DSS": "1.4.2"},
 	}, nil
+}
+
+// unavailableAccountPABResult reports that the account-level Block Public Access
+// check could not be run. StatusError keeps it out of the compliance score;
+// reporting StatusFail here would penalise accounts for a missing permission.
+func unavailableAccountPABResult(reason string) CheckResult {
+	return CheckResult{
+		Control:     "CIS-2.1.7",
+		Name:        "S3 Account Public Access Block",
+		Status:      StatusError,
+		Severity:    "HIGH",
+		Evidence:    fmt.Sprintf("Unable to check account-level public access block: %s", reason),
+		Remediation: "Grant s3:GetAccountPublicAccessBlock and sts:GetCallerIdentity, then re-run the scan",
+		Priority:    PriorityHigh,
+		Timestamp:   time.Now(),
+		Frameworks:  map[string]string{"CIS-AWS": "2.1.7", "SOC2": "CC6.1", "PCI-DSS": "1.4.2"},
+	}
 }

@@ -7,6 +7,7 @@ import (
 	_ "embed"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -21,9 +22,6 @@ import (
 //
 //go:embed framework-crosswalk.yaml
 var embeddedCrosswalk []byte
-
-//go:embed fedramp-baselines.yaml
-var embeddedFedRAMP []byte
 
 // Crosswalk holds mappings between frameworks and NIST 800-53
 type Crosswalk struct {
@@ -278,12 +276,36 @@ func GetFedRAMPBaselines() (*FedRAMPBaselines, error) {
 		return globalFedRAMPBaselines, nil
 	}
 
-	var baselines FedRAMPBaselines
-	if err := yaml.Unmarshal(embeddedFedRAMP, &baselines); err != nil {
-		return nil, fmt.Errorf("failed to parse embedded FedRAMP baselines: %w", err)
+	// Membership comes from the same baseline catalogs the completeness pass
+	// reports against. A separate hand-written list had drifted: it held 28 of
+	// the 149 Low controls yet still admitted AC-6, SC-8, SC-8(1) and SC-28,
+	// which are not in the Low baseline, so a fedramp-low scan both dropped
+	// most of the baseline and scored against controls outside it.
+	baselines := FedRAMPBaselines{
+		Low:      baselineControlIDs("fedramp-low"),
+		Moderate: baselineControlIDs("fedramp-moderate"),
+		High:     baselineControlIDs("fedramp-high"),
+	}
+	if len(baselines.Low) == 0 || len(baselines.Moderate) == 0 || len(baselines.High) == 0 {
+		return nil, fmt.Errorf("FedRAMP baseline catalogs are missing or empty")
 	}
 	globalFedRAMPBaselines = &baselines
 	return globalFedRAMPBaselines, nil
+}
+
+// baselineControlIDs returns the 800-53 control ids in a FedRAMP baseline,
+// read from the embedded baseline catalog.
+func baselineControlIDs(baseline string) []string {
+	catalog := CatalogFor(baseline)
+	if catalog == nil {
+		return nil
+	}
+	ids := make([]string, 0, len(catalog))
+	for id := range catalog {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+	return ids
 }
 
 // IsInFedRAMPBaseline checks if an 800-53 control is in the specified FedRAMP baseline
@@ -384,4 +406,25 @@ func (c *Crosswalk) GetGDPRString(frameworks map[string]string, controlID string
 
 func (c *Crosswalk) GetNISTCSFString(frameworks map[string]string, controlID string) string {
 	return strings.Join(c.GetNISTCSFSubcategories(frameworks, controlID), ", ")
+}
+
+// deriveFrameworkIDs maps a check onto a framework's own identifiers by going
+// through 800-53, in a stable order. Without this an ISO 27001 scan reported
+// 800-53 control IDs and a HIPAA scan reported the check's own SOC2 id, so
+// neither framework's controls could be matched against its catalog.
+func (c *Crosswalk) deriveFrameworkIDs(forward map[string][]string, frameworks map[string]string, controlID string) []string {
+	ids := c.deriveFrom(forward, frameworks, controlID)
+	sort.Strings(ids)
+	return ids
+}
+
+// GetISO27001String returns the ISO/IEC 27001:2022 Annex A controls a check maps
+// to, as a comma-separated list.
+func (c *Crosswalk) GetISO27001String(frameworks map[string]string, controlID string) string {
+	return strings.Join(c.deriveFrameworkIDs(c.ISO27001ToCIS, frameworks, controlID), ", ")
+}
+
+// GetHIPAAString returns the HIPAA Security Rule citations a check maps to.
+func (c *Crosswalk) GetHIPAAString(frameworks map[string]string, controlID string) string {
+	return strings.Join(c.deriveFrameworkIDs(c.HIPAAToCIS, frameworks, controlID), ", ")
 }

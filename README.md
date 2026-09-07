@@ -1,13 +1,16 @@
 # AuditKit - Open-Source Compliance Scanner
 
-**Scan AWS, Azure, GCP, and M365 for SOC2, PCI-DSS, HIPAA, CMMC, CIS Benchmarks, and NIST 800-53 compliance. Get audit-ready reports in minutes.**
+**Scan AWS, Azure, GCP, and M365 for SOC2, PCI-DSS, HIPAA, CMMC Level 1 & 2, CIS Benchmarks, and NIST 800-53 compliance. Get audit-ready reports in minutes.**
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v0.8.5-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
+[![Version](https://img.shields.io/badge/version-v0.8.6-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://guardiannexus.substack.com)
 
-**Need CMMC Level 2, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
+**New in v0.8.6:** CMMC Level 2 is now reported in the Community Edition - all 110 practices, with
+Level 1 automated and the remainder listed with evidence-collection guidance.
+
+**Need automated Level 2 checks, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
 
 ---
 
@@ -44,7 +47,8 @@ go build ./cmd/auditkit
 
 AuditKit scans your cloud infrastructure for compliance gaps and security misconfigurations:
 
-- **Automated Scanning:** 229 AWS, 178 Azure and 135 GCP controls
+- **Automated Scanning:** 219 AWS, 174 Azure and 133 GCP controls
+- **Full CMMC Scope:** all 110 Level 1 + 2 practices reported, so you see the whole assessment surface
 - **Multi-Cloud Support:** AWS, Azure, GCP, M365 in one tool
 - **Audit-Ready Reports:** PDF/HTML/JSON output with evidence
 - **Fix Commands:** Exact CLI/Terraform commands to remediate issues
@@ -68,7 +72,7 @@ measured from the checks themselves.
 | **SOC2 Type II** | 38 of 38 | 37 of 38 | 32 of 38 | SaaS customer requirements |
 | **PCI DSS v4.0.1** | 59 | 59 | 49 | Payment card processing |
 | **CMMC Level 1** | 13 of 17 | 13 of 17 | 9 of 17 | DoW contractor compliance (FCI) |
-| **CMMC Level 2** | - | - | - | 110 practices, [AuditKit Pro](https://auditkit.io/) only |
+| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; automated Level 2 checks in [AuditKit Pro](https://auditkit.io/) |
 
 69 distinct PCI DSS v4.0.1 requirements are assessed across the three providers.
 
@@ -80,10 +84,10 @@ assessed.
 
 | Framework | AWS | Azure | GCP | Unit |
 |-----------|-----|-------|-----|------|
-| **NIST 800-53 Rev 5** | 88 | 84 | 83 | controls (96 across all providers) |
+| **NIST 800-53 Rev 5** | 88 | 83 | 84 | controls (95 across all providers) |
 | **ISO 27001:2022** | 48 | 46 | 46 | controls |
-| **NIST CSF 2.0** | 87 | 83 | 83 | subcategories |
-| **HIPAA Security Rule** | 17 | 17 | 17 | safeguards |
+| **NIST CSF 2.0** | 65 | 62 | 63 | subcategories |
+| **HIPAA Security Rule** | 18 | 18 | 18 | safeguards |
 | **GDPR** | 14 | 14 | 14 | articles |
 
 FedRAMP Low, Moderate and High are filtered views of the NIST 800-53 coverage
@@ -93,7 +97,7 @@ above rather than separate control sets.
 
 | Framework | AWS | Azure | GCP | Purpose |
 |-----------|-----|-------|-----|---------|
-| **CIS Benchmarks** | 125 | 108 | 26 | Industry security best practices |
+| **CIS Benchmarks** | 158 | 108 | 71 | Industry security best practices |
 
 **[Framework Details →](./site/docs/frameworks/)** • **[What's the difference? →](./site/docs/frameworks/#compliance-vs-security-hardening)**
 
@@ -118,8 +122,8 @@ Level 2, estate-wide scanning, or a desktop interface.
 | **CMMC Level 2** | - | 110 practices (CUI handling) |
 | **CIS Benchmarks** | AWS, Azure and GCP | Same |
 | **Derived frameworks** | 800-53, ISO 27001, HIPAA, GDPR, NIST CSF, FedRAMP | Same six, from a larger control set |
-| **NIST 800-53 derived** | 96 controls | 133 controls |
-| **GDPR / NIST CSF derived** | 14 articles, 87 subcategories (AWS) | 15 articles, 92 subcategories (AWS) |
+| **NIST 800-53 derived** | 95 controls | 133 controls |
+| **GDPR / NIST CSF derived** | 14 articles, 65 subcategories (AWS) | 15 articles, 92 subcategories (AWS) |
 | **Reports** | PDF, HTML, CSV, JSON | Same |
 | **Evidence lifecycle** | Yes | Yes, plus a packaged audit deliverable |
 | **GKE and Vertex AI** | - | 32 checks |
@@ -136,7 +140,26 @@ Everything in the Community column runs from this repository with no licence key
 
 ---
 
-## Recent Changes (v0.8.5)
+## Recent Changes (v0.8.6)
+
+**September 2026**
+
+Coverage rebaseline and stability pass.
+
+Changed:
+- CMMC reporting covers all 110 Level 1 + 2 practices. Level 1 remains the automated set (13 of 17); the rest are reported with evidence-collection guidance so a scan shows the full assessment scope
+- Framework control catalogs are embedded and reported in full: CMMC (110), HIPAA (75), ISO 27001 (93), NIST CSF 2.0 (106), PCI DSS v4.0.1 (312), NIST 800-53 Rev 5 (1196) and FedRAMP Low/Moderate/High (149/287/370)
+- FedRAMP baseline membership derives from the NIST 800-53 baselines
+- Derived-framework scans run the complete check set, broadening what each can reach through the crosswalk
+
+Refinements:
+- CIS coverage rebaselined: AWS 158, Azure 108, GCP 71
+- HIPAA catalog aligned to the published Security Rule, and two crosswalk mappings realigned
+- Control identifiers normalised across providers
+- Offline mode resolves a cached scan without a known account id
+- Documentation and site figures regenerated from the code
+
+### Previous: v0.8.5
 
 **September 2026**
 
@@ -413,6 +436,20 @@ prowler aws --output-formats json -o prowler-output     # Run Prowler first
 - **[Troubleshooting](./site/docs/troubleshooting.md)** - Known issues and fixes
 
 ---
+
+## What's New in v0.8.6
+
+Coverage rebaseline and stability pass.
+
+### Changed
+- CMMC reports all 110 Level 1 + 2 practices; Level 1 is the automated set (13 of 17)
+- Framework control catalogs embedded and reported in full across all supported frameworks
+- Derived-framework scans run the complete check set
+
+### Refinements
+- CIS coverage rebaselined (AWS 158, Azure 108, GCP 71)
+- HIPAA catalog aligned to the published Security Rule
+- Control identifiers normalised across providers
 
 ## What's New in v0.8.5
 

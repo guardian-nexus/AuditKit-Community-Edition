@@ -197,13 +197,13 @@ aws configure --profile development
 
 ```bash
 # Scan entire AWS Organization (Pro only)
-./auditkit scan -provider aws -framework soc2 --scan-all
+./auditkit-pro scan -provider aws -framework soc2 --scan-all
 
 # Limit concurrency
-./auditkit scan -provider aws --scan-all --max-concurrent 5
+./auditkit-pro scan -provider aws --scan-all --max-concurrent 5
 
 # Generate consolidated report
-./auditkit scan -provider aws --scan-all -format pdf -output org-report.pdf
+./auditkit-pro scan -provider aws --scan-all -format pdf -output org-report.pdf
 ```
 
 **[Upgrade to Pro →](https://auditkit.io/pro/)**

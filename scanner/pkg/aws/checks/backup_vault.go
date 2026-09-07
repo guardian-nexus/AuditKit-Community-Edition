@@ -266,7 +266,7 @@ func (c *BackupVaultChecks) CheckBackupVaultLock(ctx context.Context) (CheckResu
 7. Confirm lock (irreversible!)
 8. Screenshot showing vault lock enabled
 
-⚠️  WARNING: Vault Lock is IRREVERSIBLE once enabled!
+WARNING: Vault Lock is IRREVERSIBLE once enabled!
 Ensure retention policies are correct before enabling.`, vaultsWithoutLock),
 			Severity:        "HIGH",
 			Priority:        PriorityHigh,

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -282,4 +283,40 @@ func GetOfflineScanAge(provider, accountID, framework string) (time.Duration, er
 	}
 
 	return time.Since(scan.Timestamp), nil
+}
+
+// LoadLatestAny returns the newest cached scan for a provider and framework,
+// whichever account produced it.
+//
+// Cache entries are keyed on the account id, which is only known once a scan
+// has run. A caller that has nothing but a profile name ("default") cannot
+// address the entry it just wrote, which made -offline miss every time.
+func (c *Cache) LoadLatestAny(provider, framework string) (*CachedScan, error) {
+	entries, err := os.ReadDir(c.basePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read cache directory: %w", err)
+	}
+
+	prefix := fmt.Sprintf("latest-%s-", provider)
+	suffix := fmt.Sprintf("-%s.json", framework)
+
+	var newest *CachedScan
+	for _, entry := range entries {
+		name := entry.Name()
+		if entry.IsDir() || !strings.HasPrefix(name, prefix) || !strings.HasSuffix(name, suffix) {
+			continue
+		}
+		scan, err := c.loadFromFile(filepath.Join(c.basePath, name))
+		if err != nil {
+			continue
+		}
+		if newest == nil || scan.Timestamp.After(newest.Timestamp) {
+			newest = scan
+		}
+	}
+
+	if newest == nil {
+		return nil, fmt.Errorf("no cached %s scan found for %s", framework, provider)
+	}
+	return newest, nil
 }

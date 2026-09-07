@@ -47,17 +47,11 @@ func (c *AWSCMMCLevel1Checks) Run(ctx context.Context) ([]CheckResult, error) {
 	// MEDIA PROTECTION - 1 INFO
 	results = append(results, c.CheckMP_L1_001(ctx))
 
-	// PHYSICAL PROTECTION - 6 INFO
+	// PHYSICAL PROTECTION - 4 INFO
 	results = append(results, c.CheckPE_L1_001(ctx))
 	results = append(results, c.CheckPE_L1_002(ctx))
 	results = append(results, c.CheckPE_L1_003(ctx))
 	results = append(results, c.CheckPE_L1_004(ctx))
-	results = append(results, c.CheckPE_L1_005(ctx))
-	results = append(results, c.CheckPE_L1_006(ctx))
-
-	// PERSONNEL SECURITY - 2 INFO
-	results = append(results, c.CheckPS_L1_001(ctx))
-	results = append(results, c.CheckPS_L1_002(ctx))
 
 	// SYSTEM AND COMMUNICATIONS PROTECTION - 2 INFO
 	results = append(results, c.CheckSC_L1_001(ctx))
@@ -348,66 +342,7 @@ func (c *AWSCMMCLevel1Checks) CheckPE_L1_004(ctx context.Context) CheckResult {
 	}
 }
 
-func (c *AWSCMMCLevel1Checks) CheckPE_L1_005(ctx context.Context) CheckResult {
-	return CheckResult{
-		Control:         "PE.L2-3.10.2",
-		Name:            "[CMMC L1] Protect and Monitor Physical Facility",
-		Status:          "INFO",
-		Evidence:        "MANUAL: AWS data centers have monitoring and protection (inherited control)",
-		Remediation:     "Review AWS compliance documentation for physical facility monitoring",
-		Priority:        PriorityMedium,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "AWS Artifact → Screenshot SOC 2 report showing physical monitoring controls",
-		ConsoleURL:      "https://console.aws.amazon.com/artifact/home",
-		Frameworks:      map[string]string{"CMMC": "PE.L2-3.10.2", "NIST 800-171": "3.10.2"},
-	}
-}
-
-func (c *AWSCMMCLevel1Checks) CheckPE_L1_006(ctx context.Context) CheckResult {
-	return CheckResult{
-		Control:         "PE.L2-3.10.6",
-		Name:            "[CMMC L1] Enforce Safeguarding Measures for CUI",
-		Status:          "INFO",
-		Evidence:        "MANUAL: AWS enforces physical safeguarding measures (inherited control)",
-		Remediation:     "Review AWS compliance documentation for physical safeguarding measures",
-		Priority:        PriorityMedium,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "AWS Artifact → Screenshot showing physical safeguarding measures",
-		ConsoleURL:      "https://console.aws.amazon.com/artifact/home",
-		Frameworks:      map[string]string{"CMMC": "PE.L2-3.10.6", "NIST 800-171": "3.10.6"},
-	}
-}
-
 // PS.L1 - 2 INFO (personnel screening - manual)
-func (c *AWSCMMCLevel1Checks) CheckPS_L1_001(ctx context.Context) CheckResult {
-	return CheckResult{
-		Control:         "PS.L2-3.9.1",
-		Name:            "[CMMC L1] Screen Personnel",
-		Status:          "INFO",
-		Evidence:        "MANUAL: Document personnel screening procedures for CUI access",
-		Remediation:     "Implement background checks for personnel with CUI access",
-		Priority:        PriorityHigh,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "HR Documentation → Screenshot showing personnel screening procedures and background check records",
-		ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
-		Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.1", "NIST 800-171": "3.9.1"},
-	}
-}
-
-func (c *AWSCMMCLevel1Checks) CheckPS_L1_002(ctx context.Context) CheckResult {
-	return CheckResult{
-		Control:         "PS.L2-3.9.2",
-		Name:            "[CMMC L1] Ensure CUI Access Authorization",
-		Status:          "INFO",
-		Evidence:        "MANUAL: Document authorization process for CUI access",
-		Remediation:     "Implement formal authorization process before granting CUI access",
-		Priority:        PriorityHigh,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "Documentation → Screenshot showing CUI access authorization procedures and approval records",
-		ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
-		Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.2", "NIST 800-171": "3.9.2"},
-	}
-}
 
 // SC.L1 - 3 AUTOMATED
 func (c *AWSCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult {

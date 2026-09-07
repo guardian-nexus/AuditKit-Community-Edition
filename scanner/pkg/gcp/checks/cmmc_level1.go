@@ -48,11 +48,8 @@ func (c *GCPCMMCLevel1Checks) Run(ctx context.Context) ([]CheckResult, error) {
 	// MEDIA PROTECTION - 1 INFO
 	results = append(results, c.CheckMP_L1_001(ctx))
 
-	// PHYSICAL PROTECTION - 6 INFO (Google inherited)
+	// PHYSICAL PROTECTION - 1 INFO (Google inherited)
 	results = append(results, c.CheckPE_L1_001_006(ctx)...)
-
-	// PERSONNEL SECURITY - 2 INFO (organizational controls)
-	results = append(results, c.CheckPS_L1_001_002(ctx)...)
 
 	// SYSTEM AND COMMUNICATIONS PROTECTION - 2 checks
 	results = append(results, c.CheckSC_L1_001(ctx))
@@ -296,11 +293,9 @@ func (c *GCPCMMCLevel1Checks) CheckPE_L1_001_006(ctx context.Context) []CheckRes
 		action  string
 	}{
 		{"PE.L1-3.10.1", "3.10.1", "Limit Physical Access", "limit physical access"},
-		{"PE.L2-3.10.2", "3.10.2", "Protect Physical Facility", "have physical protection"},
 		{"PE.L1-3.10.3", "3.10.3", "Escort Visitors", "escort all visitors"},
 		{"PE.L1-3.10.4", "3.10.4", "Physical Access Logs", "maintain physical access logs"},
 		{"PE.L1-3.10.5", "3.10.5", "Control Access Devices", "control physical access devices"},
-		{"PE.L2-3.10.6", "3.10.6", "Safeguard CUI", "enforce physical safeguards"},
 	}
 
 	results := []CheckResult{}
@@ -320,36 +315,6 @@ func (c *GCPCMMCLevel1Checks) CheckPE_L1_001_006(ctx context.Context) []CheckRes
 	}
 
 	return results
-}
-
-// PS.L1 - Personnel Security (organizational controls)
-func (c *GCPCMMCLevel1Checks) CheckPS_L1_001_002(ctx context.Context) []CheckResult {
-	return []CheckResult{
-		{
-			Control:         "PS.L2-3.9.1",
-			Name:            "[CMMC L1] Screen Personnel",
-			Status:          "INFO",
-			Evidence:        "MANUAL: Document personnel screening procedures for CUI access",
-			Remediation:     "Implement background checks for personnel with CUI access",
-			Priority:        PriorityHigh,
-			Timestamp:       time.Now(),
-			ScreenshotGuide: "HR Documentation → Screenshot showing personnel screening procedures and background check records",
-			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.1", "NIST 800-171": "3.9.1"},
-		},
-		{
-			Control:         "PS.L2-3.9.2",
-			Name:            "[CMMC L1] Ensure CUI Access Authorization",
-			Status:          "INFO",
-			Evidence:        "MANUAL: Document authorization process for CUI access",
-			Remediation:     "Implement formal authorization process before granting CUI access",
-			Priority:        PriorityHigh,
-			Timestamp:       time.Now(),
-			ScreenshotGuide: "Documentation → Screenshot showing CUI access authorization procedures and approval records",
-			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CMMC": "PS.L2-3.9.2", "NIST 800-171": "3.9.2"},
-		},
-	}
 }
 
 // SC.L1-3.13.1 - Monitor Communications

@@ -202,13 +202,13 @@ export AZURE_SUBSCRIPTION_ID="sub-2-id"
 
 ```bash
 # Scan entire Management Group (Pro only)
-./auditkit scan -provider azure -framework soc2 --scan-all
+./auditkit-pro scan -provider azure -framework soc2 --scan-all
 
 # Limit concurrency
-./auditkit scan -provider azure --scan-all --max-concurrent 3
+./auditkit-pro scan -provider azure --scan-all --max-concurrent 3
 
 # Generate consolidated report
-./auditkit scan -provider azure --scan-all -format pdf -output mgmt-group-report.pdf
+./auditkit-pro scan -provider azure --scan-all -format pdf -output mgmt-group-report.pdf
 ```
 
 **[Upgrade to Pro →](https://auditkit.io/pro/)**

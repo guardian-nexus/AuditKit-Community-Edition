@@ -217,13 +217,13 @@ export GOOGLE_CLOUD_PROJECT=project-2
 
 ```bash
 # Scan entire GCP Organization (Pro only)
-./auditkit scan -provider gcp -framework soc2 --scan-all
+./auditkit-pro scan -provider gcp -framework soc2 --scan-all
 
 # Limit concurrency
-./auditkit scan -provider gcp --scan-all --max-concurrent 5
+./auditkit-pro scan -provider gcp --scan-all --max-concurrent 5
 
 # Generate consolidated report
-./auditkit scan -provider gcp --scan-all -format pdf -output org-report.pdf
+./auditkit-pro scan -provider gcp --scan-all -format pdf -output org-report.pdf
 ```
 
 **Requirements for Organization scanning:**

@@ -337,6 +337,30 @@ var FrameworkMappings = map[string]map[string]string{
 		FrameworkHIPAA: "164.312(a)(1)",
 		FrameworkCIS:   "5.6",
 	},
+	"UNUSED_CREDENTIALS_45": {
+		FrameworkSOC2:  "CC6.7",
+		FrameworkPCI:   "8.2.6",
+		FrameworkHIPAA: "164.308(a)(4)(ii)(C)",
+		FrameworkCIS:   "1.3",
+	},
+	"IAM_POLICIES_GROUPS_ONLY": {
+		FrameworkSOC2:  "CC6.6",
+		FrameworkPCI:   "7.2.1",
+		FrameworkHIPAA: "164.308(a)(3)(i)",
+		FrameworkCIS:   "1.16",
+	},
+	"VPC_PEERING_ROUTING": {
+		FrameworkSOC2:  "CC6.1",
+		FrameworkPCI:   "1.4.2",
+		FrameworkHIPAA: "164.312(e)(1)",
+		FrameworkCIS:   "5.8",
+	},
+	"VPC_S3_ENDPOINTS": {
+		FrameworkSOC2:  "CC6.1",
+		FrameworkPCI:   "1.4.2",
+		FrameworkHIPAA: "164.312(e)(1)",
+		FrameworkCIS:   "5.20",
+	},
 	"VPC_PEERING": {
 		FrameworkSOC2:  "CC6.1",
 		FrameworkPCI:   "1.4.2",

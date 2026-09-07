@@ -918,7 +918,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 		}
 
 		results = append(results, CheckResult{
-			Control:           "PCI-8.2.4-keys",
+			Control:           "PCI-8.4.2",
 			Name:              "[PCI-DSS] 90-Day Access Key Rotation",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -935,7 +935,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:   "PCI-8.2.4-keys",
+			Control:   "PCI-8.4.2",
 			Name:      "[PCI-DSS] Access Key Age",
 			Status:    "PASS",
 			Evidence:  "All access keys rotated within 90 days",

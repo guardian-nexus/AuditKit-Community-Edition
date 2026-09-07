@@ -518,6 +518,9 @@ func generateControlCard(pdf *gofpdf.Fpdf, control ControlResult, number int, fr
 	pdf.SetTextColor(220, 53, 69)
 
 	controlLabel := fmt.Sprintf("%d. [%s] %s", number, control.ID, control.Name)
+	if control.Name == "" || control.Name == control.ID {
+		controlLabel = fmt.Sprintf("%d. [%s]", number, control.ID)
+	}
 
 	pdf.SetXY(20, startY+3)
 	pdf.MultiCell(170, 6, controlLabel, "", "L", false)
@@ -579,6 +582,7 @@ func generateEvidenceGuideComplete(pdf *gofpdf.Fpdf, result ComplianceResult) {
 	failedControls := []ControlResult{}
 	passedControls := []ControlResult{}
 	infoControls := []ControlResult{}
+	erroredControls := []ControlResult{}
 
 	for _, control := range result.Controls {
 		if control.Status == "FAIL" {
@@ -587,6 +591,10 @@ func generateEvidenceGuideComplete(pdf *gofpdf.Fpdf, result ComplianceResult) {
 			passedControls = append(passedControls, control)
 		} else if control.Status == "INFO" || control.Status == "MANUAL" {
 			infoControls = append(infoControls, control)
+		} else if control.Status == "ERROR" {
+			// Excluded from the score, but the auditor still has to be told the
+			// control could not be evaluated.
+			erroredControls = append(erroredControls, control)
 		}
 	}
 
@@ -639,6 +647,23 @@ func generateEvidenceGuideComplete(pdf *gofpdf.Fpdf, result ComplianceResult) {
 			generateInfoCard(pdf, control, i+1)
 		}
 	}
+
+	if len(erroredControls) > 0 {
+		pdf.AddPage()
+
+		pdf.SetFont("Arial", "B", 14)
+		pdf.SetTextColor(180, 95, 6)
+		pdf.CellFormat(0, 8, fmt.Sprintf("Unable To Check (%d total)", len(erroredControls)), "", 1, "L", false, 0, "")
+
+		pdf.SetFont("Arial", "", 10)
+		pdf.SetTextColor(108, 117, 125)
+		pdf.MultiCell(0, 5, "These controls could not be evaluated, usually because of a missing permission. They are excluded from the compliance score.", "", "L", false)
+		pdf.Ln(5)
+
+		for i, control := range erroredControls {
+			generateInfoCard(pdf, control, i+1)
+		}
+	}
 }
 
 func generateEvidenceCard(pdf *gofpdf.Fpdf, control ControlResult, number int) {
@@ -663,7 +688,7 @@ func generateEvidenceCard(pdf *gofpdf.Fpdf, control ControlResult, number int) {
 	cleanName := strings.ReplaceAll(control.Name, "→", "->")
 	cleanName = strings.ReplaceAll(cleanName, "•", "-")
 
-	pdf.CellFormat(0, 6, fmt.Sprintf("%d. %s - %s", number, cleanID, cleanName), "", 1, "L", false, 0, "")
+	pdf.CellFormat(0, 6, fmt.Sprintf("%d. %s%s", number, cleanID, reportNameSuffix(cleanID, cleanName)), "", 1, "L", false, 0, "")
 
 	if control.ConsoleURL != "" {
 		pdf.SetFont("Arial", "", 9)
@@ -724,7 +749,7 @@ func generateInfoCard(pdf *gofpdf.Fpdf, control ControlResult, number int) {
 	cleanName = strings.ReplaceAll(cleanName, "â†'", "->")
 	cleanName = strings.ReplaceAll(cleanName, "â", "")
 
-	pdf.MultiCell(170, 6, fmt.Sprintf("%d. [INFO] %s - %s", number, cleanID, cleanName), "", "L", false)
+	pdf.MultiCell(170, 6, fmt.Sprintf("%d. [INFO] %s%s", number, cleanID, reportNameSuffix(cleanID, cleanName)), "", "L", false)
 
 	// Evidence guidance
 	pdf.SetFont("Arial", "", 10)
@@ -856,7 +881,7 @@ func getFrameworkChecklist(framework string, totalControls int) []string {
 				"[ ] System and Communications Protection (3.13.1, 3.13.5)",
 				"[ ] System and Information Integrity (3.14.1, 3.14.2, 3.14.4, 3.14.5)",
 				"",
-				"For CMMC Level 2 (CUI Protection - 110 additional practices):",
+				"For CMMC Level 2 (CUI Protection - all 110 practices):",
 				"Visit auditkit.io/pro",
 			}
 		} else {
@@ -901,4 +926,14 @@ func countCritical(controls []ControlResult) int {
 		}
 	}
 	return count
+}
+
+// reportNameSuffix renders " - Name" for report output, or "" when the control
+// has no distinct human-readable name (getControlName returns "" for unmapped
+// controls, which otherwise printed a dangling "ID - ").
+func reportNameSuffix(id, name string) string {
+	if name == "" || name == id {
+		return ""
+	}
+	return " - " + name
 }

@@ -11,13 +11,13 @@ AuditKit supports multiple compliance frameworks for automated technical control
 | **[SOC2 Type II](./soc2.md)** | Production | 38 criteria | AWS, Azure, GCP |
 | **[PCI-DSS v4.0.1](./pci-dss.md)** | Production | 69 requirements across all 12 groups | AWS, Azure, GCP |
 | **[CMMC Level 1](./cmmc.md)** | Production | 13 of 17 practices | AWS, Azure, GCP |
-| **[CMMC Level 2](./cmmc.md)** | Pro Only | 110 practices | AWS, Azure, GCP |
-| **[CIS Benchmarks](./cis-benchmarks.md)** | Production | AWS: 125, Azure: 108, GCP: 26 | AWS, Azure, GCP |
-| **[NIST 800-53 Rev 5](./nist-800-53.md)** | Production | 96 technical controls (covers FedRAMP) | AWS, Azure, GCP |
+| **[CMMC Level 2](./cmmc.md)** | Reported; automated in Pro | 110 practices | AWS, Azure, GCP |
+| **[CIS Benchmarks](./cis-benchmarks.md)** | Production | AWS: 158, Azure: 108, GCP: 71 | AWS, Azure, GCP |
+| **[NIST 800-53 Rev 5](./nist-800-53.md)** | Production | 95 technical controls (covers FedRAMP) | AWS, Azure, GCP |
 | **[ISO 27001:2022](./iso27001.md)** | Production | 46 controls, derived | AWS, Azure, GCP |
-| **[NIST CSF 2.0](./nist-csf.md)** | Production | 83 subcategories, derived | AWS, Azure, GCP |
+| **[NIST CSF 2.0](./nist-csf.md)** | Production | 63 subcategories, derived | AWS, Azure, GCP |
 | **[GDPR](./gdpr.md)** | Production | 14 articles, derived | AWS, Azure, GCP |
-| **[HIPAA Security Rule](./hipaa.md)** | Production | 17 safeguards, derived | AWS, Azure, GCP |
+| **[HIPAA Security Rule](./hipaa.md)** | Production | 18 safeguards, derived | AWS, Azure, GCP |
 
 ---
 
@@ -115,7 +115,7 @@ Requires AuditKit subscription:
 ### NIST 800-53 Rev 5
 **Purpose:** Security controls for federal information systems  
 **Certification:** Not a certification (used by FedRAMP, FISMA)  
-**Coverage:** 96 automated technical controls  
+**Coverage:** 95 automated technical controls  
 **Timeline:** 6-12 months for full implementation
 
 **[Learn more →](./nist-800-53.md)**
@@ -142,7 +142,7 @@ auditkit scan -provider aws -framework pci
 # CMMC Level 1
 auditkit scan -provider aws -framework cmmc
 
-# CMMC Level 2 (Pro only)
+# CMMC Level 2 (reported in Community; automated checks in Pro)
 auditkit-pro scan -provider aws -framework cmmc-l2
 
 # CIS Benchmarks

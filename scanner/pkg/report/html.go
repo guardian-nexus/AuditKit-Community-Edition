@@ -699,7 +699,7 @@ func GenerateHTML(result ComplianceResult) string {
 		generatePriorityActions(result),
 		countByStatus(result.Controls, "FAIL"),
 		countByStatus(result.Controls, "PASS"),
-		countByStatus(result.Controls, "INFO"),
+		countByStatus(result.Controls, "INFO")+countByStatus(result.Controls, "MANUAL")+countByStatus(result.Controls, "ERROR"),
 		generateFailedControlsHTML(result),
 		generatePassedControlsHTML(result),
 		generateInfoControlsHTML(result),
@@ -812,7 +812,7 @@ func generateFailedControlsHTML(result ComplianceResult) string {
 			html += fmt.Sprintf(`
                 <div class="%s">
                     <div class="control-header">
-                        <div class="control-title">%d. [%s] %s</div>
+                        <div class="control-title">%d. [%s]%s</div>
                         <span class="control-badge badge-fail">FAIL</span>
                     </div>
                     <div class="control-issue">
@@ -821,7 +821,7 @@ func generateFailedControlsHTML(result ComplianceResult) string {
 				severityClass,
 				failedCount,
 				control.ID,
-				control.Name,
+				reportNameSuffix(control.ID, control.Name),
 				control.Evidence,
 			)
 
@@ -884,14 +884,14 @@ func generatePassedControlsHTML(result ComplianceResult) string {
 			html += fmt.Sprintf(`
                 <div class="control-card pass">
                     <div class="control-header">
-                        <div class="control-title">%d. [%s] %s</div>
+                        <div class="control-title">%d. [%s]%s</div>
                         <span class="control-badge badge-pass">PASS</span>
                     </div>
                     <div class="control-issue">%s</div>
                 </div>`,
 				passedCount,
 				control.ID,
-				control.Name,
+				reportNameSuffix(control.ID, control.Name),
 				control.Evidence,
 			)
 		}
@@ -917,7 +917,7 @@ func generateInfoControlsHTML(result ComplianceResult) string {
 			html += fmt.Sprintf(`
                 <div class="control-card info">
                     <div class="control-header">
-                        <div class="control-title">%d. [%s] %s</div>
+                        <div class="control-title">%d. [%s]%s</div>
                         <span class="control-badge badge-info">MANUAL</span>
                     </div>
                     <div class="control-issue">
@@ -925,7 +925,7 @@ func generateInfoControlsHTML(result ComplianceResult) string {
                     </div>`,
 				infoCount,
 				control.ID,
-				control.Name,
+				reportNameSuffix(control.ID, control.Name),
 				control.Evidence,
 			)
 
@@ -967,6 +967,8 @@ func generateInfoControlsHTML(result ComplianceResult) string {
                 </div>`
 	}
 
+	html += generateErroredControlsHTML(result)
+
 	return html
 }
 
@@ -988,4 +990,41 @@ func erroredNote(errored int) string {
 		return ""
 	}
 	return fmt.Sprintf("<li>%d control(s) could not be evaluated, usually a missing permission. These are excluded from the score, not counted as failures.</li>", errored)
+}
+
+// generateErroredControlsHTML renders controls that could not be evaluated.
+// They are excluded from the score, but every other section filters on
+// FAIL/PASS/INFO/MANUAL, so without this they vanished from the report while
+// still counting toward the stated total.
+func generateErroredControlsHTML(result ComplianceResult) string {
+	html := ""
+	errCount := 0
+
+	for _, control := range result.Controls {
+		if control.Status != "ERROR" {
+			continue
+		}
+		errCount++
+		html += fmt.Sprintf(`
+                <div class="control-card info">
+                    <div class="control-header">
+                        <div class="control-title">%d. [%s]%s</div>
+                        <span class="control-badge badge-info">UNABLE TO CHECK</span>
+                    </div>
+                    <div class="control-issue">
+                        <strong>Reason:</strong> %s
+                    </div>`,
+			errCount,
+			control.ID,
+			reportNameSuffix(control.ID, control.Name),
+			control.Evidence,
+		)
+		if control.Remediation != "" {
+			html += fmt.Sprintf(`
+                    <div class="control-issue"><strong>Fix:</strong> %s</div>`, control.Remediation)
+		}
+		html += `</div>`
+	}
+
+	return html
 }

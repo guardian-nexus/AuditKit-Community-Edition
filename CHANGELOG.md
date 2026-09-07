@@ -2,6 +2,20 @@
 
 All notable changes to AuditKit will be documented in this file.
 
+## [0.8.6] - 2026-09-07
+
+### Changed
+- CMMC reporting covers all 110 Level 1 + 2 practices; Level 1 remains the automated set (13 of 17)
+- Framework control catalogs embedded and reported in full (CMMC 110, 800-53 1196, PCI 312, CSF 106, ISO 93, HIPAA 75, SOC2 43, FedRAMP 149/287/370)
+- FedRAMP baseline membership derives from the NIST 800-53 baselines
+- Derived-framework scans run the complete check set
+
+### Fixed
+- CIS coverage rebaselined (AWS 158, Azure 108, GCP 71)
+- HIPAA catalog aligned to the published Security Rule; two crosswalk mappings realigned
+- Control identifiers normalised across providers
+- Offline mode resolves a cached scan without a known account id
+
 ## [v0.8.5] - 2026-09-02
 
 Hotfix for v0.8.4. The v0.8.4 binaries were built before these corrections, so

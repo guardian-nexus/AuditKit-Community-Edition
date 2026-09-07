@@ -99,7 +99,7 @@ func (c *VPCChecks) CheckVPCFlowLogs(ctx context.Context) (CheckResult, error) {
 
 	if len(vpcsWithoutFlowLogs) > 0 {
 		return CheckResult{
-			Control:           "CIS-3.9, CC7.1",
+			Control:           "CC7.1",
 			Name:              "VPC Flow Logs",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -115,7 +115,7 @@ func (c *VPCChecks) CheckVPCFlowLogs(ctx context.Context) (CheckResult, error) {
 	}
 
 	return CheckResult{
-		Control:    "CIS-3.9, CC7.1",
+		Control:    "CC7.1",
 		Name:       "VPC Flow Logs",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d VPCs have Flow Logs enabled | Meets CIS-3.9", len(vpcs.Vpcs)),
@@ -169,7 +169,7 @@ func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
 
 	if len(defaultVPCsInUse) > 0 {
 		return CheckResult{
-			Control:           "[CIS-5.1]",
+			Control:           "CIS-5.1",
 			Name:              "Default VPC in Use",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -185,7 +185,7 @@ func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
 	}
 
 	return CheckResult{
-		Control:    "[CIS-5.1]",
+		Control:    "CIS-5.1",
 		Name:       "Default VPC in Use",
 		Status:     "PASS",
 		Evidence:   "No resources using default VPC",
@@ -198,7 +198,7 @@ func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
 // CIS 5.5 - Ensure routing tables for VPC peering are least access
 func (c *VPCChecks) CheckVPCPeering(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control:           "[CIS-5.5]",
+		Control:           "CIS-5.5",
 		Name:              "VPC Peering Routing",
 		Status:            "INFO",
 		Evidence:          "MANUAL CHECK: Review VPC peering connections for least privilege routing",
@@ -266,7 +266,7 @@ func (c *VPCChecks) CheckVPCEndpoints(ctx context.Context) (CheckResult, error) 
 			len(vpcsWithoutS3), len(vpcsWithoutDynamoDB))
 
 		return CheckResult{
-			Control:     "[CIS-5.7, 5.8]",
+			Control:     "CIS-5.7",
 			Name:        "VPC Endpoints for AWS Services",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
@@ -286,7 +286,7 @@ aws ec2 create-vpc-endpoint --vpc-id VPC_ID --service-name com.amazonaws.REGION.
 	}
 
 	return CheckResult{
-		Control:    "[CIS-5.7, 5.8]",
+		Control:    "CIS-5.7",
 		Name:       "VPC Endpoints for AWS Services",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d VPCs have appropriate endpoints | CIS 5.7-5.8", len(vpcs.Vpcs)-countDefaultVPCs(vpcs.Vpcs)),
@@ -363,7 +363,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 	// CIS 5.9
 	if len(naclsAllowingSSH) > 0 {
 		results = append(results, CheckResult{
-			Control:           "[CIS-5.9]",
+			Control:           "CIS-5.9",
 			Name:              "NACL Restricts SSH from Internet",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -378,7 +378,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "[CIS-5.9]",
+			Control:    "CIS-5.9",
 			Name:       "NACL Restricts SSH from Internet",
 			Status:     "PASS",
 			Evidence:   "No NACLs allow SSH from internet | CIS 5.9",
@@ -391,7 +391,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 	// CIS 5.10
 	if len(naclsAllowingRDP) > 0 {
 		results = append(results, CheckResult{
-			Control:           "[CIS-5.10]",
+			Control:           "CIS-5.10",
 			Name:              "NACL Restricts RDP from Internet",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -406,7 +406,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "[CIS-5.10]",
+			Control:    "CIS-5.10",
 			Name:       "NACL Restricts RDP from Internet",
 			Status:     "PASS",
 			Evidence:   "No NACLs allow RDP from internet | CIS 5.10",
@@ -419,7 +419,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 	// CIS 5.11
 	if len(naclsAllowingSSHv6) > 0 {
 		results = append(results, CheckResult{
-			Control:           "[CIS-5.11]",
+			Control:           "CIS-5.11",
 			Name:              "NACL Restricts SSH from Internet (IPv6)",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -434,7 +434,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "[CIS-5.11]",
+			Control:    "CIS-5.11",
 			Name:       "NACL Restricts SSH from Internet (IPv6)",
 			Status:     "PASS",
 			Evidence:   "No NACLs allow SSH from ::/0 | CIS 5.11",
@@ -447,7 +447,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 	// CIS 5.12
 	if len(naclsAllowingRDPv6) > 0 {
 		results = append(results, CheckResult{
-			Control:           "[CIS-5.12]",
+			Control:           "CIS-5.12",
 			Name:              "NACL Restricts RDP from Internet (IPv6)",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -462,7 +462,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "[CIS-5.12]",
+			Control:    "CIS-5.12",
 			Name:       "NACL Restricts RDP from Internet (IPv6)",
 			Status:     "PASS",
 			Evidence:   "No NACLs allow RDP from ::/0 | CIS 5.12",
@@ -506,7 +506,7 @@ func (c *VPCChecks) CheckAdminPortSecurity(ctx context.Context) (CheckResult, er
 
 	if len(violatingSGs) > 0 {
 		return CheckResult{
-			Control:     "[CIS-5.13]",
+			Control:     "CIS-5.13",
 			Name:        "Security Groups Restrict Admin Ports",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
@@ -523,7 +523,7 @@ aws ec2 authorize-security-group-ingress --group-id SG_ID --protocol tcp --port 
 	}
 
 	return CheckResult{
-		Control:    "[CIS-5.13]",
+		Control:    "CIS-5.13",
 		Name:       "Security Groups Restrict Admin Ports",
 		Status:     "PASS",
 		Evidence:   "Security groups properly restrict admin port access | CIS 5.13",
@@ -565,7 +565,7 @@ func (c *VPCChecks) CheckEC2SubnetPlacement(ctx context.Context) (CheckResult, e
 
 	if len(instancesInDefault) > 0 {
 		return CheckResult{
-			Control:           "[CIS-5.14]",
+			Control:           "CIS-5.14",
 			Name:              "EC2 Instances in Custom VPC",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -581,7 +581,7 @@ func (c *VPCChecks) CheckEC2SubnetPlacement(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "[CIS-5.14]",
+		Control:    "CIS-5.14",
 		Name:       "EC2 Instances in Custom VPC",
 		Status:     "PASS",
 		Evidence:   "All instances in custom VPCs | CIS 5.14",
@@ -625,7 +625,7 @@ func (c *VPCChecks) CheckUnusedSecurityGroups(ctx context.Context) (CheckResult,
 
 	if len(unusedSGs) > 0 {
 		return CheckResult{
-			Control:           "[CIS-5.18]",
+			Control:           "CIS-5.18",
 			Name:              "Unused Security Groups Removed",
 			Status:            "FAIL",
 			Severity:          "LOW",
@@ -641,7 +641,7 @@ func (c *VPCChecks) CheckUnusedSecurityGroups(ctx context.Context) (CheckResult,
 	}
 
 	return CheckResult{
-		Control:    "[CIS-5.18]",
+		Control:    "CIS-5.18",
 		Name:       "Unused Security Groups Removed",
 		Status:     "PASS",
 		Evidence:   "No unused security groups | CIS 5.18",

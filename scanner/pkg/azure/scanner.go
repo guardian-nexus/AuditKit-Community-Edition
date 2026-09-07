@@ -47,6 +47,7 @@ type AzureScanner struct {
 
 type ScanResult struct {
 	Control           string
+	Name              string
 	Status            string
 	Evidence          string
 	Remediation       string
@@ -231,7 +232,12 @@ func (s *AzureScanner) ScanServices(ctx context.Context, services []string, verb
 		results = append(results, s.runCMMCChecks(ctx, verbose)...)
 	case "cis", "cis-azure":
 		results = append(results, s.runCISChecks(ctx, verbose)...)
-	case "all":
+	case "all",
+		// Derived frameworks are reported through the crosswalk, which can
+		// map any suite's findings. Falling through to the SOC2 suite alone
+		// meant an 800-53, ISO or HIPAA scan never saw the PCI, CMMC or CIS
+		// checks that map onto it.
+		"800-53", "nist800-53", "nist-800-53", "iso27001", "iso-27001", "gdpr", "nist-csf", "csf", "hipaa", "fedramp-low", "fedramp-moderate", "fedramp-high":
 		results = append(results, s.runSOC2Checks(ctx, verbose)...)
 		results = append(results, s.runPCIChecks(ctx, verbose)...)
 		results = append(results, s.runCMMCChecks(ctx, verbose)...)
@@ -285,6 +291,7 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 		for _, cr := range checkResults {
 			results = append(results, ScanResult{
 				Control:           cr.Control,
+				Name:              cr.Name,
 				Status:            cr.Status,
 				Evidence:          cr.Evidence,
 				Remediation:       cr.Remediation,
@@ -324,6 +331,7 @@ func (s *AzureScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanRes
 	for _, cr := range checkResults {
 		results = append(results, ScanResult{
 			Control:           cr.Control,
+			Name:              cr.Name,
 			Status:            cr.Status,
 			Evidence:          cr.Evidence,
 			Remediation:       cr.Remediation,
@@ -342,7 +350,7 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 	var results []ScanResult
 
 	if verbose {
-		fmt.Println("Running CMMC Level 1 (17 practices) - Open Source")
+		fmt.Println("Running CMMC Level 1 - Open Source (the level defines 17 practices)")
 		fmt.Println("")
 		fmt.Println("IMPORTANT DISCLAIMER:")
 		fmt.Println("This scanner tests technical controls that can be automated.")
@@ -362,6 +370,7 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 	for _, cr := range results1 {
 		results = append(results, ScanResult{
 			Control:           cr.Control,
+			Name:              cr.Name,
 			Status:            cr.Status,
 			Evidence:          cr.Evidence,
 			Remediation:       cr.Remediation,
@@ -377,8 +386,8 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 		fmt.Printf("\nCMMC Level 1 scan complete: %d controls tested\n", len(results))
 		fmt.Println("")
 		fmt.Println("UNLOCK CMMC LEVEL 2:")
-		fmt.Println("  - 110 additional Level 2 practices for CUI")
-		fmt.Println("  - Required for DoD contractors handling CUI")
+		fmt.Println("  - All 110 CMMC Level 2 practices for CUI")
+		fmt.Println("  - Required for DoW contractors handling CUI")
 		fmt.Println("  - Complete evidence collection guides")
 		fmt.Println("  - November 10, 2025 deadline compliance")
 		fmt.Println("")
@@ -471,6 +480,7 @@ func (s *AzureScanner) runCISChecks(ctx context.Context, verbose bool) []ScanRes
 
 				results = append(results, ScanResult{
 					Control:           cr.Control,
+					Name:              cr.Name,
 					Status:            cr.Status,
 					Evidence:          cr.Evidence,
 					Remediation:       cr.Remediation,

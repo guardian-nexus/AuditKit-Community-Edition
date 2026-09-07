@@ -424,6 +424,24 @@ var FrameworkMappings = map[string]map[string]string{
 		FrameworkHIPAA: "164.312(a)(2)(i)",
 		FrameworkCIS:   "8.5",
 	},
+	"CLOUD_AUDIT_LOGS": {
+		FrameworkSOC2:  "CC7.2",
+		FrameworkPCI:   "10.2.1",
+		FrameworkHIPAA: "164.312(b)",
+		FrameworkCIS:   "2.1",
+	},
+	"HTTPS_FORWARDING": {
+		FrameworkSOC2:  "CC6.7",
+		FrameworkPCI:   "4.2.1",
+		FrameworkHIPAA: "164.312(e)(1)",
+		FrameworkCIS:   "3.6",
+	},
+	"TLS_VERSION": {
+		FrameworkSOC2:  "CC6.7",
+		FrameworkPCI:   "4.2.1",
+		FrameworkHIPAA: "164.312(e)(1)",
+		FrameworkCIS:   "3.7",
+	},
 }
 
 // Helper function to get framework mappings for a control

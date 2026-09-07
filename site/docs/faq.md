@@ -101,11 +101,11 @@ Compare to traditional costs:
 | PCI-DSS v4.0.1 | Production | 69 requirements |
 | CMMC Level 1 | Production | 17 practices |
 | CMMC Level 2 | Pro only | 110 practices |
-| NIST 800-53 Rev 5 | Production | 96 technical controls |
+| NIST 800-53 Rev 5 | Production | 95 technical controls |
 | ISO 27001:2022 | Production | 46 controls, derived via crosswalk |
-| NIST CSF 2.0 | Production | 83 subcategories, derived via crosswalk |
+| NIST CSF 2.0 | Production | 63 subcategories, derived via crosswalk |
 | GDPR | Production | 14 articles, derived via crosswalk |
-| HIPAA | Production | 17 safeguards, derived via crosswalk |
+| HIPAA | Production | 18 safeguards, derived via crosswalk |
 
 **[Framework details →](./frameworks/)**
 

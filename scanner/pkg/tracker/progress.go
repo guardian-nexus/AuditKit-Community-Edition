@@ -82,7 +82,7 @@ func ShowProgress(accountID string) {
 	var progress ProgressData
 	json.Unmarshal(data, &progress)
 
-	fmt.Println("\n📊 Your SOC2 Journey Progress")
+	fmt.Println("\nYour SOC2 Journey Progress")
 	fmt.Println("==============================")
 	fmt.Printf("Account: %s\n", progress.AccountID)
 	fmt.Printf("First scan: %s\n", progress.FirstScan.Format("Jan 2, 2006"))

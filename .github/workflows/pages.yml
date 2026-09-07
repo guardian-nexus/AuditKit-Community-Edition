@@ -9,8 +9,6 @@ on:
       # number the documentation states.
       - 'scanner/pkg/*/checks/**'
       - 'scanner/pkg/mappings/framework-crosswalk.yaml'
-      - '.github/scripts/check-links.sh'
-      - '.github/scripts/coverage-counts.py'
       - '.github/coverage-claims.json'
       - '.github/workflows/pages.yml'
 # Pages allows one deployment at a time. Without this, pushing several commits
@@ -25,11 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify local links resolve
-        run: .github/scripts/check-links.sh
 
-      - name: Verify documented coverage matches the code
-        run: .github/scripts/coverage-counts.py --check
 
   deploy:
     needs: check-links

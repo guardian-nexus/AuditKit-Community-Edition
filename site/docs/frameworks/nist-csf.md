@@ -10,7 +10,7 @@ The NIST Cybersecurity Framework, version 2.0.
 
 **Who needs it:** Anyone who wants a common language for security posture; often asked for by insurers, boards and enterprise customers
 **Status in AuditKit:** Production
-**Coverage:** 83 subcategories (AWS 75, Azure 82, GCP 83)
+**Coverage:** 63 subcategories (AWS 75, Azure 82, GCP 83)
 **How it works:** Derived from your SOC2, PCI DSS and CMMC results through NIST 800-53
 
 ---

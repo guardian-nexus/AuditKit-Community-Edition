@@ -37,6 +37,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/redshift"
 	"github.com/aws/aws-sdk-go-v2/service/route53"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3control"
 	"github.com/aws/aws-sdk-go-v2/service/sagemaker"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/aws/aws-sdk-go-v2/service/securityhub"
@@ -48,8 +49,13 @@ import (
 )
 
 type AWSScanner struct {
-	cfg                  aws.Config
-	s3Client             *s3.Client
+	cfg             aws.Config
+	s3Client        *s3.Client
+	s3controlClient *s3control.Client
+	// moduleResults memoises one check module's results for the duration of a
+	// single ScanServices call. With -framework all the SOC2, PCI and CIS suites
+	// share most modules, which previously ran (and hit the AWS API) three times.
+	moduleResults        map[string][]checks.CheckResult
 	iamClient            *iam.Client
 	ec2Client            *ec2.Client
 	ctClient             *cloudtrail.Client
@@ -91,6 +97,7 @@ type AWSScanner struct {
 
 type ScanResult struct {
 	Control           string
+	Name              string
 	Status            string
 	Evidence          string
 	Remediation       string
@@ -118,6 +125,7 @@ func NewScannerWithConfig(cfg aws.Config) (*AWSScanner, error) {
 	return &AWSScanner{
 		cfg:                  cfg,
 		s3Client:             s3.NewFromConfig(cfg),
+		s3controlClient:      s3control.NewFromConfig(cfg),
 		iamClient:            iam.NewFromConfig(cfg),
 		ec2Client:            ec2.NewFromConfig(cfg),
 		ctClient:             cloudtrail.NewFromConfig(cfg),
@@ -177,6 +185,7 @@ func (s *AWSScanner) ScanServices(ctx context.Context, services []string, verbos
 
 	var results []ScanResult
 	framework = strings.ToLower(framework)
+	s.moduleResults = make(map[string][]checks.CheckResult)
 
 	switch framework {
 	case "soc2":
@@ -187,11 +196,18 @@ func (s *AWSScanner) ScanServices(ctx context.Context, services []string, verbos
 		results = append(results, s.runCMMCChecks(ctx, verbose)...)
 	case "cis", "cis-aws":
 		results = append(results, s.runCISChecks(ctx, verbose)...)
-	case "all":
+	case "all",
+		// Derived frameworks are reported through the crosswalk, which can
+		// map any suite's findings. Falling through to the SOC2 suite alone
+		// meant an 800-53, ISO or HIPAA scan never saw the PCI, CMMC or CIS
+		// checks that map onto it.
+		"800-53", "nist800-53", "nist-800-53", "iso27001", "iso-27001", "gdpr", "nist-csf", "csf", "hipaa", "fedramp-low", "fedramp-moderate", "fedramp-high":
 		results = append(results, s.runSOC2Checks(ctx, verbose)...)
 		results = append(results, s.runPCIChecks(ctx, verbose)...)
 		results = append(results, s.runCMMCChecks(ctx, verbose)...)
 		results = append(results, s.runCISChecks(ctx, verbose)...)
+		// The suites overlap, so the same finding arrives once per suite.
+		results = dedupeIdenticalResults(results)
 	default:
 		results = append(results, s.runSOC2Checks(ctx, verbose)...)
 	}
@@ -211,7 +227,7 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 	// Run existing AWS check modules - they return results with Frameworks map
 	checkModules := []checks.Check{
 		checks.NewIAMChecks(s.iamClient),
-		checks.NewS3Checks(s.s3Client),
+		checks.NewS3Checks(s.s3Client, s.s3controlClient, s.stsClient),
 		checks.NewEC2Checks(s.ec2Client),
 		checks.NewCloudTrailChecks(s.ctClient),
 		checks.NewConfigChecks(s.configClient),
@@ -256,7 +272,7 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 			fmt.Printf("  Running %s...\n", check.Name())
 		}
 
-		checkResults, checkErr := check.Run(ctx)
+		checkResults, checkErr := s.runCheckModule(ctx, check)
 		if checkErr != nil && verbose {
 			fmt.Printf("    Warning: %v\n", checkErr)
 		}
@@ -364,9 +380,9 @@ func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 	var results []ScanResult
 
 	if verbose {
-		fmt.Println("Running CMMC Level 1 (17 practices) - Open Source")
+		fmt.Println("Running CMMC Level 1 - Open Source (the level defines 17 practices)")
 		fmt.Println("")
-		fmt.Println("⚠️  IMPORTANT DISCLAIMER:")
+		fmt.Println("IMPORTANT DISCLAIMER:")
 		fmt.Println("═══════════════════════════════════════════════════════════")
 		fmt.Println("This scanner tests technical controls that can be automated.")
 		fmt.Println("")
@@ -390,6 +406,7 @@ func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 	for _, cr := range results1 {
 		results = append(results, ScanResult{
 			Control:           cr.Control,
+			Name:              cr.Name,
 			Status:            cr.Status,
 			Evidence:          cr.Evidence,
 			Remediation:       cr.Remediation,
@@ -404,9 +421,9 @@ func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 	if verbose {
 		fmt.Printf("\nCMMC Level 1 scan complete: %d controls tested\n", len(results))
 		fmt.Println("")
-		fmt.Println("🔓 UNLOCK CMMC LEVEL 2:")
-		fmt.Println("  • 110 additional Level 2 practices for CUI")
-		fmt.Println("  • Required for DoD contractors handling CUI")
+		fmt.Println("UNLOCK CMMC LEVEL 2:")
+		fmt.Println("  • All 110 CMMC Level 2 practices for CUI")
+		fmt.Println("  • Required for DoW contractors handling CUI")
 		fmt.Println("  • Complete evidence collection guides")
 		fmt.Println("  • November 10, 2025 deadline compliance")
 		fmt.Println("")
@@ -437,8 +454,13 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 		checks.NewCC9Checks(s.rdsClient, s.s3Client),
 		checks.NewAvailabilityConfidentialityChecks(s.s3Client, s.rdsClient),
 
+		// Advanced IAM and systems coverage. These suites were written but never
+		// constructed, so their controls (CC6.4-CC6.6, CC7.1, A1.1) never ran.
+		checks.NewIAMAdvancedChecks(s.iamClient),
+		checks.NewSystemsChecks(s.ssmClient, s.asClient),
+
 		// Also run traditional checks for backward compatibility
-		checks.NewS3Checks(s.s3Client),
+		checks.NewS3Checks(s.s3Client, s.s3controlClient, s.stsClient),
 		checks.NewIAMChecks(s.iamClient),
 		checks.NewEC2Checks(s.ec2Client),
 		checks.NewCloudTrailChecks(s.ctClient),
@@ -481,7 +503,7 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 			fmt.Printf("  Running %s ...\n", check.Name())
 		}
 
-		checkResults, err := check.Run(ctx)
+		checkResults, err := s.runCheckModule(ctx, check)
 		if err != nil && verbose {
 			fmt.Printf("    Warning in %s: %v\n", check.Name(), err)
 		}
@@ -490,6 +512,7 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 		for _, cr := range checkResults {
 			results = append(results, ScanResult{
 				Control:           cr.Control,
+				Name:              cr.Name,
 				Status:            cr.Status,
 				Evidence:          cr.Evidence,
 				Remediation:       cr.Remediation,
@@ -524,6 +547,7 @@ func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 	for _, cr := range checkResults {
 		results = append(results, ScanResult{
 			Control:           cr.Control,
+			Name:              cr.Name,
 			Status:            cr.Status,
 			Evidence:          cr.Evidence,
 			Remediation:       cr.Remediation,
@@ -537,19 +561,20 @@ func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 
 	// Also run basic checks but filter for PCI relevance
 	basicChecks := []checks.Check{
-		checks.NewIAMChecks(s.iamClient),       // For password policy, MFA, key rotation
-		checks.NewS3Checks(s.s3Client),         // For encryption requirements
-		checks.NewEC2Checks(s.ec2Client),       // For network segmentation
-		checks.NewCloudTrailChecks(s.ctClient), // For logging requirements
+		checks.NewIAMChecks(s.iamClient),                               // For password policy, MFA, key rotation
+		checks.NewS3Checks(s.s3Client, s.s3controlClient, s.stsClient), // For encryption requirements
+		checks.NewEC2Checks(s.ec2Client),                               // For network segmentation
+		checks.NewCloudTrailChecks(s.ctClient),                         // For logging requirements
 	}
 
 	for _, check := range basicChecks {
-		checkResults, _ := check.Run(ctx)
+		checkResults, _ := s.runCheckModule(ctx, check)
 		for _, cr := range checkResults {
 			// Only include if it has PCI mapping
 			if cr.Frameworks != nil && cr.Frameworks["PCI-DSS"] != "" {
 				results = append(results, ScanResult{
 					Control:           cr.Control,
+					Name:              cr.Name,
 					Status:            cr.Status,
 					Evidence:          cr.Evidence,
 					Remediation:       cr.Remediation,
@@ -564,4 +589,43 @@ func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 	}
 
 	return results
+}
+
+// runCheckModule executes a check module once per scan, reusing its results if
+// another framework suite in the same run already ran it.
+func (s *AWSScanner) runCheckModule(ctx context.Context, check checks.Check) ([]checks.CheckResult, error) {
+	if s.moduleResults == nil {
+		s.moduleResults = make(map[string][]checks.CheckResult)
+	}
+	if cached, ok := s.moduleResults[check.Name()]; ok {
+		return cached, nil
+	}
+	results, err := check.Run(ctx)
+	if err != nil {
+		// Caching a partial result and replaying it as success would hide the
+		// failure from every later framework suite in the same run.
+		return results, err
+	}
+	s.moduleResults[check.Name()] = results
+	return results, nil
+}
+
+// dedupeIdenticalResults removes results that are the same finding reported by
+// more than one framework suite. It keys on control, status and evidence, so
+// genuinely distinct findings that share a control ID (several resources failing
+// the same criterion) are preserved.
+func dedupeIdenticalResults(results []ScanResult) []ScanResult {
+	seen := make(map[string]bool, len(results))
+	deduped := make([]ScanResult, 0, len(results))
+
+	for _, result := range results {
+		key := result.Control + "\x00" + result.Status + "\x00" + result.Evidence
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		deduped = append(deduped, result)
+	}
+
+	return deduped
 }

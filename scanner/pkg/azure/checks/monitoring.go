@@ -84,16 +84,16 @@ VERIFICATION STEPS:
 1. Azure Portal → Monitor → Activity log → Diagnostic settings
 2. Confirm diagnostic setting exists at SUBSCRIPTION level
 3. Verify ALL log categories are enabled:
-   ✓ Administrative
-   ✓ Security
-   ✓ Service Health
-   ✓ Alert
-   ✓ Policy
-   ✓ Autoscale
-   ✓ Recommendation
+   - Administrative
+   - Security
+   - Service Health
+   - Alert
+   - Policy
+   - Autoscale
+   - Recommendation
 4. Confirm destinations configured:
-   ✓ Log Analytics workspace (for real-time querying/alerting)
-   ✓ Storage account (for 365+ day retention per CIS 5.2)
+   - Log Analytics workspace (for real-time querying/alerting)
+   - Storage account (for 365+ day retention per CIS 5.2)
 5. Storage account must use Customer-managed key (CMK) encryption (CIS 5.3)
 
 Azure CLI verification:

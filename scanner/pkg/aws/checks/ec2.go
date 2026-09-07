@@ -386,7 +386,7 @@ func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, err
 
 	if len(sshOpenGroups) > 0 {
 		return CheckResult{
-			Control:           "[CIS-5.2]",
+			Control:           "CIS-5.2",
 			Name:              "SSH Access from Internet",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -402,7 +402,7 @@ func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, err
 	}
 
 	return CheckResult{
-		Control:    "[CIS-5.2]",
+		Control:    "CIS-5.2",
 		Name:       "SSH Access from Internet",
 		Status:     "PASS",
 		Evidence:   "No security groups allow unrestricted SSH access",
@@ -437,7 +437,7 @@ func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, err
 
 	if len(rdpOpenGroups) > 0 {
 		return CheckResult{
-			Control:           "[CIS-5.3]",
+			Control:           "CIS-5.3",
 			Name:              "RDP Access from Internet",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -453,7 +453,7 @@ func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, err
 	}
 
 	return CheckResult{
-		Control:    "[CIS-5.3]",
+		Control:    "CIS-5.3",
 		Name:       "RDP Access from Internet",
 		Status:     "PASS",
 		Evidence:   "No security groups allow unrestricted RDP access",
@@ -497,7 +497,7 @@ func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult,
 
 	if len(openDefaultSGs) > 0 {
 		return CheckResult{
-			Control:           "[CIS-5.4]",
+			Control:           "CIS-5.4",
 			Name:              "Default Security Group",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -513,7 +513,7 @@ func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult,
 	}
 
 	return CheckResult{
-		Control:    "[CIS-5.4]",
+		Control:    "CIS-5.4",
 		Name:       "Default Security Group",
 		Status:     "PASS",
 		Evidence:   "All default security groups properly restrict traffic",
@@ -549,7 +549,7 @@ func (c *EC2Checks) CheckIMDSv2(ctx context.Context) (CheckResult, error) {
 
 	if len(imdsV1Instances) > 0 {
 		return CheckResult{
-			Control:           "[CIS-5.6]",
+			Control:           "CIS-5.6",
 			Name:              "EC2 IMDSv2",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -565,7 +565,7 @@ func (c *EC2Checks) CheckIMDSv2(ctx context.Context) (CheckResult, error) {
 	}
 
 	return CheckResult{
-		Control:    "[CIS-5.6]",
+		Control:    "CIS-5.6",
 		Name:       "EC2 IMDSv2",
 		Status:     "PASS",
 		Evidence:   "All EC2 instances require IMDSv2",
@@ -604,7 +604,7 @@ func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, e
 
 	if len(publicSnapshots) > 0 {
 		return CheckResult{
-			Control:           "[CIS-2.2.2]",
+			Control:           "CIS-2.2.2",
 			Name:              "EBS Public Snapshots",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -620,7 +620,7 @@ func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "[CIS-2.2.2]",
+		Control:    "CIS-2.2.2",
 		Name:       "EBS Public Snapshots",
 		Status:     "PASS",
 		Evidence:   "No EBS snapshots are publicly accessible",
@@ -635,7 +635,7 @@ func (c *EC2Checks) CheckInstanceIAMRoles(ctx context.Context) (CheckResult, err
 	result, err := c.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "[CIS-1.18]",
+			Control:    "CIS-1.18",
 			Name:       "EC2 Instance IAM Roles",
 			Status:     "FAIL",
 			Evidence:   fmt.Sprintf("Unable to check EC2 instances: %v", err),
@@ -673,7 +673,7 @@ func (c *EC2Checks) CheckInstanceIAMRoles(ctx context.Context) (CheckResult, err
 		}
 
 		return CheckResult{
-			Control:     "[CIS-1.18]",
+			Control:     "CIS-1.18",
 			Name:        "EC2 Instance IAM Roles",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
@@ -712,7 +712,7 @@ aws ec2 associate-iam-instance-profile --instance-id %s --iam-instance-profile N
 
 	if totalRunningInstances == 0 {
 		return CheckResult{
-			Control:    "[CIS-1.18]",
+			Control:    "CIS-1.18",
 			Name:       "EC2 Instance IAM Roles",
 			Status:     "INFO",
 			Evidence:   "No running EC2 instances found",
@@ -723,7 +723,7 @@ aws ec2 associate-iam-instance-profile --instance-id %s --iam-instance-profile N
 	}
 
 	return CheckResult{
-		Control:    "[CIS-1.18]",
+		Control:    "CIS-1.18",
 		Name:       "EC2 Instance IAM Roles",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d running EC2 instances use IAM roles | Meets CIS 1.18", totalRunningInstances),

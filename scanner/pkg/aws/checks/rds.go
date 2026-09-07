@@ -213,7 +213,7 @@ func (c *RDSChecks) CheckRDSMinorVersionUpgrade(ctx context.Context) (CheckResul
 
 	if len(noAutoUpgrade) > 0 {
 		return CheckResult{
-			Control:           "[CIS-2.3.2]",
+			Control:           "CIS-2.3.2",
 			Name:              "RDS Automatic Minor Version Upgrade",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -229,7 +229,7 @@ func (c *RDSChecks) CheckRDSMinorVersionUpgrade(ctx context.Context) (CheckResul
 	}
 
 	return CheckResult{
-		Control:    "[CIS-2.3.2]",
+		Control:    "CIS-2.3.2",
 		Name:       "RDS Automatic Minor Version Upgrade",
 		Status:     "PASS",
 		Evidence:   "All RDS instances have automatic minor version upgrade enabled",
@@ -256,7 +256,7 @@ func (c *RDSChecks) CheckRDSMultiAZ(ctx context.Context) (CheckResult, error) {
 
 	if len(noMultiAZ) > 0 {
 		return CheckResult{
-			Control:           "[CIS-2.3.4]",
+			Control:           "CIS-2.3.4",
 			Name:              "RDS Multi-AZ Deployment",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -272,7 +272,7 @@ func (c *RDSChecks) CheckRDSMultiAZ(ctx context.Context) (CheckResult, error) {
 	}
 
 	return CheckResult{
-		Control:    "[CIS-2.3.4]",
+		Control:    "CIS-2.3.4",
 		Name:       "RDS Multi-AZ Deployment",
 		Status:     "PASS",
 		Evidence:   "All RDS instances use Multi-AZ deployment",
@@ -299,7 +299,7 @@ func (c *RDSChecks) CheckRDSDeletionProtection(ctx context.Context) (CheckResult
 
 	if len(noDeletionProtection) > 0 {
 		return CheckResult{
-			Control:           "[CIS-2.3.5]",
+			Control:           "CIS-2.3.5",
 			Name:              "RDS Deletion Protection",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -315,7 +315,7 @@ func (c *RDSChecks) CheckRDSDeletionProtection(ctx context.Context) (CheckResult
 	}
 
 	return CheckResult{
-		Control:    "[CIS-2.3.5]",
+		Control:    "CIS-2.3.5",
 		Name:       "RDS Deletion Protection",
 		Status:     "PASS",
 		Evidence:   "All RDS instances have deletion protection enabled",

@@ -50,7 +50,7 @@
                 Most compliance tools stop at detection. AuditKit goes further: every failed check includes the specific CLI command to fix it, a step-by-step screenshot guide for manual evidence collection, and direct links to the relevant cloud console page.
             </p>
             <p>
-                The Community Edition covers SOC2, PCI-DSS v4.0.1, CMMC Level 1, HIPAA, NIST 800-53, CIS Benchmarks, ISO 27001, FedRAMP, and GDPR with full cross-framework mappings. AuditKit adds CMMC Level 2 (all 110 practices), multi-account scanning, evidence package generation, continuous monitoring, drift detection, and a Desktop GUI.
+                The Community Edition covers SOC2, PCI-DSS v4.0.1, CMMC Level 1, HIPAA, NIST 800-53, CIS Benchmarks, ISO 27001, FedRAMP, and GDPR with full cross-framework mappings. AuditKit reports all 110 CMMC Level 1 + 2 practices; AuditKit Pro adds automated checks for Level 2, multi-account scanning, evidence package generation, continuous monitoring, drift detection, and a Desktop GUI.
             </p>
         </div>
     </section>
@@ -103,7 +103,7 @@
                 AuditKit uses read-only API calls to inspect your cloud configuration. It never modifies your infrastructure. The scanner runs locally on your machine, connects to your cloud provider using your existing credentials, evaluates each compliance control, and generates a report.
             </p>
             <p>
-                Each scan result maps to one or more compliance framework controls. A single check -- like verifying S3 bucket encryption -- simultaneously satisfies SOC2 CC6.3, PCI-DSS 3.5.1, HIPAA 164.312(a)(2)(iv), and CMMC SC.L2-3.13.11. This cross-framework mapping eliminates duplicate work when you need multiple certifications.
+                Each scan result maps to one or more compliance framework controls. A single check, like verifying S3 bucket encryption, simultaneously satisfies SOC2 CC6.3, PCI-DSS 3.5.1, HIPAA 164.312(a)(2)(iv), and CMMC SC.L2-3.13.11. This cross-framework mapping eliminates duplicate work when you need multiple certifications.
             </p>
             <p>
                 All scanning happens locally. No data leaves your machine. No cloud account, no SaaS dashboard, no telemetry. The tool is a single Go binary that runs wherever you have credentials.

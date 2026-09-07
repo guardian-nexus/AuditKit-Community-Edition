@@ -18,7 +18,7 @@ Professional, auditor-ready compliance reports with clickable tabs, severity bad
 
 | Framework | Provider | Controls | View Report |
 |-----------|----------|----------|-------------|
-| **CMMC Level 2** | AWS | 127 practices | [View HTML](./reports/sample-aws-cmmc-level2-report.html) |
+| **CMMC Level 2** | AWS | 110 practices | [View HTML](./reports/sample-aws-cmmc-level2-report.html) |
 | **SOC2** | AWS | 49 controls | [View HTML](./reports/sample-aws-soc2-report.html) |
 | **CMMC Level 1** | Azure | 17 practices | [View HTML](./reports/sample-azure-cmmc-report.html) |
 

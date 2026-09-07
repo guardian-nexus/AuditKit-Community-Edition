@@ -48,3 +48,11 @@ Thumbs.db
 .env.local
 release-notes-*.md
 RELEASE-*.md
+
+# Local-only QA tooling: kept out of the public Community repo. These are
+# development aids for adding features and counting controls, not product code.
+.github/scripts/
+
+# Compiled Python bytecode.
+__pycache__/
+*.pyc

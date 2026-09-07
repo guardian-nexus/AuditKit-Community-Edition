@@ -22,7 +22,7 @@ func GenerateFixScript(results []ControlResult, outputPath string) error {
 	script.WriteString("#  REVIEW BEFORE RUNNING - This will modify your AWS account!\n\n")
 
 	script.WriteString("set -e  # Exit on error\n\n")
-	script.WriteString("echo '🔧 AuditKit Auto-Remediation Starting...'\n\n")
+	script.WriteString("echo 'AuditKit Auto-Remediation Starting...'\n\n")
 
 	criticalFixes := []string{}
 	highFixes := []string{}
