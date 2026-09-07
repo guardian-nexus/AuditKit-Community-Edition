@@ -418,6 +418,26 @@
    "file": "site/docs/frameworks/index.html",
    "metric": "cis.gcp",
    "pattern": "CIS Benchmarks</a></td><td>\\d+</td><td>\\d+</td><td>(\\d+)</td>"
+  },
+  {
+   "file": "site/docs/faq.md",
+   "metric": "controls.aws",
+   "pattern": "- AWS: (\\d+) controls - \\d+ SOC2 criteria"
+  },
+  {
+   "file": "site/docs/faq.md",
+   "metric": "controls.azure",
+   "pattern": "- Azure: (\\d+) controls - \\d+ SOC2 criteria"
+  },
+  {
+   "file": "site/docs/faq.md",
+   "metric": "controls.gcp",
+   "pattern": "- GCP: (\\d+) controls - \\d+ SOC2 criteria"
+  },
+  {
+   "file": "site/docs/faq.md",
+   "metric": "cmmc_l1.aws",
+   "pattern": "- AWS: \\d+ controls - \\d+ SOC2 criteria, \\d+ PCI-DSS requirements, (\\d+) of 17 CMMC Level 1"
   }
  ]
 }

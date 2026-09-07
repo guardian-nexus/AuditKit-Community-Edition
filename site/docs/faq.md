@@ -37,10 +37,10 @@ AuditKit can integrate with Prowler for complete NIST 800-53 coverage.
 |---------|------|---------------|
 | AWS/Azure/GCP/M365 | Full support | Full support |
 | SOC2, PCI-DSS, NIST 800-53 | All frameworks | All frameworks |
-| CMMC Level 1 | 17 practices | 17 practices |
-| CMMC Level 2 | - | 110 practices (CUI) |
+| CMMC Level 1 | 13 of 17 practices automated | 17 of 17 practices automated |
+| CMMC Level 2 | All 110 practices reported for evidence | All 110 practices automated (CUI) |
 | Controls assessed | 229 AWS, 178 Azure, 135 GCP | 321 AWS, 268 Azure, 284 GCP |
-| GCP Advanced | - | GKE + Vertex AI (32 checks) |
+| GCP Advanced | 5 GKE controls | Deep GKE scanning (15) + Vertex AI (10) |
 | Multi-Account | One at a time | AWS Orgs, Azure Mgmt, GCP Folders |
 | Support | Community | Priority + 14-day trial |
 
@@ -71,9 +71,9 @@ Compare to traditional costs:
 - M365 (Microsoft 365) via ScubaGear integration
 
 **Coverage:**
-- AWS: 229 controls - 38 SOC2 criteria, 59 PCI-DSS requirements, 17 CMMC L1 practices; CMMC L2 is Pro
-- Azure: 178 controls - 37 SOC2 criteria, 59 PCI-DSS requirements, 17 CMMC L1 practices; CMMC L2 is Pro
-- GCP: 135 controls - 32 SOC2 criteria, 49 PCI-DSS requirements; GKE and Vertex AI (32 checks) are Pro
+- AWS: 219 controls - 38 SOC2 criteria, 59 PCI-DSS requirements, 13 of 17 CMMC Level 1 practices automated; all 110 Level 1 + 2 practices reported
+- Azure: 174 controls - 37 SOC2 criteria, 59 PCI-DSS requirements, CMMC Level 1 automated; Level 2 practices reported
+- GCP: 133 controls - 32 SOC2 criteria, 49 PCI-DSS requirements, 5 GKE controls; deep GKE scanning and Vertex AI are Pro
 - M365: 29+ Entra ID rules via ScubaGear
 
 ### Which GCP services are scanned?
@@ -99,8 +99,8 @@ Compare to traditional costs:
 |-----------|--------|----------|
 | SOC2 Type II | Production | 38 criteria |
 | PCI-DSS v4.0.1 | Production | 69 requirements |
-| CMMC Level 1 | Production | 17 practices |
-| CMMC Level 2 | Pro only | 110 practices |
+| CMMC Level 1 | Production | 13 of 17 automated |
+| CMMC Level 2 | Reported free; automated in Pro | 110 practices |
 | NIST 800-53 Rev 5 | Production | 95 technical controls |
 | ISO 27001:2022 | Production | 46 controls, derived via crosswalk |
 | NIST CSF 2.0 | Production | 63 subcategories, derived via crosswalk |
