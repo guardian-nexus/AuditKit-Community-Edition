@@ -116,7 +116,7 @@ scanning, or a desktop interface.
 | | Community Edition (free) | AuditKit Pro ($297/mo) |
 |---|---|---|
 | **Cloud providers** | AWS, Azure, GCP, M365 | Same, plus Azure Arc |
-| **Controls assessed** | 219 AWS, 174 Azure, 133 GCP | 316 AWS, 322 Azure, 259 GCP |
+| **Controls assessed** | 219 AWS, 174 Azure, 133 GCP | 317 AWS, 322 Azure, 259 GCP |
 | **SOC2 Type II** | 38, 37, 32 criteria | 38, 38, 36 criteria |
 | **PCI DSS v4.0.1** | 69 requirements | 76 requirements |
 | **CMMC Level 1** | 13 of 17 practices automated | 17 of 17 practices automated |
