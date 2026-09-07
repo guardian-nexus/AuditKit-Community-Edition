@@ -193,13 +193,13 @@ All read-only, no write permissions required.
 
 ### What's the difference between CMMC Level 1 and Level 2?
 
-**CMMC Level 1 (17 practices) - FREE**
+**CMMC Level 1 (17 practices) - automated in the free Community Edition**
 - Protects Federal Contract Information (FCI)
 - Basic cybersecurity hygiene
 - Required for all DoW contractors
 - Self-assessment allowed
 
-**CMMC Level 2 (110 practices) - PRO**
+**CMMC Level 2 (110 practices) - reported free; automated checks in AuditKit Pro**
 - Protects Controlled Unclassified Information (CUI)
 - Based on NIST SP 800-171 Rev 2
 - Required for contractors handling CUI
