@@ -33,7 +33,7 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 - CMMC Level 1 automated (13 of 17 practices), and all 110 Level 1 + 2 practices reported for evidence tracking
 - NIST 800-53 Rev 5 (95 technical controls)
 - GCP Core Services (133 controls)
-- PDF, HTML, JSON reports
+- PDF, HTML, JSON, CSV and terminal reports
 - Evidence collection tracker
 - CLI tool
 - Community support
@@ -51,19 +51,19 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 
 ### Pro
 
-**$297/month** with 14-day free trial (no credit card required)
+**$297/month** with a 14-day free trial. Card required up front; cancel any time before the trial ends and you are not charged.
 
 **Everything in Free, plus:**
 
-**CMMC Level 2 (110 practices)**
+**CMMC Level 2 (all 110 L1 + L2 practices assessed)**
 - Required for DoW contractors handling CUI
-- Complete NIST SP 800-171 Rev 2 coverage
-- November 10, 2025 deadline compliance
+- Automated checks where your cloud configuration can prove it, structured evidence guidance where an assessor needs a document
+- Phase 1 self-assessment ready (Phase 2 C3PAO assessment suspended pending review)
 - C3PAO assessment preparation
 - Evidence packages
 
 **GCP Advanced**
-- GKE Security (10 checks)
+- GKE Deep Security (10 checks)
   - Workload Identity validation
   - Binary Authorization
   - Private clusters
@@ -96,7 +96,7 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 - Multi-cloud organizations
 - Enterprises needing priority support
 
-**[Start Free Trial →](https://auditkit.io/pro/)**
+**[Start Free Trial →](https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01)**
 
 ---
 
@@ -107,17 +107,17 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 | **Cloud Providers** |
 | AWS | Full support | Full support |
 | Azure | Full support | Full support |
-| Total controls assessed | 229 AWS, 178 Azure, 135 GCP | 321 AWS, 268 Azure, 284 GCP |
+| Total controls assessed | 219 AWS, 174 Azure, 133 GCP | 317 AWS, 322 Azure, 259 GCP |
 | GCP Core | Full support | Full support |
-| GCP Advanced | - | GKE + Vertex AI (32 checks) |
+| GCP Advanced | 5 basic GKE checks (CIS GCP 8.1-8.5) | Adds GKE deep security + Vertex AI (20 checks) |
 | M365 (ScubaGear) | Full support | Full support |
 | **Frameworks** |
 | SOC2 Type II | 38 criteria | 38 criteria |
-| PCI-DSS v4.0.1 | 69 requirements | 73 requirements |
+| PCI-DSS v4.0.1 | 69 requirements | 76 requirements |
 | CMMC Level 1 | 13 of 17 practices automated | 17 of 17 practices automated |
-| CMMC Level 2 | - | 110 practices |
-| NIST 800-53 Rev 5 | 95 controls | 129 controls |
-| HIPAA | 17 safeguards, derived | 17 safeguards, derived |
+| CMMC Level 2 | All 110 L1 + L2 practices reported for evidence tracking | All 110 assessed: automated checks where the cloud configuration can prove it, evidence guidance elsewhere |
+| NIST 800-53 Rev 5 | 95 controls | 135 controls |
+| HIPAA | 18 safeguards, derived | 18 safeguards, derived |
 | **Scanning** |
 | Single account/project | Yes | Yes |
 | Multi-account (AWS Orgs) | - | Yes |
@@ -266,7 +266,7 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 - Need Kubernetes and AI governance
 - SOC2 compliance
 
-**Solution:** Pro version (only version with GKE + Vertex AI checks)
+**Solution:** Pro version (only version with GKE deep security + Vertex AI checks)
 
 **Costs:**
 - AuditKit: $3,564/year
@@ -283,7 +283,7 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 
 ### Is there a discount for nonprofits?
 
-Contact info@auditkit.io for nonprofit pricing.
+Contact hello@auditkit.io for nonprofit pricing.
 
 ### Can I pay annually?
 
@@ -299,7 +299,7 @@ Yes. Cancel anytime during your trial or subscription. No long-term contracts.
 
 ### Do you offer refunds?
 
-14-day free trial (no credit card required). After trial, monthly subscriptions are non-refundable but can be cancelled anytime.
+14-day free trial. A card is required to start the trial and the subscription begins automatically when the trial ends unless you cancel first. After that, monthly subscriptions are non-refundable but can be cancelled anytime.
 
 ### Can I upgrade from Free to Pro?
 
@@ -307,7 +307,7 @@ Yes. Start Pro trial anytime from the free version.
 
 ### What happens when my trial ends?
 
-You'll be prompted to enter payment info. No automatic charges during trial.
+Your card is charged $297/month automatically unless you cancel before the trial ends.
 
 ### Do you offer enterprise pricing?
 
@@ -334,7 +334,7 @@ go build ./cmd/auditkit
 ### Pro Version
 
 1. **[Start 14-day free trial →](https://auditkit.io/pro/)**
-2. No credit card required
+2. Card required up front; cancel before the trial ends and you are not charged
 3. Download Pro binary and save your `.lic` file to `~/.auditkit-pro/license.lic`
 4. Run `auditkit-pro` — activation is automatic on first run
 5. Start scanning with Pro features

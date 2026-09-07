@@ -6,15 +6,15 @@ What AuditKit scans in Microsoft Azure.
 
 ## Overview
 
-**Coverage:** 178 controls across Azure services  
+**Coverage:** 174 controls across Azure services  
 **Supported in:** Free and Pro versions
 
 **Supported frameworks:**
-- SOC2 Type II (38 criteria)
-- PCI-DSS v4.0.1 (69 requirements)
+- SOC2 Type II (37 criteria)
+- PCI-DSS v4.0.1 (59 requirements)
 - CMMC Level 1 and Level 2: all 110 practices reported; Level 1 automated, Level 2 automated in Pro
-- NIST 800-53 Rev 5 (95 controls, derived via crosswalk)
-- HIPAA (17 safeguards, derived via crosswalk)
+- NIST 800-53 Rev 5 (83 controls, derived via crosswalk)
+- HIPAA (18 safeguards, derived via crosswalk)
 
 ---
 
@@ -24,14 +24,20 @@ What AuditKit scans in Microsoft Azure.
 
 **Controls checked:** 8
 
-- **CC6.2** - Public blob access disabled
-- **CC8.1** - Storage encryption at rest (Microsoft-managed or customer-managed keys)
-- **CC8.2** - Secure transfer (HTTPS) required
-- **CC7.2** - Blob soft delete enabled
-- **CC6.23** - Shared access signature (SAS) token security
-- **CC7.13** - Storage account firewall rules
-- **CC6.24** - Storage account key rotation
-- **SC.1.176** - Network access restrictions
+**Controls checked:** 13
+
+- **CIS-3.1** - Storage account public access blocked (SOC2 CC6.2)
+- **CIS-3.3 / CIS-3.4** - Storage encryption at rest and storage service encryption (SOC2 CC6.3)
+- **CIS-4.1** - Secure transfer (HTTPS) required (SOC2 CC6.7)
+- **CIS-4.2** - Infrastructure encryption
+- **CIS-4.3** - Storage account key rotation
+- **CIS-4.6** - Public network access disabled
+- **CIS-4.7** - Default network access rule set to Deny
+- **CIS-4.10** - Blob soft delete enabled (SOC2 CC9.1)
+- **CIS-4.12** - Storage logging
+- **CIS-4.15** - Minimum TLS version
+- **CIS-4.16** - Cross-tenant replication disabled
+- **CIS-4.17** - Blob anonymous access disabled
 
 **Example fixes:**
 ```bash
@@ -383,36 +389,35 @@ az network private-endpoint create \
 
 ## Controls by Framework
 
-### SOC2 Type II (38 criteria)
+### SOC2 Type II (37 of the 43 criteria carry automated Azure checks)
 
-**CC1 - Control Environment:** 5 controls  
-**CC2 - Communication:** 4 controls  
-**CC3 - Risk Assessment:** 6 controls  
-**CC5 - Control Activities:** 7 controls  
-**CC6 - Logical Access:** 18 controls  
-**CC7 - System Operations:** 12 controls  
-**CC8 - Change Management:** 6 controls  
-**CC9 - Risk Mitigation:** 6 controls
+**CC1 - Control Environment:** 5 criteria  
+**CC2 - Communication:** 3 criteria  
+**CC3 - Risk Assessment:** 4 criteria  
+**CC4 - Monitoring:** 2 criteria  
+**CC5 - Control Activities:** 3 criteria  
+**CC6 - Logical Access:** 8 criteria  
+**CC7 - System Operations:** 4 of 5 criteria  
+**CC8 - Change Management:** 1 criterion  
+**CC9 - Risk Mitigation:** 2 criteria  
+**A1 - Availability:** 3 criteria  
+**C1 - Confidentiality:** 2 criteria  
+**PI1 - Processing Integrity:** no automated Azure check (reported as MANUAL)
 
-### PCI-DSS v4.0.1 (69 requirements)
+### PCI-DSS v4.0.1 (59 requirements with automated checks)
 
-**Requirement 1 - Network Security:** 5 controls  
-**Requirement 2 - Secure Configurations:** 4 controls  
-**Requirement 3 - Cardholder Data Protection:** 6 controls  
-**Requirement 8 - Access Control:** 8 controls  
-**Requirement 10 - Logging:** 5 controls  
-**Requirement 11 - Security Testing:** 2 controls
+Automated checks map into all twelve requirement families (1 through 12). Requirements with no automated check are still reported and marked "No automated check covers this control".
 
-### CMMC Level 1 (17 practices)
+### CMMC Level 1 (17 practices, 13 automated)
 
-**Access Control:** 3 practices  
-**Identification & Authentication:** 2 practices  
-**Media Protection:** 1 practice  
-**Physical Protection:** 3 practices  
-**System Protection:** 5 practices  
-**System Integrity:** 3 practices
+**Access Control (AC):** 4 practices  
+**Identification & Authentication (IA):** 2 practices  
+**Media Protection (MP):** 1 practice  
+**Physical Protection (PE):** 4 practices  
+**System & Communications Protection (SC):** 2 practices  
+**System & Information Integrity (SI):** 4 practices
 
-### CMMC Level 2 (110 practices - Pro only)
+### CMMC Level 2 (110 practices - reported free, automated in Pro)
 
 All Level 1 practices plus 93 additional practices across 14 domains.
 
@@ -437,7 +442,7 @@ export AZURE_SUBSCRIPTION_ID="your-subscription-id"
 ./auditkit scan -provider azure -framework cmmc
 
 # Scan for CMMC Level 2 (Pro only)
-./auditkit-pro scan -provider azure -framework cmmc-l2
+./auditkit-pro scan -provider azure -framework cmmc
 
 # Generate report
 ./auditkit scan -provider azure -framework soc2 -format pdf -output azure-report.pdf

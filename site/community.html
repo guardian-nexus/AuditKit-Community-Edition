@@ -45,6 +45,7 @@
                 <span class="badge badge-outline">HIPAA</span>
                 <span class="badge badge-outline">CIS Benchmarks</span>
                 <span class="badge badge-outline">NIST 800-53</span>
+                <span class="badge badge-outline">NIST CSF 2.0</span>
                 <span class="badge badge-outline">ISO 27001</span>
                 <span class="badge badge-outline">FedRAMP</span>
                 <span class="badge badge-outline">GDPR</span>
@@ -57,17 +58,18 @@
         <div class="container-prose">
             <h2>Installation</h2>
 
-            <div class="code-block"><span class="comment"># Quick install (Go required)</span>
-go install github.com/guardian-nexus/auditkit/scanner/cmd/auditkit@latest
+            <div class="code-block"><span class="comment"># Download a prebuilt binary from the Releases page</span>
+<span class="comment"># https://github.com/guardian-nexus/AuditKit-Community-Edition/releases</span>
+tar xzf auditkit-linux-amd64.tar.gz &amp;&amp; chmod +x auditkit-linux-amd64
 
 <span class="comment"># Or build from source</span>
 git clone https://github.com/guardian-nexus/AuditKit-Community-Edition.git
-cd auditkit/scanner && go build ./cmd/auditkit
+cd AuditKit-Community-Edition/scanner && go build ./cmd/auditkit
 
 <span class="comment"># Run your first scan</span>
 ./auditkit scan -framework soc2 -format pdf -output report.pdf</div>
 
-            <p>Requires <a href="https://go.dev/dl/">Go 1.21+</a> and read-only cloud credentials. See the <a href="./docs/">documentation</a> for cloud-specific setup guides.</p>
+            <p>Requires <a href="https://go.dev/dl/">Go 1.24+</a> and read-only cloud credentials. See the <a href="./docs/">documentation</a> for cloud-specific setup guides.</p>
         </div>
     </section>
 
@@ -91,7 +93,8 @@ cd auditkit/scanner && go build ./cmd/auditkit
   <span class="label">Evidence:</span>    CloudTrail enabled in all regions, logs encrypted
   <span class="label">Frameworks:</span>  SOC2 (CC6.1), PCI-DSS (10.2.2), CMMC (AU.L2-3.3.1)
 
-<span class="comment"># Scan complete: 58/64 passing (91%)</span>
+<span class="comment"># Automated Check Score: 27.4% (23/84 passed)</span>
+<span class="comment"># Only 84 of 189 total controls are automated; the rest need evidence you collect</span>
 <span class="comment"># PDF report: compliance-report.pdf</span></div>
 
             <p>Every failed check includes the specific CLI command to fix it, a step-by-step screenshot guide for manual evidence collection, and a direct link to the relevant cloud console page.</p>
@@ -114,7 +117,7 @@ cd auditkit/scanner && go build ./cmd/auditkit
     <section class="section section-alt">
         <div class="container text-center">
             <p class="text-muted" style="max-width: 540px; margin: 0 auto;">
-                Need automated Level 2 checks, evidence packages, or continuous monitoring? <a href="/">AuditKit</a> adds automated checks for all 110 CMMC Level 2 practices, multi-account scanning, drift detection, and more.
+                Need automated Level 2 checks, evidence packages, or continuous monitoring? <a href="/">AuditKit</a> assesses all 110 Level 1 + 2 practices - automated checks where your cloud configuration can prove it, structured evidence guidance where an assessor needs a document - and adds multi-account scanning, drift detection, and more.
             </p>
         </div>
     </section>

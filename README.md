@@ -1,6 +1,6 @@
 # AuditKit - Open-Source Compliance Scanner
 
-**Scan AWS, Azure, GCP, and M365 for SOC2, PCI-DSS, HIPAA, CMMC Level 1 & 2, CIS Benchmarks, and NIST 800-53 compliance. Get audit-ready reports in minutes.**
+**Scan AWS, Azure and GCP - plus Microsoft 365 via ScubaGear import - against ten frameworks - SOC2, PCI DSS v4.0.1, CMMC Level 1 & 2, HIPAA, NIST 800-53, ISO 27001, NIST CSF 2.0, GDPR, FedRAMP and CIS Benchmarks. Get audit-ready reports in minutes.**
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -8,7 +8,7 @@
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://guardiannexus.substack.com)
 
 **New in v0.8.6:** CMMC Level 2 is now reported in the Community Edition - all 110 practices, with
-Level 1 automated and the remainder listed with evidence-collection guidance.
+Level 1 automated (13 of 17 practices) and the remainder listed with evidence-collection guidance.
 
 **Need automated Level 2 checks, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
 
@@ -47,9 +47,9 @@ go build ./cmd/auditkit
 
 AuditKit scans your cloud infrastructure for compliance gaps and security misconfigurations:
 
-- **Automated Scanning:** 219 AWS, 174 Azure and 133 GCP controls
+- **Broad Control Coverage:** 219 AWS, 174 Azure and 133 GCP controls assessed - some return an automated verdict, the rest are reported with evidence-collection guidance
 - **Full CMMC Scope:** all 110 Level 1 + 2 practices reported, so you see the whole assessment surface
-- **Multi-Cloud Support:** AWS, Azure, GCP, M365 in one tool
+- **Multi-Cloud Support:** AWS, Azure and GCP scanned directly, Microsoft 365 via ScubaGear import
 - **Audit-Ready Reports:** PDF/HTML/JSON output with evidence
 - **Fix Commands:** Exact CLI/Terraform commands to remediate issues
 - **Framework Crosswalk:** One control fix improves multiple frameworks
@@ -69,10 +69,10 @@ measured from the checks themselves.
 
 | Framework | AWS | Azure | GCP | Purpose |
 |-----------|-----|-------|-----|---------|
-| **SOC2 Type II** | 38 of 38 | 37 of 38 | 32 of 38 | SaaS customer requirements |
+| **SOC2 Type II** | 38 of 43 | 37 of 43 | 32 of 43 | SaaS customer requirements |
 | **PCI DSS v4.0.1** | 59 | 59 | 49 | Payment card processing |
 | **CMMC Level 1** | 13 of 17 | 13 of 17 | 9 of 17 | DoW contractor compliance (FCI) |
-| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; automated Level 2 checks in [AuditKit Pro](https://auditkit.io/) |
+| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; 8 practices automated on GCP, none on AWS/Azure. Automated Level 2 across all providers in [AuditKit Pro](https://auditkit.io/) |
 
 69 distinct PCI DSS v4.0.1 requirements are assessed across the three providers.
 
@@ -106,7 +106,7 @@ above rather than separate control sets.
 ## Community Edition vs AuditKit Pro
 
 This repository is the **Community Edition**: free, open source, and the whole
-scanner for AWS, Azure, GCP and M365 against SOC2, PCI DSS, CMMC Level 1 and 2,
+scanner for AWS, Azure and GCP - with Microsoft 365 via ScubaGear import - against SOC2, PCI DSS, CMMC Level 1 and 2,
 and the frameworks derived from them. It is not a trial or a crippled build.
 
 **AuditKit Pro** is a separate paid product for organisations that need
@@ -115,12 +115,12 @@ scanning, or a desktop interface.
 
 | | Community Edition (free) | AuditKit Pro ($297/mo) |
 |---|---|---|
-| **Cloud providers** | AWS, Azure, GCP, M365 | Same, plus Azure Arc |
+| **Cloud providers** | AWS, Azure, GCP scanned; M365 via ScubaGear import | Same, plus Azure Arc |
 | **Controls assessed** | 219 AWS, 174 Azure, 133 GCP | 317 AWS, 322 Azure, 259 GCP |
 | **SOC2 Type II** | 38, 37, 32 criteria | 38, 38, 36 criteria |
 | **PCI DSS v4.0.1** | 69 requirements | 76 requirements |
 | **CMMC Level 1** | 13 of 17 practices automated | 17 of 17 practices automated |
-| **CMMC Level 2** | All 110 practices reported for evidence | All 110 practices automated |
+| **CMMC Level 2** | All 110 practices reported for evidence | All 110 covered: 42 query the cloud, 68 are evidence guidance |
 | **CIS Benchmarks** | 158 AWS, 108 Azure, 71 GCP | 158 AWS, 122 Azure, 72 GCP |
 | **Derived frameworks** | 800-53, ISO 27001, HIPAA, GDPR, NIST CSF, FedRAMP | Same six, from a larger control set |
 | **NIST 800-53 derived** | 95 controls | 135 controls |
@@ -244,7 +244,7 @@ New Features:
 
 ---
 
-## AuditKit Pro Desktop (v0.9.4-pro)
+## AuditKit Pro Desktop (v0.9.6-pro)
 
 *This section describes AuditKit Pro, the paid product. It is not part of the
 Community Edition and is not built from this repository.*
@@ -292,8 +292,8 @@ cp ~/Downloads/license.lic ~/.auditkit-pro/license.lic
 
 **For Startups:** Free SOC2 prep without $50K consultants  
 **For Security Teams:** CIS Benchmarks for proactive hardening  
-**For DoW Contractors:** CMMC Level 1 (Community Edition) or [Level 2](https://auditkit.io/) compliance  
-**For Multi-Cloud:** Single tool for AWS + Azure + GCP + M365  
+**For DoW Contractors:** all 110 CMMC Level 1 + 2 practices reported free, with Level 1 automated (13 of 17) and 8 Level 2 practices automated on GCP - [automated Level 2 across all providers in Pro](https://auditkit.io/)  
+**For Multi-Cloud:** Single tool for AWS + Azure + GCP, with M365 via ScubaGear import  
 **For DevOps:** JSON output for CI/CD integration
 
 ---
@@ -315,7 +315,7 @@ go build ./cmd/auditkit
 
 **Option 2: Provider-Specific Scanners (Smaller Binaries)**
 ```bash
-# AWS-only scanner (~30% smaller)
+# AWS-only scanner (~93% smaller: 22 MB vs 310 MB)
 go build -o auditkit-aws ./cmd/auditkit-aws
 ./auditkit-aws scan -framework soc2
 
@@ -329,7 +329,7 @@ go build -o auditkit-gcp ./cmd/auditkit-gcp
 ```
 
 **Requirements:**
-- Go 1.19+
+- Go 1.24+ (matching `scanner/go.mod`)
 - Cloud credentials configured (AWS CLI, Azure CLI, gcloud CLI)
 - Read-only permissions (no write access needed)
 
@@ -344,7 +344,7 @@ go build -o auditkit-gcp ./cmd/auditkit-gcp
 # AWS scans
 ./auditkit scan -provider aws -framework soc2       # SOC2 Type II
 ./auditkit scan -provider aws -framework pci        # PCI-DSS v4.0
-./auditkit scan -provider aws -framework cmmc       # CMMC Level 1
+./auditkit scan -provider aws -framework cmmc       # CMMC Level 1 + 2 (110 practices)
 ./auditkit scan -provider aws -framework 800-53     # NIST 800-53 Rev 5
 
 # Azure scans
@@ -360,9 +360,9 @@ go build -o auditkit-gcp ./cmd/auditkit-gcp
 
 ### Security Hardening (CIS Benchmarks)
 ```bash
-./auditkit scan -provider aws -framework cis-aws      # CIS AWS (58 controls)
-./auditkit scan -provider azure -framework cis-azure  # CIS Azure (40+ controls)
-./auditkit scan -provider gcp -framework cis-gcp      # CIS GCP (30+ controls)
+./auditkit scan -provider aws -framework cis-aws      # CIS AWS (158 controls)
+./auditkit scan -provider azure -framework cis-azure  # CIS Azure (108 controls)
+./auditkit scan -provider gcp -framework cis-gcp      # CIS GCP (71 controls)
 ```
 
 ### Report Generation
@@ -420,7 +420,7 @@ prowler aws --output-formats json -o prowler-output     # Run Prowler first
 ### Getting Started
 - **[Quick Start Guide](./site/docs/getting-started.md)** - First scan in 5 minutes
 - **[Cloud Provider Setup](./site/docs/setup/)** - AWS, Azure, GCP, M365 authentication
-- **[Understanding Results](./site/docs/understanding-results.md)** - Pass/Fail/Info status explained
+- **[Understanding Results](./site/docs/getting-started.md#understanding-your-results)** - Pass/Fail/Info status explained
 
 ### Frameworks
 - **[SOC2 Type II](./site/docs/frameworks/soc2.md)** - Trust Services Criteria
@@ -432,13 +432,13 @@ prowler aws --output-formats json -o prowler-output     # Run Prowler first
 
 ### Examples & Use Cases
 - **[Sample Reports](./site/examples/)** - See what output looks like
-- **[Remediation Examples](./site/examples/remediation.md)** - How to fix issues
+- **[Sample Scan Outputs](./site/examples/scan-outputs/)** - Real findings with their fix commands
 - **[CI/CD Integration](./site/examples/cicd.md)** - Automate compliance checks
 
 ### Reference
 - **[CLI Reference](./site/docs/cli-reference.md)** - All commands and flags
 - **[FAQ](./site/docs/faq.md)** - Common questions
-- **[Troubleshooting](./site/docs/troubleshooting.md)** - Known issues and fixes
+- **[Troubleshooting](./site/docs/faq.md#troubleshooting)** - Known issues and fixes
 
 ---
 
@@ -535,7 +535,7 @@ We need help with:
 - **Community Support:** [GitHub Issues](https://github.com/guardian-nexus/AuditKit-Community-Edition/issues)
 - **Security Issues:** [SECURITY.md](./SECURITY.md)
 - **Newsletter:** [guardiannexus.substack.com](https://guardiannexus.substack.com)
-- **AuditKit Pro Support:** Priority email + Slack channel (info@auditkit.io)
+- **AuditKit Pro Support:** Priority email, 24-48 hour response (info@auditkit.io)
 
 ---
 

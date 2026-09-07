@@ -132,7 +132,7 @@ they report CMMC practice identifiers that do not match the standard.
   - Notes field for each control
   - Export to JSON for backup/sharing
   - Print-friendly layout
-  - Use `auditkit evidence-tracker -provider aws -output tracker.html`
+  - Use `auditkit evidence -provider aws` (writes evidence-tracker.html)
 
 ### Improved
 - Evidence tracker now persists progress in browser localStorage
@@ -437,7 +437,7 @@ Special thanks to our community contributor for the comprehensive Entra ID secur
 Added
 
 CMMC Level 1 Support: Complete implementation of all 17 CMMC Level 1 practices for both AWS and Azure
-DoD Contractor Compliance: Support for Federal Contract Information (FCI) protection requirements
+DoW Contractor Compliance: Support for Federal Contract Information (FCI) protection requirements
 November 10, 2025 Deadline Tracking: Built-in countdown and deadline warnings for CMMC compliance
 CMMC Evidence Collection: Screenshot guides and console URLs for all 17 Level 1 practices
 Framework-Specific Help: Enhanced verbose output with control counts and deadline information

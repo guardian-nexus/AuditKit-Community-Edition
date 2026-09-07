@@ -7,20 +7,20 @@ What AuditKit scans in Google Cloud Platform.
 ## Overview
 
 **Community Edition:** 133 controls across 8 core services  
-**Pro version:** 210+ automated checks (178 core + 32 advanced)
+**Pro version:** 259 controls, including 15 GKE and 10 Vertex AI checks
 
 **Supported frameworks:**
 - SOC2 Type II
 - PCI-DSS v4.0.1
-- CMMC Level 1 automated; all 110 Level 1 + 2 practices reported (Level 2 automated in Pro)
-- NIST 800-53 Rev 5
-- HIPAA (17 safeguards, derived via crosswalk)
+- CMMC: 9 of the 17 Level 1 practices automated on GCP; all 110 Level 1 + 2 practices reported (Level 2 automated in Pro)
+- NIST 800-53 Rev 5 (84 controls, derived via crosswalk)
+- HIPAA (18 safeguards, derived via crosswalk)
 
 ---
 
 ## Core Services (Free & Pro)
 
-### Cloud Storage (GCS) - 4 Checks
+### Cloud Storage (GCS) - 6 Checks
 
 #### CC6.2 - Public Access Controls
 **What it checks:**
@@ -483,13 +483,15 @@ gcloud logging sinks create SINK_NAME \
 
 ---
 
-## Advanced Services (Pro Only)
+## Advanced Services
 
-### GKE (Google Kubernetes Engine) - 10 Checks
+### GKE (Google Kubernetes Engine) - 5 checks free, 15 in Pro
 
-**Pro version required:** $297/month
+The Community Edition covers CIS GCP 8.1-8.5 (Binary Authorization, Network Policies, Kubernetes Dashboard, Pod Security Policy, Workload Identity). AuditKit Pro adds ten deeper GKE security checks.
 
-#### Workload Identity Validation
+**Pro version required for the deep GKE checks:** $297/month
+
+#### Workload Identity Validation (Community Edition, CIS GCP 8.5)
 **What it checks:**
 - Workload Identity enabled on clusters
 - Pods use Workload Identity vs node service accounts
@@ -727,9 +729,10 @@ gcloud logging sinks create SINK_NAME \
 - Cloud Functions
 - Cloud Run
 - Pub/Sub
-- BigQuery
 - Dataflow
 - Cloud Spanner
+
+(BigQuery is already covered — see CIS GCP 7.1 and 7.2.)
 
 **Vote for features:** [GitHub Issues](https://github.com/guardian-nexus/AuditKit-Community-Edition/issues)
 
@@ -765,7 +768,7 @@ gcloud auth application-default login
 export GOOGLE_CLOUD_PROJECT=my-project-id
 
 # Scan for CMMC Level 2 (includes GKE + Vertex AI)
-./auditkit-pro scan -provider gcp -framework cmmc-l2
+./auditkit-pro scan -provider gcp -framework cmmc
 
 # Scan entire organization (Pro only)
 ./auditkit-pro scan -provider gcp -framework soc2 --scan-all

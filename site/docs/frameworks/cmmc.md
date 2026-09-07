@@ -65,7 +65,7 @@ SPRS score postings and annual affirmations.
 
 ### The 17 Practices
 
-AuditKit automates checks for these practices:
+AuditKit reports all 17 practices. 13 carry an automated check on AWS and Azure, 9 on GCP; the rest are reported for evidence tracking:
 
 #### Access Control (AC)
 1. **AC.1.001** - Limit system access to authorized users
@@ -98,7 +98,7 @@ AuditKit automates checks for these practices:
 
 ### What AuditKit Checks (Level 1)
 
-**Queried automatically from your cloud configuration (5 of the 17):**
+**Queried automatically from your cloud configuration (13 of the 17 on AWS and Azure, 9 of 17 on GCP):**
 - IAM password policy configuration
 - MFA enforcement
 - Access key rotation
@@ -108,7 +108,11 @@ AuditKit automates checks for these practices:
 - Encryption at rest
 - Patch management
 
-**Manual verification required (9 practices):**
+**No automated check - manual verification required (4 practices):**
+- AC.L1-3.1.20 - Verify and control connections to external systems
+- AC.L1-3.1.22 - Control publicly posted information
+- SI.L1-3.14.4 - Update malicious code protection mechanisms
+- SI.L1-3.14.5 - Perform periodic and real-time scans
 - Physical security measures
 - Visitor escort procedures
 - Media sanitization procedures
@@ -129,7 +133,8 @@ auditkit scan -provider gcp -framework cmmc
 auditkit scan -provider aws -framework cmmc -format pdf -output cmmc-l1-report.pdf
 
 # Generate evidence tracker for manual practices
-auditkit evidence -framework cmmc -format html -output cmmc-evidence.html
+# Evidence tracker (covers every framework; -framework and -format are not honoured here)
+auditkit evidence -output cmmc-evidence.html
 ```
 
 ### Level 1 Timeline
@@ -145,13 +150,13 @@ auditkit evidence -framework cmmc -format html -output cmmc-evidence.html
 
 ---
 
-## CMMC Level 2 (Pro)
+## CMMC Level 2 (reported in Community, automated in Pro)
 
 ### The 110 Practices
 
 Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14 domains.
 
-**Pro version required:** $297/month with 14-day free trial
+**Free in Community for reporting all 110 practices. Automated Level 2 checks require Pro:** $297/month with 14-day free trial
 
 ### CMMC Level 2 Domains
 
@@ -163,7 +168,7 @@ Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14
 - Session termination
 - Access enforcement
 
-#### Awareness & Training (AT) - 5 practices
+#### Awareness & Training (AT) - 3 practices
 - Security awareness training
 - Role-based training
 - Insider threat awareness
@@ -190,7 +195,7 @@ Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14
 - Cryptographic authentication
 - Password complexity
 
-#### Incident Response (IR) - 7 practices
+#### Incident Response (IR) - 3 practices
 - Incident handling
 - Incident monitoring
 - Incident reporting
@@ -210,7 +215,7 @@ Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14
 - Media sanitization
 - Media accountability
 
-#### Personnel Security (PS) - 5 practices
+#### Personnel Security (PS) - 2 practices
 - Personnel screening
 - Termination procedures
 - Personnel sanctions
@@ -223,23 +228,21 @@ Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14
 - Access logs
 - Asset monitoring
 
-#### Recovery (RE) - 2 practices
-- Backup and restore
-- System recovery testing
+(delete this heading and its two bullets entirely)
 
-#### Risk Assessment (RA) - 5 practices
+#### Risk Assessment (RA) - 3 practices
 - Risk assessments
 - Vulnerability scanning
 - Remediation tracking
 - Threat analysis
 
-#### Security Assessment (CA) - 7 practices
+#### Security Assessment (CA) - 4 practices
 - Security assessments
 - Plan of Action & Milestones (POA&M)
 - Security authorization
 - Continuous monitoring
 
-#### System & Communications Protection (SC) - 15 practices
+#### System & Communications Protection (SC) - 16 practices
 - Boundary protection
 - Network segmentation
 - Cryptographic protection
@@ -248,7 +251,7 @@ Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14
 - Session authenticity
 - Denial of service protection
 
-#### System & Information Integrity (SI) - 11 practices
+#### System & Information Integrity (SI) - 7 practices
 - Flaw remediation
 - Malicious code protection
 - System monitoring
@@ -274,7 +277,7 @@ All technical controls across:
 - Key rotation
 - Public access controls
 
-**Manual verification required (77 practices):**
+**Structured evidence guidance (68 practices):**
 Organizational controls:
 - Policies and procedures
 - Training programs
@@ -288,15 +291,15 @@ Organizational controls:
 
 ```bash
 # Scan for CMMC Level 2 (requires Pro license)
-auditkit-pro scan -provider aws -framework cmmc-l2
-auditkit-pro scan -provider azure -framework cmmc-l2
-auditkit-pro scan -provider gcp -framework cmmc-l2
+auditkit-pro scan -provider aws -framework cmmc
+auditkit-pro scan -provider azure -framework cmmc
+auditkit-pro scan -provider gcp -framework cmmc
 
 # Generate complete assessment report
-auditkit-pro scan -provider aws -framework cmmc-l2 -format pdf -output cmmc-l2-report.pdf
+auditkit-pro scan -provider aws -framework cmmc -format pdf -output cmmc-report.pdf
 
-# Generate evidence tracker for all 110 practices
-auditkit-pro evidence -framework cmmc-l2 -format html -output cmmc-l2-evidence.html
+# Generate the evidence tracker (covers every framework; -framework does not scope it)
+auditkit-pro evidence -output cmmc-evidence.html
 ```
 
 ### Level 2 Timeline
@@ -325,8 +328,8 @@ auditkit-pro evidence -framework cmmc-l2 -format html -output cmmc-l2-evidence.h
 | **Cost (AuditKit)** | Free | $297/month |
 | **Cost (Assessment)** | $0 | $0 under Phase 1; $25,000-$150,000 if C3PAO resumes |
 | **Timeline** | 2-4 weeks | 3-6 months |
-| **Automated Checks** | 8 | 33 |
-| **Manual Docs** | 9 | 77 |
+| **Automated Checks** | 13 of 17 | 42 of 110 query the cloud |
+| **Manual Docs** | 4 | 68 assessed as evidence guidance |
 | **Required For** | All DoW contracts | CUI contracts |
 | **Deadline** | Now | Now (Phase 1, self-assessment) |
 
@@ -339,9 +342,9 @@ auditkit-pro evidence -framework cmmc-l2 -format html -output cmmc-l2-evidence.h
 AuditKit maps all 110 CMMC Level 2 practices to their corresponding NIST SP 800-171 controls.
 
 **Example mapping:**
-- CMMC AC.2.007 → NIST 800-171 3.1.2
-- CMMC IA.2.081 → NIST 800-171 3.5.3
-- CMMC SC.2.179 → NIST 800-171 3.13.1
+- CMMC AC.L1-3.1.2 → NIST 800-171 3.1.2
+- CMMC IA.L2-3.5.3 → NIST 800-171 3.5.3
+- CMMC SC.L1-3.13.1 → NIST 800-171 3.13.1
 
 This means passing CMMC Level 2 = compliance with NIST SP 800-171.
 

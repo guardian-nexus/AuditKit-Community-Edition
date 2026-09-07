@@ -14,6 +14,24 @@ auditkit [command] [flags]
 
 ## Commands
 
+### cache
+
+List and manage the offline scan cache.
+
+```bash
+auditkit cache
+```
+
+Every scan is cached under `~/.auditkit/cache`. Combined with `-offline`, this lets you scan on a connected machine and produce reports on an air-gapped one.
+
+```bash
+# Report from the newest cached scan, no cloud API calls
+auditkit scan -provider aws -framework soc2 -offline
+
+# Report from a specific cache file
+auditkit scan -offline -cache-file /path/to/scan.json
+```
+
 ### scan
 
 Run a compliance scan against your cloud infrastructure.
@@ -44,14 +62,14 @@ auditkit scan --full
 
 **Flags:**
 - `-provider` - Cloud provider: `aws`, `azure`, `gcp` (default: `aws`)
-- `-framework` - Compliance framework: `soc2`, `pci`, `cmmc`, `cmmc-l2`, `800-53`, `hipaa`, `all` (default: `soc2`)
+- `-framework` - Compliance framework: `soc2`, `pci`, `cmmc`, `hipaa`, `gdpr`, `nist-csf`, `800-53`, `iso27001`, `fedramp-low`, `fedramp-moderate`, `fedramp-high`, `cis`, `cis-aws`, `cis-azure`, `cis-gcp`, `all` (default: `all`)
 - `-verbose` - Show detailed output
 - `--full` - Show all controls without truncation
-- `-format` - Output format: `text`, `json`, `html`, `pdf` (default: `text`)
+- `-format` - Output format: `text`, `json`, `html`, `pdf`, `csv` (default: `text`)
 - `-output` - Output file path (e.g., `report.pdf`)
 - `-profile` - AWS profile name (AWS only)
 - `--scan-all` - Scan all accounts/subscriptions/projects (Pro only)
-- `--max-concurrent` - Max concurrent scans (Pro only, default: 3)
+- `--max-concurrent` - Max concurrent scans (Pro only, default: 5)
 - `--summary-only` - Show summary only, skip detailed results (Pro only)
 
 ---
@@ -82,7 +100,7 @@ auditkit integrate -source scubagear -file ScubaResults.json -format pdf -output
 **Flags:**
 - `-source` - Source tool: `prowler`, `scubagear`
 - `-file` - Path to results file
-- `-format` - Output format: `text`, `json`, `html`, `pdf` (default: `text`)
+- `-format` - Output format: `text`, `json`, `pdf` (default: `text`)
 - `-output` - Output file path
 
 ---
@@ -109,8 +127,8 @@ bash fixes.sh  # Run after review
 ```
 
 **Flags:**
-- `-output` - Output file path (default: stdout)
-- `-provider` - Cloud provider (uses last scan if omitted)
+- `-output` - Output file path (default: `auditkit-<provider>-fixes.sh`)
+- `-provider` - Cloud provider to re-scan; `fix` runs a fresh scan rather than reusing the last one (default: `aws`)
 
 ---
 
@@ -177,6 +195,9 @@ Score Change: +5.6%
 Track the evidence an assessor will ask for. Auditors want evidence for every
 control, including the ones that pass, so this covers the whole scan rather than
 just failures.
+
+**Note:** the tracker currently always runs the SOC2 control set. The `-framework`
+flag does not apply to this command.
 
 ```bash
 auditkit evidence [flags]
@@ -277,7 +298,7 @@ auditkit version
 
 **Output:**
 ```
-AuditKit v0.8.5 - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)
+AuditKit v0.8.6 - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)
 ```
 
 ---
@@ -286,8 +307,10 @@ AuditKit v0.8.5 - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)
 
 These flags work with all commands:
 
-- `-h`, `--help` - Show help for command
-- `-v`, `--version` - Show version
+- `auditkit version` - Show version
+- `auditkit <command> --help` - Show the flag list (e.g. `auditkit scan --help`)
+
+Note: bare `-h`, `--help`, `-v` and `--version` are not recognised — they are treated as commands and print the usage block with an "Unknown command" warning.
 
 ---
 
@@ -392,11 +415,9 @@ GCP_PROJECT                     # Alternative project ID variable
 ## Exit Codes
 
 - `0` - Success
-- `1` - General error
-- `2` - Authentication error
-- `3` - Permission denied
-- `4` - Invalid arguments
-- `5` - Scan failed
+- `1` - Any error (bad arguments, missing credentials, permission denied, or a failed scan)
+
+AuditKit does not currently distinguish error classes by exit code. To branch on the result in CI, parse the JSON report rather than the exit status.
 
 ---
 
@@ -508,10 +529,10 @@ auditkit-pro scan -provider aws --scan-all --max-concurrent 5
 
 ```bash
 # Scan for CMMC Level 2 (110 practices)
-auditkit scan -provider aws -framework cmmc-l2
+auditkit-pro scan -provider aws -framework cmmc
 
 # Generate Level 2 report
-auditkit scan -provider aws -framework cmmc-l2 -format pdf -output cmmc-l2-report.pdf
+auditkit-pro scan -provider aws -framework cmmc -format pdf -output cmmc-l2-report.pdf
 ```
 
 ### Advanced GCP

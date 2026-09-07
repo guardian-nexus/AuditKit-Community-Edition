@@ -8,14 +8,15 @@ AuditKit supports multiple compliance frameworks for automated technical control
 
 | Framework | Status | Automated Controls | Cloud Providers |
 |-----------|--------|-------------------|-----------------|
-| **[SOC2 Type II](./soc2.md)** | Production | 38 criteria | AWS, Azure, GCP |
+| **[SOC2 Type II](./soc2.md)** | Production | 38 of 43 criteria | AWS, Azure, GCP |
 | **[PCI-DSS v4.0.1](./pci-dss.md)** | Production | 69 requirements across all 12 groups | AWS, Azure, GCP |
 | **[CMMC Level 1](./cmmc.md)** | Production | 13 of 17 practices | AWS, Azure, GCP |
 | **[CMMC Level 2](./cmmc.md)** | Reported; automated in Pro | 110 practices | AWS, Azure, GCP |
 | **[CIS Benchmarks](./cis-benchmarks.md)** | Production | AWS: 158, Azure: 108, GCP: 71 | AWS, Azure, GCP |
-| **[NIST 800-53 Rev 5](./nist-800-53.md)** | Production | 95 technical controls (covers FedRAMP) | AWS, Azure, GCP |
-| **[ISO 27001:2022](./iso27001.md)** | Production | 46 controls, derived | AWS, Azure, GCP |
-| **[NIST CSF 2.0](./nist-csf.md)** | Production | 63 subcategories, derived | AWS, Azure, GCP |
+| **[NIST 800-53 Rev 5](./nist-800-53.md)** | Production | 95 technical controls (covers FedRAMP), derived, of 1,196 in the catalog | AWS, Azure, GCP |
+| **[FedRAMP](./fedramp.md)** | Production | Low 56 of 149, Moderate 77 of 287, High 78 of 370 on AWS | AWS, Azure, GCP |
+| **[ISO 27001:2022](./iso27001.md)** | Production | 46 controls, derived (48 on AWS, of 93 in Annex A) | AWS, Azure, GCP |
+| **[NIST CSF 2.0](./nist-csf.md)** | Production | 63 subcategories, derived (65 AWS, 62 Azure, of 106) | AWS, Azure, GCP |
 | **[GDPR](./gdpr.md)** | Production | 14 articles, derived | AWS, Azure, GCP |
 | **[HIPAA Security Rule](./hipaa.md)** | Production | 18 safeguards, derived | AWS, Azure, GCP |
 
@@ -28,14 +29,16 @@ Fully tested, comprehensive coverage, used in production environments:
 - **SOC2 Type II** - For SaaS companies and startups
 - **PCI-DSS v4.0.1** - For payment card processing
 - **CMMC Level 1** - For all DoW contractors
-- **CIS Benchmarks** - For security hardening (AWS: 125 controls, Azure: 108 controls, GCP: 26 controls)
+- **CIS Benchmarks** - For security hardening (AWS: 158 controls, Azure: 108 controls, GCP: 71 controls)
 - **NIST 800-53** - For federal contractors and FedRAMP compliance
 - **ISO 27001** - For international information security compliance
-- **HIPAA Security Rule** - Technical safeguards for healthcare (Note: does not cover Administrative/Physical safeguards)
+- **HIPAA Security Rule** - For healthcare (Note: all 12 Technical Safeguards plus 15 of the 31 Administrative Safeguards; does not cover Physical Safeguards)
 
-### Pro Only
-Requires AuditKit subscription:
-- **CMMC Level 2** - For DoW contractors handling CUI
+### Automated in Pro
+Community reports all 110 CMMC Level 1 and Level 2 practices and automates Level 1
+(13 of the 17 Level 1 practices carry checks on AWS and Azure, 9 on GCP).
+An AuditKit subscription adds the automated Level 2 checks:
+- **CMMC Level 2** - For DoW contractors handling CUI. Of the 110 practices Pro assesses, 42 query the cloud and 68 are structured evidence guidance.
 
 ---
 
@@ -46,9 +49,9 @@ Requires AuditKit subscription:
 **SaaS/Startups:** SOC2 Type II  
 **E-commerce/Payment Processing:** PCI-DSS v4.0.1  
 **DoW Contractors (FCI):** CMMC Level 1  
-**DoW Contractors (CUI):** CMMC Level 2 (Pro)  
+**DoW Contractors (CUI):** CMMC Level 2 (reported free, automated in Pro)  
 **Federal Contractors:** NIST 800-53 Rev 5  
-**Healthcare:** HIPAA (17 safeguards, derived via crosswalk)  
+**Healthcare:** HIPAA (18 safeguards, derived via crosswalk)  
 **Security Hardening:** CIS Benchmarks
 
 ### By Requirements
@@ -106,9 +109,9 @@ Requires AuditKit subscription:
 **Timeline:** 2-4 weeks for basic hardening (IG1)
 
 **Current Coverage:**
-- AWS: ~58 automated controls (Production)
+- AWS: 158 automated controls (Production)
 - Azure: 108 automated controls (Production)
-- GCP: ~30+ automated controls (Production)
+- GCP: 71 automated controls (Production)
 
 **[Learn more →](./cis-benchmarks.md)**
 
@@ -122,8 +125,8 @@ Requires AuditKit subscription:
 
 ### HIPAA
 **Purpose:** Healthcare data protection  
-**Status:** Experimental - technical safeguards only  
-**Note:** Does not cover administrative or physical safeguards
+**Status:** Production - 27 of the 75 Security Rule safeguards carry checks on AWS  
+**Note:** Covers all 12 Technical Safeguards (164.312) and 15 of the 31 Administrative Safeguards (164.308). Does not cover Physical Safeguards (164.310), Organizational Requirements (164.314) or Policies and Documentation (164.316)
 
 **[Learn more →](./hipaa.md)**
 
@@ -142,8 +145,8 @@ auditkit scan -provider aws -framework pci
 # CMMC Level 1
 auditkit scan -provider aws -framework cmmc
 
-# CMMC Level 2 (reported in Community; automated checks in Pro)
-auditkit-pro scan -provider aws -framework cmmc-l2
+# CMMC Level 1 + 2 - all 110 practices (Community automates Level 1, Pro automates Level 2)
+auditkit-pro scan -provider aws -framework cmmc
 
 # CIS Benchmarks
 auditkit scan -provider aws -framework cis-aws
@@ -167,7 +170,7 @@ AuditKit maps controls across frameworks. For example:
 **AWS IAM MFA enforcement** maps to:
 - SOC2: CC6.6
 - PCI-DSS: Requirement 8.3
-- CMMC: IA.2.081
+- CMMC: IA.L2-3.5.3
 - CIS AWS: 1.5, 1.6
 - NIST 800-53: IA-2, IA-2(1)
 - HIPAA: 164.312(a)(2)(i)

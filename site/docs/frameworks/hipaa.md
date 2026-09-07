@@ -9,15 +9,15 @@ Health Insurance Portability and Accountability Act guide.
 **HIPAA** protects Protected Health Information (PHI) in the United States.
 
 **Who needs it:** Healthcare providers, health plans, healthcare clearinghouses, business associates
-**Status in AuditKit:** Production - Technical Safeguards
-**Coverage:** 40-70 framework mappings per cloud (AWS: 70, Azure: 62, GCP: 40)
-**What's not covered:** Administrative and physical safeguards
+**Status in AuditKit:** Production - Technical and part of Administrative Safeguards
+**Coverage:** 27 of the 75 Security Rule safeguards carry an automated check on AWS (12 of 12 Technical, 15 of 31 Administrative)
+**What's not covered:** Physical safeguards (164.310), organizational requirements (164.314) and policies/documentation (164.316); 16 of the 31 administrative safeguards
 
 ---
 
 ## Important Disclaimer
 
-**AuditKit's HIPAA support covers Technical Safeguards only - NOT sufficient for HIPAA certification.**
+**AuditKit's HIPAA support covers the Technical Safeguards and part of the Administrative Safeguards - NOT sufficient for HIPAA certification.**
 
 **What AuditKit covers:**
 - Technical Safeguards (164.312) - Fully mapped across all cloud providers
@@ -25,7 +25,7 @@ Health Insurance Portability and Accountability Act guide.
 - Automated scanning of technical configurations
 
 **What AuditKit does NOT cover:**
-- Administrative Safeguards (164.308) - Policies, procedures, training
+- Administrative Safeguards (164.308) beyond the 15 covered - risk analysis as a document, workforce training records, sanction policy, BAA management
 - Physical Safeguards (164.310) - Facility access, workstation security
 - Business Associate Agreements
 - Risk assessments and documentation

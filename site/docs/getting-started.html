@@ -160,7 +160,7 @@ bash fixes.sh</code></pre>
             <pre class="code-block"><code># PCI-DSS
 ./auditkit scan -framework pci
 
-# CMMC Level 1
+# CMMC Level 1 + 2 (all 110 practices reported; 13 of the 17 Level 1 practices automated)
 ./auditkit scan -framework cmmc
 
 # NIST 800-53
@@ -184,11 +184,11 @@ bash fixes.sh</code></pre>
             <p><strong>Timeline:</strong> Most startups fix 80%+ of issues in 2-4 weeks</p>
 
             <h3>For DoW Contractors: CMMC Compliance</h3>
-            <p><strong>Goal:</strong> Self-assess CMMC Level 1 before C3PAO assessment</p>
+            <p><strong>Goal:</strong> Complete a CMMC Level 1 self-assessment, and see where you stand against Level 2</p>
             <p><strong>Steps:</strong></p>
             <ol>
                 <li>Run CMMC scan: <code>./auditkit scan -framework cmmc</code></li>
-                <li>Fix automated controls (AC.1.001, AC.1.002, etc.)</li>
+                <li>Fix automated controls (AC.L1-3.1.1, AC.L1-3.1.2, etc.)</li>
                 <li>Document manual controls (physical security, training)</li>
                 <li>Generate assessment report</li>
                 <li>Schedule C3PAO review with confidence</li>
@@ -201,9 +201,9 @@ bash fixes.sh</code></pre>
             <h3>For Multi-Cloud: Unified Compliance</h3>
             <p><strong>Goal:</strong> Single compliance view across AWS + Azure + GCP</p>
             <pre class="code-block"><code># Scan all providers
-./auditkit scan -provider aws -framework soc2 -output aws.json
-./auditkit scan -provider azure -framework soc2 -output azure.json
-./auditkit scan -provider gcp -framework soc2 -output gcp.json</code></pre>
+./auditkit scan -provider aws -framework soc2 -format json -output aws.json
+./auditkit scan -provider azure -framework soc2 -format json -output azure.json
+./auditkit scan -provider gcp -framework soc2 -format json -output gcp.json</code></pre>
 
             <h2>Troubleshooting</h2>
 

@@ -35,7 +35,7 @@
     <section class="page-header">
         <div class="container">
             <h1>About AuditKit</h1>
-            <p class="subtitle">One scanner that replaces $200K in compliance consulting across nine frameworks and four cloud providers.</p>
+            <p class="subtitle">One scanner that replaces $200K in compliance consulting across ten frameworks and four cloud providers.</p>
         </div>
     </section>
 
@@ -44,13 +44,13 @@
         <div class="container-prose">
             <h2>What AuditKit Does</h2>
             <p>
-                AuditKit is a multi-cloud compliance scanner. It connects to your AWS, Azure, GCP, and Microsoft 365 environments, runs 350+ automated checks, and tells you exactly what's passing, what's failing, how to fix each issue, and what evidence your auditors will ask for.
+                AuditKit is a multi-cloud compliance scanner. It connects to your AWS, Azure and GCP environments - and imports Microsoft 365 findings from ScubaGear - runs 350+ automated checks, and tells you exactly what's passing, what's failing, how to fix each issue, and what evidence your auditors will ask for.
             </p>
             <p>
                 Most compliance tools stop at detection. AuditKit goes further: every failed check includes the specific CLI command to fix it, a step-by-step screenshot guide for manual evidence collection, and direct links to the relevant cloud console page.
             </p>
             <p>
-                The Community Edition covers SOC2, PCI-DSS v4.0.1, CMMC Level 1, HIPAA, NIST 800-53, CIS Benchmarks, ISO 27001, FedRAMP, and GDPR with full cross-framework mappings. AuditKit reports all 110 CMMC Level 1 + 2 practices; AuditKit Pro adds automated checks for Level 2, multi-account scanning, evidence package generation, continuous monitoring, drift detection, and a Desktop GUI.
+                The Community Edition covers SOC2, PCI-DSS v4.0.1, CMMC, HIPAA, NIST 800-53, NIST CSF 2.0, CIS Benchmarks, ISO 27001, FedRAMP, and GDPR with full cross-framework mappings. It reports all 110 CMMC Level 1 + 2 practices and automates Level 1 (13 of the 17 practices carry checks). AuditKit adds automated Level 2 checks, multi-account scanning, evidence package generation, continuous monitoring, drift detection, and a Desktop GUI.
             </p>
         </div>
     </section>
@@ -65,7 +65,7 @@
                     <div class="stat-label">Automated Checks</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number">9</div>
+                    <div class="stat-number">10</div>
                     <div class="stat-label">Compliance Frameworks</div>
                 </div>
                 <div class="stat">
@@ -85,7 +85,7 @@
                 </div>
                 <div class="card text-center">
                     <h4>Providers</h4>
-                    <p class="mb-0 text-muted">AWS (229 controls), Azure (178), GCP (135), Microsoft 365 (29+ via ScubaGear)</p>
+                    <p class="mb-0 text-muted">AWS (219 controls), Azure (174), GCP (133), Microsoft 365 (29+ via ScubaGear import)</p>
                 </div>
                 <div class="card text-center">
                     <h4>Output Formats</h4>
@@ -103,14 +103,15 @@
                 AuditKit uses read-only API calls to inspect your cloud configuration. It never modifies your infrastructure. The scanner runs locally on your machine, connects to your cloud provider using your existing credentials, evaluates each compliance control, and generates a report.
             </p>
             <p>
-                Each scan result maps to one or more compliance framework controls. A single check, like verifying S3 bucket encryption, simultaneously satisfies SOC2 CC6.3, PCI-DSS 3.5.1, HIPAA 164.312(a)(2)(iv), and CMMC SC.L2-3.13.11. This cross-framework mapping eliminates duplicate work when you need multiple certifications.
+                Each scan result maps to one or more compliance framework controls. A single check, like verifying S3 bucket encryption, simultaneously satisfies SOC2 CC6.3, PCI-DSS 3.5.1, HIPAA 164.312(a)(2)(iv), and CIS AWS 2.1.1. This cross-framework mapping eliminates duplicate work when you need multiple certifications.
             </p>
             <p>
                 All scanning happens locally. No data leaves your machine. No cloud account, no SaaS dashboard, no telemetry. The tool is a single Go binary that runs wherever you have credentials.
             </p>
 
             <div class="code-block"><span class="comment"># Install</span>
-go install github.com/guardian-nexus/auditkit/scanner/cmd/auditkit@latest
+git clone https://github.com/guardian-nexus/AuditKit-Community-Edition.git
+cd AuditKit-Community-Edition/scanner &amp;&amp; go build ./cmd/auditkit
 
 <span class="comment"># Scan all frameworks against AWS</span>
 ./auditkit scan -provider aws -framework all -format pdf -output report.pdf

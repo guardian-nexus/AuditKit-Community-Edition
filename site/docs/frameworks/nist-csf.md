@@ -10,7 +10,7 @@ The NIST Cybersecurity Framework, version 2.0.
 
 **Who needs it:** Anyone who wants a common language for security posture; often asked for by insurers, boards and enterprise customers
 **Status in AuditKit:** Production
-**Coverage:** 63 subcategories (AWS 75, Azure 82, GCP 83)
+**Coverage:** 63 subcategories on GCP, 65 on AWS and 62 on Azure, out of the 106 subcategories a CSF scan lists (71 are in the crosswalk)
 **How it works:** Derived from your SOC2, PCI DSS and CMMC results through NIST 800-53
 
 ---
@@ -31,10 +31,12 @@ chain strategy. A scanner cannot assess it.
 - **Detect** - logging, monitoring and alerting configuration
 - **Respond** - the detection and notification prerequisites of an incident response process
 
-**What AuditKit does not cover**
+**What AuditKit covers only in part**
 
-- **Govern** - organisational context, risk management strategy, roles and responsibilities, policy, oversight, supply chain risk management
-- **Recover** - recovery plan execution, communications during recovery
+- **Govern** - 12 of the 31 GV subcategories are reachable, from configuration evidence only. Organisational context, risk strategy, roles and oversight are not.
+- **Recover** - 3 of the 8 RC subcategories, from backup and restore configuration. Recovery plan execution and communications are not.
+
+**What AuditKit does not cover**
 - Anything requiring evidence of a process rather than a configuration
 
 ---
@@ -63,15 +65,15 @@ consequence of the SOC2, PCI DSS and CMMC scanning you already ran.
 
 | Function | Subcategories in crosswalk | What drives coverage |
 |----------|---------------------------|----------------------|
-| **Identify** (ID) | 18 | Asset enumeration, risk assessment controls |
-| **Protect** (PR) | 39 | Access control, encryption, platform hardening |
-| **Detect** (DE) | 18 | Logging, monitoring, anomaly detection |
-| **Respond** (RS) | 16 | Alerting and incident notification controls |
-| **Recover** (RC) | 6 | Backup and restore controls |
-| **Govern** (GV) | 0 | Organisational, not visible to a scanner |
+| **Identify** (ID) | 17 | Asset enumeration, risk assessment controls |
+| **Protect** (PR) | 20 | Access control, encryption, platform hardening |
+| **Detect** (DE) | 10 | Logging, monitoring, anomaly detection |
+| **Respond** (RS) | 9 | Alerting and incident notification controls |
+| **Recover** (RC) | 3 | Backup and restore controls |
+| **Govern** (GV) | 12 | Only the parts a configuration scan can see; the strategy, roles and policy subcategories are not covered |
 
-97 subcategories are in the crosswalk. How many reach your report depends on the
-provider: 75 on AWS, 82 on Azure, 83 on GCP.
+71 subcategories are in the crosswalk. How many reach your report depends on the
+provider: 65 on AWS, 62 on Azure, 63 on GCP, out of the 106 the CSF catalog lists.
 
 The absence of Govern is not a gap in AuditKit so much as a statement about what
 configuration scanning can see. If a customer asks for CSF 2.0 coverage, expect

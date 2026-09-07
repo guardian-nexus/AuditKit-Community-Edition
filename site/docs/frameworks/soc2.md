@@ -12,7 +12,7 @@ System and Organization Controls (SOC) 2 framework guide.
 **Auditor:** CPA firm  
 **Cost:** $15,000 - $30,000 for audit  
 **Timeline:** 3-6 months prep + 3-12 month observation period  
-**AuditKit coverage:** 64 automated technical controls
+**AuditKit coverage:** 38 of the 43 SOC 2 criteria on AWS (37 on Azure, 32 on GCP)
 
 ---
 
@@ -62,7 +62,7 @@ Policies and procedures to ensure directives are carried out
 **What AuditKit checks:** Limited - mostly organizational policies
 
 ### CC6 - Logical & Physical Access Controls
-**Most technical controls - AuditKit automates 18 checks**
+**Most technical controls - AuditKit covers all 8 CC6 criteria (CC6.1-CC6.8) on AWS**
 
 - CC6.1: Access key rotation, unused credentials
 - CC6.2: S3 public access, Storage account security
@@ -93,28 +93,31 @@ Policies and procedures to ensure directives are carried out
 Configuration management, system components, data
 
 - CC8.1: Encryption at rest (S3, RDS, disks)
-- CC8.2: Encryption in transit (SSL/TLS)
-- CC8.3: Key rotation
+(delete both lines - CC8.1 is the only criterion in the CC8 series)
 
 ### CC9 - Risk Mitigation
 System changes, incident management, business continuity
 
-- CC9.1: High availability configurations
-- CC9.2: Disaster recovery testing
+- CC9.1: Risk mitigation - RDS encryption at rest (only reported when RDS instances exist)
+- CC9.2: Vendor and business partner risk - S3 default encryption
 
 ---
 
 ## What AuditKit Automates
 
-**Technical controls (64 total):**
-- Access controls (18)
-- Logging and monitoring (12)
-- Encryption (6)
-- Network security (8)
-- Backup and recovery (4)
-- Vulnerability management (4)
-- Change management (6)
-- Other technical (6)
+**Criteria assessed on AWS (38 of the 43 in the catalog), by group:**
+- CC1 Control environment - 5 of 5 criteria
+- CC2 Communication and information - 3 of 3
+- CC3 Risk assessment - 4 of 4
+- CC4 Monitoring activities - 2 of 2
+- CC5 Control activities - 3 of 3
+- CC6 Logical and physical access - 8 of 8
+- CC7 System operations - 5 of 5
+- CC8 Change management - 1 of 1
+- CC9 Risk mitigation - 2 of 2
+- A1 Availability - 3 of 3
+- C1 Confidentiality - 2 of 2
+- PI1 Processing integrity - 0 of 5
 
 **What AuditKit doesn't cover:**
 - Organizational policies
@@ -161,7 +164,8 @@ auditkit scan -provider azure -framework soc2 -output azure-soc2.pdf
 auditkit scan -provider gcp -framework soc2 -output gcp-soc2.pdf
 
 # Generate evidence tracker
-auditkit evidence -framework soc2 -format html -output evidence.html
+# Evidence tracker (covers every framework; -framework and -format are not honoured here)
+auditkit evidence -output evidence.html
 ```
 
 ---

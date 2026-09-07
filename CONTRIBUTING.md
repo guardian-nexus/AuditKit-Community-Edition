@@ -84,13 +84,13 @@ We're building policy and procedure templates. If you have compliance expertise:
 ## What We're Looking For
 
 ### High Priority
-- Azure and GCP provider implementations
+- CIS Azure and CIS GCP control expansion (108 and 71 controls today, against 158 for AWS)
 - Integration parsers for common security tools
 - Control mapping validation from actual auditors
 - Performance improvements for large environments
 
 ### Medium Priority  
-- Additional compliance frameworks (HIPAA, ISO 27001)
+- Deeper crosswalk mappings for the frameworks already shipped (framework-crosswalk.yaml maps 18 HIPAA safeguards of 75 and 54 ISO 27001 controls of 93)
 - Policy template contributions
 - Dashboard improvements
 - CI/CD integrations
@@ -110,7 +110,7 @@ Open a discussion in GitHub Discussions for:
 ## Recognition
 
 Contributors who make significant improvements will be:
-- Added to CONTRIBUTORS.md
+- Credited in the release notes and the GitHub contributors list
 - Mentioned in release notes
 - Given credit in documentation
 

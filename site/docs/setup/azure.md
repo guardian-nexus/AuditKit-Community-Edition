@@ -84,7 +84,15 @@ export AZURE_SUBSCRIPTION_ID="your-subscription-id"
 
 ## Required Permissions
 
-AuditKit needs **Reader** role to scan your Azure subscription.
+AuditKit needs the **Reader** role on your Azure subscription, plus Microsoft Graph read permissions for the identity checks.
+
+Azure RBAC covers the infrastructure checks. The MFA, authentication-methods and Conditional Access checks call Microsoft Graph, which Reader does not cover — grant the scanning identity these Graph application permissions and admin-consent them:
+
+- `User.Read.All`
+- `UserAuthenticationMethod.Read.All`
+- `Policy.Read.All`
+
+Without them the identity checks report ERROR rather than a pass or fail.
 
 ### Reader Role (Recommended)
 

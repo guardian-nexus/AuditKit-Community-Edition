@@ -29,7 +29,7 @@ For security scanning, use tools like:
 - **Scout Suite** - Multi-cloud security auditing
 - **Trivy** - Container vulnerability scanning
 
-AuditKit can integrate with Prowler for complete NIST 800-53 coverage.
+AuditKit can import Prowler results to broaden NIST 800-53 coverage.
 
 ### What's the difference between Free and Pro?
 
@@ -39,7 +39,7 @@ AuditKit can integrate with Prowler for complete NIST 800-53 coverage.
 | SOC2, PCI-DSS, NIST 800-53 | All frameworks | All frameworks |
 | CMMC Level 1 | 13 of 17 practices automated | 17 of 17 practices automated |
 | CMMC Level 2 | All 110 practices reported for evidence | All 110 practices automated (CUI) |
-| Controls assessed | 229 AWS, 178 Azure, 135 GCP | 321 AWS, 268 Azure, 284 GCP |
+| Controls assessed | 219 AWS, 174 Azure, 133 GCP | 317 AWS, 322 Azure, 259 GCP |
 | GCP Advanced | 5 GKE controls | Deep GKE scanning (15) + Vertex AI (10) |
 | Multi-Account | One at a time | AWS Orgs, Azure Mgmt, GCP Folders |
 | Support | Community | Priority + 14-day trial |
@@ -78,7 +78,7 @@ Compare to traditional costs:
 
 ### Which GCP services are scanned?
 
-**Free version (229 AWS, 178 Azure, 135 GCP controls):**
+**Free version (219 AWS, 174 Azure, 133 GCP controls):**
 - Cloud Storage (GCS)
 - Cloud IAM
 - Compute Engine
@@ -97,6 +97,8 @@ Compare to traditional costs:
 
 | Framework | Status | Coverage |
 |-----------|--------|----------|
+| CIS Benchmarks | Production | 158 AWS, 108 Azure, 71 GCP |
+| FedRAMP | Production | Low / Moderate / High baselines (149 / 287 / 370 controls reported) |
 | SOC2 Type II | Production | 38 criteria |
 | PCI-DSS v4.0.1 | Production | 69 requirements |
 | CMMC Level 1 | Production | 13 of 17 automated |
@@ -193,7 +195,7 @@ All read-only, no write permissions required.
 
 ### What's the difference between CMMC Level 1 and Level 2?
 
-**CMMC Level 1 (17 practices) - automated in the free Community Edition**
+**CMMC Level 1 (17 practices) - 13 of the 17 automated in the free Community Edition**
 - Protects Federal Contract Information (FCI)
 - Basic cybersecurity hygiene
 - Required for all DoW contractors
@@ -262,7 +264,7 @@ You still need to handle:
 
 ### Can I scan specific services only?
 
-Not currently. AuditKit scans all supported services for the chosen framework.
+Not currently. AuditKit scans all supported services for the chosen framework. The `-services` flag shown in `auditkit scan --help` is accepted but not yet honoured — it does not narrow the scan.
 
 **Workaround:** Run scan, then filter results in JSON output:
 
@@ -355,7 +357,7 @@ Not in the Free version. Reports follow standard compliance framework formats.
 
 ### Does AuditKit integrate with Jira/Slack/ServiceNow?
 
-Not yet. Currently on roadmap for Q1 2026.
+Not for Jira or ServiceNow. The AuditKit Pro daemon already posts scan alerts natively to Slack and Microsoft Teams, and to any webhook, SMTP mailbox or syslog target.
 
 **Workaround:** Use JSON output with custom scripts:
 
@@ -491,7 +493,7 @@ auditkit evidence -format html -output evidence-tracker.html
 
 **AuditKit:**
 - Compliance scanners (not security-focused)
-- Check 150+ compliance controls
+- Check 219 AWS / 174 Azure / 133 GCP compliance controls
 - Maps to SOC2, PCI-DSS, CMMC, NIST 800-53
 - Includes evidence collection guides
 

@@ -166,7 +166,7 @@ bash fixes.sh
 # PCI-DSS
 ./auditkit scan -framework pci
 
-# CMMC Level 1
+# CMMC Level 1 + 2 (all 110 practices reported; 13 of the 17 Level 1 practices automated)
 ./auditkit scan -framework cmmc
 
 # NIST 800-53
@@ -197,11 +197,11 @@ bash fixes.sh
 
 ### For DoW Contractors: CMMC Compliance
 
-**Goal:** Self-assess CMMC Level 1 before C3PAO assessment
+**Goal:** Complete a CMMC Level 1 self-assessment, and see where you stand against Level 2
 
 **Steps:**
 1. Run CMMC scan: `./auditkit scan -framework cmmc`
-2. Fix automated controls (AC.1.001, AC.1.002, etc.)
+2. Fix automated controls (AC.L1-3.1.1, AC.L1-3.1.2, etc.)
 3. Document manual controls (physical security, training)
 4. Generate assessment report
 5. Schedule C3PAO review with confidence
@@ -215,9 +215,9 @@ bash fixes.sh
 **Steps:**
 ```bash
 # Scan all providers
-./auditkit scan -provider aws -framework soc2 -output aws-results.json
-./auditkit scan -provider azure -framework soc2 -output azure-results.json
-./auditkit scan -provider gcp -framework soc2 -output gcp-results.json
+./auditkit scan -provider aws -framework soc2 -format json -output aws-results.json
+./auditkit scan -provider azure -framework soc2 -format json -output azure-results.json
+./auditkit scan -provider gcp -framework soc2 -format json -output gcp-results.json
 
 # Compare results
 # Unified multi-cloud reporting is an AuditKit Pro feature

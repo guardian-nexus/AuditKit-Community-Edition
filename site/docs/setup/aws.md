@@ -86,7 +86,7 @@ The easiest approach is to use AWS managed policy:
 
 ### Custom Policy (Least Privilege)
 
-If you need tighter control, here's a minimal policy:
+If you need tighter control, note first that AuditKit calls 38 AWS services, so a hand-built policy will silently reduce coverage — controls it cannot evaluate are reported as ERROR. `ReadOnlyAccess` is strongly recommended. The policy below covers only the core S3/IAM/EC2/RDS/CloudTrail/KMS/GuardDuty/Config/Security Hub checks; add read permissions for Lambda, ECS, EKS, Macie, Network Firewall, Route 53, IAM Access Analyzer, SQS, API Gateway, Elastic Beanstalk, Secrets Manager, ECR, DynamoDB, CloudFormation, ACM, SageMaker, Redshift, ElastiCache, OpenSearch, Inspector, Backup, SSM, SNS, CloudWatch, Auto Scaling and Organizations for full coverage:
 
 ```json
 {

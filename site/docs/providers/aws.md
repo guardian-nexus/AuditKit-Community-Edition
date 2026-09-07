@@ -6,15 +6,15 @@ What AuditKit scans in Amazon Web Services.
 
 ## Overview
 
-**Coverage:** 229 controls across AWS services  
+**Coverage:** 219 controls across AWS services  
 **Supported in:** Free and Pro versions
 
 **Supported frameworks:**
 - SOC2 Type II (38 criteria)
 - PCI-DSS v4.0.1 (69 requirements)
-- CMMC Level 1 and Level 2: all 110 practices reported; Level 1 automated, Level 2 automated in Pro
+- CMMC Level 1 and Level 2: all 110 practices reported; 13 of the 17 Level 1 practices automated, Level 2 automated in Pro
 - NIST 800-53 Rev 5 (95 controls, derived via crosswalk)
-- HIPAA (17 safeguards, derived via crosswalk)
+- HIPAA (18 safeguards, derived via crosswalk)
 
 ---
 
@@ -24,14 +24,14 @@ What AuditKit scans in Amazon Web Services.
 
 **Controls checked:** 8
 
-- **CC6.2** - Bucket public access blocking
-- **CC8.1** - Bucket encryption at rest
-- **CC7.2** - Bucket versioning enabled
-- **CC7.1** - Bucket logging enabled
-- **CC6.12** - Bucket policies (overly permissive access)
-- **SC.1.176** - Secure transport enforced (HTTPS only)
-- **CC8.4** - Object encryption default
-- **CC6.13** - MFA Delete enabled on critical buckets
+- **CC6.2** - S3 Public Access Block
+- **CC6.3** - Bucket encryption at rest
+- **CC7.1** - Bucket access logging
+- **A1.2** - Bucket versioning and lifecycle policies
+- **CIS-2.1.2** - MFA Delete enabled
+- **CIS-2.1.4** - Server access logging
+- **CIS-2.1.6** - S3 Object Lock
+- **CIS-2.1.7** - Account-level Block Public Access
 
 **Example fixes:**
 ```bash
@@ -343,38 +343,39 @@ aws ssm create-maintenance-window \
 
 ## Controls by Framework
 
-### SOC2 Type II (38 criteria)
+### SOC2 Type II (38 of the 43 criteria carry automated AWS checks)
 
-**CC1 - Control Environment:** 5 controls  
-**CC2 - Communication:** 4 controls  
-**CC3 - Risk Assessment:** 6 controls  
-**CC5 - Control Activities:** 7 controls  
-**CC6 - Logical Access:** 18 controls  
-**CC7 - System Operations:** 12 controls  
-**CC8 - Change Management:** 6 controls  
-**CC9 - Risk Mitigation:** 6 controls
+The 43-criteria catalogue breaks down as:
 
-### PCI-DSS v4.0.1 (69 requirements)
+**CC1 - Control Environment:** 5 criteria  
+**CC2 - Communication:** 3 criteria  
+**CC3 - Risk Assessment:** 4 criteria  
+**CC4 - Monitoring:** 2 criteria  
+**CC5 - Control Activities:** 3 criteria  
+**CC6 - Logical Access:** 8 criteria  
+**CC7 - System Operations:** 5 criteria  
+**CC8 - Change Management:** 1 criterion  
+**CC9 - Risk Mitigation:** 2 criteria  
+**A1 - Availability:** 3 criteria  
+**C1 - Confidentiality:** 2 criteria  
+**PI1 - Processing Integrity:** 5 criteria (no automated AWS check - reported as MANUAL)
 
-**Requirement 1 - Network Security:** 5 controls  
-**Requirement 2 - Secure Configurations:** 4 controls  
-**Requirement 3 - Cardholder Data Protection:** 6 controls  
-**Requirement 8 - Access Control:** 8 controls  
-**Requirement 10 - Logging:** 5 controls  
-**Requirement 11 - Security Testing:** 2 controls
+### PCI-DSS v4.0.1 (59 of the 312 catalogued requirements carry automated AWS checks; 69 across all providers)
 
-### CMMC Level 1 (17 practices)
+Automated AWS checks map into all twelve requirement families (1 through 12). Requirements with no automated check are still reported and marked "No automated check covers this control" so they can be evidenced manually.
 
-**Access Control:** 3 practices  
-**Identification & Authentication:** 2 practices  
-**Media Protection:** 1 practice  
-**Physical Protection:** 3 practices  
-**System Protection:** 5 practices  
-**System Integrity:** 3 practices
+### CMMC Level 1 (17 practices, 13 automated)
 
-### CMMC Level 2 (110 practices - Pro only)
+**Access Control (AC):** 4 practices  
+**Identification & Authentication (IA):** 2 practices  
+**Media Protection (MP):** 1 practice  
+**Physical Protection (PE):** 4 practices  
+**System & Communications Protection (SC):** 2 practices  
+**System & Information Integrity (SI):** 4 practices
 
-All Level 1 practices plus 93 additional practices across 14 domains.
+### CMMC Level 2 (110 practices - reported free, automated in Pro)
+
+All Level 1 practices plus 93 additional practices across 14 domains. The Community Edition reports all 110 for evidence tracking and marks the ones it cannot check automatically; automated Level 2 checks are an AuditKit Pro feature.
 
 **[View CMMC details →](../frameworks/cmmc.md)**
 
@@ -396,7 +397,7 @@ aws configure
 ./auditkit scan -provider aws -framework cmmc
 
 # Scan for CMMC Level 2 (Pro only)
-./auditkit-pro scan -provider aws -framework cmmc-l2
+./auditkit-pro scan -provider aws -framework cmmc
 
 # Generate report
 ./auditkit scan -provider aws -framework soc2 -format pdf -output aws-report.pdf

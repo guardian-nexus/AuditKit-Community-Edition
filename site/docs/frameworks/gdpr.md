@@ -10,7 +10,7 @@ Technical and organisational measures under the EU General Data Protection Regul
 
 **Who needs it:** Any organisation processing personal data of people in the EU or UK
 **Status in AuditKit:** Production
-**Coverage:** 14 articles (AWS 13, Azure 14, GCP 14)
+**Coverage:** 14 articles (AWS 14, Azure 14, GCP 14)
 **How it works:** Derived from your SOC2, PCI DSS and CMMC results through NIST 800-53
 
 ---
@@ -94,7 +94,7 @@ time.
 | Art 35(1) | Data Protection Impact Assessment | RA-3 |
 
 Sixteen articles are in the crosswalk. How many appear in your report depends on
-which controls your provider actually assesses: 13 on AWS, 14 on Azure and GCP.
+which controls your provider actually assesses: 14 on AWS, Azure and GCP alike.
 
 ---
 

@@ -108,7 +108,13 @@ title: "AuditKit Scanner"
 description: "Read-only access for AuditKit compliance scanning"
 stage: "GA"
 includedPermissions:
+- container.clusters.get
+- container.clusters.list
+- bigquery.datasets.get
+- bigquery.datasets.list
 - storage.buckets.get
+
+(And add `gcloud services enable container.googleapis.com` and `gcloud services enable bigquery.googleapis.com` to the API-enablement block at lines 302-308.)
 - storage.buckets.getIamPolicy
 - storage.buckets.list
 - compute.instances.get
@@ -383,16 +389,18 @@ gcloud config get-value project
 ## GCP Service Coverage
 
 **Free version includes:**
-- Cloud Storage (29 checks)
-- Cloud IAM
-- Compute Engine
-- VPC Networks
-- Cloud SQL
-- Cloud KMS
-- Cloud Logging
+- Cloud Storage (6 checks)
+- Cloud IAM (12 checks)
+- Compute Engine (12 checks)
+- VPC Networks (11 checks)
+- Cloud SQL (10 checks)
+- Cloud KMS (2 checks)
+- Cloud Logging (4 checks)
+- GKE (5 CIS checks)
+- BigQuery (2 CIS checks)
 
 **Pro version adds:**
-- GKE Security (10 checks)
+- Deep GKE Security (10 further checks, 15 in total)
 - Vertex AI Compliance (10 checks)
 
 **[View full service coverage →](../providers/gcp.md)**

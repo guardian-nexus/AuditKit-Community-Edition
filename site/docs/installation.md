@@ -12,13 +12,16 @@ Complete installation instructions for AuditKit.
 - Windows (10/11 or Server 2016+)
 
 **Requirements:**
-- Go 1.19 or newer (for building from source)
+- Go 1.24 or newer (for building from source)
 - Cloud CLI tools (AWS CLI, Azure CLI, or gcloud CLI)
 - Read-only cloud credentials
 - Internet connection (for downloading and scanning)
 
 **Disk Space:**
-- Binary: ~15 MB
+- Universal binary (all clouds): ~64 MB download, ~325 MB installed
+- `auditkit-aws`: ~7 MB download, ~23 MB installed
+- `auditkit-azure`: ~7 MB download, ~28 MB installed
+- `auditkit-gcp`: ~12 MB download, ~45 MB installed
 - Source code: ~50 MB
 - Scan results: ~1-10 MB per scan
 
@@ -92,11 +95,11 @@ Rename-Item auditkit-windows-amd64.exe auditkit.exe
 #### Prerequisites
 
 ```bash
-# Install Go 1.19 or newer
+# Install Go 1.24 or newer
 # Download from: https://go.dev/dl/
 
 # Verify Go installation
-go version  # Should show 1.19 or higher
+go version  # Should show 1.24 or higher
 ```
 
 #### Clone and Build
@@ -262,7 +265,7 @@ auditkit version
 
 **Expected output:**
 ```
-AuditKit v0.8.5 - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)
+AuditKit v0.8.6 - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)
 ```
 
 ### Check Cloud CLI Tools
@@ -404,7 +407,7 @@ xattr -d com.apple.quarantine auditkit
 
 **Solution:**
 ```bash
-# Update Go to 1.19 or newer
+# Update Go to 1.24 or newer
 go version
 
 # Clean build cache
@@ -467,6 +470,8 @@ rm -rf ~/.auditkit/
 ### Installing in Air-Gapped Environment
 
 **For environments without internet access:**
+
+AuditKit can scan on a connected machine and report on a disconnected one. Every scan is cached under `~/.auditkit/cache`; `auditkit cache` lists what is stored, and `auditkit scan -offline` (optionally `-cache-file <path>`) rebuilds a report with no cloud API calls.
 
 1. Download binary on internet-connected machine:
 ```bash
@@ -535,7 +540,7 @@ cp ~/Downloads/license.lic ~/.auditkit-pro/license.lic
 auditkit-pro version  # Shows "Pro" edition
 
 # Run Pro scans
-auditkit-pro scan -provider aws -framework cmmc-l2
+auditkit-pro scan -provider aws -framework cmmc
 ```
 
 **Note:** Pro version uses `auditkit-pro` command, not `auditkit`

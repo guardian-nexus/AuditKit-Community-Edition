@@ -12,9 +12,11 @@ AuditKit is designed with security-first principles. This document outlines the 
 
 ### AWS Permissions (Read-Only)
 
-AuditKit requires **READ-ONLY** AWS permissions. No write, modify, or delete permissions are needed.
+AuditKit requires read-only AWS permissions, with one exception: `iam:GenerateCredentialReport`, which AuditKit calls to produce the IAM credential report it then reads. That action creates a report inside IAM and modifies no resource of yours. No other write, modify or delete permission is needed.
 
-**Required IAM Permissions:**
+The simplest working grant is the AWS managed policy `ReadOnlyAccess` (or `SecurityAudit` plus `ViewOnlyAccess`). A Community scan uses 38 AWS SDK clients across 37 services: IAM, S3, S3 Control, EC2, Auto Scaling, CloudTrail, CloudWatch, CloudFormation, Config, RDS, Redshift, DynamoDB, ElastiCache, OpenSearch, KMS, Secrets Manager, ACM, Lambda, ECS, EKS, ECR, Elastic Beanstalk, API Gateway (v1 and v2), Route 53, Network Firewall, SNS, SQS, SSM, Backup, SageMaker, GuardDuty, Macie, Security Hub, Inspector, Access Analyzer, Organizations and STS. The inline policy below covers the core checks only; checks for services outside it fail on AccessDenied and are dropped from the report rather than reported as a verdict.
+
+**Minimum IAM permissions for the core checks:**
 ```json
 {
   "Version": "2012-10-17",
@@ -28,8 +30,10 @@ AuditKit requires **READ-ONLY** AWS permissions. No write, modify, or delete per
         "iam:ListAccessKeys",
         "iam:ListAttachedUserPolicies",
         "iam:GetAccountSummary",
+        "iam:GenerateCredentialReport",
+        "iam:GetCredentialReport",
         "iam:ListRoles",
-        "s3:ListBuckets",
+        "s3:ListAllMyBuckets",
         "s3:GetBucketEncryption",
         "s3:GetPublicAccessBlock",
         "s3:GetBucketVersioning",
@@ -87,7 +91,16 @@ AuditKit requires **READ-ONLY** Azure permissions via the built-in Reader role o
 **Required Azure Role:**
 - Built-in **"Reader"** role at Subscription scope
 
-**OR Custom Role with these permissions:**
+Azure RBAC covers the infrastructure checks only. The MFA, authentication-methods
+and Conditional Access checks call Microsoft Graph (`pkg/azure/checks/aad.go`),
+which Reader does not cover. Grant the scanning identity these Graph application
+permissions and admin-consent them, or those checks report ERROR:
+
+- `User.Read.All`
+- `UserAuthenticationMethod.Read.All`
+- `Policy.Read.All`
+
+**OR Custom Role with these ARM permissions:**
 ```json
 {
   "permissions": [
@@ -162,9 +175,17 @@ includedPermissions:
 - cloudkms.cryptoKeys.list
 - logging.logEntries.list
 - logging.sinks.list
+- container.clusters.list
+- container.clusters.get
+- bigquery.datasets.list
+- bigquery.datasets.get
 ```
 
-**For Pro - GKE Advanced Scanning:**
+The `container.*` and `bigquery.*` entries cover the basic GKE and BigQuery checks
+that Community ships (`pkg/gcp/checks/gke.go`, `bigquery.go`). Enable the
+`container.googleapis.com` and `bigquery.googleapis.com` APIs on the project as well.
+
+**For Pro - GKE Advanced Scanning (in addition to the above):**
 ```yaml
 includedPermissions:
 - container.clusters.list
@@ -325,7 +346,7 @@ Test the policy before using it:
 # Simulate read operations (should succeed)
 aws iam simulate-principal-policy \
   --policy-source-arn arn:aws:iam::123456789:user/auditkit-scanner \
-  --action-names iam:ListUsers s3:ListBuckets \
+  --action-names iam:ListUsers s3:ListAllMyBuckets \
   --resource-arns "*"
 
 # Simulate write operations (should fail)
@@ -358,8 +379,8 @@ gcloud projects get-iam-policy PROJECT_ID \
 - Security settings (encryption status, MFA status, firewall rules)
 - Compliance-relevant configuration (logging, monitoring, access controls)
 - Cloud resource metadata (all providers: AWS, Azure, GCP)
-- Kubernetes cluster configuration (Pro only - GKE advanced scanning)
-- AI/ML model metadata (Pro only - Vertex AI, Azure ML, SageMaker advanced features)
+- Kubernetes cluster configuration (basic GKE checks in both editions; deep GKE scanning is Pro)
+- AI/ML model metadata (SageMaker in both editions; Vertex AI deep checks are Pro only)
 
 **AuditKit does NOT read:**
 - Actual data stored in S3 buckets / Cloud Storage / Blob Storage
@@ -773,10 +794,10 @@ AuditKit is designed to help you achieve compliance, but the tool itself:
 - [PCI DSS v4.0](https://www.pcisecuritystandards.org/)
 
 ### AuditKit Documentation
-- [Getting Started](https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/docs/getting-started.md)
-- [AWS Setup Guide](https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/docs/setup/aws.md)
-- [Azure Setup Guide](https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/docs/setup/azure.md)
-- [GCP Setup Guide](https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/docs/setup/gcp.md)
+- [Getting Started](https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/getting-started.md)
+- [AWS Setup Guide](https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/setup/aws.md)
+- [Azure Setup Guide](https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/setup/azure.md)
+- [GCP Setup Guide](https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/setup/gcp.md)
 
 ---
 
@@ -789,5 +810,5 @@ AuditKit is designed to help you achieve compliance, but the tool itself:
 
 ---
 
-**Last Updated:** November 04, 2025
-**Version:** 3.0 (v0.7.0)
+**Last Updated:** September 07, 2026
+**Version:** 4.0 (Community v0.8.6 / Pro v0.9.6-pro)

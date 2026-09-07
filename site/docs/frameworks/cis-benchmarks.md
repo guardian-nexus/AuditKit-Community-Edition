@@ -19,12 +19,12 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 ## Supported Benchmarks
 
 ### AWS Foundations Benchmark
-**Status:**  Production (v0.7.0) - **ENHANCED COVERAGE**
-**Controls:** 125 unique AWS controls implemented
+**Status:** Production (v0.8.6)
+**Controls:** 158 unique AWS controls implemented
 **Command:** `./auditkit scan -provider aws -framework cis-aws`
 
 **What's Covered:**
-- **Section 1:** Identity and Access Management (IAM) - 18/22 automated controls (82% coverage)
+- **Section 1:** Identity and Access Management (IAM) - 21/22 automated controls (only 1.7 is not automated)
   - CIS-1.3: Credentials unused 45+ days (NEW)
   - CIS-1.5: Root account MFA enabled (LABELED)
   - CIS-1.11: No root access keys (LABELED)
@@ -39,8 +39,8 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 - **Section 5:** Networking (VPC, Security Groups) - 20/20 automated controls (100% coverage)
   - CIS-5.8: VPC peering routing least access (NEW)
   - CIS-5.20: VPC endpoints for S3 (NEW)
-- **Sections 6-18:** Service-specific controls across EC2, RDS, Lambda, and more
-- **Total Coverage:** AWS 125, Azure 108, GCP 26 benchmark controls
+- **Sections 6-22:** Service-specific controls across EC2, RDS, Lambda, and more
+- **Total Coverage:** AWS 158, Azure 108, GCP 71 benchmark controls
 
 ---
 
@@ -62,7 +62,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 
 ### GCP Foundations Benchmark
 **Status:**  Production (v0.7.0) - **NEAR-COMPLETE COVERAGE**
-**Controls:** 48 automated + 9 manual = 57 total checks
+**Controls:** 71 GCP benchmark controls
 **Command:** `./auditkit scan -provider gcp -framework cis-gcp`
 
 **What's Covered:**
@@ -83,7 +83,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
   - NEW: CIS-6.1.1, 6.2.1, 6.2.2: Database security flags
 - **Section 7:** BigQuery - 3 automated controls
   - NEW: CIS-7.1, 7.2, 7.3: Public access, CMEK encryption
-- **Total Coverage:** 57 controls out of ~66 CIS GCP Foundations (86%)**
+- **Total Coverage:** 71 CIS GCP Foundations controls
 
 ---
 
@@ -108,7 +108,7 @@ CIS Benchmarks are organized into Implementation Groups (IGs) based on organizat
 ### IG1 - Basic Cyber Hygiene
 **Target:** Small organizations, limited security resources  
 **Controls:** ~56 essential safeguards  
-**AuditKit Coverage:** All IG1 controls automated
+**AuditKit Coverage:** AuditKit scans the CIS Foundations Benchmarks, which are not tagged by Implementation Group. Map benchmark findings to your IG tier manually.
 
 **Example Controls:**
 - Enable MFA for all users
@@ -296,7 +296,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
 **A:** No, AuditKit complements them. We focus on compliance frameworks and provide auditor-friendly reports. For comprehensive AWS-specific security scanning, use both AuditKit (for compliance reporting) and Prowler (for deep AWS security checks).
 
 ### Q: Which CIS version should I use - v1.4 or v3.0?
-**A:** AuditKit combines both! v3.0 is newer and consolidated, but v1.4 has some additional checks that are still valuable. Our implementation gives you the best of both versions (125 unique controls).
+**A:** AuditKit combines both! v3.0 is newer and consolidated, but v1.4 has some additional checks that are still valuable. Our implementation gives you the best of both versions (158 unique controls).
 
 ### Q: Can I export results to my SIEM or ticketing system?
 **A:** Yes! Use JSON output:
@@ -332,9 +332,8 @@ Help us expand CIS coverage:
 
 - **Issues:** [GitHub Issues](https://github.com/guardian-nexus/AuditKit-Community-Edition/issues)
 - **Questions:** info@auditkit.io
-- **Pro Support:** Priority email + Slack channel
+- **Pro Support:** Priority email support
 
 ---
 
-**Last Updated:** October 2025  
-**Next Update:** November 2025 (Azure & GCP CIS support)
+**Last Updated:** September 2026

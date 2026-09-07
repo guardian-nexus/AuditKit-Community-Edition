@@ -50,7 +50,7 @@
 
             <p><strong>Requirements:</strong></p>
             <ul>
-                <li>Go 1.21 or newer (for building from source)</li>
+                <li>Go 1.24 or newer (for building from source)</li>
                 <li>Cloud CLI tools (AWS CLI, Azure CLI, or gcloud CLI)</li>
                 <li>Read-only cloud credentials</li>
                 <li>Internet connection (for downloading and scanning)</li>
@@ -58,8 +58,10 @@
 
             <p><strong>Disk Space:</strong></p>
             <ul>
-                <li>Universal binary (all clouds): ~59 MB download, ~300 MB installed</li>
-                <li>Single-cloud binary (auditkit-aws / -azure / -gcp): ~6-11 MB download</li>
+                <li>Universal binary (all clouds): ~64 MB download, ~325 MB installed</li>
+                <li><code>auditkit-aws</code>: ~7 MB download, ~23 MB installed</li>
+                <li><code>auditkit-azure</code>: ~7 MB download, ~28 MB installed</li>
+                <li><code>auditkit-gcp</code>: ~12 MB download, ~45 MB installed</li>
                 <li>Source code: ~50 MB</li>
                 <li>Scan results: ~1-10 MB per scan</li>
             </ul>
@@ -146,11 +148,11 @@ Rename-Item auditkit-windows-amd64.exe auditkit.exe
             <p>For developers or custom builds</p>
 
             <h4>Prerequisites</h4>
-            <pre class="code-block"><code># Install Go 1.21 or newer
+            <pre class="code-block"><code># Install Go 1.24 or newer
 # Download from: https://go.dev/dl/
 
 # Verify Go installation
-go version  # Should show 1.21 or higher</code></pre>
+go version  # Should show 1.24 or higher</code></pre>
 
             <h4>Clone and Build</h4>
             <pre class="code-block"><code># Clone repository
@@ -272,7 +274,7 @@ gcloud --version</code></pre>
             <pre class="code-block"><code>auditkit version</code></pre>
 
             <p><strong>Expected output:</strong></p>
-            <pre class="code-block"><code>AuditKit v0.8.5 - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)</code></pre>
+            <pre class="code-block"><code>AuditKit v0.8.6 - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)</code></pre>
 
             <h3>Check Cloud CLI Tools</h3>
             <pre class="code-block"><code># AWS
@@ -337,7 +339,7 @@ xattr -d com.apple.quarantine auditkit
 
             <h3>Build errors with Go</h3>
             <p><strong>Cause:</strong> Go version too old or dependencies missing</p>
-            <pre class="code-block"><code># Update Go to 1.21 or newer
+            <pre class="code-block"><code># Update Go to 1.24 or newer
 go version
 
 # Clean build cache
@@ -368,7 +370,7 @@ cp license.lic ~/.auditkit-pro/license.lic
 auditkit-pro version  # Shows "Pro" edition
 
 # Run Pro scans
-auditkit-pro scan -provider aws -framework cmmc-l2</code></pre>
+auditkit-pro scan -provider aws -framework cmmc</code></pre>
 
             <div class="callout-warning">
                 <h4>Note</h4>

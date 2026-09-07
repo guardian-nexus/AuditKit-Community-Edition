@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HIPAA Compliance Scanning - AuditKit</title>
-    <meta name="description" content="AuditKit HIPAA Security Rule scanning - 215 framework mappings across AWS, Azure, and GCP covering Technical Safeguards (164.312) and Administrative Safeguards (164.308).">
+    <meta name="description" content="AuditKit HIPAA Security Rule scanning across AWS, Azure, and GCP - on AWS 27 of the 75 Security Rule safeguards carry automated checks, covering all 12 Technical Safeguards (164.312) and 15 Administrative Safeguards (164.308).">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,7 +34,7 @@
     <section class="page-header">
         <div class="container">
             <h1>HIPAA Security Rule</h1>
-            <p class="subtitle">Technical Safeguards scanning across AWS, Azure, and GCP</p>
+            <p class="subtitle">Technical Safeguards and part of the Administrative Safeguards, across AWS, Azure, and GCP</p>
         </div>
     </section>
 
@@ -46,40 +46,31 @@
                 <h4>Important</h4>
                 <ul style="margin-bottom: 0; padding-left: 1.25rem;">
                     <li><strong>Covers:</strong> Technical Safeguards (164.312) and parts of Administrative Safeguards (164.308)</li>
-                    <li><strong>Does not cover:</strong> Physical Safeguards (164.310), BAAs, or organizational policies</li>
+                    <li><strong>Does not cover:</strong> Physical Safeguards (164.310), organizational requirements (164.314) and policies/documentation (164.316), 16 of the 31 Administrative Safeguards, or BAAs</li>
                     <li>Use AuditKit as part of a broader HIPAA compliance program, not as a sole assessment</li>
                 </ul>
             </div>
 
             <h2>Coverage Summary</h2>
 
-            <p>AuditKit maps cloud infrastructure checks to HIPAA Security Rule requirements across three providers:</p>
+            <p>On AWS, 27 of the 75 HIPAA Security Rule safeguards carry an automated check — all 12 Technical Safeguards (164.312) and 15 of the 31 Administrative Safeguards (164.308). AuditKit maps cloud infrastructure checks to those requirements across three providers:</p>
 
             <table>
                 <tr>
                     <th>Cloud Provider</th>
-                    <th>HIPAA Mappings</th>
                     <th>Key Services Checked</th>
                 </tr>
                 <tr>
                     <td>AWS</td>
-                    <td>106</td>
                     <td>IAM, S3, EC2, RDS, CloudTrail, KMS, VPC, Lambda, SageMaker, Redshift</td>
                 </tr>
                 <tr>
                     <td>Azure</td>
-                    <td>63</td>
                     <td>Entra ID, Storage, SQL, Key Vault, NSGs, Defender, Activity Logs</td>
                 </tr>
                 <tr>
                     <td>GCP</td>
-                    <td>46</td>
                     <td>IAM, Cloud Storage, Cloud SQL, KMS, Logging, Compute, VPC</td>
-                </tr>
-                <tr>
-                    <td><strong>Total</strong></td>
-                    <td><strong>215</strong></td>
-                    <td></td>
                 </tr>
             </table>
 
@@ -162,8 +153,8 @@
                     <td>Password policies, minimum length, reuse prevention, expiry</td>
                 </tr>
                 <tr>
-                    <td>164.308(a)(6)(ii)</td>
-                    <td>Security Incidents</td>
+                    <td>164.308(a)(6)(i)</td>
+                    <td>Security Incident Procedures</td>
                     <td>GuardDuty/Defender/SCC alerting configuration</td>
                 </tr>
                 <tr>
