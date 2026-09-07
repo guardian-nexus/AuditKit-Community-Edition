@@ -76,8 +76,9 @@ auditkit version
 #### Windows
 
 ```powershell
-# Download from GitHub Releases page
-# https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-windows-amd64.zip
+# Download and extract
+curl.exe -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-windows-amd64.zip
+Expand-Archive -Path auditkit-windows-amd64.zip -DestinationPath .
 
 # Rename to auditkit.exe
 Rename-Item auditkit-windows-amd64.exe auditkit.exe
@@ -347,7 +348,7 @@ auditkit version
 ### Update Source Installation
 
 ```bash
-cd auditkit
+cd AuditKit-Community-Edition
 git pull origin main
 cd scanner
 go build ./cmd/auditkit

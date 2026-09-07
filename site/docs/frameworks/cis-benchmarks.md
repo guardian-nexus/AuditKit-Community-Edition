@@ -45,7 +45,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 ---
 
 ### Azure Foundations Benchmark
-**Status:** Production (v0.7.0)
+**Status:** Production
 **Automated Controls:** 108 checks (CIS Microsoft Azure Foundations Benchmark v3.0)
 **Command:** `./auditkit scan -provider azure -framework cis-azure`
 
@@ -61,7 +61,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 ---
 
 ### GCP Foundations Benchmark
-**Status:**  Production (v0.7.0) - **NEAR-COMPLETE COVERAGE**
+**Status:** Production - **NEAR-COMPLETE COVERAGE**
 **Controls:** 71 GCP benchmark controls
 **Command:** `./auditkit scan -provider gcp -framework cis-gcp`
 

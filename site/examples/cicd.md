@@ -27,7 +27,10 @@ AuditKit can run in CI/CD pipelines to:
 
 **Key Features:**
 - JSON output for programmatic parsing (`-format json`)
-- Exit codes (0 = pass, 1 = fail) for pipeline decisions
+- A JSON report you can gate on with `jq` (see the examples below)
+
+A completed scan exits 0 whatever the compliance score; a non-zero exit means
+the scan itself could not run. Gate the build on the score, not the exit code.
 - Lightweight binaries (~50-80MB) run in Docker containers
 - Provider-specific scanners for faster CI/CD builds
 
@@ -71,7 +74,7 @@ jobs:
 
       - name: Check compliance score
         run: |
-          SCORE=$(jq -r '.score.percentage' soc2-results.json)
+          SCORE=$(jq -r '.score' soc2-results.json)
           echo "Compliance Score: $SCORE%"
           if (( $(echo "$SCORE < 80" | bc -l) )); then
             echo "FAIL:Compliance score below 80% threshold"
@@ -124,6 +127,7 @@ jobs:
         run: |
           curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-azure-linux-amd64.tar.gz && tar -xzf auditkit-azure-linux-amd64.tar.gz && mv auditkit-azure-linux-amd64 auditkit-azure
           chmod +x auditkit-azure
+          export AZURE_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
           ./auditkit-azure scan -framework soc2 -format json -output azure-soc2.json
       - uses: actions/upload-artifact@v3
         with:
@@ -169,7 +173,7 @@ aws-pci-scan:
   script:
     - ./auditkit scan -provider aws -framework pci -format json -output pci-results.json
     - |
-      CRITICAL_FAILURES=$(jq '[.results[] | select(.status=="FAIL" and .severity=="CRITICAL")] | length' pci-results.json)
+      CRITICAL_FAILURES=$(jq '[.controls[] | select(.status=="FAIL" and .severity=="CRITICAL")] | length' pci-results.json)
       if [ "$CRITICAL_FAILURES" -gt 0 ]; then
         echo "FAIL:Found $CRITICAL_FAILURES CRITICAL failures"
         exit 1
@@ -195,6 +199,7 @@ azure-cmmc-scan:
     - curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-azure-linux-amd64.tar.gz && tar -xzf auditkit-azure-linux-amd64.tar.gz && mv auditkit-azure-linux-amd64 auditkit-azure
     - chmod +x auditkit-azure
   script:
+    - export AZURE_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
     - ./auditkit-azure scan -framework cmmc -format json -output cmmc-results.json
   artifacts:
     paths:
@@ -243,7 +248,7 @@ pipeline {
             steps {
                 script {
                     def results = readJSON file: 'soc2-results.json'
-                    def score = results.score.percentage
+                    def score = results.score
 
                     echo "Compliance Score: ${score}%"
 
@@ -302,6 +307,7 @@ pipeline {
                             curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-azure-linux-amd64.tar.gz && tar -xzf auditkit-azure-linux-amd64.tar.gz && mv auditkit-azure-linux-amd64 auditkit-azure
                             chmod +x auditkit-azure
                             az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+                            export AZURE_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
                             ./auditkit-azure scan -framework soc2 -format json -output azure-soc2.json
                         '''
                     }
@@ -323,9 +329,9 @@ pipeline {
         stage('Aggregate Results') {
             steps {
                 script {
-                    def awsScore = readJSON(file: 'aws-soc2.json').score.percentage
-                    def azureScore = readJSON(file: 'azure-soc2.json').score.percentage
-                    def gcpScore = readJSON(file: 'gcp-soc2.json').score.percentage
+                    def awsScore = readJSON(file: 'aws-soc2.json').score
+                    def azureScore = readJSON(file: 'azure-soc2.json').score
+                    def gcpScore = readJSON(file: 'gcp-soc2.json').score
 
                     echo "AWS Score: ${awsScore}%"
                     echo "Azure Score: ${azureScore}%"
@@ -369,7 +375,7 @@ phases:
   post_build:
     commands:
       - |
-        SCORE=$(jq -r '.score.percentage' soc2-results.json)
+        SCORE=$(jq -r '.score' soc2-results.json)
         echo "Compliance Score: $SCORE%"
         if [ $(echo "$SCORE < 80" | bc) -eq 1 ]; then
           echo "Compliance score below 80% threshold"
@@ -417,6 +423,7 @@ steps:
     displayName: 'Download AuditKit'
 
   - script: |
+      export AZURE_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
       ./auditkit-azure scan -framework soc2 -format json -output soc2-results.json
     displayName: 'Run SOC2 Compliance Scan'
 
@@ -427,7 +434,7 @@ steps:
       ArtifactName: 'compliance-report'
 
   - script: |
-      SCORE=$(jq -r '.score.percentage' soc2-results.json)
+      SCORE=$(jq -r '.score' soc2-results.json)
       echo "Compliance Score: $SCORE%"
       if (( $(echo "$SCORE < 80" | bc -l) )); then
         echo "##vso[task.logissue type=error]Compliance score below 80%"
@@ -467,7 +474,7 @@ steps:
   - name: 'gcr.io/cloud-builders/jq'
     args:
       - '-r'
-      - '.score.percentage'
+      - '.score'
       - 'soc2-results.json'
 
 artifacts:
@@ -489,11 +496,11 @@ timeout: '600s'
 #!/bin/bash
 # fail-on-critical.sh
 
-CRITICAL_FAILURES=$(jq '[.results[] | select(.status=="FAIL" and .severity=="CRITICAL")] | length' results.json)
+CRITICAL_FAILURES=$(jq '[.controls[] | select(.status=="FAIL" and .severity=="CRITICAL")] | length' results.json)
 
 if [ "$CRITICAL_FAILURES" -gt 0 ]; then
   echo "FAIL:Found $CRITICAL_FAILURES CRITICAL compliance failures:"
-  jq -r '.results[] | select(.status=="FAIL" and .severity=="CRITICAL") | "\(.control_id): \(.name)"' results.json
+  jq -r '.controls[] | select(.status=="FAIL" and .severity=="CRITICAL") | "\(.id): \(.name)"' results.json
   exit 1
 fi
 
@@ -507,7 +514,7 @@ echo "PASS:No critical compliance failures"
 # fail-on-score.sh
 
 THRESHOLD=80
-SCORE=$(jq -r '.score.percentage' results.json)
+SCORE=$(jq -r '.score' results.json)
 
 echo "Compliance Score: $SCORE%"
 
@@ -535,7 +542,7 @@ REQUIRED_CONTROLS=(
 FAILED=false
 
 for CONTROL in "${REQUIRED_CONTROLS[@]}"; do
-  STATUS=$(jq -r ".results[] | select(.control_id==\"$CONTROL\") | .status" results.json)
+  STATUS=$(jq -r ".controls[] | select(.id==\"$CONTROL\") | .status" results.json)
 
   if [ "$STATUS" == "FAIL" ]; then
     echo "FAIL:Required control $CONTROL failed"

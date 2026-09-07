@@ -8,7 +8,7 @@ Scan your on-premises servers connected via Azure Arc.
 
 **Status:** Pro only
 **Coverage:** Defender for Cloud assessments + Guest Configuration compliance
-**Supported in:** AuditKit Pro v0.8.2-pro and later
+**Supported in:** AuditKit Pro v0.8.2-pro and later (current release v0.9.9-pro)
 
 Azure Arc extends Azure management to your on-premises servers. AuditKit can scan Arc-enabled machines for compliance by pulling:
 

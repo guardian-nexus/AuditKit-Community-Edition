@@ -22,16 +22,17 @@ What AuditKit scans in Amazon Web Services.
 
 ### S3 (Simple Storage Service)
 
-**Controls checked:** 8
+**Controls checked:** 9
 
 - **CC6.2** - S3 Public Access Block
-- **CC6.3** - Bucket encryption at rest
-- **CC7.1** - Bucket access logging
-- **A1.2** - Bucket versioning and lifecycle policies
-- **CIS-2.1.2** - MFA Delete enabled
-- **CIS-2.1.4** - Server access logging
+- **CC6.3** - S3 Encryption at Rest
+- **CC7.1** - S3 Access Logging
+- **A1.2** - S3 Versioning for Backup
+- **A1.2** - S3 Lifecycle Policies
+- **CIS-2.1.2** - S3 MFA Delete
+- **CIS-2.1.4** - S3 Server Access Logging
 - **CIS-2.1.6** - S3 Object Lock
-- **CIS-2.1.7** - Account-level Block Public Access
+- **CIS-2.1.7** - S3 Account Public Access Block
 
 **Example fixes:**
 ```bash
@@ -57,20 +58,38 @@ aws s3api put-bucket-versioning \
 
 ### IAM (Identity & Access Management)
 
-**Controls checked:** 12
+**Controls checked:** 30
 
-- **CC6.1** - Access key rotation (90 days for PCI-DSS, 180 for SOC2)
-- **CC6.6** - MFA enforcement for users
-- **CC6.7** - MFA for root account
-- **IA.1.076** - Password policy strength
-- **IA.1.077** - Password reuse prevention
-- **CC6.8** - Unused IAM credentials
-- **CC6.14** - IAM users with excessive permissions
-- **AC.1.001** - Policies following least privilege
-- **CC6.15** - Inactive users (90+ days)
-- **CC6.16** - Root account usage
-- **IA.2.081** - Multi-factor authentication required
-- **CC6.17** - IAM roles for EC2 instances
+- **CC6.4** - Zombie IAM Users
+- **CC6.4** - Inactive IAM Users
+- **CC6.4** - User Access Reviews
+- **CC6.5** - Excessive Admin Users
+- **CC6.5** - Least Privilege Access
+- **CC6.5** - Service Account Security
+- **CC6.6** - Root Account MFA
+- **CC6.6** - Root Account Usage
+- **CC6.7** - Password Policy
+- **CC6.7** - Unused Credentials
+- **CC6.8** - Access Key Rotation
+- **CIS-1.1** - Account Contact Details
+- **CIS-1.2** - Security Contact Information
+- **CIS-1.3** - Credentials Unused 45+ Days
+- **CIS-1.6** - Root Hardware MFA
+- **CIS-1.10** - MFA for IAM Users
+- **CIS-1.11** - Root Account Access Keys
+- **CIS-1.12** - Credentials Unused 90 Days
+- **CIS-1.13** - One Active Access Key Per User
+- **CIS-1.15** - IAM Policies via Groups Only
+- **CIS-1.16** - IAM Policies on Groups/Roles Only
+- **CIS-1.17** - IAM Support Role
+- **CIS-1.18** - IAM Master and Manager Roles
+- **CIS-1.19** - IAM Instance Roles
+- **CIS-1.20** - Password Expiration Policy
+- **CIS-1.21** - Password Reuse Prevention
+- **CIS-1.22** - IAM Policies Attached to Groups Only
+- **CIS-1.22** - IAM User Access Review
+- **CIS-17.1** - IAM Service-Linked Roles Configured
+- **CIS-17.2** - IAM Permission Boundaries Configured
 
 **Example fixes:**
 ```bash
@@ -100,16 +119,19 @@ aws iam delete-access-key --user-name USERNAME --access-key-id OLD_KEY_ID
 
 ### EC2 (Elastic Compute Cloud)
 
-**Controls checked:** 8
+**Controls checked:** 11
 
-- **CC6.4** - Security group rules (overly permissive)
-- **SC.1.175** - Open ports to 0.0.0.0/0
-- **CC8.1** - EBS volume encryption
-- **CC7.1** - Instance metadata v2 (IMDSv2) enforced
-- **CC6.18** - Public IP assignments
-- **SC.2.179** - Network isolation and segmentation
-- **CC7.3** - CloudWatch monitoring enabled
-- **SI.1.210** - Patch management via Systems Manager
+- **CC6.1** - Open Security Groups
+- **CC6.1** - Network Security - Open Ports
+- **CC6.1** - Public EC2 Instances
+- **CC6.3** - EBS Volume Encryption
+- **CC7.2** - AMI Age and Patching
+- **CIS-1.18** - EC2 Instance IAM Roles
+- **CIS-2.2.2** - EBS Public Snapshots
+- **CIS-5.2** - SSH Access from Internet
+- **CIS-5.3** - RDP Access from Internet
+- **CIS-5.4** - Default Security Group
+- **CIS-5.6** - EC2 IMDSv2
 
 **Example fixes:**
 ```bash
@@ -136,14 +158,19 @@ aws ec2 modify-instance-metadata-options \
 
 ### CloudTrail
 
-**Controls checked:** 6
+**Controls checked:** 11
 
-- **CC7.1** - CloudTrail enabled in all regions
-- **AU.2.041** - Management events logged
-- **AU.2.042** - Data events logged (S3, Lambda)
-- **CC7.4** - Log file validation enabled
-- **CC8.1** - CloudTrail logs encrypted with KMS
-- **CC7.5** - CloudTrail logs stored in S3 with retention
+- **CC7.1** - CloudTrail Logging Enabled
+- **CC7.1** - Multi-Region CloudTrail
+- **CC7.1** - CloudTrail Log Integrity
+- **CIS-3.2** - CloudTrail Log File Validation
+- **CIS-3.3** - CloudTrail CloudWatch Logs Integration
+- **CIS-3.4** - CloudTrail S3 Bucket Policy
+- **CIS-3.6** - CloudTrail S3 Bucket Logging
+- **CIS-3.7** - CloudTrail Encryption at Rest
+- **CIS-3.8** - CloudTrail KMS Key Rotation
+- **CIS-3.10** - S3 Object-Level Logging (Write)
+- **CIS-3.11** - S3 Object-Level Logging (Read)
 
 **Example fixes:**
 ```bash
@@ -168,12 +195,12 @@ aws cloudtrail update-trail \
 
 **Controls checked:** 6
 
-- **CC8.1** - Database encryption at rest
-- **CC8.2** - SSL/TLS in transit enforcement
-- **CC7.4** - Automated backups enabled
-- **CC6.19** - Public accessibility disabled
-- **CC7.6** - Enhanced monitoring enabled
-- **CC9.1** - Multi-AZ deployment for production
+- **CC6.1** - RDS Public Access
+- **CC6.3** - RDS Encryption at Rest
+- **A1.2** - RDS Backup Retention
+- **CIS-2.3.2** - RDS Automatic Minor Version Upgrade
+- **CIS-2.3.4** - RDS Multi-AZ Deployment
+- **CIS-2.3.5** - RDS Deletion Protection
 
 **Example fixes:**
 ```bash
@@ -199,13 +226,21 @@ aws rds modify-db-instance \
 
 ### VPC (Virtual Private Cloud)
 
-**Controls checked:** 5
+**Controls checked:** 13
 
-- **SC.1.175** - VPC Flow Logs enabled
-- **SC.2.179** - Network segmentation (public/private subnets)
-- **CC6.20** - Default security group restricted
-- **SC.1.176** - Network ACLs configured
-- **CC6.21** - VPC peering security
+- **CC7.1** - VPC Flow Logs
+- **CIS-5.1** - Default VPC in Use
+- **CIS-5.5** - VPC Peering Routing
+- **CIS-5.7** - VPC Endpoints for AWS Services
+- **CIS-5.8** - VPC Peering Routing Least Access
+- **CIS-5.9** - NACL Restricts SSH from Internet
+- **CIS-5.10** - NACL Restricts RDP from Internet
+- **CIS-5.11** - NACL Restricts SSH from Internet (IPv6)
+- **CIS-5.12** - NACL Restricts RDP from Internet (IPv6)
+- **CIS-5.13** - Security Groups Restrict Admin Ports
+- **CIS-5.14** - EC2 Instances in Custom VPC
+- **CIS-5.18** - Unused Security Groups Removed
+- **CIS-5.20** - VPC Endpoints for S3
 
 **Example fixes:**
 ```bash
@@ -231,11 +266,14 @@ aws ec2 revoke-security-group-egress \
 
 ### KMS (Key Management Service)
 
-**Controls checked:** 3
+**Controls checked:** 1
 
-- **CC8.3** - Key rotation enabled
-- **CC6.22** - Key policies (overly permissive)
-- **CC7.7** - Key usage monitoring via CloudTrail
+- **CC5.2** - Encryption Key Management
+
+There is no dedicated KMS check set. The KMS-adjacent checks live with the
+service that uses the key: `CIS-3.7` and `CIS-3.8` under CloudTrail, `CIS-12.2`
+under Secrets Manager, and `CIS-4.7` (a metric filter for key disable and delete
+events) under CloudWatch monitoring.
 
 **Example fixes:**
 ```bash
@@ -253,11 +291,10 @@ aws kms put-key-policy \
 
 ### GuardDuty
 
-**Controls checked:** 3
+**Controls checked:** 2
 
-- **SI.1.214** - GuardDuty enabled
-- **IR.2.092** - Findings monitored
-- **CC7.8** - High/critical findings addressed
+- **CC7.2** - GuardDuty Threat Detection
+- **CIS-9.1** - GuardDuty Enabled
 
 **Example fixes:**
 ```bash
@@ -272,12 +309,10 @@ aws guardduty list-findings --detector-id DETECTOR_ID
 
 ### Config
 
-**Controls checked:** 4
+**Controls checked:** 2
 
-- **CM.2.061** - AWS Config enabled
-- **CM.2.062** - Config rules deployed
-- **CC7.9** - Configuration changes tracked
-- **CC7.10** - Compliance dashboard available
+- **CC7.1** - AWS Config Recording
+- **CIS-3.5** - AWS Config Recording Status
 
 **Example fixes:**
 ```bash
@@ -295,11 +330,10 @@ aws configservice start-configuration-recorder --configuration-recorder-name def
 
 ### Security Hub
 
-**Controls checked:** 3
+**Controls checked:** 2
 
-- **CA.2.158** - Security Hub enabled
-- **CA.2.159** - Security standards enabled (CIS, PCI-DSS)
-- **CC7.11** - Security findings aggregated
+- **CIS-4.16** - AWS Security Hub Enabled
+- **CIS-9.3** - Security Hub Enabled
 
 **Example fixes:**
 ```bash
@@ -315,12 +349,14 @@ aws securityhub batch-enable-standards \
 
 ### Systems Manager
 
-**Controls checked:** 4
+**Controls checked:** 6
 
-- **SI.1.210** - Patch Manager configured
-- **CM.2.063** - State Manager associations
-- **CC7.12** - Session Manager for secure access
-- **MA.2.111** - Maintenance windows defined
+- **CC7.1** - Patch Management
+- **A1.1** - Processing Capacity Management
+- **A1.1** - High Availability
+- **CIS-10.1** - SSM Parameter Store Encryption
+- **CIS-10.2** - SSM Session Manager Logging
+- **CIS-10.3** - SSM Patch Compliance
 
 **Example fixes:**
 ```bash

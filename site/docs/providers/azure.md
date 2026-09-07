@@ -22,8 +22,6 @@ What AuditKit scans in Microsoft Azure.
 
 ### Storage Accounts
 
-**Controls checked:** 8
-
 **Controls checked:** 13
 
 - **CIS-3.1** - Storage account public access blocked (SOC2 CC6.2)
@@ -64,20 +62,25 @@ az storage blob service-properties delete-policy update \
 
 ### Azure AD (Entra ID)
 
-**Controls checked:** 12
+**Controls checked:** 17
 
-- **CC6.6** - MFA enforcement for all users
-- **IA.2.081** - Conditional Access policies configured
-- **CC6.7** - MFA for admin accounts
-- **CC6.25** - Identity Protection enabled
-- **CC6.26** - Privileged Identity Management (PIM) configured
-- **IA.1.076** - Password policy strength
-- **CC6.27** - Guest user restrictions
-- **CC6.28** - Legacy authentication blocked
-- **CC6.29** - Self-service password reset enabled
-- **CC6.30** - Risk-based sign-in policies
-- **CC7.14** - Sign-in logs retained
-- **AU.2.041** - Audit logs enabled
+- **CC6.1** - Privileged Role Management
+- **CC6.1** - Guest User Access Control
+- **CC6.6** - Global Administrator MFA
+- **CC6.7** - Azure AD Password Policy
+- **CC6.7** - Stale Account Detection
+- **CIS-1.1** - MFA for All Users
+- **CIS-1.2** - MFA for Privileged Users
+- **CIS-1.3** - Password Policy Configuration
+- **CIS-1.4** - Privileged and Owner Role Assignments
+- **CIS-1.5** - App Registration Owner Requirements
+- **CIS-1.6** - Contributor Role Assignments
+- **CIS-1.7** - Guest User Access Review
+- **CIS-1.8** - Guest Invite Restrictions
+- **CIS-1.9** - Conditional Access Policies
+- **CIS-1.10** - Block Legacy Authentication
+- **CIS-1.11** - Guest Invite Restrictions
+- **CIS-1.12** - Security Defaults or Conditional Access
 
 **Example fixes:**
 ```bash
@@ -99,14 +102,21 @@ az rest --method GET \
 
 ### Network Security Groups (NSGs)
 
-**Controls checked:** 6
+**Controls checked:** 13
 
-- **SC.1.175** - Overly permissive inbound rules
-- **CC6.31** - Rules allowing 0.0.0.0/0 access
-- **SC.2.179** - Network segmentation
-- **CC6.32** - Unused or default NSG rules
-- **CC7.15** - NSG flow logs enabled
-- **SC.1.176** - Just-in-time VM access configured
+- **CIS-6.1** - Dangerous Open Ports
+- **CIS-6.2** - RDP Access from Internet Restricted
+- **CIS-6.3** - SSH Access from Internet Restricted
+- **CIS-6.4** - SQL Server Port Access Restricted
+- **CIS-6.5** - PostgreSQL Port Access Restricted
+- **CIS-6.6** - MySQL Port Access Restricted
+- **CIS-7.1** - RDP Access from Internet
+- **CIS-7.2** - SSH Access from Internet
+- **CIS-7.3** - UDP Access from Internet
+- **CIS-7.4** - HTTP(S) Access from Internet
+- **CIS-7.5** - NSG Flow Log Retention
+- **CIS-7.6** - Network Watcher Enabled
+- **CIS-7.7** - Public IP Address Evaluation
 
 **Example fixes:**
 ```bash
@@ -142,13 +152,13 @@ az network watcher flow-log create \
 
 **Controls checked:** 7
 
-- **CC8.1** - Disk encryption enabled (Azure Disk Encryption)
-- **CC6.33** - Public IP assignments
-- **CC7.16** - Azure Monitor agent installed
-- **SI.1.210** - Update Management configured
-- **CC6.34** - Just-in-time VM access
-- **CC7.17** - Boot diagnostics enabled
-- **MA.2.111** - Maintenance configurations
+- **CC6.1** - VM Public IP Exposure
+- **CC7.1** - VM Monitoring Agents
+- **CIS-7.1** - Disk Encryption at Rest
+- **CIS-7.3** - Managed Disks
+- **CIS-7.4** - Endpoint Protection
+- **CIS-7.6** - VM Backup
+- **CIS-8.5** - Disk Network Access Restriction
 
 **Example fixes:**
 ```bash
@@ -176,14 +186,20 @@ az vm boot-diagnostics enable \
 
 ### SQL Database
 
-**Controls checked:** 6
+**Controls checked:** 12
 
-- **CC8.1** - Transparent Data Encryption (TDE) enabled
-- **CC8.2** - SSL/TLS enforcement
-- **AU.2.042** - Auditing enabled
-- **CC6.35** - Firewall rules configured (no 0.0.0.0/0)
-- **CC9.1** - High availability configured
-- **CC7.18** - Advanced Threat Protection enabled
+- **CIS-3.1.7.3** - Microsoft Defender for SQL
+- **CIS-5.1.1** - SQL Server Auditing
+- **CIS-5.1.2** - SQL Server Firewall and Public Access
+- **CIS-5.1.3** - SQL Transparent Data Encryption
+- **CIS-5.1.4** - SQL Entra ID Authentication
+- **CIS-5.2.1** - PostgreSQL Require Secure Transport
+- **CIS-5.2.2** - PostgreSQL Logging Configuration
+- **CIS-5.2.5** - PostgreSQL Public Network Access
+- **CIS-5.2.6** - PostgreSQL Single Server (Legacy)
+- **CIS-5.3.1** - MySQL Require Secure Transport
+- **CIS-5.3.2** - MySQL TLS Version
+- **CIS-5.3.3** - MySQL Audit Logging
 
 **Example fixes:**
 ```bash
@@ -212,13 +228,17 @@ az sql server firewall-rule delete \
 
 ### Key Vault
 
-**Controls checked:** 5
+**Controls checked:** 9
 
-- **CC8.3** - Key rotation policies configured
-- **CC6.36** - Access policies follow least privilege
-- **CC7.19** - Soft delete enabled
-- **CC7.20** - Purge protection enabled
-- **AU.2.043** - Diagnostic logging enabled
+- **CIS-3.3.5** - Key Vault Recovery Settings
+- **CIS-3.3.6** - Key Vault RBAC Authorization
+- **CIS-3.3.7** - Key Vault Private Endpoints
+- **CIS-6.1.4** - Key Vault Logging
+- **CIS-8.1** - Key Vault Recoverable
+- **CIS-8.2** - Key Vault Keys Have Expiration Dates
+- **CIS-8.3** - Key Vault Network Access
+- **CIS-8.4** - Key Vault Secrets Have Expiration Dates
+- **CIS-8.6** - Key Vault Certificates Auto-Renew
 
 **Example fixes:**
 ```bash
@@ -245,12 +265,10 @@ az monitor diagnostic-settings create \
 
 ### Azure Policy
 
-**Controls checked:** 4
+**Controls checked:** 2
 
-- **CM.2.061** - Policy assignments configured
-- **CC7.21** - Compliance dashboard monitored
-- **CM.2.062** - Resource compliance tracked
-- **CC6.37** - Deny policies for critical controls
+- **CC5.3** - Policies and Procedures
+- **CIS-5.2.2** - Create Alert for Policy Assignment Changes
 
 **Example fixes:**
 ```bash
@@ -268,13 +286,23 @@ az policy state list --filter "isCompliant eq false"
 
 ### Defender for Cloud
 
-**Controls checked:** 5
+**Controls checked:** 15
 
-- **CC7.22** - Defender for Cloud enabled
-- **SI.1.214** - Security alerts configured
-- **CA.2.158** - Secure score monitored
-- **RA.2.138** - Vulnerability assessments enabled
-- **IR.2.092** - Security recommendations addressed
+- **CIS-2.1.1** - Microsoft Defender for Servers
+- **CIS-2.1.2** - Microsoft Defender for App Service
+- **CIS-2.1.3** - Microsoft Defender for Azure SQL Databases
+- **CIS-2.1.4** - Microsoft Defender for SQL Servers on Machines
+- **CIS-2.1.5** - Microsoft Defender for Open-Source Relational Databases
+- **CIS-2.1.6** - Microsoft Defender for Azure Cosmos DB
+- **CIS-2.1.7** - Microsoft Defender for Storage
+- **CIS-2.1.8** - Microsoft Defender for Containers
+- **CIS-2.1.9** - Microsoft Defender for DNS
+- **CIS-2.1.10** - Microsoft Defender for Key Vault
+- **CIS-2.1.11** - Microsoft Defender for APIs
+- **CIS-2.1.12** - Microsoft Defender for Resource Manager
+- **CIS-2.1.17** - Auto-Provisioning of Defender Components
+- **CIS-2.1.19** - Security Contact Email
+- **CIS-2.1.20** - Security Alert Notifications
 
 **Example fixes:**
 ```bash
@@ -292,12 +320,11 @@ az security assessment list
 
 ### Activity Logs
 
-**Controls checked:** 4
+**Controls checked:** 3
 
-- **AU.2.041** - Activity log collection enabled
-- **CC7.23** - Log retention configured (90+ days)
-- **CC7.24** - Log export to storage account
-- **AU.2.044** - Activity log alerts configured
+- **CIS-5.1.2** - Activity Log Export and Retention
+- **CIS-5.1.5** - Key Vault and NSG Diagnostic Logging
+- **PCI-10.5.1** - Activity Log Retention - 12 Months Immediately Available
 
 **Example fixes:**
 ```bash
@@ -319,13 +346,16 @@ az monitor activity-log alert create \
 
 ### Azure Monitor
 
-**Controls checked:** 5
+**Controls checked:** 8
 
-- **SI.1.214** - Log Analytics workspace configured
-- **CC7.25** - Monitoring agents deployed
-- **AU.2.045** - Log retention policy set
-- **CC7.26** - Custom alerts configured
-- **IR.2.093** - Alert action groups defined
+- **CIS-5.2.1** - Create Alert for Authorization Changes
+- **CIS-5.2.2** - Create Alert for Policy Assignment Changes
+- **CIS-5.2.3** - Create Alert for NSG Changes
+- **CIS-5.2.4** - Create Alert for Security Group Changes
+- **CIS-5.2.5** - Create Alert for Security Solutions Changes
+- **CIS-5.2.6** - Create Alert for SQL Firewall Changes
+- **CIS-5.2.7** - Create Alert for Key Vault Deletion
+- **CIS-5.2.8** - Create Alert for Storage Account Deletion
 
 **Example fixes:**
 ```bash
@@ -354,13 +384,12 @@ az monitor metrics alert create \
 
 ### Virtual Networks
 
-**Controls checked:** 5
+**Controls checked:** 4
 
-- **SC.1.175** - NSG flow logs enabled
-- **SC.2.179** - Subnets properly segmented
-- **CC6.38** - Service endpoints configured
-- **CC6.39** - Private endpoints for PaaS services
-- **SC.1.176** - DDoS Protection Standard enabled
+- **CIS-6.1** - Dangerous Open Ports
+- **CIS-7.5** - NSG Flow Log Retention
+- **CIS-7.6** - Network Watcher Enabled
+- **CIS-7.7** - Public IP Address Evaluation
 
 **Example fixes:**
 ```bash

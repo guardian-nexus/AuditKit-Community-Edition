@@ -19,6 +19,7 @@ type IntegrationResult struct {
 	Product         string            `json:"product"`          // M365 service (AAD, SharePoint, etc.)
 	Title           string            `json:"title"`            // Human readable control name
 	Status          string            `json:"status"`           // PASS, FAIL, INFO, MANUAL
+	Severity        string            `json:"severity"`         // CRITICAL, HIGH, MEDIUM, LOW
 	Evidence        string            `json:"evidence"`         // What was found/checked
 	Remediation     string            `json:"remediation"`      // How to fix
 	ScreenshotGuide string            `json:"screenshot_guide"` // Evidence collection guidance

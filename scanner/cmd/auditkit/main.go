@@ -225,13 +225,10 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 			fmt.Fprintf(os.Stderr, "Loading ScubaGear integration...\n")
 		}
 
+		// The mappings are embedded in the binary. A local mappings/scubagear
+		// directory still wins when one is present, so an edited mapping can be
+		// tested without a rebuild.
 		mappingsDir := filepath.Join("mappings", "scubagear")
-
-		if _, err := os.Stat(mappingsDir); os.IsNotExist(err) {
-			fmt.Fprintf(os.Stderr, "Error: ScubaGear mappings not found at %s\n", mappingsDir)
-			fmt.Fprintf(os.Stderr, "Make sure entra.json exists in mappings/scubagear/\n")
-			os.Exit(1)
-		}
 
 		integration := scubagear.NewScubaGearIntegration(mappingsDir)
 

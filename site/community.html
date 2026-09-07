@@ -60,7 +60,8 @@
 
             <div class="code-block"><span class="comment"># Download a prebuilt binary from the Releases page</span>
 <span class="comment"># https://github.com/guardian-nexus/AuditKit-Community-Edition/releases</span>
-tar xzf auditkit-linux-amd64.tar.gz &amp;&amp; chmod +x auditkit-linux-amd64
+tar xzf auditkit-linux-amd64.tar.gz
+mv auditkit-linux-amd64 auditkit &amp;&amp; chmod +x auditkit
 
 <span class="comment"># Or build from source</span>
 git clone https://github.com/guardian-nexus/AuditKit-Community-Edition.git

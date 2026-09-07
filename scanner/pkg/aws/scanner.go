@@ -109,9 +109,24 @@ type ScanResult struct {
 }
 
 func NewScanner(profile string) (*AWSScanner, error) {
-	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithSharedConfigProfile(profile),
-	)
+	// Only name a profile when one was actually asked for.
+	//
+	// The -profile flag defaults to "default", and passing that explicitly
+	// selects the SDK's strict shared-config path: without a ~/.aws/config the
+	// load fails outright with "failed to get shared config profile, default",
+	// and environment credentials do not rescue it. That is exactly the shape of
+	// every CI runner and container, so each CI/CD recipe on the site, and the
+	// Docker example, could never have worked.
+	//
+	// With no profile named, the SDK's normal chain still reads the [default]
+	// profile when one exists, and otherwise falls through to environment
+	// variables, the container credential provider and the instance role.
+	opts := []func(*config.LoadOptions) error{}
+	if p := strings.TrimSpace(profile); p != "" && p != "default" {
+		opts = append(opts, config.WithSharedConfigProfile(p))
+	}
+
+	cfg, err := config.LoadDefaultConfig(context.TODO(), opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load AWS config: %v", err)
 	}

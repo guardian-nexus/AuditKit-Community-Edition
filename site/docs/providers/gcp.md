@@ -284,7 +284,7 @@ gcloud compute firewall-rules create RULE_NAME \
   --source-ranges=SPECIFIC_IP_RANGE
 ```
 
-#### CC6.9 - Default Network Usage
+#### CIS GCP 3.1 - Default VPC Network Deleted
 **What it checks:**
 - Use of default VPC network
 - Custom VPCs preferred
@@ -304,7 +304,7 @@ gcloud compute networks create custom-vpc --subnet-mode=custom
 gcloud compute networks delete default
 ```
 
-#### SC.1.175 - Open Ingress Rules
+#### CC6.6 - Open Ingress Rules
 **What it checks:**
 - Firewall rules allowing 0.0.0.0/0 ingress
 - Ports exposed to internet
@@ -326,7 +326,7 @@ gcloud compute firewall-rules update RULE_NAME \
 
 ### Cloud SQL - 4 Checks
 
-#### CC6.10 - Public IP Exposure
+#### CC6.6 - Cloud SQL Public IP
 **What it checks:**
 - Cloud SQL instances with public IPs
 - Authorized networks configured
@@ -348,7 +348,7 @@ gcloud sql instances patch INSTANCE_NAME \
   --network=projects/PROJECT/global/networks/VPC_NAME
 ```
 
-#### CC8.2 - SSL/TLS Enforcement
+#### CC6.1 - Cloud SQL SSL Enforcement
 **What it checks:**
 - SSL/TLS required for connections
 - Certificate validation enabled
@@ -403,7 +403,7 @@ gcloud sql instances patch INSTANCE_NAME \
 
 ### Cloud KMS - 2 Checks
 
-#### CC8.3 - Automatic Key Rotation
+#### CIS GCP 1.10 - KMS Key Rotation
 **What it checks:**
 - Key rotation enabled
 - Rotation period configured
@@ -424,20 +424,28 @@ gcloud kms keys update KEY_NAME \
   --next-rotation-time=2025-11-01T00:00:00Z
 ```
 
-#### CC6.11 - Key Usage Monitoring
+#### CIS GCP 1.9 - KMS Separation of Duties
+
 **What it checks:**
-- Cloud Audit Logs enabled for KMS
-- Key usage tracked
-- Unauthorized access attempts logged
+- No principal holds both `cloudkms.admin` and a key-usage role
+  (`cloudkms.cryptoKeyEncrypterDecrypter`, `...Encrypter`, `...Decrypter`)
+  on the same key
 
 **Pass criteria:**
-- Audit logs enabled
-- Logs exported to long-term storage
-- Alerting configured
+- Key administration and key use are held by different principals
 
-**Fix (manual verification):**
-- Verify in Cloud Console > IAM > Audit Logs
-- Ensure Cloud KMS API logging enabled
+**Fix command:**
+```bash
+# Remove the key-usage role from an account that also administers keys
+gcloud kms keys remove-iam-policy-binding KEY_NAME \
+  --keyring=KEYRING --location=LOCATION \
+  --member=serviceAccount:ACCOUNT \
+  --role=roles/cloudkms.cryptoKeyEncrypterDecrypter
+```
+
+KMS audit logging is not checked here. `CIS GCP 2.1` under Cloud Logging covers
+Cloud Audit Logs, and `CIS GCP 1.8` and `CIS GCP 1.16` under Cloud IAM cover
+public key exposure and KMS role separation at the project level.
 
 ---
 

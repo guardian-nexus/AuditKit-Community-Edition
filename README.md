@@ -244,7 +244,7 @@ New Features:
 
 ---
 
-## AuditKit Pro Desktop (v0.9.6-pro)
+## AuditKit Pro Desktop
 
 *This section describes AuditKit Pro, the paid product. It is not part of the
 Community Edition and is not built from this repository.*

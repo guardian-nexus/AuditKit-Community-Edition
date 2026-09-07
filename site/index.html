@@ -154,7 +154,7 @@
 
                 <div class="card card-flex card-highlight">
                     <h3>Desktop GUI</h3>
-                    <p>A local web dashboard with real-time compliance scores, a findings explorer, scan history and evidence management. Runs in your browser, no cloud dependencies. Multi-account scanning, custom controls and offline mode are CLI-only.</p>
+                    <p>A local web dashboard with real-time compliance scores, a findings explorer, scan history and evidence management. Runs in your browser, no cloud dependencies. Custom control definitions and cached-scan replay (<code>--offline</code>) are CLI-only.</p>
                     <ul class="feature-list">
                         <li>Real-time compliance scores and trends</li>
                         <li>Findings explorer with severity filtering</li>
@@ -246,6 +246,7 @@
                 <div class="code-block"><span class="comment"># 1. Install AuditKit (private repo access provided after signup)</span>
 <span class="comment"># Download the binary for your platform from the Releases page</span>
 tar xzf auditkit-pro-linux-amd64.tar.gz
+mv auditkit-pro-linux-amd64 auditkit-pro &amp;&amp; chmod +x auditkit-pro
 mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
 
 <span class="comment"># 2. Run your first compliance scan (30 minutes)</span>
@@ -459,7 +460,7 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
 
             <div class="faq-item">
                 <h3>What's the difference between the CLI and Desktop GUI?</h3>
-                <p>Both are included in your subscription. The CLI scanner is a terminal-based tool for engineers, good for automation, CI/CD integration, and scripting. The Desktop GUI is a local web dashboard with visual compliance scores, a findings explorer, scan history and evidence management. Multi-account scanning, custom controls and offline mode are CLI-only. Use whichever fits your workflow, or both.</p>
+                <p>Both are included in your subscription. The CLI scanner is a terminal-based tool for engineers, good for automation, CI/CD integration, and scripting. The Desktop GUI is a local web dashboard with visual compliance scores, a findings explorer, scan history and evidence management. Custom control definitions and cached-scan replay (<code>--offline</code>) are CLI-only. Use whichever fits your workflow, or both.</p>
             </div>
 
             <div class="faq-item">
@@ -479,7 +480,8 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
 
             <div class="faq-item">
                 <h3>Do all features work in air-gapped environments?</h3>
-                <p>Yes, all features work offline including the Desktop GUI, daemon, evidence package generator, and drift detection. No cloud account, no SaaS dashboard, no telemetry. The tool runs wherever you have credentials.</p>
+                <p>Nothing in AuditKit talks to AuditKit. Licence files are verified locally against a key compiled into the binary, there is no SaaS dashboard, no account to create and no telemetry. The Desktop GUI, daemon, evidence packages, reports and drift detection all run on your machine.</p>
+                <p class="mb-0">Scanning itself still reaches your cloud provider's API, so a host with no route to AWS, Azure or GCP cannot scan them. Run the scan where the credentials reach, then use <code>--offline</code> to work from the cached results, or import ScubaGear and Prowler output.</p>
             </div>
 
             <div class="faq-item">

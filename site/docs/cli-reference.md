@@ -42,7 +42,7 @@ auditkit scan [flags]
 
 **Examples:**
 ```bash
-# Basic scan (defaults to AWS, SOC2)
+# Basic scan (defaults to AWS, all frameworks)
 auditkit scan
 
 # Specify provider and framework
@@ -68,9 +68,13 @@ auditkit scan --full
 - `-format` - Output format: `text`, `json`, `html`, `pdf`, `csv` (default: `text`)
 - `-output` - Output file path (e.g., `report.pdf`)
 - `-profile` - AWS profile name (AWS only)
-- `--scan-all` - Scan all accounts/subscriptions/projects (Pro only)
-- `--max-concurrent` - Max concurrent scans (Pro only, default: 5)
-- `--summary-only` - Show summary only, skip detailed results (Pro only)
+
+These exist only on the Pro binary. Passing them to Community Edition exits with
+`flag provided but not defined`:
+
+- `--scan-all` - Scan all accounts/subscriptions/projects
+- `--max-concurrent` - Max concurrent scans (default: 5)
+- `--summary-only` - Show summary only, skip detailed results
 
 ---
 
@@ -298,7 +302,7 @@ auditkit version
 
 **Output:**
 ```
-AuditKit v0.8.6 - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)
+AuditKit v0.8.6 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
 ```
 
 ---

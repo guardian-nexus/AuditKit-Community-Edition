@@ -68,33 +68,37 @@ SPRS score postings and annual affirmations.
 AuditKit reports all 17 practices. 13 carry an automated check on AWS and Azure, 9 on GCP; the rest are reported for evidence tracking:
 
 #### Access Control (AC)
-1. **AC.1.001** - Limit system access to authorized users
-2. **AC.1.002** - Limit system access to authorized transactions
-3. **AC.1.003** - Control remote access sessions
+1. **AC.L1-3.1.1** - Limit system access to authorized users
+2. **AC.L1-3.1.2** - Limit system access to the types of transactions and functions authorized users are permitted to execute
+3. **AC.L1-3.1.20** - Verify and control connections to and use of external systems
+4. **AC.L1-3.1.22** - Control information posted or processed on publicly accessible systems
 
 #### Identification & Authentication (IA)
-4. **IA.1.076** - Identify users
-5. **IA.1.077** - Authenticate users
+5. **IA.L1-3.5.1** - Identify system users, processes acting on behalf of users, and devices
+6. **IA.L1-3.5.2** - Authenticate the identities of those users, processes and devices
 
 #### Media Protection (MP)
-6. **MP.1.118** - Sanitize or destroy media
+7. **MP.L1-3.8.3** - Sanitize or destroy media containing FCI before disposal or reuse
 
 #### Physical Protection (PE)
-7. **PE.1.131** - Limit physical access to systems
-8. **PE.1.132** - Escort visitors
-9. **PE.1.133** - Maintain audit logs of physical access
+8. **PE.L1-3.10.1** - Limit physical access to systems, equipment and operating environments
+9. **PE.L1-3.10.3** - Escort visitors and monitor visitor activity
+10. **PE.L1-3.10.4** - Maintain audit logs of physical access
+11. **PE.L1-3.10.5** - Control and manage physical access devices
 
 #### System & Communications Protection (SC)
-10. **SC.1.175** - Monitor communications at external boundaries
-11. **SC.1.176** - Control communications at external boundaries
+12. **SC.L1-3.13.1** - Monitor, control and protect communications at external and key internal boundaries
+13. **SC.L1-3.13.5** - Implement subnetworks for publicly accessible components, separated from internal networks
 
 #### System & Information Integrity (SI)
-12. **SI.1.210** - Identify and manage information system flaws
-13. **SI.1.211** - Identify malicious content
-14. **SI.1.212** - Update malicious code protection
-15. **SI.1.213** - Perform network scans
-16. **SI.1.214** - Monitor system security alerts
-17. **SI.1.217** - Update system components
+14. **SI.L1-3.14.1** - Identify, report and correct system flaws in a timely manner
+15. **SI.L1-3.14.2** - Provide protection from malicious code at designated locations
+16. **SI.L1-3.14.4** - Update malicious code protection mechanisms when new releases are available
+17. **SI.L1-3.14.5** - Perform periodic scans of the system and real-time scans of files from external sources
+
+These are the identifiers the scanner emits. The older `AC.1.001` form belongs to
+CMMC 1.0, which was withdrawn; CMMC 2.0 identifies each practice by its domain,
+level and NIST SP 800-171 Rev 2 requirement number.
 
 ### What AuditKit Checks (Level 1)
 
@@ -435,14 +439,14 @@ Based on C3PAO assessments, here are the most common failures:
 5. No vulnerability scanning
 
 ### Level 2 Failures
-1. Inadequate access controls (AC.2.016)
-2. Missing audit logs (AU.2.041)
-3. No security awareness training (AT.2.056)
-4. Weak incident response (IR.2.092)
-5. No vulnerability management (RA.2.138)
-6. Missing system hardening (CM.2.061)
-7. No cryptographic protection (SC.2.179)
-8. Inadequate media protection (MP.2.120)
+1. Inadequate access controls (AC.L2-3.1.5, least privilege)
+2. Missing audit logs (AU.L2-3.3.1)
+3. No security awareness training (AT.L2-3.2.1)
+4. Weak incident response (IR.L2-3.6.1)
+5. No vulnerability management (RA.L2-3.11.2)
+6. Missing system hardening (CM.L2-3.4.1, baseline configurations)
+7. No cryptographic protection (SC.L2-3.13.11)
+8. Inadequate media protection (MP.L2-3.8.1)
 
 **AuditKit catches all technical failures before assessment.**
 
