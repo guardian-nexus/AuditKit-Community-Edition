@@ -106,28 +106,33 @@ above rather than separate control sets.
 ## Community Edition vs AuditKit Pro
 
 This repository is the **Community Edition**: free, open source, and the whole
-scanner for AWS, Azure, GCP and M365 against SOC2, PCI DSS, CMMC Level 1 and the
-frameworks derived from them. It is not a trial or a crippled build.
+scanner for AWS, Azure, GCP and M365 against SOC2, PCI DSS, CMMC Level 1 and 2,
+and the frameworks derived from them. It is not a trial or a crippled build.
 
-**AuditKit Pro** is a separate paid product for organisations that need CMMC
-Level 2, estate-wide scanning, or a desktop interface.
+**AuditKit Pro** is a separate paid product for organisations that need
+automated CMMC Level 2 checks, an assessor-ready evidence package, estate-wide
+scanning, or a desktop interface.
 
 | | Community Edition (free) | AuditKit Pro ($297/mo) |
 |---|---|---|
-| **Cloud providers** | AWS, Azure, GCP, M365 | Same |
-| **Controls assessed** | 229 AWS, 178 Azure, 135 GCP | 321 AWS, 268 Azure, 284 GCP |
+| **Cloud providers** | AWS, Azure, GCP, M365 | Same, plus Azure Arc |
+| **Controls assessed** | 219 AWS, 174 Azure, 133 GCP | 316 AWS, 322 Azure, 259 GCP |
 | **SOC2 Type II** | 38, 37, 32 criteria | 38, 38, 36 criteria |
-| **PCI DSS v4.0.1** | 69 requirements | 73 requirements |
-| **CMMC Level 1** | Yes | Yes |
-| **CMMC Level 2** | - | 110 practices (CUI handling) |
-| **CIS Benchmarks** | AWS, Azure and GCP | Same |
+| **PCI DSS v4.0.1** | 69 requirements | 76 requirements |
+| **CMMC Level 1** | 13 of 17 practices automated | 17 of 17 practices automated |
+| **CMMC Level 2** | All 110 practices reported for evidence | All 110 practices automated |
+| **CIS Benchmarks** | 158 AWS, 108 Azure, 71 GCP | 158 AWS, 122 Azure, 72 GCP |
 | **Derived frameworks** | 800-53, ISO 27001, HIPAA, GDPR, NIST CSF, FedRAMP | Same six, from a larger control set |
-| **NIST 800-53 derived** | 95 controls | 133 controls |
-| **GDPR / NIST CSF derived** | 14 articles, 65 subcategories (AWS) | 15 articles, 92 subcategories (AWS) |
+| **NIST 800-53 derived** | 95 controls | 135 controls |
+| **GDPR / NIST CSF derived** | 14 articles, 65 subcategories (AWS) | 16 articles, 67 subcategories (AWS) |
 | **Reports** | PDF, HTML, CSV, JSON | Same |
-| **Evidence lifecycle** | Yes | Yes, plus a packaged audit deliverable |
-| **GKE and Vertex AI** | - | 32 checks |
-| **Multi-account scanning** | - | AWS Organizations, Azure Management Groups, GCP folders |
+| **Offline / air-gapped scans** | Yes | Yes, plus cache expiry and clearing |
+| **Evidence lifecycle** | Collection tracking | Tracking, plus a packaged audit deliverable |
+| **GKE and Vertex AI** | 5 GKE controls | 15 GKE and 10 Vertex AI controls |
+| **Multi-account scanning** | - | AWS Organizations, Azure Management Groups, GCP folders, with account, OU and folder selection |
+| **Multi-cloud in one run** | - | AWS, Azure and GCP together |
+| **Drift detection** | - | Across environments, or between two saved scans |
+| **Exceptions and waivers** | - | Tracked with approval and expiry |
 | **On-premises** | - | Azure Arc (experimental) |
 | **Desktop GUI** | - | Web dashboard at localhost:1337 |
 | **Custom controls** | - | Define your own checks in YAML |
