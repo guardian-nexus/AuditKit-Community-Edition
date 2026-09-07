@@ -26,7 +26,7 @@ import (
 	"github.com/guardian-nexus/auditkit/scanner/pkg/updater"
 )
 
-var CurrentVersion = "v0.8.6"
+var CurrentVersion = "v0.8.7"
 
 type ComplianceResult struct {
 	Timestamp       time.Time       `json:"timestamp"`
@@ -125,6 +125,7 @@ func main() {
 	case "cache":
 		runCacheCommand(*provider, *profile, *framework, *verbose)
 	case "update":
+		updater.CurrentVersion = CurrentVersion
 		updater.CheckForUpdates()
 	case "version":
 		fmt.Printf("AuditKit %s - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)\n", CurrentVersion)
