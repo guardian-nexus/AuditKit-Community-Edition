@@ -27,7 +27,7 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 **$0/month forever**
 
 **What's included:**
-- AWS, Azure, GCP, M365 scanning
+- AWS, Azure and GCP scanning; M365 findings via ScubaGear import
 - SOC2 Type II (38 criteria: all 33 Common Criteria, plus Availability and Confidentiality)
 - PCI-DSS v4.0.1 (69 requirements)
 - CMMC Level 1 automated (13 of 17 practices), and all 110 Level 1 + 2 practices reported for evidence tracking
