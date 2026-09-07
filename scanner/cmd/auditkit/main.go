@@ -127,7 +127,7 @@ func main() {
 	case "update":
 		updater.CheckForUpdates()
 	case "version":
-		fmt.Printf("AuditKit %s - Multi-cloud compliance scanning (AWS, Azure, GCP, M365)\n", CurrentVersion)
+		fmt.Printf("AuditKit %s - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)\n", CurrentVersion)
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\n", command)
 		printUsage()
