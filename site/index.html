@@ -154,10 +154,10 @@
 
                 <div class="card card-flex card-highlight">
                     <h3>Desktop GUI</h3>
-                    <p>Everything the CLI does, made visual. A local web dashboard with real-time compliance scores, findings explorer, scan history, and evidence management. Runs in your browser, no cloud dependencies.</p>
+                    <p>A local web dashboard with real-time compliance scores, a findings explorer, scan history and evidence management. Runs in your browser, no cloud dependencies. Multi-account scanning, custom controls and offline mode are CLI-only.</p>
                     <ul class="feature-list">
                         <li>Real-time compliance scores and trends</li>
-                        <li>Search and filter findings by severity</li>
+                        <li>Findings explorer with severity filtering</li>
                         <li>Scan history with drift tracking</li>
                         <li>Evidence package management</li>
                     </ul>
@@ -190,7 +190,7 @@
                             <img src="./examples/screenshots/auditkitwebgui-findings.png" alt="Findings Explorer" loading="lazy">
                             <div class="carousel-caption">
                                 <strong>Findings Explorer</strong>
-                                <p>Search &amp; filter by severity</p>
+                                <p>Filter by severity, with control, framework and evidence in view</p>
                             </div>
                         </div>
                         <div class="carousel-slide" onclick="openLightbox(2)">
@@ -459,7 +459,7 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
 
             <div class="faq-item">
                 <h3>What's the difference between the CLI and Desktop GUI?</h3>
-                <p>Both are included in your subscription. The CLI scanner is a terminal-based tool for engineers, good for automation, CI/CD integration, and scripting. The Desktop GUI is a local web dashboard that provides the same scanning capabilities with visual compliance scores, findings explorer, scan history, and evidence management. Use whichever fits your workflow, or both.</p>
+                <p>Both are included in your subscription. The CLI scanner is a terminal-based tool for engineers, good for automation, CI/CD integration, and scripting. The Desktop GUI is a local web dashboard with visual compliance scores, a findings explorer, scan history and evidence management. Multi-account scanning, custom controls and offline mode are CLI-only. Use whichever fits your workflow, or both.</p>
             </div>
 
             <div class="faq-item">
@@ -613,7 +613,7 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
         // Lightbox
         var slides = [
             { src: './examples/screenshots/auditkitwebgui-dashboard.png', caption: 'Dashboard - Real-time compliance scores & trends' },
-            { src: './examples/screenshots/auditkitwebgui-findings.png', caption: 'Findings Explorer - Search & filter by severity' },
+            { src: './examples/screenshots/auditkitwebgui-findings.png', caption: 'Findings Explorer - Filter by severity across every framework' },
             { src: './examples/screenshots/auditkitwebgui-scanhistory.png', caption: 'Scan History - Browse all past scans' }
         ];
         var currentSlide = 0;
