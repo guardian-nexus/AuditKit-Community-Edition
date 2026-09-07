@@ -511,7 +511,7 @@ auditkit evidence -format html -output evidence-tracker.html
 - Evidence guides included
 - Free (or $297/month for Pro)
 
-**AuditKit saves:** 40+ hours per compliance cycle
+**What AuditKit removes:** the manual hunt for what to collect. Every control ships with the evidence that triggered it, a console link and a step-by-step collection guide, so the work is a checklist rather than a search.
 
 ---
 

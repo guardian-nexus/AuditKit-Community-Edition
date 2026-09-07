@@ -142,7 +142,7 @@
                     <h3>CLI Scanner</h3>
                     <p>Terminal-based scanning for engineers. Run compliance checks from your command line, integrate with CI/CD pipelines, automate with cron. Works in air-gapped environments with zero external dependencies.</p>
                     <ul class="feature-list">
-                        <li>350+ automated checks across 9 frameworks</li>
+                        <li>350+ automated checks across 10 frameworks</li>
                         <li>AWS, Azure, GCP, Microsoft 365</li>
                         <li>PDF, HTML, JSON, CSV output</li>
                         <li>Fix scripts for every finding</li>
@@ -265,7 +265,7 @@ go build ./cmd/auditkit-pro
 ./auditkit-pro evidence-package -framework soc2 -output ./audit-evidence
 
 <span class="comment"># 5. Walk into your audit knowing you'll pass</span>
-<span class="pass">&#10003; 38/38 criteria assessed - ready for review</span></div>
+<span class="pass">&#10003; 36 of 43 Trust Services criteria assessed - evidence package ready for your CPA</span></div>
             </div>
         </div>
     </section>
@@ -341,7 +341,7 @@ go build ./cmd/auditkit-pro
 
                 <div class="card card-flex">
                     <h3>Evidence Packages</h3>
-                    <p>Generates auditor-ready ZIP files with configuration dumps, logs, and documentation in the format auditors expect. Saves 40+ hours of manual evidence collection per assessment.</p>
+                    <p>Generates auditor-ready ZIP files with configuration dumps, logs and documentation in the format auditors expect, with a folder per control holding the finding, a console link and a step-by-step evidence guide.</p>
                     <div class="code-inline">./auditkit-pro evidence-package -framework soc2</div>
                 </div>
 
@@ -489,7 +489,7 @@ go build ./cmd/auditkit-pro
         <div class="container text-center">
             <h2>Know Exactly Where You Stand in 30 Minutes</h2>
             <p class="text-lg mb-3" style="color: var(--slate-300);">
-                350+ automated checks. 9 compliance frameworks. Specific remediation for every finding. Evidence packages your auditor expects. CLI + Desktop GUI included.
+                350+ automated checks. 10 compliance frameworks. Specific remediation for every finding. Evidence packages your auditor expects. CLI + Desktop GUI included.
             </p>
             <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary btn-lg" onclick="if (window.auditKitConsent && window.auditKitConsent.marketing && typeof gtag === 'function') { gtag('event', 'conversion', {'send_to': 'AW-17730440946/q5TvCL37jsAbEPKdxIZC', 'value': 297.0, 'currency': 'USD'}); } return true;">
                 Start 14-Day Free Trial
