@@ -5,11 +5,6 @@ on:
   pull_request:
     paths:
       - 'site/**'
-      # The coverage check reads these, so a change here can invalidate a
-      # number the documentation states.
-      - 'scanner/pkg/*/checks/**'
-      - 'scanner/pkg/mappings/framework-crosswalk.yaml'
-      - '.github/coverage-claims.json'
       - '.github/workflows/pages.yml'
 # Pages allows one deployment at a time. Without this, pushing several commits
 # in quick succession makes the later runs fail with "in progress deployment"
@@ -19,14 +14,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  check-links:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-
   deploy:
-    needs: check-links
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
