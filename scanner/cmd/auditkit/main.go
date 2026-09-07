@@ -2424,16 +2424,17 @@ func convertControlsForPDF(controls []ControlResult) []report.ControlResult {
 	pdfControls := []report.ControlResult{}
 	for _, c := range controls {
 		pdfControls = append(pdfControls, report.ControlResult{
-			ID:              c.ID,
-			Name:            c.Name,
-			Category:        c.Category,
-			Severity:        c.Severity,
-			Status:          c.Status,
-			Evidence:        c.Evidence,
-			Remediation:     c.Remediation,
-			ScreenshotGuide: c.ScreenshotGuide,
-			ConsoleURL:      c.ConsoleURL,
-			Frameworks:      c.Frameworks,
+			ID:                c.ID,
+			Name:              c.Name,
+			Category:          c.Category,
+			Severity:          c.Severity,
+			Status:            c.Status,
+			Evidence:          c.Evidence,
+			Remediation:       c.Remediation,
+			RemediationDetail: c.RemediationDetail,
+			ScreenshotGuide:   c.ScreenshotGuide,
+			ConsoleURL:        c.ConsoleURL,
+			Frameworks:        c.Frameworks,
 		})
 	}
 	return pdfControls

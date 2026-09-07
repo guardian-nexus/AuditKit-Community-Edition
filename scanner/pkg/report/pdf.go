@@ -25,16 +25,19 @@ type ComplianceResult struct {
 }
 
 type ControlResult struct {
-	ID              string
-	Name            string
-	Category        string
-	Severity        string
-	Status          string
-	Evidence        string
-	Remediation     string
-	ScreenshotGuide string
-	ConsoleURL      string
-	Frameworks      map[string]string
+	ID          string
+	Name        string
+	Category    string
+	Severity    string
+	Status      string
+	Evidence    string
+	Remediation string
+	// The fuller fix instructions. Dropped in conversion until now, which is
+	// why the evidence package could only ever show the one-line form.
+	RemediationDetail string
+	ScreenshotGuide   string
+	ConsoleURL        string
+	Frameworks        map[string]string
 }
 
 // Generate unique report ID from timestamp + license

@@ -565,6 +565,10 @@ func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 		checks.NewS3Checks(s.s3Client, s.s3controlClient, s.stsClient), // For encryption requirements
 		checks.NewEC2Checks(s.ec2Client),                               // For network segmentation
 		checks.NewCloudTrailChecks(s.ctClient),                         // For logging requirements
+		// RDS carries PCI 3.5.1 (stored account data encrypted) and 1.4.2 (no
+		// direct public access). Without it a PCI scan reported no RDS evidence
+		// at all, though the mappings for it already existed.
+		checks.NewRDSChecks(s.rdsClient),
 	}
 
 	for _, check := range basicChecks {
