@@ -206,7 +206,7 @@ bash fixes.sh
 4. Generate assessment report
 5. Schedule C3PAO review with confidence
 
-**Note:** Need CMMC Level 2 (110 practices)? [Try Pro free for 14 days →](https://auditkit.io/pro/)
+**Note:** Need automated checks for the 110 CMMC Level 2 practices? [Try Pro free for 14 days →](https://auditkit.io/pro/)
 
 ### For Multi-Cloud: Unified Compliance
 
