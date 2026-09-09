@@ -163,6 +163,11 @@ Free to find your gaps. Paid for the evidence package, multi-account scanning, a
 - Compliance platform: $5,000 - $15,000/year
 - **Total first year:** $65,000 - $150,000
 
+**PCI-DSS v4.0.1:**
+- QSA assessment (required): $15,000 - $50,000
+- Gap analysis and CDE scoping consulting: $10,000 - $30,000
+- **Total first year:** $25,000 - $80,000
+
 
 > **Note:** C3PAO assessment is a Phase 2 requirement. The Department of War
 > suspended Phase 2 on July 13, 2026, so this cost does not currently apply.
@@ -176,20 +181,24 @@ Free to find your gaps. Paid for the evidence package, multi-account scanning, a
 
 ### AuditKit Costs
 
-**Free version (SOC2/PCI/CMMC L1):**
+Both editions scan all ten frameworks. The difference is not which framework you
+get, it is what you walk away with.
+
+**Community Edition:**
 - AuditKit: $0
-- CPA firm (still required): $15,000 - $30,000
-- **Total: $15,000 - $30,000**
-- **Savings vs traditional:** $50,000 - $120,000
+- Auditor or assessor (still required): varies by framework
+- **Replaces:** the consultant gap analysis
+- **You still assemble** the evidence yourself, one account at a time
 
-**Pro version (CMMC Level 2):**
+**AuditKit:**
 - AuditKit: $297/month = $3,564/year
-- C3PAO assessment (Phase 2, currently suspended): $25,000 - $150,000
-- **Total: $28,564 - $153,564**
-- **Savings vs traditional:** $66,436 - $171,436
+- Auditor or assessor (still required): varies by framework
+- **Adds:** evidence package per control, organization-wide scanning, drift
+  detection and alerting between audits
 
-**What you save:** Consultant fees for technical scanning and remediation guidance  
-**What you still pay:** Required auditor/assessor fees
+**What you save:** consultant fees for technical scanning and gap analysis  
+**What you still pay:** required auditor/assessor fees, and the engineering time
+to actually fix what the scan finds
 
 ---
 
@@ -216,7 +225,7 @@ Free to find your gaps. Paid for the evidence package, multi-account scanning, a
 
 ---
 
-### Scenario 2: DoW Contractor (CMMC Level 2)
+### Scenario 2: DoW Contractor (CMMC Level 2 self-assessment)
 
 **Requirements:**
 - CMMC Level 2 (110 practices)
@@ -234,7 +243,8 @@ Free to find your gaps. Paid for the evidence package, multi-account scanning, a
 
 **Traditional cost:** $95,000 - $325,000  
 **What AuditKit replaces:** Technical consultant preparation ($50,000-$100,000)  
-**What you still need:** C3PAO assessment and policy documentation
+**What you still need:** C3PAO assessment, policy documentation, and the
+engineering time to remediate what the scan finds
 
 ---
 
