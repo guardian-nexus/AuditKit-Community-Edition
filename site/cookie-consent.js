@@ -7,6 +7,11 @@
 
   var STORAGE_KEY = 'auditkit_cookie_consent';
 
+  // Bump when the vendors behind a category change. A stored choice from an
+  // earlier version is not consent for the new vendor, so the banner is shown
+  // again rather than silently reused. v2 added the Reddit Ads pixel.
+  var CONSENT_VERSION = 2;
+
   // Google Ads. Both the tag and its conversion event are marketing, not analytics.
   var GTAG_ID = 'AW-17730440946';
   var GTAG_TRIAL_CONVERSION = 'AW-17730440946/q5TvCL37jsAbEPKdxIZC';
@@ -25,13 +30,20 @@
   function getConsent() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
+      if (!raw) return null;
+      var saved = JSON.parse(raw);
+      // Anything stored before the current vendor list is treated as no answer.
+      if (!saved || saved.v !== CONSENT_VERSION) return null;
+      return saved;
     } catch (e) {}
     return null;
   }
 
   function setConsent(prefs) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+    prefs.v = CONSENT_VERSION;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+    } catch (e) {}
     window.auditKitConsent = prefs;
     applyConsent(prefs);
   }
@@ -145,6 +157,22 @@
   }
 
   window.auditKitTrack = { checkoutReached: checkoutReached, trialStarted: trialStarted };
+
+  // Reopening the preference centre. Consent has to be as easy to withdraw as
+  // it was to give, and until now a stored choice was final: the banner never
+  // returned and nothing else opened the modal.
+  window.auditKitCookies = { open: function () { showModal(); } };
+
+  function bindPreferenceLinks() {
+    document.addEventListener('click', function (e) {
+      var el = e.target;
+      if (!el || typeof el.closest !== 'function') return;
+      var link = el.closest('[data-cookie-preferences]');
+      if (!link) return;
+      e.preventDefault();
+      showModal();
+    });
+  }
 
   // ---------- UI ----------
 
@@ -277,6 +305,7 @@
   function init() {
     injectStyles();
     bindTrialLinks();
+    bindPreferenceLinks();
     var saved = getConsent();
     if (saved) {
       window.auditKitConsent = saved;
