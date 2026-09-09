@@ -1,12 +1,23 @@
 /**
  * AuditKit Cookie Consent Manager
- * Manages cookie preferences with gtag gating.
+ * Manages cookie preferences and gates the marketing pixels (Google Ads, Reddit).
  */
 (function () {
   'use strict';
 
   var STORAGE_KEY = 'auditkit_cookie_consent';
+
+  // Google Ads. Both the tag and its conversion event are marketing, not analytics.
   var GTAG_ID = 'AW-17730440946';
+  var GTAG_TRIAL_CONVERSION = 'AW-17730440946/q5TvCL37jsAbEPKdxIZC';
+
+  // Reddit Ads pixel. Advertiser ID from Reddit Ads Manager > Events Manager.
+  var REDDIT_PIXEL_ID = 'a2_jn2kx21yst59';
+
+  // Trial CTAs all point at the same Stripe checkout.
+  var TRIAL_LINK_MATCH = 'buy.stripe.com';
+  var TRIAL_VALUE = 297.0;
+  var TRIAL_CURRENCY = 'USD';
 
   // Expose global consent state
   window.auditKitConsent = { necessary: true, analytics: false, marketing: false };
@@ -26,7 +37,10 @@
   }
 
   function applyConsent(prefs) {
-    if (prefs.analytics) loadGtag();
+    if (prefs.marketing) {
+      loadGtag();
+      loadRdt();
+    }
   }
 
   function loadGtag() {
@@ -42,6 +56,65 @@
     gtag('js', new Date());
     gtag('config', GTAG_ID);
   }
+
+  function loadRdt() {
+    if (REDDIT_PIXEL_ID.indexOf('a2_') !== 0) return;
+    if (window.rdt) return;
+
+    // Queueing stub, so events fired before pixel.js lands are not dropped.
+    var rdt = function () {
+      if (rdt.sendEvent) rdt.sendEvent.apply(rdt, arguments);
+      else rdt.callQueue.push(arguments);
+    };
+    rdt.callQueue = [];
+    window.rdt = rdt;
+
+    var s = document.createElement('script');
+    s.id = 'auditkit-rdt';
+    s.async = true;
+    s.src = 'https://www.redditstatic.com/ads/pixel.js?pixel_id=' + REDDIT_PIXEL_ID;
+    document.head.appendChild(s);
+
+    rdt('init', REDDIT_PIXEL_ID, { optOut: false, useDecimalCurrencyValues: true });
+    rdt('track', 'PageVisit');
+  }
+
+  // ---------- Conversion tracking ----------
+
+  // Fired when a visitor clicks through to the Stripe trial checkout. The
+  // purchase itself happens on Stripe and cannot be pixelled, so both networks
+  // record the click as a lead rather than a sale.
+  function trackTrialClick() {
+    var prefs = window.auditKitConsent;
+    if (!prefs || !prefs.marketing) return;
+
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'conversion', {
+        send_to: GTAG_TRIAL_CONVERSION,
+        value: TRIAL_VALUE,
+        currency: TRIAL_CURRENCY
+      });
+    }
+
+    if (typeof window.rdt === 'function') {
+      window.rdt('track', 'Lead', {
+        value: TRIAL_VALUE,
+        currency: TRIAL_CURRENCY
+      });
+    }
+  }
+
+  // Delegated so the trial CTAs stay plain links on every page. Capture phase
+  // means it still fires if a handler downstream stops propagation.
+  function bindTrialLinks() {
+    document.addEventListener('click', function (e) {
+      var el = e.target;
+      if (!el || typeof el.closest !== 'function') return;
+      if (el.closest('a[href*="' + TRIAL_LINK_MATCH + '"]')) trackTrialClick();
+    }, true);
+  }
+
+  window.auditKitTrack = { trialClick: trackTrialClick };
 
   // ---------- UI ----------
 
@@ -134,7 +207,7 @@
       '<label class="cc-toggle"><input type="checkbox" id="cc-analytics" ' + (current.analytics ? 'checked' : '') + '><span class="cc-toggle-slider"></span></label>' +
       '</div>' +
       '<div class="cc-category">' +
-      '<div class="cc-category-info"><h4>Marketing</h4><p>Used to measure the effectiveness of our advertising.</p></div>' +
+      '<div class="cc-category-info"><h4>Marketing</h4><p>Used to measure the effectiveness of our advertising (Google Ads, Reddit).</p></div>' +
       '<label class="cc-toggle"><input type="checkbox" id="cc-marketing" ' + (current.marketing ? 'checked' : '') + '><span class="cc-toggle-slider"></span></label>' +
       '</div>' +
       '<div class="cc-modal-actions">' +
@@ -173,6 +246,7 @@
 
   function init() {
     injectStyles();
+    bindTrialLinks();
     var saved = getConsent();
     if (saved) {
       window.auditKitConsent = saved;
