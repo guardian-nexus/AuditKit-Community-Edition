@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trial Started - AuditKit</title>
+    <meta name="description" content="Your AuditKit trial has started. Here is what happens next and how to get scanning.">
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/svg+xml" href="./auditkit-logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <nav class="site-nav" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <img src="./auditkit-logo-dark.svg" alt="AuditKit">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+            <div class="nav-links">
+                <a href="/#features">Features</a>
+                <a href="/docs/frameworks/">Frameworks</a>
+                <a href="./pricing.html">Pricing</a>
+                <a href="./docs/">Docs</a>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main">
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Your Trial Has Started</h1>
+            <p class="subtitle">Fourteen days, full access, no charge until it ends. Your licence is on its way by email.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container-content">
+
+            <div class="callout">
+                <h3>Check your inbox</h3>
+                <p style="margin-bottom: 0.75rem;">
+                    Your licence file (<code class="code-inline">license.lic</code>) is attached to a welcome email
+                    from AuditKit. Save it to <code class="code-inline">~/.auditkit-pro/license.lic</code> and the
+                    scanner picks it up automatically.
+                </p>
+                <p class="mb-0">
+                    Nothing after a few minutes? Check spam and quarantine first, then email
+                    <a href="mailto:hello@auditkit.io">hello@auditkit.io</a> and we will reissue it.
+                </p>
+            </div>
+
+            <h2>While you wait</h2>
+
+            <div class="grid-3" style="margin: 2rem 0;">
+                <div class="card">
+                    <h3>1. Install</h3>
+                    <p class="mb-0">Download the binary for your platform and put it on your PATH. No agent, no cloud account required.</p>
+                    <p style="margin-top: 1rem; margin-bottom: 0;"><a href="./docs/installation.html">Installation guide &rarr;</a></p>
+                </div>
+                <div class="card">
+                    <h3>2. Connect a provider</h3>
+                    <p class="mb-0">Read-only credentials for AWS, Azure or GCP. The setup guides list the exact permissions and nothing beyond them.</p>
+                    <p style="margin-top: 1rem; margin-bottom: 0;"><a href="./docs/setup/aws.html">AWS</a> &middot; <a href="./docs/setup/azure.html">Azure</a> &middot; <a href="./docs/setup/gcp.html">GCP</a></p>
+                </div>
+                <div class="card">
+                    <h3>3. Scan</h3>
+                    <p class="mb-0">First results in about thirty minutes, with a remediation command and a console link on every finding.</p>
+                    <p style="margin-top: 1rem; margin-bottom: 0;"><a href="./docs/getting-started.html">Quick start &rarr;</a></p>
+                </div>
+            </div>
+
+            <h2>Generate your first evidence package</h2>
+            <p>
+                The evidence package is the part your assessor actually asks for: one folder per control holding the
+                finding, a remediation script, a direct console link and a guide naming the screen to screenshot.
+            </p>
+
+            <div class="code-block"><span class="comment"># Scan, then package the evidence</span>
+./auditkit-pro scan -provider aws -framework soc2
+
+./auditkit-pro evidence-package -framework soc2 -output ./soc2-evidence.zip
+
+<span class="pass">&#10003; Evidence package generated successfully!</span></div>
+
+            <div class="callout-warning">
+                <h4>Cancel any time</h4>
+                <p class="mb-0">
+                    Nothing is charged until day 14. Cancel before then from the billing portal link in your welcome
+                    email and you will not be billed at all.
+                </p>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="./docs/getting-started.html" class="btn btn-primary btn-lg">Start the Quick Start Guide &rarr;</a>
+            </div>
+
+        </div>
+    </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p style="margin-bottom: 2rem; color: var(--slate-300); font-size: 1rem;">
+                <strong style="color: var(--white);">Built for compliance teams, by engineers who understand the audit process.</strong>
+            </p>
+
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/">AuditKit</a></li>
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/community.html">Community Edition (Open Source)</a></li>
+                        <li><a href="/about.html">About</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="/docs/getting-started.html">Quick Start Guide</a></li>
+                        <li><a href="/docs/installation.html">Installation</a></li>
+                        <li><a href="/docs/cli-reference.html">CLI Reference</a></li>
+                        <li><a href="/docs/faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Frameworks</h4>
+                    <ul>
+                        <li><a href="/docs/frameworks/cmmc.html">CMMC</a></li>
+                        <li><a href="/docs/frameworks/soc2.html">SOC2</a></li>
+                        <li><a href="/docs/frameworks/pci-dss.html">PCI-DSS</a></li>
+                        <li><a href="/docs/frameworks/hipaa.html">HIPAA</a></li>
+                        <li><a href="/docs/frameworks/nist-800-53.html">NIST 800-53</a></li>
+                        <li><a href="/docs/frameworks/iso27001.html">ISO 27001</a></li>
+                        <li><a href="/docs/frameworks/fedramp.html">FedRAMP</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/docs/setup/aws.html">AWS Setup</a></li>
+                        <li><a href="/docs/setup/azure.html">Azure Setup</a></li>
+                        <li><a href="/docs/setup/gcp.html">GCP Setup</a></li>
+                        <li><a href="/docs/setup/m365.html">M365 Setup</a></li>
+                        <li><a href="/examples/">Examples</a></li>
+                        <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition">GitHub</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>Community Edition is Apache 2.0. AuditKit is commercially licensed.</p>
+                <p>&copy; 2026 Guardian Nexus LLC</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./cookie-consent.js"></script>
+    <script src="./main.js"></script>
+    <script>
+    /* Trial-start conversion.
+
+       This page is the Stripe payment link's post-checkout redirect, so reaching
+       it means a trial actually began - unlike a CTA click, which only means the
+       visitor reached the checkout page. The conversion ids live in
+       cookie-consent.js; this only supplies the moment and the session id. */
+    (function () {
+      'use strict';
+
+      var FIRED_PREFIX = 'auditkit_conv_';
+
+      var match = /[?&]session_id=([^&]+)/.exec(window.location.search);
+      var id = match ? decodeURIComponent(match[1]) : null;
+
+      // No session id means the page was opened directly rather than reached
+      // through checkout, so there is nothing to report.
+      if (!id) return;
+
+      function alreadyFired() {
+        try { return localStorage.getItem(FIRED_PREFIX + id) === '1'; } catch (e) { return false; }
+      }
+
+      function markFired() {
+        try { localStorage.setItem(FIRED_PREFIX + id, '1'); } catch (e) {}
+      }
+
+      // A refresh or a back-navigation must not report a second trial.
+      if (alreadyFired()) return;
+
+      // cookie-consent.js loads the pixels asynchronously, and the visitor may
+      // still be granting consent, so retry briefly rather than firing once.
+      var tries = 0;
+      (function attempt() {
+        var track = window.auditKitTrack;
+        if (track && track.trialStarted(id)) {
+          markFired();
+          return;
+        }
+        if (++tries < 20) setTimeout(attempt, 500);
+      })();
+    })();
+    </script>
+</body>
+</html>

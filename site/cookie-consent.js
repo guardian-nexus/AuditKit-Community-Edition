@@ -81,27 +81,57 @@
 
   // ---------- Conversion tracking ----------
 
-  // Fired when a visitor clicks through to the Stripe trial checkout. The
-  // purchase itself happens on Stripe and cannot be pixelled, so both networks
-  // record the click as a lead rather than a sale.
-  function trackTrialClick() {
+  // Two distinct moments, deliberately weighted differently.
+  //
+  //   checkoutReached()  a CTA click. The visitor reached Stripe; they have not
+  //                      signed up for anything. Secondary signal only, so
+  //                      campaigns do not optimise toward checkout bounces.
+  //
+  //   trialStarted(id)   the post-checkout redirect landed on trial-started.html,
+  //                      which only happens when a trial actually began. This is
+  //                      the conversion worth bidding on.
+
+  function marketingAllowed() {
     var prefs = window.auditKitConsent;
-    if (!prefs || !prefs.marketing) return;
+    return !!(prefs && prefs.marketing);
+  }
+
+  function checkoutReached() {
+    if (!marketingAllowed()) return;
+
+    // Reddit records this as a funnel step, not a conversion event. Google gets
+    // nothing here: its conversion action belongs to the trial start below, and
+    // firing the same label twice would double-count one funnel.
+    if (typeof window.rdt === 'function') {
+      window.rdt('track', 'ViewContent');
+    }
+  }
+
+  // id is the Stripe checkout session id. It doubles as the deduplication key:
+  // the same id appears on the webhook's session object, so a server-side
+  // Conversions API call can later be matched to this event rather than
+  // counting the same trial twice.
+  function trialStarted(id) {
+    if (!id || !marketingAllowed()) return false;
 
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'conversion', {
         send_to: GTAG_TRIAL_CONVERSION,
         value: TRIAL_VALUE,
-        currency: TRIAL_CURRENCY
+        currency: TRIAL_CURRENCY,
+        transaction_id: id
       });
     }
 
     if (typeof window.rdt === 'function') {
-      window.rdt('track', 'Lead', {
+      window.rdt('track', 'SignUp', {
         value: TRIAL_VALUE,
-        currency: TRIAL_CURRENCY
+        currency: TRIAL_CURRENCY,
+        conversionId: id
       });
     }
+
+    return true;
   }
 
   // Delegated so the trial CTAs stay plain links on every page. Capture phase
@@ -110,11 +140,11 @@
     document.addEventListener('click', function (e) {
       var el = e.target;
       if (!el || typeof el.closest !== 'function') return;
-      if (el.closest('a[href*="' + TRIAL_LINK_MATCH + '"]')) trackTrialClick();
+      if (el.closest('a[href*="' + TRIAL_LINK_MATCH + '"]')) checkoutReached();
     }, true);
   }
 
-  window.auditKitTrack = { trialClick: trackTrialClick };
+  window.auditKitTrack = { checkoutReached: checkoutReached, trialStarted: trialStarted };
 
   // ---------- UI ----------
 
