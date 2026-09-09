@@ -14,7 +14,7 @@
 
   // Google Ads. Both the tag and its conversion event are marketing, not analytics.
   var GTAG_ID = 'AW-17730440946';
-  var GTAG_TRIAL_CONVERSION = 'AW-17730440946/q5TvCL37jsAbEPKdxIZC';
+  var GTAG_TRIAL_CONVERSION = 'AW-17730440946/SbTxCICVs_IcEPKdxIZC';
 
   // Reddit Ads pixel. Advertiser ID from Reddit Ads Manager > Events Manager.
   var REDDIT_PIXEL_ID = 'a2_jn2kx21yst59';
