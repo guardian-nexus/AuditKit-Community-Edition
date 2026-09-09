@@ -332,7 +332,7 @@ Help us expand CIS coverage:
 - Improve remediation guidance
 - Add Terraform/CloudFormation templates
 
-**[Contributing Guide →](../../../CONTRIBUTING.md)**
+**[Contributing Guide →](https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/CONTRIBUTING.md)**
 
 ---
 

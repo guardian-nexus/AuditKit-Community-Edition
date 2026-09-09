@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWS Setup - AuditKit</title>
+    <title>AWS Authentication Setup - AuditKit</title>
+    <meta name="description" content="Configure read-only AWS credentials for AuditKit scanning, with the exact permissions required and nothing beyond them.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="AWS Authentication Setup - AuditKit">
+    <meta property="og:description" content="Configure read-only AWS credentials for AuditKit scanning, with the exact permissions required and nothing beyond them.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/setup/aws.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,227 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
-            <h1>AWS Setup</h1>
-            <p class="subtitle">Cloud provider setup guide for AuditKit</p>
+            <h1>AWS Authentication Setup</h1>
+            <p class="subtitle">Configure read-only AWS credentials for AuditKit scanning, with the exact permissions required and nothing beyond them.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/setup/aws.md">View full AWS Setup guide on GitHub &rarr;</a></p>
+<p>How to configure AWS credentials for AuditKit scanning.</p>
+<h2>Quick Start</h2>
+<div class="code-block"># Option 1: AWS CLI (easiest)
+aws configure
+
+# Test it works
+aws sts get-caller-identity
+
+# Run scan
+./auditkit scan -provider aws -framework soc2
+</div>
+<h2>Authentication Methods</h2>
+<p>AuditKit supports three authentication methods for AWS:</p>
+<h3>Option 1: AWS CLI Credentials (Recommended)</h3>
+<p><strong>Best for:</strong> Local scanning, development</p>
+<div class="code-block"># Install AWS CLI
+# macOS: brew install awscli
+# Linux: apt-get install awscli
+# Windows: Download from aws.amazon.com/cli
+
+# Configure credentials
+aws configure
+</div>
+<p>You'll be prompted for:
+- AWS Access Key ID
+- AWS Secret Access Key<br />
+- Default region (e.g., us-east-1)
+- Default output format (json recommended)</p>
+<p><strong>Credentials stored at:</strong> <code class="code-inline">~/.aws/credentials</code></p>
+<h3>Option 2: Environment Variables</h3>
+<p><strong>Best for:</strong> CI/CD pipelines, automation</p>
+<div class="code-block">export AWS_ACCESS_KEY_ID=&quot;AKIAIOSFODNN7EXAMPLE&quot;
+export AWS_SECRET_ACCESS_KEY=&quot;wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&quot;
+export AWS_DEFAULT_REGION=&quot;us-east-1&quot;
+
+# Run scan
+./auditkit scan -provider aws -framework soc2
+</div>
+<h3>Option 3: IAM Role (EC2/ECS/Lambda)</h3>
+<p><strong>Best for:</strong> Running AuditKit on AWS infrastructure</p>
+<p>No configuration needed - automatically detected if running on:
+- EC2 instance with IAM role attached
+- ECS task with task role
+- Lambda function with execution role</p>
+<div class="code-block"># Just run scan - credentials auto-detected
+./auditkit scan -provider aws -framework soc2
+</div>
+<h2>Required IAM Permissions</h2>
+<p>AuditKit needs <strong>read-only</strong> access to scan your AWS account.</p>
+<h3>Minimum Permissions (ReadOnlyAccess)</h3>
+<p>The easiest approach is to use AWS managed policy:</p>
+<p><strong>Policy ARN:</strong> <code class="code-inline">arn:aws:iam::aws:policy/ReadOnlyAccess</code></p>
+<h3>Custom Policy (Least Privilege)</h3>
+<p>If you need tighter control, note first that AuditKit calls 38 AWS services, so a hand-built policy will silently reduce coverage — controls it cannot evaluate are reported as ERROR. <code class="code-inline">ReadOnlyAccess</code> is strongly recommended. The policy below covers only the core S3/IAM/EC2/RDS/CloudTrail/KMS/GuardDuty/Config/Security Hub checks; add read permissions for Lambda, ECS, EKS, Macie, Network Firewall, Route 53, IAM Access Analyzer, SQS, API Gateway, Elastic Beanstalk, Secrets Manager, ECR, DynamoDB, CloudFormation, ACM, SageMaker, Redshift, ElastiCache, OpenSearch, Inspector, Backup, SSM, SNS, CloudWatch, Auto Scaling and Organizations for full coverage:</p>
+<div class="code-block">{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Action&quot;: [
+        &quot;s3:GetBucketPublicAccessBlock&quot;,
+        &quot;s3:GetBucketVersioning&quot;,
+        &quot;s3:GetEncryptionConfiguration&quot;,
+        &quot;s3:GetBucketLogging&quot;,
+        &quot;s3:ListBucket&quot;,
+        &quot;s3:ListAllMyBuckets&quot;,
+        &quot;iam:GetAccountPasswordPolicy&quot;,
+        &quot;iam:ListUsers&quot;,
+        &quot;iam:ListMFADevices&quot;,
+        &quot;iam:ListAccessKeys&quot;,
+        &quot;iam:GetAccessKeyLastUsed&quot;,
+        &quot;ec2:DescribeInstances&quot;,
+        &quot;ec2:DescribeSecurityGroups&quot;,
+        &quot;ec2:DescribeVolumes&quot;,
+        &quot;ec2:DescribeVpcs&quot;,
+        &quot;rds:DescribeDBInstances&quot;,
+        &quot;cloudtrail:DescribeTrails&quot;,
+        &quot;cloudtrail:GetTrailStatus&quot;,
+        &quot;cloudtrail:GetEventSelectors&quot;,
+        &quot;kms:ListKeys&quot;,
+        &quot;kms:DescribeKey&quot;,
+        &quot;kms:GetKeyRotationStatus&quot;,
+        &quot;guardduty:ListDetectors&quot;,
+        &quot;guardduty:GetDetector&quot;,
+        &quot;config:DescribeConfigurationRecorders&quot;,
+        &quot;config:DescribeConfigurationRecorderStatus&quot;,
+        &quot;securityhub:DescribeHub&quot;
+      ],
+      &quot;Resource&quot;: &quot;*&quot;
+    }
+  ]
+}
+</div>
+<h2>Creating an IAM User for AuditKit</h2>
+<h3>Step 1: Create IAM User</h3>
+<div class="code-block"># Via AWS CLI
+aws iam create-user --user-name auditkit-scanner
+
+# Via Console
+# Go to IAM &gt; Users &gt; Add User &gt; &quot;auditkit-scanner&quot;
+</div>
+<h3>Step 2: Attach ReadOnlyAccess Policy</h3>
+<div class="code-block"># Via AWS CLI
+aws iam attach-user-policy \
+  --user-name auditkit-scanner \
+  --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess
+
+# Via Console
+# IAM &gt; Users &gt; auditkit-scanner &gt; Permissions &gt; Attach policies &gt; ReadOnlyAccess
+</div>
+<h3>Step 3: Create Access Keys</h3>
+<div class="code-block"># Via AWS CLI
+aws iam create-access-key --user-name auditkit-scanner
+
+# Save the output - you'll need AccessKeyId and SecretAccessKey
+</div>
+<h3>Step 4: Configure AuditKit</h3>
+<div class="code-block">aws configure
+# Enter the AccessKeyId and SecretAccessKey from step 3
+</div>
+<h2>Multi-Account Scanning</h2>
+<p><strong>Free version:</strong> Scan one account at a time by switching profiles</p>
+<p><strong>Pro version:</strong> Scan entire AWS Organization automatically</p>
+<h3>Community Edition - Using Profiles</h3>
+<div class="code-block"># Configure multiple profiles
+aws configure --profile production
+aws configure --profile staging
+aws configure --profile development
+
+# Scan each account
+./auditkit scan -provider aws -framework soc2 --profile production
+./auditkit scan -provider aws -framework soc2 --profile staging
+./auditkit scan -provider aws -framework soc2 --profile development
+</div>
+<h3>Pro Version - Organization Scanning</h3>
+<div class="code-block"># Scan entire AWS Organization (Pro only)
+./auditkit-pro scan -provider aws -framework soc2 --scan-all
+
+# Limit concurrency
+./auditkit-pro scan -provider aws --scan-all --max-concurrent 5
+
+# Generate consolidated report
+./auditkit-pro scan -provider aws --scan-all -format pdf -output org-report.pdf
+</div>
+<p><strong><a href="https://auditkit.io/pro/">Upgrade to Pro →</a></strong></p>
+<h2>Troubleshooting</h2>
+<h3>"Error: AWS credentials not configured"</h3>
+<p><strong>Cause:</strong> No credentials found</p>
+<p><strong>Solution:</strong></p>
+<div class="code-block">aws configure
+# Enter your credentials when prompted
+</div>
+<h3>"Error: Access Denied"</h3>
+<p><strong>Cause:</strong> IAM user lacks required permissions</p>
+<p><strong>Solution:</strong> Attach <code class="code-inline">ReadOnlyAccess</code> policy:</p>
+<div class="code-block">aws iam attach-user-policy \
+  --user-name auditkit-scanner \
+  --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess
+</div>
+<h3>"Error: Region not found"</h3>
+<p><strong>Cause:</strong> Default region not set</p>
+<p><strong>Solution:</strong></p>
+<div class="code-block">export AWS_DEFAULT_REGION=&quot;us-east-1&quot;
+# Or run: aws configure
+</div>
+<h3>"Error: MFA required"</h3>
+<p><strong>Cause:</strong> Account requires MFA for API access</p>
+<p><strong>Solution:</strong> Use temporary credentials:</p>
+<div class="code-block">aws sts get-session-token --serial-number arn:aws:iam::ACCOUNT:mfa/USER --token-code 123456
+
+# Use the temporary credentials returned
+export AWS_ACCESS_KEY_ID=&quot;temp-key&quot;
+export AWS_SECRET_ACCESS_KEY=&quot;temp-secret&quot;
+export AWS_SESSION_TOKEN=&quot;temp-token&quot;
+</div>
+<h2>Security Best Practices</h2>
+<h3>1. Use Dedicated IAM User</h3>
+<p>Don't use your personal credentials or root account.</p>
+<div class="code-block">aws iam create-user --user-name auditkit-scanner
+</div>
+<h3>2. Rotate Access Keys Regularly</h3>
+<div class="code-block"># Every 90 days
+aws iam create-access-key --user-name auditkit-scanner
+aws iam delete-access-key --user-name auditkit-scanner --access-key-id OLD_KEY_ID
+</div>
+<h3>3. Enable CloudTrail Logging</h3>
+<p>Monitor what AuditKit accesses:</p>
+<div class="code-block"># CloudTrail logs all API calls made by AuditKit
+aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=auditkit-scanner
+</div>
+<h3>4. Use Read-Only Access</h3>
+<p>AuditKit only needs read permissions - never grant write access.</p>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../getting-started.html">Run your first scan →</a></strong></li>
+<li><strong><a href="../cli-reference.html">CLI Reference →</a></strong></li>
+<li><strong><a href="../providers/aws.html">AWS Service Coverage →</a></strong></li>
+<li><strong><a href="../frameworks/">Framework Guide →</a></strong></li>
+</ul>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Start scanning</h3>
+                <p style="margin-bottom: 1.25rem;">Full results in about thirty minutes, with a remediation command and a console link on every finding.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed setup documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">

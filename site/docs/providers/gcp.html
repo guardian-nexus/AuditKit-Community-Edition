@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCP Service Coverage - AuditKit</title>
+    <meta name="description" content="Every Google Cloud service AuditKit scans, and the checks it runs against each.">
+    <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="GCP Service Coverage - AuditKit">
+    <meta property="og:description" content="Every Google Cloud service AuditKit scans, and the checks it runs against each.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/providers/gcp.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+<body>
+
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <nav class="site-nav" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <img src="../../auditkit-logo-dark.svg" alt="AuditKit">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+            <div class="nav-links">
+                <a href="/#features">Features</a>
+                <a href="/docs/frameworks/">Frameworks</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/docs/">Docs</a>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="nav-cta">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main">
+
+    <section class="page-header">
+        <div class="container">
+            <h1>GCP Service Coverage</h1>
+            <p class="subtitle">Every Google Cloud service AuditKit scans, and the checks it runs against each.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container-prose">
+<p>What AuditKit scans in Google Cloud Platform.</p>
+<h2>Overview</h2>
+<p><strong>Community Edition:</strong> 133 controls across 8 core services<br />
+<strong>Pro version:</strong> 259 controls, including 15 GKE and 10 Vertex AI checks</p>
+<p><strong>Supported frameworks:</strong>
+- SOC2 Type II
+- PCI-DSS v4.0.1
+- CMMC: 9 of the 17 Level 1 practices automated on GCP; all 110 Level 1 + 2 practices reported (Level 2 automated in Pro)
+- NIST 800-53 Rev 5 (84 controls, derived via crosswalk)
+- HIPAA (18 safeguards, derived via crosswalk)</p>
+<h2>Core Services (Free &amp; Pro)</h2>
+<h3>Cloud Storage (GCS) - 6 Checks</h3>
+<h4>CC6.2 - Public Access Controls</h4>
+<p><strong>What it checks:</strong>
+- Buckets with public access (allUsers or allAuthenticatedUsers)
+- Bucket-level IAM policies allowing public read/write
+- Object-level ACLs granting public access</p>
+<p><strong>Pass criteria:</strong>
+- No buckets allow public access
+- Bucket policies restrict to authorized users only
+- Object ACLs are private</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Remove public access from bucket
+gsutil iam ch -d allUsers:objectViewer gs://BUCKET_NAME
+gsutil iam ch -d allAuthenticatedUsers:objectViewer gs://BUCKET_NAME
+
+# Set uniform bucket-level access
+gsutil uniformbucketlevelaccess set on gs://BUCKET_NAME
+</div>
+<h4>CC8.1 - Bucket Encryption (CMEK)</h4>
+<p><strong>What it checks:</strong>
+- Default encryption enabled on buckets
+- Customer-managed encryption keys (CMEK) used
+- Key rotation configured</p>
+<p><strong>Pass criteria:</strong>
+- All buckets use CMEK for encryption
+- Keys managed in Cloud KMS
+- Automatic key rotation enabled</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Enable CMEK on bucket
+gsutil encryption set \
+  -k projects/PROJECT/locations/LOCATION/keyRings/KEYRING/cryptoKeys/KEY \
+  gs://BUCKET_NAME
+</div>
+<h4>CC7.3 - Uniform Bucket-Level Access</h4>
+<p><strong>What it checks:</strong>
+- Uniform bucket-level access enabled
+- No object-level ACLs in use
+- IAM-only access control</p>
+<p><strong>Pass criteria:</strong>
+- All buckets use uniform bucket-level access
+- Object ACLs disabled
+- Access managed through IAM</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block">gsutil uniformbucketlevelaccess set on gs://BUCKET_NAME
+</div>
+<h4>CC7.2 - Object Versioning</h4>
+<p><strong>What it checks:</strong>
+- Versioning enabled on buckets
+- Previous versions retained
+- Version lifecycle configured</p>
+<p><strong>Pass criteria:</strong>
+- Versioning enabled on critical buckets
+- Version retention policy configured</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block">gsutil versioning set on gs://BUCKET_NAME
+</div>
+<h3>Cloud IAM - 5 Checks</h3>
+<h4>CC6.1 - Service Account Key Age</h4>
+<p><strong>What it checks:</strong>
+- Service account keys older than 90 days (PCI-DSS requirement)
+- Number of keys per service account
+- Last used date for keys</p>
+<p><strong>Pass criteria:</strong>
+- All service account keys rotated within 90 days
+- No unused keys present
+- Maximum 2 keys per service account</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Create new key
+gcloud iam service-accounts keys create new-key.json \
+  --iam-account=SERVICE_ACCOUNT_EMAIL
+
+# Delete old key
+gcloud iam service-accounts keys delete KEY_ID \
+  --iam-account=SERVICE_ACCOUNT_EMAIL
+</div>
+<h4>CC6.7 - Primitive Role Usage</h4>
+<p><strong>What it checks:</strong>
+- Use of Owner, Editor, or Viewer roles (overly permissive)
+- Predefined or custom roles preferred
+- Principle of least privilege</p>
+<p><strong>Pass criteria:</strong>
+- No primitive roles (Owner/Editor/Viewer) in use
+- All access uses predefined or custom roles
+- Roles follow least privilege</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Remove primitive role
+gcloud projects remove-iam-policy-binding PROJECT_ID \
+  --member=user:USER_EMAIL \
+  --role=roles/editor
+
+# Add specific role
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member=user:USER_EMAIL \
+  --role=roles/compute.instanceAdmin.v1
+</div>
+<h4>CC6.6 - User MFA Enforcement</h4>
+<p><strong>What it checks:</strong>
+- 2-Step Verification enforced in Google Workspace
+- Number of users without MFA
+- Admin accounts require MFA</p>
+<p><strong>Pass criteria:</strong>
+- 2-Step Verification enforced for all users
+- Admin accounts use security keys</p>
+<p><strong>Fix (manual verification):</strong>
+- Enforce 2-Step Verification in Google Workspace Admin Console
+- Navigate to: https://admin.google.com/ac/security/2sv
+- Requires Google Workspace (cannot be automated via API)</p>
+<h4>CC6.3 - Service Account Key Count</h4>
+<p><strong>What it checks:</strong>
+- Number of active keys per service account
+- Unused keys present
+- Key creation patterns</p>
+<p><strong>Pass criteria:</strong>
+- Maximum 2 keys per service account
+- All keys actively used</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># List keys
+gcloud iam service-accounts keys list \
+  --iam-account=SERVICE_ACCOUNT_EMAIL
+
+# Delete unused key
+gcloud iam service-accounts keys delete KEY_ID \
+  --iam-account=SERVICE_ACCOUNT_EMAIL
+</div>
+<h4>CC6.8 - Service Account Permissions</h4>
+<p><strong>What it checks:</strong>
+- Service accounts with excessive permissions
+- Service accounts used by humans (anti-pattern)
+- Cross-project service account usage</p>
+<p><strong>Pass criteria:</strong>
+- Service accounts follow least privilege
+- No human use of service accounts
+- Workload Identity used where possible</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Review and restrict permissions
+gcloud projects get-iam-policy PROJECT_ID
+
+# Remove unnecessary roles
+gcloud projects remove-iam-policy-binding PROJECT_ID \
+  --member=serviceAccount:SERVICE_ACCOUNT_EMAIL \
+  --role=ROLE_TO_REMOVE
+</div>
+<h3>Compute Engine - 3 Checks</h3>
+<h4>CC6.4 - Public IP Assignments</h4>
+<p><strong>What it checks:</strong>
+- VMs with external IP addresses
+- Unnecessary public exposure
+- Private-only instances preferred</p>
+<p><strong>Pass criteria:</strong>
+- Only necessary VMs have external IPs
+- Internal-only VMs use Cloud NAT for outbound
+- Bastion hosts properly configured</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Remove external IP
+gcloud compute instances delete-access-config INSTANCE_NAME \
+  --zone=ZONE \
+  --access-config-name=&quot;External NAT&quot;
+</div>
+<h4>CC7.1 - OS Patch Management</h4>
+<p><strong>What it checks:</strong>
+- OS Config management enabled
+- Patch compliance status
+- Automatic patch deployment configured</p>
+<p><strong>Pass criteria:</strong>
+- OS Config enabled on all VMs
+- Patches applied within 30 days
+- Automated patching scheduled</p>
+<p><strong>Fix (manual verification):</strong>
+- Enable OS Config in console
+- Configure patch management policies
+- Schedule patch windows</p>
+<h4>CC8.1 - Disk Encryption</h4>
+<p><strong>What it checks:</strong>
+- Boot disks encrypted at rest
+- Data disks encrypted
+- Customer-managed keys (CMEK) used</p>
+<p><strong>Pass criteria:</strong>
+- All disks encrypted (default in GCP)
+- CMEK used for sensitive data
+- Keys managed in Cloud KMS</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Create disk with CMEK
+gcloud compute disks create DISK_NAME \
+  --kms-key=projects/PROJECT/locations/LOCATION/keyRings/KEYRING/cryptoKeys/KEY
+</div>
+<h3>VPC Networks - 3 Checks</h3>
+<h4>CC6.5 - Firewall Rule Restrictions</h4>
+<p><strong>What it checks:</strong>
+- Overly permissive firewall rules
+- Rules allowing 0.0.0.0/0 access
+- Unused firewall rules</p>
+<p><strong>Pass criteria:</strong>
+- No rules allowing 0.0.0.0/0 for production services
+- Specific IP ranges defined
+- Unused rules removed</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Delete overly permissive rule
+gcloud compute firewall-rules delete RULE_NAME
+
+# Create restricted rule
+gcloud compute firewall-rules create RULE_NAME \
+  --allow=tcp:443 \
+  --source-ranges=SPECIFIC_IP_RANGE
+</div>
+<h4>CIS GCP 3.1 - Default VPC Network Deleted</h4>
+<p><strong>What it checks:</strong>
+- Use of default VPC network
+- Custom VPCs preferred
+- Network segmentation</p>
+<p><strong>Pass criteria:</strong>
+- Default network not in use
+- Custom VPCs configured
+- Network segmentation implemented</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Create custom VPC
+gcloud compute networks create custom-vpc --subnet-mode=custom
+
+# Delete default network (after migration)
+gcloud compute networks delete default
+</div>
+<h4>CC6.6 - Open Ingress Rules</h4>
+<p><strong>What it checks:</strong>
+- Firewall rules allowing 0.0.0.0/0 ingress
+- Ports exposed to internet
+- Unnecessary services accessible</p>
+<p><strong>Pass criteria:</strong>
+- No production services exposed to 0.0.0.0/0
+- Only specific IPs allowed
+- Bastion/jump hosts properly configured</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Update rule to specific IPs
+gcloud compute firewall-rules update RULE_NAME \
+  --source-ranges=SPECIFIC_IP/32
+</div>
+<h3>Cloud SQL - 4 Checks</h3>
+<h4>CC6.6 - Cloud SQL Public IP</h4>
+<p><strong>What it checks:</strong>
+- Cloud SQL instances with public IPs
+- Authorized networks configured
+- Private IP usage</p>
+<p><strong>Pass criteria:</strong>
+- Instances use private IP only
+- If public IP required, authorized networks configured
+- Cloud SQL Proxy recommended</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Disable public IP
+gcloud sql instances patch INSTANCE_NAME \
+  --no-assign-ip
+
+# Enable private IP
+gcloud sql instances patch INSTANCE_NAME \
+  --network=projects/PROJECT/global/networks/VPC_NAME
+</div>
+<h4>CC6.1 - Cloud SQL SSL Enforcement</h4>
+<p><strong>What it checks:</strong>
+- SSL/TLS required for connections
+- Certificate validation enabled
+- Encrypted connections only</p>
+<p><strong>Pass criteria:</strong>
+- SSL/TLS enforced on all instances
+- No unencrypted connections allowed</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block">gcloud sql instances patch INSTANCE_NAME \
+  --require-ssl
+</div>
+<h4>CC7.4 - Automated Backups</h4>
+<p><strong>What it checks:</strong>
+- Automated backups enabled
+- Backup retention period
+- Point-in-time recovery</p>
+<p><strong>Pass criteria:</strong>
+- Automated backups enabled
+- 7+ day retention (30 days for PCI-DSS)
+- Point-in-time recovery enabled</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block">gcloud sql instances patch INSTANCE_NAME \
+  --backup-start-time=02:00 \
+  --enable-bin-log
+</div>
+<h4>CC9.1 - High Availability</h4>
+<p><strong>What it checks:</strong>
+- High availability configuration
+- Regional instances
+- Automatic failover</p>
+<p><strong>Pass criteria:</strong>
+- HA enabled for production databases
+- Regional configuration
+- Tested failover procedures</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block">gcloud sql instances patch INSTANCE_NAME \
+  --availability-type=REGIONAL
+</div>
+<h3>Cloud KMS - 2 Checks</h3>
+<h4>CIS GCP 1.10 - KMS Key Rotation</h4>
+<p><strong>What it checks:</strong>
+- Key rotation enabled
+- Rotation period configured
+- Key version management</p>
+<p><strong>Pass criteria:</strong>
+- Automatic rotation enabled
+- 90-day rotation period (PCI-DSS)
+- Key versions tracked</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Enable rotation
+gcloud kms keys update KEY_NAME \
+  --keyring=KEYRING \
+  --location=LOCATION \
+  --rotation-period=90d \
+  --next-rotation-time=2025-11-01T00:00:00Z
+</div>
+<h4>CIS GCP 1.9 - KMS Separation of Duties</h4>
+<p><strong>What it checks:</strong>
+- No principal holds both <code class="code-inline">cloudkms.admin</code> and a key-usage role
+  (<code class="code-inline">cloudkms.cryptoKeyEncrypterDecrypter</code>, <code class="code-inline">...Encrypter</code>, <code class="code-inline">...Decrypter</code>)
+  on the same key</p>
+<p><strong>Pass criteria:</strong>
+- Key administration and key use are held by different principals</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Remove the key-usage role from an account that also administers keys
+gcloud kms keys remove-iam-policy-binding KEY_NAME \
+  --keyring=KEYRING --location=LOCATION \
+  --member=serviceAccount:ACCOUNT \
+  --role=roles/cloudkms.cryptoKeyEncrypterDecrypter
+</div>
+<p>KMS audit logging is not checked here. <code class="code-inline">CIS GCP 2.1</code> under Cloud Logging covers
+Cloud Audit Logs, and <code class="code-inline">CIS GCP 1.8</code> and <code class="code-inline">CIS GCP 1.16</code> under Cloud IAM cover
+public key exposure and KMS role separation at the project level.</p>
+<h3>Cloud Logging - 2 Checks</h3>
+<h4>CC7.1 - Audit Log Configuration</h4>
+<p><strong>What it checks:</strong>
+- Admin Activity logs enabled (default)
+- Data Access logs enabled
+- System Event logs enabled</p>
+<p><strong>Pass criteria:</strong>
+- All audit log types enabled
+- Logs exported to Cloud Storage/BigQuery
+- 1-year retention minimum (PCI-DSS)</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Enable Data Access logs
+gcloud projects get-iam-policy PROJECT_ID &gt; policy.yaml
+# Edit policy.yaml to add auditConfigs
+gcloud projects set-iam-policy PROJECT_ID policy.yaml
+</div>
+<h4>CC7.5 - Log Retention and Export</h4>
+<p><strong>What it checks:</strong>
+- Log retention period
+- Log sinks configured
+- Long-term storage setup</p>
+<p><strong>Pass criteria:</strong>
+- Logs retained for 1+ year
+- Exported to Cloud Storage or BigQuery
+- Immutable storage for compliance</p>
+<p><strong>Fix command:</strong></p>
+<div class="code-block"># Create log sink to Cloud Storage
+gcloud logging sinks create SINK_NAME \
+  storage.googleapis.com/BUCKET_NAME \
+  --log-filter='resource.type=&quot;gce_instance&quot;'
+</div>
+<h2>Advanced Services</h2>
+<h3>GKE (Google Kubernetes Engine) - 5 checks free, 15 in Pro</h3>
+<p>The Community Edition covers CIS GCP 8.1-8.5 (Binary Authorization, Network Policies, Kubernetes Dashboard, Pod Security Policy, Workload Identity). AuditKit Pro adds ten deeper GKE security checks.</p>
+<p><strong>Pro version required for the deep GKE checks:</strong> $297/month</p>
+<h4>Workload Identity Validation (Community Edition, CIS GCP 8.5)</h4>
+<p><strong>What it checks:</strong>
+- Workload Identity enabled on clusters
+- Pods use Workload Identity vs node service accounts
+- Service account bindings configured</p>
+<p><strong>Pass criteria:</strong>
+- Workload Identity enabled
+- No pods use node service accounts
+- Proper IAM bindings</p>
+<h4>Binary Authorization</h4>
+<p><strong>What it checks:</strong>
+- Binary Authorization enabled
+- Container images signed
+- Only trusted images deployed</p>
+<p><strong>Pass criteria:</strong>
+- Binary Authorization enforced
+- All images have attestations
+- Policy violations blocked</p>
+<h4>Private Cluster Configuration</h4>
+<p><strong>What it checks:</strong>
+- Control plane private endpoints
+- Nodes use private IPs only
+- Authorized networks for access</p>
+<p><strong>Pass criteria:</strong>
+- Private cluster enabled
+- No public control plane access
+- VPN/Cloud Interconnect for access</p>
+<h4>Network Policy Validation</h4>
+<p><strong>What it checks:</strong>
+- Network policies configured
+- Pod-to-pod communication restricted
+- Default deny policies</p>
+<p><strong>Pass criteria:</strong>
+- Network policies enabled
+- Explicit allow rules only
+- Default deny in place</p>
+<h4>Shielded Nodes Assessment</h4>
+<p><strong>What it checks:</strong>
+- Shielded GKE nodes enabled
+- Secure Boot enabled
+- Integrity monitoring active</p>
+<p><strong>Pass criteria:</strong>
+- All nodes are shielded
+- Secure Boot verified
+- Integrity alerts configured</p>
+<h4>Pod Security Standards</h4>
+<p><strong>What it checks:</strong>
+- Pod Security Policy/Standards enforced
+- Privileged containers blocked
+- Host namespace usage restricted</p>
+<p><strong>Pass criteria:</strong>
+- Pod Security Standards enforced
+- Restricted policy baseline
+- Exceptions documented</p>
+<h4>Container-Optimized OS</h4>
+<p><strong>What it checks:</strong>
+- Nodes run Container-Optimized OS
+- Automatic updates enabled
+- Minimal OS footprint</p>
+<p><strong>Pass criteria:</strong>
+- All nodes use COS
+- Auto-upgrade enabled
+- Security patches applied</p>
+<h4>Vulnerability Scanning</h4>
+<p><strong>What it checks:</strong>
+- Container scanning enabled
+- Vulnerabilities detected and tracked
+- Critical CVEs addressed</p>
+<p><strong>Pass criteria:</strong>
+- Scanning enabled
+- No critical/high vulnerabilities
+- Remediation tracking</p>
+<h4>Secrets Management</h4>
+<p><strong>What it checks:</strong>
+- Kubernetes secrets encrypted at rest
+- Secret Manager integration
+- No secrets in environment variables</p>
+<p><strong>Pass criteria:</strong>
+- CMEK encryption for secrets
+- Secret Manager used for sensitive data
+- Secrets never in plaintext</p>
+<h4>GKE Audit Logging</h4>
+<p><strong>What it checks:</strong>
+- GKE audit logs enabled
+- API server logs collected
+- Log retention configured</p>
+<p><strong>Pass criteria:</strong>
+- All audit log types enabled
+- Logs exported for analysis
+- 1+ year retention</p>
+<p><strong><a href="https://auditkit.io/pro/">Try Pro free for 14 days →</a></strong></p>
+<h3>Vertex AI - 10 Checks</h3>
+<p><strong>Pro version required:</strong> $297/month</p>
+<h4>Model Encryption at Rest</h4>
+<p><strong>What it checks:</strong>
+- Model artifacts encrypted with CMEK
+- Training data encrypted
+- Managed datasets use encryption</p>
+<p><strong>Pass criteria:</strong>
+- All models use CMEK
+- Training data encrypted
+- Keys managed in Cloud KMS</p>
+<h4>Endpoint Authentication</h4>
+<p><strong>What it checks:</strong>
+- Prediction endpoints require authentication
+- IAM controls on endpoints
+- No public prediction endpoints</p>
+<p><strong>Pass criteria:</strong>
+- All endpoints require auth
+- IAM roles properly scoped
+- No anonymous access</p>
+<h4>Model Versioning Controls</h4>
+<p><strong>What it checks:</strong>
+- Model versioning enabled
+- Version tracking and lineage
+- Rollback capabilities</p>
+<p><strong>Pass criteria:</strong>
+- Versions tracked
+- Lineage documented
+- Rollback tested</p>
+<h4>Audit Logging Configuration</h4>
+<p><strong>What it checks:</strong>
+- Vertex AI audit logs enabled
+- Training and prediction logged
+- Log export configured</p>
+<p><strong>Pass criteria:</strong>
+- All operations logged
+- Logs retained 1+ year
+- Exported for analysis</p>
+<h4>Data Residency Compliance</h4>
+<p><strong>What it checks:</strong>
+- Data location constraints
+- Regional endpoints used
+- Cross-region restrictions</p>
+<p><strong>Pass criteria:</strong>
+- Data stays in specified region
+- Compliance with data residency laws
+- Documented controls</p>
+<h4>Model Explainability Features</h4>
+<p><strong>What it checks:</strong>
+- Explainable AI features enabled
+- Feature attributions available
+- Model transparency documented</p>
+<p><strong>Pass criteria:</strong>
+- Explainability enabled
+- Attributions generated
+- Documentation complete</p>
+<h4>Training Data Security</h4>
+<p><strong>What it checks:</strong>
+- Access controls on training datasets
+- Data versioning and lineage
+- PII detection and handling</p>
+<p><strong>Pass criteria:</strong>
+- Strict access controls
+- Data lineage tracked
+- PII properly handled</p>
+<h4>Prediction Endpoint Security</h4>
+<p><strong>What it checks:</strong>
+- HTTPS-only endpoints
+- Rate limiting configured
+- DDoS protection enabled</p>
+<p><strong>Pass criteria:</strong>
+- HTTPS enforced
+- Rate limits set
+- Cloud Armor configured</p>
+<h4>VPC Service Controls</h4>
+<p><strong>What it checks:</strong>
+- Service perimeters configured
+- Vertex AI in VPC-SC perimeter
+- Data exfiltration prevention</p>
+<p><strong>Pass criteria:</strong>
+- VPC-SC enabled
+- Vertex AI protected
+- Policies enforced</p>
+<h4>CMEK for Datasets</h4>
+<p><strong>What it checks:</strong>
+- Managed datasets use CMEK
+- Customer-controlled encryption
+- Key rotation enabled</p>
+<p><strong>Pass criteria:</strong>
+- All datasets use CMEK
+- Keys managed properly
+- Rotation scheduled</p>
+<p><strong><a href="https://auditkit.io/pro/">Try Pro free for 14 days →</a></strong></p>
+<h2>Services Not Yet Supported</h2>
+<p><strong>Coming in future releases:</strong>
+- Cloud Functions
+- Cloud Run
+- Pub/Sub
+- Dataflow
+- Cloud Spanner</p>
+<p>(BigQuery is already covered — see CIS GCP 7.1 and 7.2.)</p>
+<p><strong>Vote for features:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/issues">GitHub Issues</a></p>
+<h2>Running GCP Scans</h2>
+<h3>Community Edition</h3>
+<div class="code-block"># Authenticate
+gcloud auth application-default login
+export GOOGLE_CLOUD_PROJECT=my-project-id
+
+# Scan for SOC2
+./auditkit scan -provider gcp -framework soc2
+
+# Scan for PCI-DSS
+./auditkit scan -provider gcp -framework pci
+
+# Scan for CMMC Level 1
+./auditkit scan -provider gcp -framework cmmc
+
+# Generate report
+./auditkit scan -provider gcp -framework soc2 -format pdf -output gcp-report.pdf
+</div>
+<h3>Pro Version</h3>
+<div class="code-block"># Authenticate
+gcloud auth application-default login
+export GOOGLE_CLOUD_PROJECT=my-project-id
+
+# Scan for CMMC Level 2 (includes GKE + Vertex AI)
+./auditkit-pro scan -provider gcp -framework cmmc
+
+# Scan entire organization (Pro only)
+./auditkit-pro scan -provider gcp -framework soc2 --scan-all
+
+# Generate comprehensive report
+./auditkit-pro scan -provider gcp -framework soc2 -format pdf -output gcp-pro-report.pdf
+</div>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../setup/gcp.html">GCP Setup Guide →</a></strong></li>
+<li><strong><a href="../getting-started.html">Getting Started →</a></strong></li>
+<li><strong><a href="../cli-reference.html">CLI Reference →</a></strong></li>
+<li><strong><a href="https://auditkit.io/pro/">Try Pro for GKE/Vertex AI →</a></strong></li>
+</ul>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Start scanning</h3>
+                <p style="margin-bottom: 1.25rem;">Full results in about thirty minutes, with a remediation command and a console link on every finding.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
+            </div>
+        </div>
+    </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p style="margin-bottom: 2rem; color: var(--slate-300); font-size: 1rem;">
+                <strong style="color: var(--white);">Built for compliance teams, by engineers who understand the audit process.</strong>
+            </p>
+
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/">AuditKit</a></li>
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/community.html">Community Edition (Open Source)</a></li>
+                        <li><a href="/about.html">About</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="/docs/getting-started.html">Quick Start Guide</a></li>
+                        <li><a href="/docs/installation.html">Installation</a></li>
+                        <li><a href="/docs/cli-reference.html">CLI Reference</a></li>
+                        <li><a href="/docs/faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Frameworks</h4>
+                    <ul>
+                        <li><a href="/docs/frameworks/cmmc.html">CMMC</a></li>
+                        <li><a href="/docs/frameworks/soc2.html">SOC2</a></li>
+                        <li><a href="/docs/frameworks/pci-dss.html">PCI-DSS</a></li>
+                        <li><a href="/docs/frameworks/hipaa.html">HIPAA</a></li>
+                        <li><a href="/docs/frameworks/nist-800-53.html">NIST 800-53</a></li>
+                        <li><a href="/docs/frameworks/iso27001.html">ISO 27001</a></li>
+                        <li><a href="/docs/frameworks/fedramp.html">FedRAMP</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/docs/setup/aws.html">AWS Setup</a></li>
+                        <li><a href="/docs/setup/azure.html">Azure Setup</a></li>
+                        <li><a href="/docs/setup/gcp.html">GCP Setup</a></li>
+                        <li><a href="/docs/setup/m365.html">M365 Setup</a></li>
+                        <li><a href="/examples/">Examples</a></li>
+                        <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition">GitHub</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>Community Edition is Apache 2.0. AuditKit is commercially licensed.</p>
+                <p>&copy; 2026 Guardian Nexus LLC</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../cookie-consent.js"></script>
+    <script src="../../main.js"></script>
+    <script>
+        (function() {
+            var toggle = document.querySelector('.nav-toggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function() {
+                    var open = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', open);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

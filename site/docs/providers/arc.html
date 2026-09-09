@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Azure Arc (On-Premises) - AuditKit</title>
+    <title>Azure Arc Coverage - AuditKit</title>
+    <meta name="description" content="Scanning Azure Arc connected machines and hybrid infrastructure with AuditKit.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="Azure Arc Coverage - AuditKit">
+    <meta property="og:description" content="Scanning Azure Arc connected machines and hybrid infrastructure with AuditKit.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/providers/arc.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,243 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
-            <h1>Azure Arc (On-Premises)</h1>
-            <p class="subtitle">On-premises compliance scanning via Azure Arc</p>
+            <h1>Azure Arc Coverage</h1>
+            <p class="subtitle">Scanning Azure Arc connected machines and hybrid infrastructure with AuditKit.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/providers/arc.md">View full Azure Arc (On-Premises) guide on GitHub &rarr;</a></p>
+<p>Scan your on-premises servers connected via Azure Arc.</p>
+<h2>Overview</h2>
+<p><strong>Status:</strong> Pro only
+<strong>Coverage:</strong> Defender for Cloud assessments + Guest Configuration compliance
+<strong>Supported in:</strong> AuditKit Pro v0.8.2-pro and later (current release v0.9.9-pro)</p>
+<p>Azure Arc extends Azure management to your on-premises servers. AuditKit can scan Arc-enabled machines for compliance by pulling:</p>
+<ul>
+<li><strong>Defender for Cloud Assessments</strong> - Security recommendations and vulnerabilities</li>
+<li><strong>Guest Configuration Compliance</strong> - Azure Policy compliance status</li>
+<li><strong>Agent Health</strong> - Arc agent connectivity monitoring</li>
+</ul>
+<p><strong>Supported frameworks:</strong>
+- SOC2 Type II
+- PCI-DSS v4.0.1
+- CMMC Level 2 (Pro)
+- NIST 800-53 Rev 5
+- ISO 27001</p>
+<p><strong><a href="https://auditkit.io/pro/">Upgrade to Pro</a></strong></p>
+<h2>Prerequisites</h2>
+<p>Before scanning Arc machines, you need:</p>
+<ol>
+<li><strong>Azure Arc-enabled servers</strong> - On-prem machines with the Arc agent installed</li>
+<li><strong>Microsoft Defender for Cloud</strong> - Enabled on your subscription (for security assessments)</li>
+<li><strong>Azure credentials</strong> - <code class="code-inline">az login</code> or service principal configured</li>
+<li><strong>Reader access</strong> - To the subscription containing Arc machines</li>
+</ol>
+<h3>Verify Arc Machines Are Connected</h3>
+<div class="code-block"># List Arc-enabled servers in your subscription
+az connectedmachine list --query &quot;[].{name:name, status:status}&quot; -o table
+</div>
+<h3>Enable Defender for Cloud</h3>
+<p>For security assessments, enable Defender for Servers on Arc machines:</p>
+<ol>
+<li>Azure Portal &gt; Microsoft Defender for Cloud</li>
+<li>Environment Settings &gt; Your Subscription</li>
+<li>Enable "Servers" plan</li>
+<li>Arc machines will be auto-enrolled</li>
+</ol>
+<h2>Setup</h2>
+<h3>1. Configure Azure Credentials</h3>
+<div class="code-block"># Interactive login
+az login
+
+# Set subscription containing Arc machines
+export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
+
+# Verify access
+az account show
+</div>
+<h3>2. Service Principal (Optional)</h3>
+<p>For automation/CI/CD:</p>
+<div class="code-block"># Create service principal with Reader access
+az ad sp create-for-rbac \
+  --name &quot;auditkit-arc-scanner&quot; \
+  --role Reader \
+  --scopes /subscriptions/YOUR_SUBSCRIPTION_ID
+
+# Set environment variables
+export AZURE_CLIENT_ID=&quot;app-id-from-output&quot;
+export AZURE_CLIENT_SECRET=&quot;password-from-output&quot;
+export AZURE_TENANT_ID=&quot;tenant-from-output&quot;
+export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
+</div>
+<h2>Usage</h2>
+<h3>CLI</h3>
+<div class="code-block"># Scan Arc machines against PCI-DSS
+auditkit-pro scan -provider arc -framework pci
+
+# Scan against SOC2
+auditkit-pro scan -provider arc -framework soc2
+
+# Scan against CMMC Level 2
+auditkit-pro scan -provider arc -framework cmmc
+
+# Generate PDF report
+auditkit-pro scan -provider arc -framework pci -format pdf -output arc-compliance.pdf
+
+# Verbose output
+auditkit-pro scan -provider arc -framework soc2 -verbose
+</div>
+<h3>Desktop GUI</h3>
+<ol>
+<li>Open AuditKit Desktop (<code class="code-inline">http://localhost:1337</code>)</li>
+<li>Click "Run Scan"</li>
+<li>Select "Azure Arc (On-Prem)" as provider</li>
+<li>Choose framework(s)</li>
+<li>Click "Start Scan"</li>
+</ol>
+<h2>What Gets Scanned</h2>
+<h3>1. Arc Agent Health</h3>
+<p>Checks connectivity status of all Arc-enabled servers:</p>
+<ul>
+<li><strong>PASS</strong> - Agent connected and reporting</li>
+<li><strong>FAIL</strong> - Agent disconnected or expired</li>
+</ul>
+<p><strong>Frameworks:</strong> PCI 10.2.1, SOC2 CC7.1, ISO 27001 A.12.4, CMMC AU.L2-3.3.1</p>
+<h3>2. Defender for Cloud Assessments</h3>
+<p>Pulls security recommendations from Microsoft Defender:</p>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Assessment Type</th>
+<th>Framework Mapping</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>System updates missing</td>
+<td>PCI 6.3.3, SOC2 CC7.1, CMMC SI.L2-3.14.1</td>
+</tr>
+<tr>
+<td>Endpoint protection issues</td>
+<td>PCI 5.2.1, SOC2 CC6.8, CMMC SI.L2-3.14.2</td>
+</tr>
+<tr>
+<td>Disk encryption</td>
+<td>PCI 3.5.1, SOC2 CC6.1, CMMC SC.L2-3.13.11</td>
+</tr>
+<tr>
+<td>Vulnerability findings</td>
+<td>PCI 11.3.1, SOC2 CC7.1, CMMC RA.L2-3.11.2</td>
+</tr>
+<tr>
+<td>Network/firewall issues</td>
+<td>PCI 1.4.4, SOC2 CC6.6, CMMC SC.L2-3.13.1</td>
+</tr>
+<tr>
+<td>Access control issues</td>
+<td>PCI 8.3.1, SOC2 CC6.1, CMMC AC.L2-3.1.1</td>
+</tr>
+<tr>
+<td>Logging/monitoring gaps</td>
+<td>PCI 10.2.1, SOC2 CC7.2, CMMC AU.L2-3.3.1</td>
+</tr>
+</tbody>
+</table></div>
+<h3>3. Guest Configuration Compliance</h3>
+<p>Reports on Azure Policy Guest Configuration assignments:</p>
+<ul>
+<li>Windows security baselines</li>
+<li>Linux security baselines</li>
+<li>Custom configuration policies</li>
+</ul>
+<p><strong>Frameworks:</strong> PCI 2.2, SOC2 CC6.1, ISO 27001 A.12.6</p>
+<h2>Required Permissions</h2>
+<p>The scanning identity needs:</p>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Permission</th>
+<th>Scope</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reader</td>
+<td>Subscription</td>
+<td>List Arc machines, read assessments</td>
+</tr>
+<tr>
+<td>Security Reader</td>
+<td>Subscription</td>
+<td>Read Defender for Cloud data</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code-block"># Assign Reader role
+az role assignment create \
+  --assignee YOUR_SP_OR_USER \
+  --role Reader \
+  --scope /subscriptions/YOUR_SUBSCRIPTION_ID
+
+# Assign Security Reader role
+az role assignment create \
+  --assignee YOUR_SP_OR_USER \
+  --role &quot;Security Reader&quot; \
+  --scope /subscriptions/YOUR_SUBSCRIPTION_ID
+</div>
+<h2>Limitations</h2>
+<ul>
+<li><strong>Requires Defender for Cloud</strong> - Security assessments only available if Defender is enabled</li>
+<li><strong>Agent must be connected</strong> - Disconnected machines show limited data</li>
+<li><strong>Azure-only</strong> - This scans Arc machines in Azure; standalone on-prem scanning not supported</li>
+<li><strong>No agentless scanning</strong> - Machines must have Arc agent installed</li>
+</ul>
+<h2>Troubleshooting</h2>
+<h3>"No Arc machines found"</h3>
+<div class="code-block"># Verify Arc machines exist
+az connectedmachine list -o table
+
+# Check subscription
+echo $AZURE_SUBSCRIPTION_ID
+az account show --query id
+</div>
+<h3>"Failed to get assessments"</h3>
+<ul>
+<li>Ensure Defender for Cloud is enabled</li>
+<li>Verify Security Reader role is assigned</li>
+<li>Some machines may not have assessments if recently onboarded</li>
+</ul>
+<h3>"Authentication failed"</h3>
+<div class="code-block"># Re-authenticate
+az login
+
+# Or check service principal
+az ad sp show --id $AZURE_CLIENT_ID
+</div>
+<h2>Related</h2>
+<ul>
+<li><a href="./azure.html">Azure Provider Setup</a></li>
+<li><a href="../frameworks/cmmc.html">CMMC Framework</a></li>
+<li><a href="../frameworks/soc2.html">SOC2 Framework</a></li>
+</ul>
+<p><strong><a href="https://auditkit.io/pro/">Upgrade to Pro</a></strong> to enable Azure Arc on-premises scanning.</p>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Start scanning</h3>
+                <p style="margin-bottom: 1.25rem;">Full results in about thirty minutes, with a remediation command and a console link on every finding.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed setup documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">

@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M365 Setup - AuditKit</title>
+    <meta name="description" content="Import Microsoft 365 findings into AuditKit through ScubaGear.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="M365 Setup - AuditKit">
+    <meta property="og:description" content="Import Microsoft 365 findings into AuditKit through ScubaGear.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/setup/m365.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,451 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
             <h1>M365 Setup</h1>
-            <p class="subtitle">Cloud provider setup guide for AuditKit</p>
+            <p class="subtitle">Import Microsoft 365 findings into AuditKit through ScubaGear.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/setup/m365.md">View full M365 Setup guide on GitHub &rarr;</a></p>
+<p>How to scan Microsoft 365 using CISA ScubaGear integration.</p>
+<h2>Overview</h2>
+<p>AuditKit integrates with <a href="https://github.com/cisagov/ScubaGear">CISA ScubaGear</a> to scan Microsoft 365 environments.</p>
+<p><strong>Why ScubaGear?</strong>
+- Official CISA tool for M365 security assessment
+- Free and open-source
+- Comprehensive coverage of 100+ security rules
+- Trusted by federal agencies</p>
+<p><strong>What AuditKit does:</strong> Maps ScubaGear results to compliance frameworks (SOC2 and PCI-DSS)</p>
+<h2>Requirements</h2>
+<p><strong>System:</strong>
+- Windows 10/11 or Windows Server 2016+
+- PowerShell 5.1 or PowerShell 7.2+
+- .NET Framework 4.8+</p>
+<p><strong>M365 Permissions:</strong>
+- Global Administrator role (or equivalent)
+- Ability to consent to application permissions</p>
+<p><strong>M365 Licenses Required:</strong>
+- Azure AD Premium P1 (minimum)
+- Microsoft 365 E3 or E5 (recommended)</p>
+<h2>Quick Start</h2>
+<h3>Step 1: Install ScubaGear (Windows PowerShell)</h3>
+<div class="code-block"># Run PowerShell as Administrator
+
+# Install ScubaGear module
+Install-Module -Name ScubaGear -Scope CurrentUser
+
+# Verify installation
+Get-Module -ListAvailable ScubaGear
+</div>
+<h3>Step 2: Run ScubaGear Scan</h3>
+<div class="code-block"># Authenticate to M365
+# This will open a browser for login
+Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams -OutPath ./ScubaResults
+
+# Wait for scan to complete (5-15 minutes)
+</div>
+<h3>Step 3: Import Results to AuditKit</h3>
+<p>ScubaGear names its consolidated output <code class="code-inline">ScubaResults_&lt;uuid&gt;.json</code>, so the glob
+below picks it up. If a directory holds more than one run, name the file you
+want explicitly.</p>
+<div class="code-block"># On Linux/macOS/Windows (with AuditKit installed)
+./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json
+
+# Generate PDF report
+./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json -format pdf -output m365-report.pdf
+</div>
+<h2>Detailed Setup Guide</h2>
+<h3>Installing ScubaGear</h3>
+<p><strong>Option 1: PowerShell Gallery (Recommended)</strong></p>
+<div class="code-block"># Run as Administrator
+Install-Module -Name ScubaGear -Scope CurrentUser -Force
+
+# Trust PSGallery if prompted
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+</div>
+<p><strong>Option 2: Manual Installation</strong></p>
+<div class="code-block"># Download from GitHub
+git clone https://github.com/cisagov/ScubaGear
+cd ScubaGear
+
+# Import module
+Import-Module ./PowerShell/ScubaGear/ScubaGear.psd1
+</div>
+<h3>Verifying Installation</h3>
+<div class="code-block"># Check module is installed
+Get-Module -ListAvailable ScubaGear
+
+# Check version
+(Get-Module -ListAvailable ScubaGear).Version
+</div>
+<h2>Running ScubaGear Scans</h2>
+<h3>Scan All Products</h3>
+<div class="code-block"># Full M365 scan (recommended)
+Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams,powerplatform,defender -OutPath ./ScubaResults
+</div>
+<h3>Scan Specific Products</h3>
+<div class="code-block"># Entra ID (Azure AD) only
+Invoke-SCuBA -ProductNames aad -OutPath ./ScubaResults
+
+# Exchange Online only
+Invoke-SCuBA -ProductNames exo -OutPath ./ScubaResults
+
+# SharePoint only
+Invoke-SCuBA -ProductNames sharepoint -OutPath ./ScubaResults
+
+# Teams only
+Invoke-SCuBA -ProductNames teams -OutPath ./ScubaResults
+</div>
+<h3>Available Products</h3>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Product</th>
+<th>ProductName</th>
+<th>What it scans</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Entra ID (Azure AD)</td>
+<td><code class="code-inline">aad</code></td>
+<td>MFA, Conditional Access, Identity Protection</td>
+</tr>
+<tr>
+<td>Exchange Online</td>
+<td><code class="code-inline">exo</code></td>
+<td>Anti-phishing, DLP, Email encryption</td>
+</tr>
+<tr>
+<td>SharePoint</td>
+<td><code class="code-inline">sharepoint</code></td>
+<td>Sharing policies, DLP, Access controls</td>
+</tr>
+<tr>
+<td>Teams</td>
+<td><code class="code-inline">teams</code></td>
+<td>Meeting security, External access</td>
+</tr>
+<tr>
+<td>Power Platform</td>
+<td><code class="code-inline">powerplatform</code></td>
+<td>DLP policies, Connector governance</td>
+</tr>
+<tr>
+<td>Defender</td>
+<td><code class="code-inline">defender</code></td>
+<td>Safe Links, Safe Attachments, ATP</td>
+</tr>
+</tbody>
+</table></div>
+<h2>Authentication</h2>
+<h3>Interactive Authentication (Default)</h3>
+<div class="code-block"># Opens browser for login
+Invoke-SCuBA -ProductNames aad,exo -OutPath ./ScubaResults
+
+# Login with Global Administrator account
+# Accept permissions when prompted
+</div>
+<p><strong>Required permissions:</strong>
+- Global Administrator role
+- Or equivalent permissions per product</p>
+<h3>Service Principal Authentication</h3>
+<div class="code-block"># Create service principal with required permissions
+# Not recommended - interactive auth is simpler
+
+# See ScubaGear docs for service principal setup:
+# https://github.com/cisagov/ScubaGear/wiki
+</div>
+<h2>Understanding ScubaGear Output</h2>
+<h3>Output Files</h3>
+<p>After running ScubaGear, you'll find:</p>
+<div class="code-block">ScubaResults/
+├── ScubaResults_&lt;uuid&gt;.json    # Main results file (use this with AuditKit)
+├── BaselineReports.html        # HTML report
+├── IndividualReports/          # Per-product HTML reports
+│   ├── AADReport.html
+│   ├── EXOReport.html
+│   └── ...
+└── TestResults/                # Detailed test results
+</div>
+<h3>Results Format</h3>
+<div class="code-block">{
+  &quot;ReportSummary&quot;: { &quot;Date&quot;: &quot;2026-09-07&quot;, &quot;Tenant&quot;: &quot;contoso.onmicrosoft.com&quot;, &quot;ProductsRun&quot;: [&quot;aad&quot;] },
+  &quot;Results&quot;: {
+    &quot;AAD&quot;: [
+      {
+        &quot;Control ID&quot;: &quot;MS.AAD.1.1v1&quot;,
+        &quot;Requirement&quot;: &quot;Legacy authentication SHALL be blocked.&quot;,
+        &quot;Result&quot;: &quot;Fail&quot;,
+        &quot;Criticality&quot;: &quot;Shall&quot;,
+        &quot;Details&quot;: &quot;1 conditional access policy found.&quot;
+      }
+    ]
+  }
+}
+</div>
+<p>Points worth knowing when reading the file yourself:</p>
+<ul>
+<li><code class="code-inline">Results</code> is keyed by ScubaGear's baseline names - <code class="code-inline">AAD</code>, <code class="code-inline">EXO</code>, <code class="code-inline">SharePoint</code>,
+  <code class="code-inline">Teams</code>, <code class="code-inline">PowerPlatform</code>, <code class="code-inline">PowerBI</code> - not by the lower-case product arguments
+  you pass to <code class="code-inline">-ProductNames</code>.</li>
+<li>The policy identifier is in <strong><code class="code-inline">Control ID</code></strong>; <code class="code-inline">Requirement</code> holds the prose.</li>
+<li><code class="code-inline">Result</code> is a string: <code class="code-inline">Pass</code>, <code class="code-inline">Fail</code>, <code class="code-inline">Warning</code>, <code class="code-inline">Error</code>, <code class="code-inline">Omitted</code> or
+  <code class="code-inline">Incorrect result</code>. AuditKit scores <code class="code-inline">Pass</code> and <code class="code-inline">Fail</code>; <code class="code-inline">Omitted</code> and <code class="code-inline">Error</code>
+  are reported but excluded from the score, so a policy your team chose not to
+  evaluate does not count against you.</li>
+<li>Policy ids carry a baseline version suffix (<code class="code-inline">MS.AAD.1.1v1</code>). AuditKit matches
+  on the identifier with or without it.</li>
+</ul>
+<h2>Importing to AuditKit</h2>
+<h3>Basic Import</h3>
+<div class="code-block"># Import ScubaGear results
+./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json
+</div>
+<p><strong>Output:</strong></p>
+<div class="code-block">M365 Compliance Scan Results (via ScubaGear)
+============================================
+Scanned Products: Entra ID, Exchange Online, SharePoint, Teams,
+                  Power Platform, Power BI, Defender for Office 365
+
+Compliance Score: 72.4%
+Total Rules: 134
+Passed: 97
+Failed: 37
+
+Framework Mappings:
+- SOC2: 134 rules mapped
+- PCI-DSS: 134 rules mapped
+
+Critical Issues: 4
+High Priority: 8
+Medium Priority: 14
+</div>
+<h3>Generate Reports</h3>
+<div class="code-block"># PDF report
+./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json -format pdf -output m365-report.pdf
+
+# JSON output
+./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json -format json -output m365-results.json
+</div>
+<h2>M365 Service Coverage</h2>
+<h3>Entra ID (Azure AD) - 30 Rules</h3>
+<p><strong>Authentication &amp; Access:</strong>
+- MFA enforcement
+- Conditional Access policies
+- Legacy authentication blocking
+- Password policies
+- Guest user restrictions</p>
+<p><strong>Identity Protection:</strong>
+- Risk-based sign-in policies
+- User risk policies
+- Identity Protection alerts</p>
+<p><strong>Administrative Controls:</strong>
+- Privileged Identity Management
+- Admin MFA requirements
+- Emergency access accounts</p>
+<h3>Exchange Online - 40 Rules</h3>
+<p><strong>Email Security:</strong>
+- Anti-phishing policies
+- Anti-malware policies
+- Safe Links configuration
+- Safe Attachments configuration</p>
+<p><strong>Data Loss Prevention:</strong>
+- DLP policies for email
+- Sensitive information types
+- Policy tips and notifications</p>
+<p><strong>Compliance:</strong>
+- Audit logging
+- Mailbox auditing
+- Message encryption</p>
+<h3>SharePoint - 8 Rules</h3>
+<p><strong>Sharing &amp; Access:</strong>
+- External sharing settings
+- Guest access policies
+- Link sharing defaults</p>
+<p><strong>Data Protection:</strong>
+- DLP policies for SharePoint
+- Information Rights Management
+- Site access controls</p>
+<p><strong>Compliance:</strong>
+- Audit logging
+- Version history
+- Information barriers</p>
+<h3>Teams - 21 Rules</h3>
+<p><strong>Meeting Security:</strong>
+- Meeting join policies
+- Lobby settings
+- Recording policies</p>
+<p><strong>External Access:</strong>
+- Guest access settings
+- External access policies
+- Federation settings</p>
+<p><strong>Data Protection:</strong>
+- DLP policies for Teams
+- Message retention
+- eDiscovery settings</p>
+<h3>Power Platform - 8 Rules</h3>
+<p><strong>Governance:</strong>
+- DLP policies for connectors
+- Environment creation restrictions
+- Power Apps sharing settings</p>
+<p><strong>Data Protection:</strong>
+- Connector classification
+- Cross-tenant isolation
+- Audit logging</p>
+<h3>Defender for Office 365 - 19 Rules</h3>
+<p><strong>Threat Protection:</strong>
+- Safe Links policies
+- Safe Attachments policies
+- Anti-phishing policies</p>
+<p><strong>Investigation:</strong>
+- Automated investigation
+- Threat intelligence
+- Attack simulation training</p>
+<h2>Troubleshooting</h2>
+<h3>"Module ScubaGear not found"</h3>
+<p><strong>Cause:</strong> ScubaGear not installed</p>
+<p><strong>Solution:</strong></p>
+<div class="code-block">Install-Module -Name ScubaGear -Scope CurrentUser -Force
+</div>
+<h3>"Access Denied" during scan</h3>
+<p><strong>Cause:</strong> Insufficient permissions</p>
+<p><strong>Solution:</strong>
+- Ensure you're logged in as Global Administrator
+- Or have equivalent permissions for each product
+- Check Azure AD roles in portal</p>
+<h3>"Cannot connect to Exchange Online"</h3>
+<p><strong>Cause:</strong> Exchange Online PowerShell not accessible</p>
+<p><strong>Solution:</strong></p>
+<div class="code-block"># Install Exchange Online module
+Install-Module -Name ExchangeOnlineManagement -Force
+
+# Test connection
+Connect-ExchangeOnline -UserPrincipalName admin@yourdomain.com
+</div>
+<h3>"ScubaGear scan times out"</h3>
+<p><strong>Cause:</strong> Large tenant with many users/policies</p>
+<p><strong>Solution:</strong>
+- Run scans during off-peak hours
+- Scan products individually instead of all at once
+- Increase timeout (see ScubaGear docs)</p>
+<h3>"AuditKit can't parse the ScubaGear results"</h3>
+<p><strong>Cause:</strong> the wrong file was passed, or the output is truncated.</p>
+<p>Pass the consolidated <code class="code-inline">ScubaResults_&lt;uuid&gt;.json</code>, not a per-product report from
+<code class="code-inline">IndividualReports/</code> and not <code class="code-inline">BaselineReports.html</code>.</p>
+<p><strong>Solution:</strong></p>
+<div class="code-block"># Update ScubaGear to latest version
+Update-Module -Name ScubaGear
+
+# Re-run scan
+Invoke-SCuBA -ProductNames aad,exo -OutPath ./ScubaResults
+</div>
+<h3>The import succeeds but reports zero findings</h3>
+<p>AuditKit only imports policies it has a mapping for - 134 rules across Entra,
+Exchange Online, SharePoint, Teams, Power Platform, Power BI and Defender.
+A product you scanned that AuditKit has no mappings for is skipped silently.
+Check that the products you ran are among those listed under
+<a href="../providers/m365.html">Covered Domains</a>.</p>
+<h2>Best Practices</h2>
+<h3>1. Run Scans Regularly</h3>
+<div class="code-block"># Monthly compliance check
+# Create scheduled task or use Task Scheduler
+
+$products = &quot;aad,exo,sharepoint,teams,powerplatform,defender&quot;
+Invoke-SCuBA -ProductNames $products -OutPath &quot;C:\ComplianceScans\$(Get-Date -Format 'yyyy-MM-dd')&quot;
+</div>
+<h3>2. Use Dedicated Admin Account</h3>
+<p>Don't use your daily-use account:
+- Create compliance-scanning@yourdomain.com
+- Assign Global Reader + required roles
+- Enable MFA
+- Use for ScubaGear scans only</p>
+<h3>3. Document Scan Schedule</h3>
+<p>For audit purposes:
+- Run scans before each audit
+- Store results for 2+ years
+- Track remediation progress
+- Re-scan after fixes</p>
+<h3>4. Combine with AuditKit Cloud Scans</h3>
+<div class="code-block"># Complete compliance picture:
+
+# 1. Scan Azure infrastructure
+./auditkit scan -provider azure -framework soc2 -format pdf -output azure-report.pdf
+
+# 2. Scan M365 with ScubaGear
+Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams -OutPath ./ScubaResults
+
+# 3. Import M365 results
+./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json -format pdf -output m365-report.pdf
+
+# Now you have complete Azure + M365 compliance coverage
+</div>
+<h2>Security Considerations</h2>
+<h3>What ScubaGear Accesses</h3>
+<p><strong>Read-only access to:</strong>
+- User accounts and groups
+- Conditional Access policies
+- Exchange mailbox settings
+- SharePoint site settings
+- Teams configurations
+- Power Platform environments</p>
+<p><strong>Does NOT access:</strong>
+- Email content
+- Files in SharePoint/OneDrive
+- Chat messages
+- User passwords</p>
+<h3>Audit Logging</h3>
+<p>All ScubaGear activity is logged in:
+- Azure AD Audit Logs
+- Exchange Admin Audit Log
+- SharePoint Audit Log</p>
+<p>Review logs after scans to verify activity.</p>
+<h2>M365 Compliance Mappings</h2>
+<h3>SOC2 Type II</h3>
+<p>ScubaGear rules map to SOC2 controls:
+- CC6.1 (Logical Access) - 15 rules
+- CC6.6 (MFA) - 8 rules
+- CC7.2 (Monitoring) - 12 rules
+- CC8.1 (Encryption) - 10 rules</p>
+<h3>PCI-DSS v4.0.1</h3>
+<p>ScubaGear rules map to PCI requirements:
+- Req 8 (Access Control) - 12 rules
+- Req 10 (Logging) - 8 rules
+- Req 12 (Security Policies) - 6 rules</p>
+<h3>CMMC</h3>
+<p>ScubaGear rules do not currently carry CMMC mappings. M365 findings are mapped to SOC2 and PCI-DSS only; run an Azure scan for CMMC coverage of your Microsoft cloud infrastructure.</p>
+<h2>Additional Resources</h2>
+<p><strong>ScubaGear:</strong>
+- GitHub: https://github.com/cisagov/ScubaGear
+- Documentation: https://github.com/cisagov/ScubaGear/wiki
+- Issues: https://github.com/cisagov/ScubaGear/issues</p>
+<p><strong>Microsoft Security Baselines:</strong>
+- https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/</p>
+<p><strong>CISA M365 Guidance:</strong>
+- https://www.cisa.gov/resources-tools/resources/microsoft-365-security</p>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../getting-started.html">Run your first M365 scan →</a></strong></li>
+<li><strong><a href="../providers/m365.html">View M365 coverage details →</a></strong></li>
+<li><strong><a href="../cli-reference.html">CLI Reference →</a></strong></li>
+<li><strong><a href="../frameworks/">Framework Mappings →</a></strong></li>
+</ul>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Start scanning</h3>
+                <p style="margin-bottom: 1.25rem;">Full results in about thirty minutes, with a remediation command and a console link on every finding.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed setup documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">

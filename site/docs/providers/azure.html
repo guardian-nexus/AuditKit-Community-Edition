@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Service Coverage - AuditKit</title>
+    <meta name="description" content="Every Azure service AuditKit scans, and the checks it runs against each.">
+    <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="Azure Service Coverage - AuditKit">
+    <meta property="og:description" content="Every Azure service AuditKit scans, and the checks it runs against each.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/providers/azure.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+<body>
+
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <nav class="site-nav" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <img src="../../auditkit-logo-dark.svg" alt="AuditKit">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+            <div class="nav-links">
+                <a href="/#features">Features</a>
+                <a href="/docs/frameworks/">Frameworks</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/docs/">Docs</a>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="nav-cta">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main">
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Azure Service Coverage</h1>
+            <p class="subtitle">Every Azure service AuditKit scans, and the checks it runs against each.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container-prose">
+<p>What AuditKit scans in Microsoft Azure.</p>
+<h2>Overview</h2>
+<p><strong>Coverage:</strong> 174 controls across Azure services<br />
+<strong>Supported in:</strong> Free and Pro versions</p>
+<p><strong>Supported frameworks:</strong>
+- SOC2 Type II (37 criteria)
+- PCI-DSS v4.0.1 (59 requirements)
+- CMMC Level 1 and Level 2: all 110 practices reported; Level 1 automated, Level 2 automated in Pro
+- NIST 800-53 Rev 5 (83 controls, derived via crosswalk)
+- HIPAA (18 safeguards, derived via crosswalk)</p>
+<h2>Covered Services</h2>
+<h3>Storage Accounts</h3>
+<p><strong>Controls checked:</strong> 13</p>
+<ul>
+<li><strong>CIS-3.1</strong> - Storage account public access blocked (SOC2 CC6.2)</li>
+<li><strong>CIS-3.3 / CIS-3.4</strong> - Storage encryption at rest and storage service encryption (SOC2 CC6.3)</li>
+<li><strong>CIS-4.1</strong> - Secure transfer (HTTPS) required (SOC2 CC6.7)</li>
+<li><strong>CIS-4.2</strong> - Infrastructure encryption</li>
+<li><strong>CIS-4.3</strong> - Storage account key rotation</li>
+<li><strong>CIS-4.6</strong> - Public network access disabled</li>
+<li><strong>CIS-4.7</strong> - Default network access rule set to Deny</li>
+<li><strong>CIS-4.10</strong> - Blob soft delete enabled (SOC2 CC9.1)</li>
+<li><strong>CIS-4.12</strong> - Storage logging</li>
+<li><strong>CIS-4.15</strong> - Minimum TLS version</li>
+<li><strong>CIS-4.16</strong> - Cross-tenant replication disabled</li>
+<li><strong>CIS-4.17</strong> - Blob anonymous access disabled</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Disable public blob access
+az storage account update \
+  --name STORAGE_ACCOUNT \
+  --resource-group RESOURCE_GROUP \
+  --allow-blob-public-access false
+
+# Require secure transfer
+az storage account update \
+  --name STORAGE_ACCOUNT \
+  --resource-group RESOURCE_GROUP \
+  --https-only true
+
+# Enable soft delete
+az storage blob service-properties delete-policy update \
+  --account-name STORAGE_ACCOUNT \
+  --enable true \
+  --days-retained 7
+</div>
+<h3>Azure AD (Entra ID)</h3>
+<p><strong>Controls checked:</strong> 17</p>
+<ul>
+<li><strong>CC6.1</strong> - Privileged Role Management</li>
+<li><strong>CC6.1</strong> - Guest User Access Control</li>
+<li><strong>CC6.6</strong> - Global Administrator MFA</li>
+<li><strong>CC6.7</strong> - Azure AD Password Policy</li>
+<li><strong>CC6.7</strong> - Stale Account Detection</li>
+<li><strong>CIS-1.1</strong> - MFA for All Users</li>
+<li><strong>CIS-1.2</strong> - MFA for Privileged Users</li>
+<li><strong>CIS-1.3</strong> - Password Policy Configuration</li>
+<li><strong>CIS-1.4</strong> - Privileged and Owner Role Assignments</li>
+<li><strong>CIS-1.5</strong> - App Registration Owner Requirements</li>
+<li><strong>CIS-1.6</strong> - Contributor Role Assignments</li>
+<li><strong>CIS-1.7</strong> - Guest User Access Review</li>
+<li><strong>CIS-1.8</strong> - Guest Invite Restrictions</li>
+<li><strong>CIS-1.9</strong> - Conditional Access Policies</li>
+<li><strong>CIS-1.10</strong> - Block Legacy Authentication</li>
+<li><strong>CIS-1.11</strong> - Guest Invite Restrictions</li>
+<li><strong>CIS-1.12</strong> - Security Defaults or Conditional Access</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># (Most Azure AD configuration done via portal)
+
+# Enable security defaults (basic MFA)
+az rest --method PATCH \
+  --uri https://graph.microsoft.com/beta/policies/identitySecurityDefaultsEnforcementPolicy \
+  --body '{&quot;isEnabled&quot;: true}'
+
+# List Conditional Access policies
+az rest --method GET \
+  --uri https://graph.microsoft.com/beta/identity/conditionalAccess/policies
+</div>
+<p><strong>Note:</strong> Full Azure AD configuration requires Azure AD Premium P1/P2 licenses</p>
+<h3>Network Security Groups (NSGs)</h3>
+<p><strong>Controls checked:</strong> 13</p>
+<ul>
+<li><strong>CIS-6.1</strong> - Dangerous Open Ports</li>
+<li><strong>CIS-6.2</strong> - RDP Access from Internet Restricted</li>
+<li><strong>CIS-6.3</strong> - SSH Access from Internet Restricted</li>
+<li><strong>CIS-6.4</strong> - SQL Server Port Access Restricted</li>
+<li><strong>CIS-6.5</strong> - PostgreSQL Port Access Restricted</li>
+<li><strong>CIS-6.6</strong> - MySQL Port Access Restricted</li>
+<li><strong>CIS-7.1</strong> - RDP Access from Internet</li>
+<li><strong>CIS-7.2</strong> - SSH Access from Internet</li>
+<li><strong>CIS-7.3</strong> - UDP Access from Internet</li>
+<li><strong>CIS-7.4</strong> - HTTP(S) Access from Internet</li>
+<li><strong>CIS-7.5</strong> - NSG Flow Log Retention</li>
+<li><strong>CIS-7.6</strong> - Network Watcher Enabled</li>
+<li><strong>CIS-7.7</strong> - Public IP Address Evaluation</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Delete overly permissive rule
+az network nsg rule delete \
+  --resource-group RESOURCE_GROUP \
+  --nsg-name NSG_NAME \
+  --name RULE_NAME
+
+# Create restrictive rule
+az network nsg rule create \
+  --resource-group RESOURCE_GROUP \
+  --nsg-name NSG_NAME \
+  --name AllowSSHFromSpecificIP \
+  --priority 100 \
+  --source-address-prefixes YOUR_IP/32 \
+  --destination-port-ranges 22 \
+  --access Allow \
+  --protocol Tcp
+
+# Enable NSG flow logs
+az network watcher flow-log create \
+  --resource-group RESOURCE_GROUP \
+  --nsg NSG_NAME \
+  --name FlowLogName \
+  --storage-account STORAGE_ACCOUNT \
+  --enabled true
+</div>
+<h3>Virtual Machines</h3>
+<p><strong>Controls checked:</strong> 7</p>
+<ul>
+<li><strong>CC6.1</strong> - VM Public IP Exposure</li>
+<li><strong>CC7.1</strong> - VM Monitoring Agents</li>
+<li><strong>CIS-7.1</strong> - Disk Encryption at Rest</li>
+<li><strong>CIS-7.3</strong> - Managed Disks</li>
+<li><strong>CIS-7.4</strong> - Endpoint Protection</li>
+<li><strong>CIS-7.6</strong> - VM Backup</li>
+<li><strong>CIS-8.5</strong> - Disk Network Access Restriction</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable disk encryption
+az vm encryption enable \
+  --resource-group RESOURCE_GROUP \
+  --name VM_NAME \
+  --disk-encryption-keyvault KEY_VAULT_NAME
+
+# Remove public IP
+az network nic ip-config update \
+  --resource-group RESOURCE_GROUP \
+  --nic-name NIC_NAME \
+  --name ipconfig1 \
+  --remove PublicIpAddress
+
+# Enable boot diagnostics
+az vm boot-diagnostics enable \
+  --resource-group RESOURCE_GROUP \
+  --name VM_NAME \
+  --storage STORAGE_ACCOUNT
+</div>
+<h3>SQL Database</h3>
+<p><strong>Controls checked:</strong> 12</p>
+<ul>
+<li><strong>CIS-3.1.7.3</strong> - Microsoft Defender for SQL</li>
+<li><strong>CIS-5.1.1</strong> - SQL Server Auditing</li>
+<li><strong>CIS-5.1.2</strong> - SQL Server Firewall and Public Access</li>
+<li><strong>CIS-5.1.3</strong> - SQL Transparent Data Encryption</li>
+<li><strong>CIS-5.1.4</strong> - SQL Entra ID Authentication</li>
+<li><strong>CIS-5.2.1</strong> - PostgreSQL Require Secure Transport</li>
+<li><strong>CIS-5.2.2</strong> - PostgreSQL Logging Configuration</li>
+<li><strong>CIS-5.2.5</strong> - PostgreSQL Public Network Access</li>
+<li><strong>CIS-5.2.6</strong> - PostgreSQL Single Server (Legacy)</li>
+<li><strong>CIS-5.3.1</strong> - MySQL Require Secure Transport</li>
+<li><strong>CIS-5.3.2</strong> - MySQL TLS Version</li>
+<li><strong>CIS-5.3.3</strong> - MySQL Audit Logging</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable TDE (enabled by default for new databases)
+az sql db tde set \
+  --resource-group RESOURCE_GROUP \
+  --server SQL_SERVER \
+  --database DATABASE_NAME \
+  --status Enabled
+
+# Enable auditing
+az sql server audit-policy update \
+  --resource-group RESOURCE_GROUP \
+  --name SQL_SERVER \
+  --state Enabled \
+  --storage-account STORAGE_ACCOUNT
+
+# Remove public firewall rule
+az sql server firewall-rule delete \
+  --resource-group RESOURCE_GROUP \
+  --server SQL_SERVER \
+  --name AllowAllAzureIPs
+</div>
+<h3>Key Vault</h3>
+<p><strong>Controls checked:</strong> 9</p>
+<ul>
+<li><strong>CIS-3.3.5</strong> - Key Vault Recovery Settings</li>
+<li><strong>CIS-3.3.6</strong> - Key Vault RBAC Authorization</li>
+<li><strong>CIS-3.3.7</strong> - Key Vault Private Endpoints</li>
+<li><strong>CIS-6.1.4</strong> - Key Vault Logging</li>
+<li><strong>CIS-8.1</strong> - Key Vault Recoverable</li>
+<li><strong>CIS-8.2</strong> - Key Vault Keys Have Expiration Dates</li>
+<li><strong>CIS-8.3</strong> - Key Vault Network Access</li>
+<li><strong>CIS-8.4</strong> - Key Vault Secrets Have Expiration Dates</li>
+<li><strong>CIS-8.6</strong> - Key Vault Certificates Auto-Renew</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable soft delete
+az keyvault update \
+  --name KEY_VAULT_NAME \
+  --enable-soft-delete true \
+  --retention-days 90
+
+# Enable purge protection
+az keyvault update \
+  --name KEY_VAULT_NAME \
+  --enable-purge-protection true
+
+# Enable diagnostic logging
+az monitor diagnostic-settings create \
+  --resource /subscriptions/SUB_ID/resourceGroups/RG/providers/Microsoft.KeyVault/vaults/VAULT_NAME \
+  --name DiagnosticLogs \
+  --logs '[{&quot;category&quot;:&quot;AuditEvent&quot;,&quot;enabled&quot;:true}]' \
+  --storage-account STORAGE_ACCOUNT
+</div>
+<h3>Azure Policy</h3>
+<p><strong>Controls checked:</strong> 2</p>
+<ul>
+<li><strong>CC5.3</strong> - Policies and Procedures</li>
+<li><strong>CIS-5.2.2</strong> - Create Alert for Policy Assignment Changes</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Assign built-in policy
+az policy assignment create \
+  --name 'RequireEncryption' \
+  --policy '/providers/Microsoft.Authorization/policyDefinitions/POLICY_ID' \
+  --scope /subscriptions/SUBSCRIPTION_ID
+
+# List non-compliant resources
+az policy state list --filter &quot;isCompliant eq false&quot;
+</div>
+<h3>Defender for Cloud</h3>
+<p><strong>Controls checked:</strong> 15</p>
+<ul>
+<li><strong>CIS-2.1.1</strong> - Microsoft Defender for Servers</li>
+<li><strong>CIS-2.1.2</strong> - Microsoft Defender for App Service</li>
+<li><strong>CIS-2.1.3</strong> - Microsoft Defender for Azure SQL Databases</li>
+<li><strong>CIS-2.1.4</strong> - Microsoft Defender for SQL Servers on Machines</li>
+<li><strong>CIS-2.1.5</strong> - Microsoft Defender for Open-Source Relational Databases</li>
+<li><strong>CIS-2.1.6</strong> - Microsoft Defender for Azure Cosmos DB</li>
+<li><strong>CIS-2.1.7</strong> - Microsoft Defender for Storage</li>
+<li><strong>CIS-2.1.8</strong> - Microsoft Defender for Containers</li>
+<li><strong>CIS-2.1.9</strong> - Microsoft Defender for DNS</li>
+<li><strong>CIS-2.1.10</strong> - Microsoft Defender for Key Vault</li>
+<li><strong>CIS-2.1.11</strong> - Microsoft Defender for APIs</li>
+<li><strong>CIS-2.1.12</strong> - Microsoft Defender for Resource Manager</li>
+<li><strong>CIS-2.1.17</strong> - Auto-Provisioning of Defender Components</li>
+<li><strong>CIS-2.1.19</strong> - Security Contact Email</li>
+<li><strong>CIS-2.1.20</strong> - Security Alert Notifications</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable Defender for Cloud (via portal or ARM template)
+# Standard tier required for full features
+
+# View security alerts
+az security alert list
+
+# View security recommendations
+az security assessment list
+</div>
+<h3>Activity Logs</h3>
+<p><strong>Controls checked:</strong> 3</p>
+<ul>
+<li><strong>CIS-5.1.2</strong> - Activity Log Export and Retention</li>
+<li><strong>CIS-5.1.5</strong> - Key Vault and NSG Diagnostic Logging</li>
+<li><strong>PCI-10.5.1</strong> - Activity Log Retention - 12 Months Immediately Available</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Create diagnostic setting for Activity Log
+az monitor diagnostic-settings create \
+  --name ActivityLogExport \
+  --resource /subscriptions/SUBSCRIPTION_ID \
+  --logs '[{&quot;category&quot;:&quot;Administrative&quot;,&quot;enabled&quot;:true},{&quot;category&quot;:&quot;Security&quot;,&quot;enabled&quot;:true}]' \
+  --storage-account STORAGE_ACCOUNT
+
+# Create activity log alert
+az monitor activity-log alert create \
+  --name SecurityGroupChange \
+  --resource-group RESOURCE_GROUP \
+  --condition category=Administrative and operationName=Microsoft.Network/networkSecurityGroups/write
+</div>
+<h3>Azure Monitor</h3>
+<p><strong>Controls checked:</strong> 8</p>
+<ul>
+<li><strong>CIS-5.2.1</strong> - Create Alert for Authorization Changes</li>
+<li><strong>CIS-5.2.2</strong> - Create Alert for Policy Assignment Changes</li>
+<li><strong>CIS-5.2.3</strong> - Create Alert for NSG Changes</li>
+<li><strong>CIS-5.2.4</strong> - Create Alert for Security Group Changes</li>
+<li><strong>CIS-5.2.5</strong> - Create Alert for Security Solutions Changes</li>
+<li><strong>CIS-5.2.6</strong> - Create Alert for SQL Firewall Changes</li>
+<li><strong>CIS-5.2.7</strong> - Create Alert for Key Vault Deletion</li>
+<li><strong>CIS-5.2.8</strong> - Create Alert for Storage Account Deletion</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Create Log Analytics workspace
+az monitor log-analytics workspace create \
+  --resource-group RESOURCE_GROUP \
+  --workspace-name WORKSPACE_NAME
+
+# Set retention policy
+az monitor log-analytics workspace update \
+  --resource-group RESOURCE_GROUP \
+  --workspace-name WORKSPACE_NAME \
+  --retention-time 90
+
+# Create alert rule
+az monitor metrics alert create \
+  --name HighCPU \
+  --resource-group RESOURCE_GROUP \
+  --scopes /subscriptions/SUB_ID/resourceGroups/RG/providers/Microsoft.Compute/virtualMachines/VM_NAME \
+  --condition &quot;avg Percentage CPU &gt; 80&quot; \
+  --window-size 5m \
+  --evaluation-frequency 1m
+</div>
+<h3>Virtual Networks</h3>
+<p><strong>Controls checked:</strong> 4</p>
+<ul>
+<li><strong>CIS-6.1</strong> - Dangerous Open Ports</li>
+<li><strong>CIS-7.5</strong> - NSG Flow Log Retention</li>
+<li><strong>CIS-7.6</strong> - Network Watcher Enabled</li>
+<li><strong>CIS-7.7</strong> - Public IP Address Evaluation</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable DDoS Protection
+az network ddos-protection create \
+  --resource-group RESOURCE_GROUP \
+  --name DDoSPlan
+
+az network vnet update \
+  --resource-group RESOURCE_GROUP \
+  --name VNET_NAME \
+  --ddos-protection true \
+  --ddos-protection-plan DDoSPlan
+
+# Create private endpoint
+az network private-endpoint create \
+  --resource-group RESOURCE_GROUP \
+  --name PrivateEndpoint \
+  --vnet-name VNET_NAME \
+  --subnet SUBNET_NAME \
+  --private-connection-resource-id RESOURCE_ID \
+  --connection-name Connection
+</div>
+<h2>Controls by Framework</h2>
+<h3>SOC2 Type II (37 of the 43 criteria carry automated Azure checks)</h3>
+<p><strong>CC1 - Control Environment:</strong> 5 criteria<br />
+<strong>CC2 - Communication:</strong> 3 criteria<br />
+<strong>CC3 - Risk Assessment:</strong> 4 criteria<br />
+<strong>CC4 - Monitoring:</strong> 2 criteria<br />
+<strong>CC5 - Control Activities:</strong> 3 criteria<br />
+<strong>CC6 - Logical Access:</strong> 8 criteria<br />
+<strong>CC7 - System Operations:</strong> 4 of 5 criteria<br />
+<strong>CC8 - Change Management:</strong> 1 criterion<br />
+<strong>CC9 - Risk Mitigation:</strong> 2 criteria<br />
+<strong>A1 - Availability:</strong> 3 criteria<br />
+<strong>C1 - Confidentiality:</strong> 2 criteria<br />
+<strong>PI1 - Processing Integrity:</strong> no automated Azure check (reported as MANUAL)</p>
+<h3>PCI-DSS v4.0.1 (59 requirements with automated checks)</h3>
+<p>Automated checks map into all twelve requirement families (1 through 12). Requirements with no automated check are still reported and marked "No automated check covers this control".</p>
+<h3>CMMC Level 1 (17 practices, 13 automated)</h3>
+<p><strong>Access Control (AC):</strong> 4 practices<br />
+<strong>Identification &amp; Authentication (IA):</strong> 2 practices<br />
+<strong>Media Protection (MP):</strong> 1 practice<br />
+<strong>Physical Protection (PE):</strong> 4 practices<br />
+<strong>System &amp; Communications Protection (SC):</strong> 2 practices<br />
+<strong>System &amp; Information Integrity (SI):</strong> 4 practices</p>
+<h3>CMMC Level 2 (110 practices - reported free, automated in Pro)</h3>
+<p>All Level 1 practices plus 93 additional practices across 14 domains.</p>
+<p><strong><a href="../frameworks/cmmc.html">View CMMC details →</a></strong></p>
+<h2>Running Azure Scans</h2>
+<div class="code-block"># Configure credentials
+az login
+export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
+
+# Scan for SOC2
+./auditkit scan -provider azure -framework soc2
+
+# Scan for PCI-DSS
+./auditkit scan -provider azure -framework pci
+
+# Scan for CMMC Level 1
+./auditkit scan -provider azure -framework cmmc
+
+# Scan for CMMC Level 2 (Pro only)
+./auditkit-pro scan -provider azure -framework cmmc
+
+# Generate report
+./auditkit scan -provider azure -framework soc2 -format pdf -output azure-report.pdf
+</div>
+<h2>Multi-Subscription Scanning</h2>
+<p><strong>Free version:</strong> One subscription at a time</p>
+<div class="code-block"># Switch subscriptions
+export AZURE_SUBSCRIPTION_ID=&quot;sub-1&quot;
+auditkit scan -provider azure -framework soc2
+
+export AZURE_SUBSCRIPTION_ID=&quot;sub-2&quot;
+auditkit scan -provider azure -framework soc2
+</div>
+<p><strong>Pro version:</strong> Scan entire Management Group</p>
+<div class="code-block"># Scan all subscriptions
+auditkit-pro scan -provider azure --scan-all
+
+# Limit concurrency
+auditkit-pro scan -provider azure --scan-all --max-concurrent 3
+
+# Generate consolidated report
+auditkit-pro scan -provider azure --scan-all -format pdf -output mgmt-group-report.pdf
+</div>
+<p><strong><a href="https://auditkit.io/pro/">Try Pro free for 14 days →</a></strong></p>
+<h2>Azure-Specific Considerations</h2>
+<h3>Azure AD Premium Requirements</h3>
+<p>Some checks require Azure AD Premium licenses:
+- Conditional Access (P1)
+- Identity Protection (P2)
+- Privileged Identity Management (P2)
+- Risk-based policies (P2)</p>
+<p><strong>Without Premium:</strong> Manual verification required for these controls</p>
+<h3>Defender for Cloud</h3>
+<p><strong>Free tier:</strong> Basic security posture assessment<br />
+<strong>Standard tier:</strong> Required for full vulnerability assessment, threat protection</p>
+<p>AuditKit reports which features require Standard tier.</p>
+<h3>Azure Policy vs Defender Recommendations</h3>
+<p>AuditKit checks both:
+- <strong>Azure Policy:</strong> Preventive controls (deny/audit)
+- <strong>Defender for Cloud:</strong> Detective controls (recommendations)</p>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../setup/azure.html">Azure Setup Guide →</a></strong></li>
+<li><strong><a href="../getting-started.html">Getting Started →</a></strong></li>
+<li><strong><a href="../cli-reference.html">CLI Reference →</a></strong></li>
+<li><strong><a href="../frameworks/">Framework Guides →</a></strong></li>
+</ul>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Start scanning</h3>
+                <p style="margin-bottom: 1.25rem;">Full results in about thirty minutes, with a remediation command and a console link on every finding.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
+            </div>
+        </div>
+    </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p style="margin-bottom: 2rem; color: var(--slate-300); font-size: 1rem;">
+                <strong style="color: var(--white);">Built for compliance teams, by engineers who understand the audit process.</strong>
+            </p>
+
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/">AuditKit</a></li>
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/community.html">Community Edition (Open Source)</a></li>
+                        <li><a href="/about.html">About</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="/docs/getting-started.html">Quick Start Guide</a></li>
+                        <li><a href="/docs/installation.html">Installation</a></li>
+                        <li><a href="/docs/cli-reference.html">CLI Reference</a></li>
+                        <li><a href="/docs/faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Frameworks</h4>
+                    <ul>
+                        <li><a href="/docs/frameworks/cmmc.html">CMMC</a></li>
+                        <li><a href="/docs/frameworks/soc2.html">SOC2</a></li>
+                        <li><a href="/docs/frameworks/pci-dss.html">PCI-DSS</a></li>
+                        <li><a href="/docs/frameworks/hipaa.html">HIPAA</a></li>
+                        <li><a href="/docs/frameworks/nist-800-53.html">NIST 800-53</a></li>
+                        <li><a href="/docs/frameworks/iso27001.html">ISO 27001</a></li>
+                        <li><a href="/docs/frameworks/fedramp.html">FedRAMP</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/docs/setup/aws.html">AWS Setup</a></li>
+                        <li><a href="/docs/setup/azure.html">Azure Setup</a></li>
+                        <li><a href="/docs/setup/gcp.html">GCP Setup</a></li>
+                        <li><a href="/docs/setup/m365.html">M365 Setup</a></li>
+                        <li><a href="/examples/">Examples</a></li>
+                        <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition">GitHub</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>Community Edition is Apache 2.0. AuditKit is commercially licensed.</p>
+                <p>&copy; 2026 Guardian Nexus LLC</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../cookie-consent.js"></script>
+    <script src="../../main.js"></script>
+    <script>
+        (function() {
+            var toggle = document.querySelector('.nav-toggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function() {
+                    var open = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', open);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

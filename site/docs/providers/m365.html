@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M365 Coverage - AuditKit</title>
+    <meta name="description" content="What AuditKit reports for Microsoft 365 via ScubaGear import.">
+    <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="M365 Coverage - AuditKit">
+    <meta property="og:description" content="What AuditKit reports for Microsoft 365 via ScubaGear import.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/providers/m365.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+<body>
+
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <nav class="site-nav" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <img src="../../auditkit-logo-dark.svg" alt="AuditKit">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+            <div class="nav-links">
+                <a href="/#features">Features</a>
+                <a href="/docs/frameworks/">Frameworks</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/docs/">Docs</a>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="nav-cta">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main">
+
+    <section class="page-header">
+        <div class="container">
+            <h1>M365 Coverage</h1>
+            <p class="subtitle">What AuditKit reports for Microsoft 365 via ScubaGear import.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container-prose">
+<p>What AuditKit scans in Microsoft 365 via ScubaGear integration.</p>
+<h2>Overview</h2>
+<p><strong>Coverage:</strong> 100+ rules via CISA ScubaGear integration<br />
+<strong>Supported in:</strong> Free and Pro versions<br />
+<strong>Method:</strong> Import ScubaGear scan results into AuditKit</p>
+<p><strong>Supported frameworks:</strong>
+- SOC2 Type II
+- PCI-DSS v4.0.1</p>
+<p>Imported M365 findings currently carry SOC2 and PCI-DSS mappings only. CMMC, HIPAA and NIST 800-53 mappings for ScubaGear rules are not yet implemented.</p>
+<p><strong>Why ScubaGear?</strong>
+- Official CISA tool for M365 security
+- Free and open-source
+- Comprehensive security baseline
+- Regular updates from CISA</p>
+<h2>How It Works</h2>
+<div class="code-block">1. Run ScubaGear (Windows PowerShell)
+   ↓
+2. Generate ScubaResults_&lt;uuid&gt;.json
+   ↓
+3. Import to AuditKit
+   ↓
+4. Get compliance-mapped report
+</div>
+<p><strong><a href="../setup/m365.html">Setup guide →</a></strong></p>
+<h2>Covered Domains</h2>
+<h3>Entra ID (Azure AD) - 30 Rules</h3>
+<h4>Authentication &amp; Access</h4>
+<ul>
+<li><strong>MS.AAD.1.1v1</strong> - MFA enforcement for all users</li>
+<li><strong>MS.AAD.2.1v1</strong> - Conditional Access policies required</li>
+<li><strong>MS.AAD.2.2v1</strong> - Block legacy authentication</li>
+<li><strong>MS.AAD.2.3v1</strong> - Risk-based sign-in policies</li>
+<li><strong>MS.AAD.2.4v1</strong> - User risk policies</li>
+<li><strong>MS.AAD.3.1v1</strong> - Privileged Identity Management</li>
+<li><strong>MS.AAD.3.2v1</strong> - Admin MFA requirements</li>
+<li><strong>MS.AAD.3.3v1</strong> - Emergency access accounts</li>
+</ul>
+<h4>Identity Protection</h4>
+<ul>
+<li><strong>MS.AAD.4.1v1</strong> - Identity Protection enabled</li>
+<li><strong>MS.AAD.4.2v1</strong> - High-risk user policy</li>
+<li><strong>MS.AAD.4.3v1</strong> - High-risk sign-in policy</li>
+<li><strong>MS.AAD.4.4v1</strong> - Password protection</li>
+</ul>
+<h4>Guest Access</h4>
+<ul>
+<li><strong>MS.AAD.5.1v1</strong> - Guest access restrictions</li>
+<li><strong>MS.AAD.5.2v1</strong> - Guest invite settings</li>
+<li><strong>MS.AAD.5.3v1</strong> - Guest user permissions</li>
+</ul>
+<h4>Password Policies</h4>
+<ul>
+<li><strong>MS.AAD.6.1v1</strong> - Password expiration policy</li>
+<li><strong>MS.AAD.6.2v1</strong> - Password complexity</li>
+<li><strong>MS.AAD.6.3v1</strong> - Self-service password reset</li>
+</ul>
+<h4>Monitoring &amp; Reporting</h4>
+<ul>
+<li><strong>MS.AAD.7.1v1</strong> - Sign-in logs retention</li>
+<li><strong>MS.AAD.7.2v1</strong> - Audit logs enabled</li>
+<li><strong>MS.AAD.7.3v1</strong> - Risk detection alerts</li>
+</ul>
+<p><strong>Framework mappings:</strong>
+- SOC2: CC6.1, CC6.6, CC6.7, CC7.1
+- PCI-DSS: Requirement 8</p>
+<h3>Exchange Online - 40 Rules</h3>
+<h4>Anti-Phishing</h4>
+<ul>
+<li><strong>MS.EXO.1.1v1</strong> - Anti-phishing policy enabled</li>
+<li><strong>MS.EXO.1.2v1</strong> - Impersonation protection</li>
+<li><strong>MS.EXO.1.3v1</strong> - Mailbox intelligence</li>
+<li><strong>MS.EXO.1.4v1</strong> - Safety tips enabled</li>
+</ul>
+<h4>Anti-Malware</h4>
+<ul>
+<li><strong>MS.EXO.2.1v1</strong> - Anti-malware policies configured</li>
+<li><strong>MS.EXO.2.2v1</strong> - Common attachments filter</li>
+<li><strong>MS.EXO.2.3v1</strong> - Zero-hour auto purge (ZAP)</li>
+</ul>
+<h4>Data Loss Prevention</h4>
+<ul>
+<li><strong>MS.EXO.3.1v1</strong> - DLP policies for email</li>
+<li><strong>MS.EXO.3.2v1</strong> - Sensitive information types</li>
+<li><strong>MS.EXO.3.3v1</strong> - Policy tips configured</li>
+<li><strong>MS.EXO.3.4v1</strong> - Incident reports</li>
+</ul>
+<h4>Email Encryption</h4>
+<ul>
+<li><strong>MS.EXO.4.1v1</strong> - Message encryption enabled</li>
+<li><strong>MS.EXO.4.2v1</strong> - IRM for emails</li>
+<li><strong>MS.EXO.4.3v1</strong> - TLS enforcement</li>
+</ul>
+<h4>Auditing</h4>
+<ul>
+<li><strong>MS.EXO.5.1v1</strong> - Mailbox auditing enabled</li>
+<li><strong>MS.EXO.5.2v1</strong> - Admin audit log</li>
+<li><strong>MS.EXO.5.3v1</strong> - Audit log retention</li>
+</ul>
+<h4>Safe Links &amp; Attachments</h4>
+<ul>
+<li><strong>MS.EXO.6.1v1</strong> - Safe Links enabled</li>
+<li><strong>MS.EXO.6.2v1</strong> - Safe Attachments enabled</li>
+<li><strong>MS.EXO.6.3v1</strong> - Real-time detonation</li>
+</ul>
+<h4>Transport Rules</h4>
+<ul>
+<li><strong>MS.EXO.7.1v1</strong> - External email warnings</li>
+<li><strong>MS.EXO.7.2v1</strong> - DKIM signing enabled</li>
+<li><strong>MS.EXO.7.3v1</strong> - SPF and DMARC configured</li>
+</ul>
+<p><strong>Framework mappings:</strong>
+- SOC2: CC6.2, CC7.2, CC8.1
+- PCI-DSS: Requirement 3, 4</p>
+<h3>SharePoint - 8 Rules</h3>
+<h4>Sharing &amp; Access</h4>
+<ul>
+<li><strong>MS.SHAREPOINT.1.1</strong> - External sharing restrictions</li>
+<li>
+<p><strong>MS.SHAREPOINT.1.2</strong> - Guest access policies</p>
+</li>
+<li>
+<p><strong>MS.SPO.1.3v1</strong> - Link sharing defaults</p>
+</li>
+<li><strong>MS.SPO.1.4v1</strong> - Anonymous access disabled</li>
+</ul>
+<h4>Data Loss Prevention</h4>
+<ul>
+<li><strong>MS.SPO.2.1v1</strong> - DLP policies for SharePoint</li>
+<li><strong>MS.SPO.2.2v1</strong> - Sensitive document labels</li>
+<li><strong>MS.SPO.2.3v1</strong> - Information barriers</li>
+</ul>
+<h4>Information Rights Management</h4>
+<ul>
+<li><strong>MS.SPO.3.1v1</strong> - IRM enabled</li>
+<li><strong>MS.SPO.3.2v1</strong> - Document encryption</li>
+<li><strong>MS.SPO.3.3v1</strong> - Download restrictions</li>
+</ul>
+<h4>Access Controls</h4>
+<ul>
+<li><strong>MS.SPO.4.1v1</strong> - Conditional Access for SharePoint</li>
+<li><strong>MS.SPO.4.2v1</strong> - Device access policies</li>
+<li><strong>MS.SPO.4.3v1</strong> - IP-based restrictions</li>
+</ul>
+<h4>Auditing</h4>
+<ul>
+<li><strong>MS.SPO.5.1v1</strong> - Audit logging enabled</li>
+<li><strong>MS.SPO.5.2v1</strong> - Version history</li>
+<li><strong>MS.SPO.5.3v1</strong> - Retention policies</li>
+</ul>
+<h4>Site Security</h4>
+<ul>
+<li><strong>MS.SPO.6.1v1</strong> - Site creation restrictions</li>
+<li><strong>MS.SPO.6.2v1</strong> - Custom scripts disabled</li>
+<li><strong>MS.SPO.6.3v1</strong> - Legacy authentication blocked</li>
+</ul>
+<p><strong>Framework mappings:</strong>
+- SOC2: CC6.1, CC6.2, CC7.2, CC8.1
+- PCI-DSS: Requirement 3, 7</p>
+<h3>Teams - 21 Rules</h3>
+<h4>Meeting Security</h4>
+<ul>
+<li><strong>MS.TEAMS.1.1v1</strong> - Lobby settings enforced</li>
+<li><strong>MS.TEAMS.1.2v1</strong> - Anonymous join disabled</li>
+<li><strong>MS.TEAMS.1.3v1</strong> - Recording policies</li>
+<li><strong>MS.TEAMS.1.4v1</strong> - Screen sharing restrictions</li>
+</ul>
+<h4>External Access</h4>
+<ul>
+<li><strong>MS.TEAMS.2.1v1</strong> - External access settings</li>
+<li><strong>MS.TEAMS.2.2v1</strong> - Guest access policies</li>
+<li><strong>MS.TEAMS.2.3v1</strong> - Federation settings</li>
+</ul>
+<h4>Data Protection</h4>
+<ul>
+<li><strong>MS.TEAMS.3.1v1</strong> - DLP policies for Teams</li>
+<li><strong>MS.TEAMS.3.2v1</strong> - Message retention</li>
+<li><strong>MS.TEAMS.3.3v1</strong> - eDiscovery holds</li>
+</ul>
+<h4>Calling &amp; Devices</h4>
+<ul>
+<li><strong>MS.TEAMS.4.1v1</strong> - Emergency calling policies</li>
+<li><strong>MS.TEAMS.4.2v1</strong> - Device management</li>
+<li><strong>MS.TEAMS.4.3v1</strong> - Calling restrictions</li>
+</ul>
+<h4>Compliance</h4>
+<ul>
+<li><strong>MS.TEAMS.5.1v1</strong> - Audit logging enabled</li>
+<li><strong>MS.TEAMS.5.2v1</strong> - Compliance recording</li>
+</ul>
+<p><strong>Framework mappings:</strong>
+- SOC2: CC6.2, CC7.2
+- PCI-DSS: Requirement 4</p>
+<h3>Power Platform - 8 Rules</h3>
+<h4>DLP Policies</h4>
+<ul>
+<li><strong>MS.POWERPLATFORM.1.1v1</strong> - DLP policies configured</li>
+<li><strong>MS.POWERPLATFORM.1.2v1</strong> - Connector classification</li>
+<li><strong>MS.POWERPLATFORM.1.3v1</strong> - Business data protection</li>
+</ul>
+<h4>Environment Management</h4>
+<ul>
+<li><strong>MS.POWERPLATFORM.2.1v1</strong> - Environment creation restrictions</li>
+<li><strong>MS.POWERPLATFORM.2.2v1</strong> - Default environment security</li>
+<li><strong>MS.POWERPLATFORM.2.3v1</strong> - Database encryption</li>
+</ul>
+<h4>Power Apps</h4>
+<ul>
+<li><strong>MS.POWERPLATFORM.3.1v1</strong> - App sharing policies</li>
+<li><strong>MS.POWERPLATFORM.3.2v1</strong> - Connector governance</li>
+<li><strong>MS.POWERPLATFORM.3.3v1</strong> - Trial environment controls</li>
+</ul>
+<h4>Auditing</h4>
+<ul>
+<li><strong>MS.POWERPLATFORM.4.1v1</strong> - Audit logging enabled</li>
+<li><strong>MS.POWERPLATFORM.4.2v1</strong> - Usage analytics</li>
+<li><strong>MS.POWERPLATFORM.4.3v1</strong> - Compliance center integration</li>
+</ul>
+<p><strong>Framework mappings:</strong>
+- SOC2: CC6.1, CC6.8</p>
+<h3>Power BI - 8 Rules</h3>
+<h4>Tenant Settings</h4>
+<ul>
+<li><strong>MS.POWERBI.1.1v1</strong> - External sharing disabled</li>
+<li><strong>MS.POWERBI.1.2v1</strong> - Publish to web disabled</li>
+<li><strong>MS.POWERBI.1.3v1</strong> - Export restrictions</li>
+</ul>
+<h4>Workspace Security</h4>
+<ul>
+<li><strong>MS.POWERBI.2.1v1</strong> - Workspace creation restrictions</li>
+<li><strong>MS.POWERBI.2.2v1</strong> - Sensitivity labels applied</li>
+</ul>
+<h4>Data Protection</h4>
+<ul>
+<li><strong>MS.POWERBI.3.1v1</strong> - Information protection</li>
+<li><strong>MS.POWERBI.3.2v1</strong> - Data lineage tracking</li>
+<li><strong>MS.POWERBI.3.3v1</strong> - Encryption at rest</li>
+</ul>
+<p><strong>Framework mappings:</strong>
+- SOC2: CC6.2, CC8.1</p>
+<h3>Defender for Office 365 - 19 Rules</h3>
+<h4>Safe Links</h4>
+<ul>
+<li><strong>MS.DEFENDER.1.1v1</strong> - Safe Links enabled</li>
+<li><strong>MS.DEFENDER.1.2v1</strong> - Real-time URL scanning</li>
+<li><strong>MS.DEFENDER.1.3v1</strong> - Safe Links for Teams</li>
+</ul>
+<h4>Safe Attachments</h4>
+<ul>
+<li><strong>MS.DEFENDER.2.1v1</strong> - Safe Attachments enabled</li>
+<li><strong>MS.DEFENDER.2.2v1</strong> - Dynamic delivery</li>
+<li><strong>MS.DEFENDER.2.3v1</strong> - Safe attachments for SharePoint</li>
+</ul>
+<h4>Anti-Phishing</h4>
+<ul>
+<li><strong>MS.DEFENDER.3.1v1</strong> - Advanced anti-phishing</li>
+<li><strong>MS.DEFENDER.3.2v1</strong> - Spoof intelligence</li>
+<li><strong>MS.DEFENDER.3.3v1</strong> - Mailbox intelligence</li>
+</ul>
+<h4>Investigation</h4>
+<ul>
+<li><strong>MS.DEFENDER.4.1v1</strong> - Automated investigation enabled</li>
+</ul>
+<p><strong>Framework mappings:</strong>
+- SOC2: CC7.2, CC7.3
+- PCI-DSS: Requirement 5</p>
+<h2>Running M365 Scans</h2>
+<h3>Step 1: Run ScubaGear (Windows PowerShell)</h3>
+<div class="code-block"># Install ScubaGear
+Install-Module -Name ScubaGear
+
+# Run scan (all domains)
+Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams,powerplatform,defender -OutPath ./ScubaResults
+
+# Run scan (specific domains)
+Invoke-SCuBA -ProductNames aad,exo -OutPath ./ScubaResults
+</div>
+<h3>Step 2: Import to AuditKit</h3>
+<div class="code-block"># Import results. The rule mappings ship inside the binary, so this runs from
+# any directory.
+./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json
+
+# Generate PDF report
+./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json -format pdf -output m365-report.pdf
+
+</div>
+<h2>M365 License Requirements</h2>
+<h3>Free M365 Features</h3>
+<ul>
+<li>Basic Entra ID (formerly Azure AD Free)</li>
+<li>Exchange Online (Plan 1)</li>
+<li>SharePoint Online (Plan 1)</li>
+<li>Teams (basic)</li>
+</ul>
+<p><strong>Limitations:</strong> Many security features require premium licenses</p>
+<h3>Premium Features Required</h3>
+<p><strong>Azure AD Premium P1</strong> ($6/user/month)
+- Conditional Access
+- Self-service password reset
+- Dynamic groups</p>
+<p><strong>Azure AD Premium P2</strong> ($9/user/month)
+- Identity Protection
+- Privileged Identity Management
+- Risk-based policies</p>
+<p><strong>Microsoft 365 E3</strong> ($36/user/month)
+- Advanced DLP
+- Information Rights Management
+- Advanced auditing</p>
+<p><strong>Microsoft 365 E5</strong> ($57/user/month)
+- Defender for Office 365 Plan 2
+- Advanced threat protection
+- Cloud App Security</p>
+<p><strong>AuditKit reports which features require premium licenses</strong></p>
+<h2>Comparison with Native Azure</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>AuditKit M365 (ScubaGear)</th>
+<th>AuditKit Azure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Entra ID</td>
+<td>Via ScubaGear (30 rules)</td>
+<td>Via Azure scan (12 checks)</td>
+</tr>
+<tr>
+<td>Exchange Online</td>
+<td>Via ScubaGear (40 rules)</td>
+<td>Not covered</td>
+</tr>
+<tr>
+<td>SharePoint</td>
+<td>Via ScubaGear (8 rules)</td>
+<td>Not covered</td>
+</tr>
+<tr>
+<td>Teams</td>
+<td>Via ScubaGear (21 rules)</td>
+<td>Not covered</td>
+</tr>
+<tr>
+<td>Power Platform</td>
+<td>Via ScubaGear (8 rules)</td>
+<td>Not covered</td>
+</tr>
+<tr>
+<td>Azure Infrastructure</td>
+<td>Not covered</td>
+<td>Via Azure scan (174 controls)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Recommendation:</strong> Run both for complete coverage</p>
+<div class="code-block"># Scan Azure infrastructure
+./auditkit scan -provider azure -framework soc2
+
+# Scan M365 applications
+Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams -OutPath ./ScubaResults
+./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json
+</div>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../setup/m365.html">M365 Setup Guide →</a></strong></li>
+<li><strong><a href="../getting-started.html">Getting Started →</a></strong></li>
+<li><strong><a href="./azure.html">Azure Provider Coverage →</a></strong></li>
+<li><strong><a href="../cli-reference.html">CLI Reference →</a></strong></li>
+</ul>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Start scanning</h3>
+                <p style="margin-bottom: 1.25rem;">Full results in about thirty minutes, with a remediation command and a console link on every finding.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
+            </div>
+        </div>
+    </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p style="margin-bottom: 2rem; color: var(--slate-300); font-size: 1rem;">
+                <strong style="color: var(--white);">Built for compliance teams, by engineers who understand the audit process.</strong>
+            </p>
+
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/">AuditKit</a></li>
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/community.html">Community Edition (Open Source)</a></li>
+                        <li><a href="/about.html">About</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="/docs/getting-started.html">Quick Start Guide</a></li>
+                        <li><a href="/docs/installation.html">Installation</a></li>
+                        <li><a href="/docs/cli-reference.html">CLI Reference</a></li>
+                        <li><a href="/docs/faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Frameworks</h4>
+                    <ul>
+                        <li><a href="/docs/frameworks/cmmc.html">CMMC</a></li>
+                        <li><a href="/docs/frameworks/soc2.html">SOC2</a></li>
+                        <li><a href="/docs/frameworks/pci-dss.html">PCI-DSS</a></li>
+                        <li><a href="/docs/frameworks/hipaa.html">HIPAA</a></li>
+                        <li><a href="/docs/frameworks/nist-800-53.html">NIST 800-53</a></li>
+                        <li><a href="/docs/frameworks/iso27001.html">ISO 27001</a></li>
+                        <li><a href="/docs/frameworks/fedramp.html">FedRAMP</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/docs/setup/aws.html">AWS Setup</a></li>
+                        <li><a href="/docs/setup/azure.html">Azure Setup</a></li>
+                        <li><a href="/docs/setup/gcp.html">GCP Setup</a></li>
+                        <li><a href="/docs/setup/m365.html">M365 Setup</a></li>
+                        <li><a href="/examples/">Examples</a></li>
+                        <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition">GitHub</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>Community Edition is Apache 2.0. AuditKit is commercially licensed.</p>
+                <p>&copy; 2026 Guardian Nexus LLC</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../cookie-consent.js"></script>
+    <script src="../../main.js"></script>
+    <script>
+        (function() {
+            var toggle = document.querySelector('.nav-toggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function() {
+                    var open = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', open);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GCP Setup - AuditKit</title>
+    <title>GCP Authentication Setup - AuditKit</title>
+    <meta name="description" content="Configure Google Cloud credentials for AuditKit scanning, with the roles required.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="GCP Authentication Setup - AuditKit">
+    <meta property="og:description" content="Configure Google Cloud credentials for AuditKit scanning, with the roles required.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/setup/gcp.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,310 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
-            <h1>GCP Setup</h1>
-            <p class="subtitle">Cloud provider setup guide for AuditKit</p>
+            <h1>GCP Authentication Setup</h1>
+            <p class="subtitle">Configure Google Cloud credentials for AuditKit scanning, with the roles required.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/setup/gcp.md">View full GCP Setup guide on GitHub &rarr;</a></p>
+<p>How to configure Google Cloud Platform credentials for AuditKit scanning.</p>
+<h2>Quick Start</h2>
+<div class="code-block"># Option 1: gcloud CLI (easiest)
+gcloud auth application-default login
+export GOOGLE_CLOUD_PROJECT=your-project-id
+
+# Test it works
+gcloud projects describe $GOOGLE_CLOUD_PROJECT
+
+# Run scan
+./auditkit scan -provider gcp -framework soc2
+</div>
+<h2>Authentication Methods</h2>
+<p>AuditKit supports three authentication methods for GCP:</p>
+<h3>Option 1: gcloud CLI (Recommended)</h3>
+<p><strong>Best for:</strong> Local scanning, development</p>
+<div class="code-block"># Install gcloud CLI
+# macOS: brew install google-cloud-sdk
+# Linux: snap install google-cloud-cli
+# Windows: Download from cloud.google.com/sdk
+
+# Login and create application default credentials
+gcloud auth application-default login
+
+# List projects
+gcloud projects list
+
+# Set project
+export GOOGLE_CLOUD_PROJECT=my-project-id
+# Or use alternative variable name
+export GCP_PROJECT=my-project-id
+</div>
+<h3>Option 2: Service Account Key (JSON)</h3>
+<p><strong>Best for:</strong> CI/CD pipelines, automation</p>
+<div class="code-block"># Set path to service account key file
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account-key.json
+export GOOGLE_CLOUD_PROJECT=my-project-id
+
+# Run scan
+./auditkit scan -provider gcp -framework soc2
+</div>
+<p><strong>How to create service account:</strong> See <a href="#creating-a-service-account-for-auditkit">Creating a Service Account</a> below</p>
+<h3>Option 3: GCE Metadata (Compute Engine)</h3>
+<p><strong>Best for:</strong> Running AuditKit on GCP infrastructure</p>
+<p>No configuration needed - automatically detected if running on:
+- Compute Engine VM with service account
+- GKE cluster with Workload Identity
+- Cloud Run with service account
+- Cloud Functions with service account</p>
+<div class="code-block"># Set project ID (required even with metadata)
+export GOOGLE_CLOUD_PROJECT=my-project-id
+
+# Run scan - credentials auto-detected
+./auditkit scan -provider gcp -framework soc2
+</div>
+<h2>Required IAM Permissions</h2>
+<p>AuditKit needs <strong>Viewer</strong> role to scan your GCP project.</p>
+<h3>Viewer Role (Recommended)</h3>
+<p><strong>Role:</strong> <code class="code-inline">roles/viewer</code><br />
+<strong>Scope:</strong> Project level</p>
+<p>This provides read-only access to all resources in the project.</p>
+<div class="code-block"># Grant Viewer role to service account
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member=&quot;serviceAccount:auditkit@PROJECT_ID.iam.gserviceaccount.com&quot; \
+  --role=&quot;roles/viewer&quot;
+</div>
+<h3>Custom Role (Least Privilege)</h3>
+<p>If you need tighter control:</p>
+<div class="code-block">title: &quot;AuditKit Scanner&quot;
+description: &quot;Read-only access for AuditKit compliance scanning&quot;
+stage: &quot;GA&quot;
+includedPermissions:
+- container.clusters.get
+- container.clusters.list
+- bigquery.datasets.get
+- bigquery.datasets.list
+- storage.buckets.get
+
+(And add `gcloud services enable container.googleapis.com` and `gcloud services enable bigquery.googleapis.com` to the API-enablement block at lines 302-308.)
+- storage.buckets.getIamPolicy
+- storage.buckets.list
+- compute.instances.get
+- compute.instances.list
+- compute.firewalls.get
+- compute.firewalls.list
+- compute.networks.get
+- compute.networks.list
+- iam.serviceAccounts.get
+- iam.serviceAccounts.list
+- iam.serviceAccountKeys.get
+- iam.serviceAccountKeys.list
+- sql.instances.get
+- sql.instances.list
+- cloudkms.cryptoKeys.get
+- cloudkms.cryptoKeys.list
+- cloudkms.keyRings.get
+- cloudkms.keyRings.list
+- logging.logEntries.list
+- logging.sinks.get
+- logging.sinks.list
+</div>
+<p>Create the role:</p>
+<div class="code-block">gcloud iam roles create auditkit_scanner \
+  --project=PROJECT_ID \
+  --file=auditkit-role.yaml
+</div>
+<h2>Creating a Service Account for AuditKit</h2>
+<h3>Step 1: Create Service Account</h3>
+<div class="code-block"># Create service account
+gcloud iam service-accounts create auditkit-scanner \
+  --display-name=&quot;AuditKit Scanner&quot; \
+  --description=&quot;Read-only access for compliance scanning&quot;
+</div>
+<h3>Step 2: Grant Viewer Role</h3>
+<div class="code-block"># Grant Viewer role at project level
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member=&quot;serviceAccount:auditkit-scanner@PROJECT_ID.iam.gserviceaccount.com&quot; \
+  --role=&quot;roles/viewer&quot;
+</div>
+<h3>Step 3: Create Key File</h3>
+<div class="code-block"># Generate JSON key file
+gcloud iam service-accounts keys create ~/auditkit-key.json \
+  --iam-account=auditkit-scanner@PROJECT_ID.iam.gserviceaccount.com
+
+# Secure the key file
+chmod 600 ~/auditkit-key.json
+</div>
+<h3>Step 4: Configure Environment Variables</h3>
+<div class="code-block">export GOOGLE_APPLICATION_CREDENTIALS=~/auditkit-key.json
+export GOOGLE_CLOUD_PROJECT=PROJECT_ID
+</div>
+<h3>Step 5: Test Authentication</h3>
+<div class="code-block"># Verify credentials work
+gcloud auth list
+gcloud projects describe $GOOGLE_CLOUD_PROJECT
+</div>
+<h3>Step 6: Run Scan</h3>
+<div class="code-block">./auditkit scan -provider gcp -framework soc2
+</div>
+<h2>Multi-Project Scanning</h2>
+<p><strong>Free version:</strong> Scan one project at a time</p>
+<p><strong>Pro version:</strong> Scan entire Organization/Folder automatically</p>
+<h3>Community Edition - Switching Projects</h3>
+<div class="code-block"># Scan first project
+export GOOGLE_CLOUD_PROJECT=project-1
+./auditkit scan -provider gcp -framework soc2 -output project1-results.json
+
+# Scan second project
+export GOOGLE_CLOUD_PROJECT=project-2
+./auditkit scan -provider gcp -framework soc2 -output project2-results.json
+</div>
+<h3>Pro Version - Organization Scanning</h3>
+<div class="code-block"># Scan entire GCP Organization (Pro only)
+./auditkit-pro scan -provider gcp -framework soc2 --scan-all
+
+# Limit concurrency
+./auditkit-pro scan -provider gcp --scan-all --max-concurrent 5
+
+# Generate consolidated report
+./auditkit-pro scan -provider gcp --scan-all -format pdf -output org-report.pdf
+</div>
+<p><strong>Requirements for Organization scanning:</strong>
+- Service account needs <code class="code-inline">roles/viewer</code> at Organization or Folder level
+- <code class="code-inline">resourcemanager.folders.list</code> and <code class="code-inline">resourcemanager.projects.list</code> permissions</p>
+<p><strong><a href="https://auditkit.io/pro/">Upgrade to Pro →</a></strong></p>
+<h2>Troubleshooting</h2>
+<h3>"Error: GCP project not found"</h3>
+<p><strong>Cause:</strong> Project ID not set</p>
+<p><strong>Solution:</strong></p>
+<div class="code-block"># List projects
+gcloud projects list
+
+# Set project
+export GOOGLE_CLOUD_PROJECT=correct-project-id
+</div>
+<h3>"Error: Application default credentials not found"</h3>
+<p><strong>Cause:</strong> Not authenticated</p>
+<p><strong>Solution:</strong></p>
+<div class="code-block">gcloud auth application-default login
+</div>
+<h3>"Error: Permission denied"</h3>
+<p><strong>Cause:</strong> Service account lacks Viewer role</p>
+<p><strong>Solution:</strong></p>
+<div class="code-block"># Grant Viewer role
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member=&quot;serviceAccount:SERVICE_ACCOUNT_EMAIL&quot; \
+  --role=&quot;roles/viewer&quot;
+</div>
+<h3>"Error: Service account key expired"</h3>
+<p><strong>Cause:</strong> Service account key is too old (&gt;90 days)</p>
+<p><strong>Solution:</strong></p>
+<div class="code-block"># List keys
+gcloud iam service-accounts keys list \
+  --iam-account=SERVICE_ACCOUNT_EMAIL
+
+# Delete old key
+gcloud iam service-accounts keys delete KEY_ID \
+  --iam-account=SERVICE_ACCOUNT_EMAIL
+
+# Create new key
+gcloud iam service-accounts keys create ~/new-key.json \
+  --iam-account=SERVICE_ACCOUNT_EMAIL
+
+# Update environment variable
+export GOOGLE_APPLICATION_CREDENTIALS=~/new-key.json
+</div>
+<h3>"Error: API not enabled"</h3>
+<p><strong>Cause:</strong> Required GCP APIs not enabled</p>
+<p><strong>Solution:</strong></p>
+<div class="code-block"># Enable required APIs
+gcloud services enable cloudresourcemanager.googleapis.com
+gcloud services enable iam.googleapis.com
+gcloud services enable compute.googleapis.com
+gcloud services enable storage.googleapis.com
+gcloud services enable sqladmin.googleapis.com
+gcloud services enable cloudkms.googleapis.com
+gcloud services enable logging.googleapis.com
+</div>
+<h2>Security Best Practices</h2>
+<h3>1. Use Dedicated Service Account</h3>
+<p>Don't use your personal credentials or default service accounts.</p>
+<div class="code-block">gcloud iam service-accounts create auditkit-scanner
+</div>
+<h3>2. Rotate Service Account Keys Regularly</h3>
+<div class="code-block"># Every 90 days
+gcloud iam service-accounts keys create new-key.json \
+  --iam-account=auditkit-scanner@PROJECT_ID.iam.gserviceaccount.com
+
+# Delete old key
+gcloud iam service-accounts keys delete OLD_KEY_ID \
+  --iam-account=auditkit-scanner@PROJECT_ID.iam.gserviceaccount.com
+</div>
+<h3>3. Enable Cloud Audit Logging</h3>
+<p>Monitor what AuditKit accesses:</p>
+<div class="code-block"># Cloud Audit Logs automatically track all API calls
+# View logs in Cloud Console &gt; Logging &gt; Logs Explorer
+# Filter: protoPayload.authenticationInfo.principalEmail=&quot;auditkit-scanner@...&quot;
+</div>
+<h3>4. Use Read-Only Access</h3>
+<p>AuditKit only needs Viewer role - never grant Editor or Owner.</p>
+<h3>5. Store Keys Securely</h3>
+<div class="code-block"># Secure key file permissions
+chmod 600 ~/auditkit-key.json
+
+# Don't commit keys to version control
+echo &quot;*.json&quot; &gt;&gt; .gitignore
+</div>
+<h2>Finding Your Project ID</h2>
+<h3>Method 1: List All Projects</h3>
+<div class="code-block">gcloud projects list
+</div>
+<h3>Method 2: Get Current Project</h3>
+<div class="code-block">gcloud config get-value project
+</div>
+<h3>Method 3: From Console</h3>
+<ol>
+<li>Go to <a href="https://console.cloud.google.com">console.cloud.google.com</a></li>
+<li>Click project selector at top</li>
+<li>Copy Project ID column</li>
+</ol>
+<h2>GCP Service Coverage</h2>
+<p><strong>Free version includes:</strong>
+- Cloud Storage (6 checks)
+- Cloud IAM (12 checks)
+- Compute Engine (12 checks)
+- VPC Networks (11 checks)
+- Cloud SQL (10 checks)
+- Cloud KMS (2 checks)
+- Cloud Logging (4 checks)
+- GKE (5 CIS checks)
+- BigQuery (2 CIS checks)</p>
+<p><strong>Pro version adds:</strong>
+- Deep GKE Security (10 further checks, 15 in total)
+- Vertex AI Compliance (10 checks)</p>
+<p><strong><a href="../providers/gcp.html">View full service coverage →</a></strong></p>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../getting-started.html">Run your first scan →</a></strong></li>
+<li><strong><a href="../cli-reference.html">CLI Reference →</a></strong></li>
+<li><strong><a href="../providers/gcp.html">GCP Service Coverage →</a></strong></li>
+<li><strong><a href="../frameworks/">Framework Guide →</a></strong></li>
+</ul>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Start scanning</h3>
+                <p style="margin-bottom: 1.25rem;">Full results in about thirty minutes, with a remediation command and a console link on every finding.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed setup documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">

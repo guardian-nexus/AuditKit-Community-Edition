@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Service Coverage - AuditKit</title>
+    <meta name="description" content="Every AWS service AuditKit scans, and the checks it runs against each.">
+    <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="AWS Service Coverage - AuditKit">
+    <meta property="og:description" content="Every AWS service AuditKit scans, and the checks it runs against each.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/providers/aws.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+<body>
+
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <nav class="site-nav" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <img src="../../auditkit-logo-dark.svg" alt="AuditKit">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+            <div class="nav-links">
+                <a href="/#features">Features</a>
+                <a href="/docs/frameworks/">Frameworks</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/docs/">Docs</a>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="nav-cta">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main">
+
+    <section class="page-header">
+        <div class="container">
+            <h1>AWS Service Coverage</h1>
+            <p class="subtitle">Every AWS service AuditKit scans, and the checks it runs against each.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container-prose">
+<p>What AuditKit scans in Amazon Web Services.</p>
+<h2>Overview</h2>
+<p><strong>Coverage:</strong> 219 controls across AWS services<br />
+<strong>Supported in:</strong> Free and Pro versions</p>
+<p><strong>Supported frameworks:</strong>
+- SOC2 Type II (38 criteria)
+- PCI-DSS v4.0.1 (69 requirements)
+- CMMC Level 1 and Level 2: all 110 practices reported; 13 of the 17 Level 1 practices automated, Level 2 automated in Pro
+- NIST 800-53 Rev 5 (95 controls, derived via crosswalk)
+- HIPAA (18 safeguards, derived via crosswalk)</p>
+<h2>Covered Services</h2>
+<h3>S3 (Simple Storage Service)</h3>
+<p><strong>Controls checked:</strong> 9</p>
+<ul>
+<li><strong>CC6.2</strong> - S3 Public Access Block</li>
+<li><strong>CC6.3</strong> - S3 Encryption at Rest</li>
+<li><strong>CC7.1</strong> - S3 Access Logging</li>
+<li><strong>A1.2</strong> - S3 Versioning for Backup</li>
+<li><strong>A1.2</strong> - S3 Lifecycle Policies</li>
+<li><strong>CIS-2.1.2</strong> - S3 MFA Delete</li>
+<li><strong>CIS-2.1.4</strong> - S3 Server Access Logging</li>
+<li><strong>CIS-2.1.6</strong> - S3 Object Lock</li>
+<li><strong>CIS-2.1.7</strong> - S3 Account Public Access Block</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Block public access
+aws s3api put-public-access-block \
+  --bucket BUCKET_NAME \
+  --public-access-block-configuration \
+  BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
+
+# Enable encryption
+aws s3api put-bucket-encryption \
+  --bucket BUCKET_NAME \
+  --server-side-encryption-configuration \
+  '{&quot;Rules&quot;:[{&quot;ApplyServerSideEncryptionByDefault&quot;:{&quot;SSEAlgorithm&quot;:&quot;AES256&quot;}}]}'
+
+# Enable versioning
+aws s3api put-bucket-versioning \
+  --bucket BUCKET_NAME \
+  --versioning-configuration Status=Enabled
+</div>
+<h3>IAM (Identity &amp; Access Management)</h3>
+<p><strong>Controls checked:</strong> 30</p>
+<ul>
+<li><strong>CC6.4</strong> - Zombie IAM Users</li>
+<li><strong>CC6.4</strong> - Inactive IAM Users</li>
+<li><strong>CC6.4</strong> - User Access Reviews</li>
+<li><strong>CC6.5</strong> - Excessive Admin Users</li>
+<li><strong>CC6.5</strong> - Least Privilege Access</li>
+<li><strong>CC6.5</strong> - Service Account Security</li>
+<li><strong>CC6.6</strong> - Root Account MFA</li>
+<li><strong>CC6.6</strong> - Root Account Usage</li>
+<li><strong>CC6.7</strong> - Password Policy</li>
+<li><strong>CC6.7</strong> - Unused Credentials</li>
+<li><strong>CC6.8</strong> - Access Key Rotation</li>
+<li><strong>CIS-1.1</strong> - Account Contact Details</li>
+<li><strong>CIS-1.2</strong> - Security Contact Information</li>
+<li><strong>CIS-1.3</strong> - Credentials Unused 45+ Days</li>
+<li><strong>CIS-1.6</strong> - Root Hardware MFA</li>
+<li><strong>CIS-1.10</strong> - MFA for IAM Users</li>
+<li><strong>CIS-1.11</strong> - Root Account Access Keys</li>
+<li><strong>CIS-1.12</strong> - Credentials Unused 90 Days</li>
+<li><strong>CIS-1.13</strong> - One Active Access Key Per User</li>
+<li><strong>CIS-1.15</strong> - IAM Policies via Groups Only</li>
+<li><strong>CIS-1.16</strong> - IAM Policies on Groups/Roles Only</li>
+<li><strong>CIS-1.17</strong> - IAM Support Role</li>
+<li><strong>CIS-1.18</strong> - IAM Master and Manager Roles</li>
+<li><strong>CIS-1.19</strong> - IAM Instance Roles</li>
+<li><strong>CIS-1.20</strong> - Password Expiration Policy</li>
+<li><strong>CIS-1.21</strong> - Password Reuse Prevention</li>
+<li><strong>CIS-1.22</strong> - IAM Policies Attached to Groups Only</li>
+<li><strong>CIS-1.22</strong> - IAM User Access Review</li>
+<li><strong>CIS-17.1</strong> - IAM Service-Linked Roles Configured</li>
+<li><strong>CIS-17.2</strong> - IAM Permission Boundaries Configured</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enforce password policy
+aws iam update-account-password-policy \
+  --minimum-password-length 14 \
+  --require-symbols \
+  --require-numbers \
+  --require-uppercase-characters \
+  --require-lowercase-characters \
+  --max-password-age 90 \
+  --password-reuse-prevention 24
+
+# Enable MFA for user
+aws iam enable-mfa-device \
+  --user-name USERNAME \
+  --serial-number arn:aws:iam::ACCOUNT:mfa/USERNAME \
+  --authentication-code-1 CODE1 \
+  --authentication-code-2 CODE2
+
+# Rotate access key
+aws iam create-access-key --user-name USERNAME
+aws iam delete-access-key --user-name USERNAME --access-key-id OLD_KEY_ID
+</div>
+<h3>EC2 (Elastic Compute Cloud)</h3>
+<p><strong>Controls checked:</strong> 11</p>
+<ul>
+<li><strong>CC6.1</strong> - Open Security Groups</li>
+<li><strong>CC6.1</strong> - Network Security - Open Ports</li>
+<li><strong>CC6.1</strong> - Public EC2 Instances</li>
+<li><strong>CC6.3</strong> - EBS Volume Encryption</li>
+<li><strong>CC7.2</strong> - AMI Age and Patching</li>
+<li><strong>CIS-1.18</strong> - EC2 Instance IAM Roles</li>
+<li><strong>CIS-2.2.2</strong> - EBS Public Snapshots</li>
+<li><strong>CIS-5.2</strong> - SSH Access from Internet</li>
+<li><strong>CIS-5.3</strong> - RDP Access from Internet</li>
+<li><strong>CIS-5.4</strong> - Default Security Group</li>
+<li><strong>CIS-5.6</strong> - EC2 IMDSv2</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Restrict security group
+aws ec2 revoke-security-group-ingress \
+  --group-id sg-XXXXXXXX \
+  --ip-permissions IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges='[{CidrIp=0.0.0.0/0}]'
+
+aws ec2 authorize-security-group-ingress \
+  --group-id sg-XXXXXXXX \
+  --ip-permissions IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges='[{CidrIp=YOUR_IP/32}]'
+
+# Enable EBS encryption by default
+aws ec2 enable-ebs-encryption-by-default --region us-east-1
+
+# Enforce IMDSv2
+aws ec2 modify-instance-metadata-options \
+  --instance-id i-XXXXXXXX \
+  --http-tokens required \
+  --http-put-response-hop-limit 1
+</div>
+<h3>CloudTrail</h3>
+<p><strong>Controls checked:</strong> 11</p>
+<ul>
+<li><strong>CC7.1</strong> - CloudTrail Logging Enabled</li>
+<li><strong>CC7.1</strong> - Multi-Region CloudTrail</li>
+<li><strong>CC7.1</strong> - CloudTrail Log Integrity</li>
+<li><strong>CIS-3.2</strong> - CloudTrail Log File Validation</li>
+<li><strong>CIS-3.3</strong> - CloudTrail CloudWatch Logs Integration</li>
+<li><strong>CIS-3.4</strong> - CloudTrail S3 Bucket Policy</li>
+<li><strong>CIS-3.6</strong> - CloudTrail S3 Bucket Logging</li>
+<li><strong>CIS-3.7</strong> - CloudTrail Encryption at Rest</li>
+<li><strong>CIS-3.8</strong> - CloudTrail KMS Key Rotation</li>
+<li><strong>CIS-3.10</strong> - S3 Object-Level Logging (Write)</li>
+<li><strong>CIS-3.11</strong> - S3 Object-Level Logging (Read)</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable CloudTrail in all regions
+aws cloudtrail create-trail \
+  --name my-trail \
+  --s3-bucket-name my-cloudtrail-bucket \
+  --is-multi-region-trail \
+  --enable-log-file-validation
+
+aws cloudtrail start-logging --name my-trail
+
+# Enable log file encryption
+aws cloudtrail update-trail \
+  --name my-trail \
+  --kms-key-id arn:aws:kms:REGION:ACCOUNT:key/KEY_ID
+</div>
+<h3>RDS (Relational Database Service)</h3>
+<p><strong>Controls checked:</strong> 6</p>
+<ul>
+<li><strong>CC6.1</strong> - RDS Public Access</li>
+<li><strong>CC6.3</strong> - RDS Encryption at Rest</li>
+<li><strong>A1.2</strong> - RDS Backup Retention</li>
+<li><strong>CIS-2.3.2</strong> - RDS Automatic Minor Version Upgrade</li>
+<li><strong>CIS-2.3.4</strong> - RDS Multi-AZ Deployment</li>
+<li><strong>CIS-2.3.5</strong> - RDS Deletion Protection</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable encryption (must be done at creation)
+aws rds create-db-instance \
+  --db-instance-identifier mydb \
+  --storage-encrypted \
+  --kms-key-id arn:aws:kms:REGION:ACCOUNT:key/KEY_ID
+
+# Disable public access
+aws rds modify-db-instance \
+  --db-instance-identifier mydb \
+  --no-publicly-accessible
+
+# Enable automated backups
+aws rds modify-db-instance \
+  --db-instance-identifier mydb \
+  --backup-retention-period 7 \
+  --preferred-backup-window &quot;03:00-04:00&quot;
+</div>
+<h3>VPC (Virtual Private Cloud)</h3>
+<p><strong>Controls checked:</strong> 13</p>
+<ul>
+<li><strong>CC7.1</strong> - VPC Flow Logs</li>
+<li><strong>CIS-5.1</strong> - Default VPC in Use</li>
+<li><strong>CIS-5.5</strong> - VPC Peering Routing</li>
+<li><strong>CIS-5.7</strong> - VPC Endpoints for AWS Services</li>
+<li><strong>CIS-5.8</strong> - VPC Peering Routing Least Access</li>
+<li><strong>CIS-5.9</strong> - NACL Restricts SSH from Internet</li>
+<li><strong>CIS-5.10</strong> - NACL Restricts RDP from Internet</li>
+<li><strong>CIS-5.11</strong> - NACL Restricts SSH from Internet (IPv6)</li>
+<li><strong>CIS-5.12</strong> - NACL Restricts RDP from Internet (IPv6)</li>
+<li><strong>CIS-5.13</strong> - Security Groups Restrict Admin Ports</li>
+<li><strong>CIS-5.14</strong> - EC2 Instances in Custom VPC</li>
+<li><strong>CIS-5.18</strong> - Unused Security Groups Removed</li>
+<li><strong>CIS-5.20</strong> - VPC Endpoints for S3</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable VPC Flow Logs
+aws ec2 create-flow-logs \
+  --resource-type VPC \
+  --resource-ids vpc-XXXXXXXX \
+  --traffic-type ALL \
+  --log-destination-type cloud-watch-logs \
+  --log-group-name /aws/vpc/flowlogs
+
+# Restrict default security group
+aws ec2 revoke-security-group-ingress \
+  --group-id sg-default \
+  --ip-permissions IpProtocol=-1,IpRanges='[{CidrIp=0.0.0.0/0}]'
+
+aws ec2 revoke-security-group-egress \
+  --group-id sg-default \
+  --ip-permissions IpProtocol=-1,IpRanges='[{CidrIp=0.0.0.0/0}]'
+</div>
+<h3>KMS (Key Management Service)</h3>
+<p><strong>Controls checked:</strong> 1</p>
+<ul>
+<li><strong>CC5.2</strong> - Encryption Key Management</li>
+</ul>
+<p>There is no dedicated KMS check set. The KMS-adjacent checks live with the
+service that uses the key: <code class="code-inline">CIS-3.7</code> and <code class="code-inline">CIS-3.8</code> under CloudTrail, <code class="code-inline">CIS-12.2</code>
+under Secrets Manager, and <code class="code-inline">CIS-4.7</code> (a metric filter for key disable and delete
+events) under CloudWatch monitoring.</p>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable automatic key rotation
+aws kms enable-key-rotation --key-id KEY_ID
+
+# Update key policy for least privilege
+aws kms put-key-policy \
+  --key-id KEY_ID \
+  --policy-name default \
+  --policy file://policy.json
+</div>
+<h3>GuardDuty</h3>
+<p><strong>Controls checked:</strong> 2</p>
+<ul>
+<li><strong>CC7.2</strong> - GuardDuty Threat Detection</li>
+<li><strong>CIS-9.1</strong> - GuardDuty Enabled</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable GuardDuty
+aws guardduty create-detector --enable
+
+# List findings
+aws guardduty list-findings --detector-id DETECTOR_ID
+</div>
+<h3>Config</h3>
+<p><strong>Controls checked:</strong> 2</p>
+<ul>
+<li><strong>CC7.1</strong> - AWS Config Recording</li>
+<li><strong>CIS-3.5</strong> - AWS Config Recording Status</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable AWS Config
+aws configservice put-configuration-recorder \
+  --configuration-recorder name=default,roleARN=arn:aws:iam::ACCOUNT:role/ConfigRole
+
+aws configservice put-delivery-channel \
+  --delivery-channel name=default,s3BucketName=my-config-bucket
+
+aws configservice start-configuration-recorder --configuration-recorder-name default
+</div>
+<h3>Security Hub</h3>
+<p><strong>Controls checked:</strong> 2</p>
+<ul>
+<li><strong>CIS-4.16</strong> - AWS Security Hub Enabled</li>
+<li><strong>CIS-9.3</strong> - Security Hub Enabled</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Enable Security Hub
+aws securityhub enable-security-hub
+
+# Enable CIS standard
+aws securityhub batch-enable-standards \
+  --standards-subscription-requests StandardsArn=arn:aws:securityhub:REGION::standards/cis-aws-foundations-benchmark/v/1.2.0
+</div>
+<h3>Systems Manager</h3>
+<p><strong>Controls checked:</strong> 6</p>
+<ul>
+<li><strong>CC7.1</strong> - Patch Management</li>
+<li><strong>A1.1</strong> - Processing Capacity Management</li>
+<li><strong>A1.1</strong> - High Availability</li>
+<li><strong>CIS-10.1</strong> - SSM Parameter Store Encryption</li>
+<li><strong>CIS-10.2</strong> - SSM Session Manager Logging</li>
+<li><strong>CIS-10.3</strong> - SSM Patch Compliance</li>
+</ul>
+<p><strong>Example fixes:</strong></p>
+<div class="code-block"># Create patch baseline
+aws ssm create-patch-baseline \
+  --name &quot;Production-Baseline&quot; \
+  --operating-system AMAZON_LINUX_2 \
+  --approval-rules &quot;PatchRules=[{PatchFilterGroup={PatchFilters=[{Key=CLASSIFICATION,Values=[Security,Bugfix]}]},ApprovalRules={ApproveAfterDays=7}}]&quot;
+
+# Create maintenance window
+aws ssm create-maintenance-window \
+  --name &quot;Production-Patching&quot; \
+  --schedule &quot;cron(0 2 ? * SUN *)&quot; \
+  --duration 4 \
+  --cutoff 1 \
+  --allow-unassociated-targets
+</div>
+<h2>Controls by Framework</h2>
+<h3>SOC2 Type II (38 of the 43 criteria carry automated AWS checks)</h3>
+<p>The 43-criteria catalogue breaks down as:</p>
+<p><strong>CC1 - Control Environment:</strong> 5 criteria<br />
+<strong>CC2 - Communication:</strong> 3 criteria<br />
+<strong>CC3 - Risk Assessment:</strong> 4 criteria<br />
+<strong>CC4 - Monitoring:</strong> 2 criteria<br />
+<strong>CC5 - Control Activities:</strong> 3 criteria<br />
+<strong>CC6 - Logical Access:</strong> 8 criteria<br />
+<strong>CC7 - System Operations:</strong> 5 criteria<br />
+<strong>CC8 - Change Management:</strong> 1 criterion<br />
+<strong>CC9 - Risk Mitigation:</strong> 2 criteria<br />
+<strong>A1 - Availability:</strong> 3 criteria<br />
+<strong>C1 - Confidentiality:</strong> 2 criteria<br />
+<strong>PI1 - Processing Integrity:</strong> 5 criteria (no automated AWS check - reported as MANUAL)</p>
+<h3>PCI-DSS v4.0.1 (59 of the 312 catalogued requirements carry automated AWS checks; 69 across all providers)</h3>
+<p>Automated AWS checks map into all twelve requirement families (1 through 12). Requirements with no automated check are still reported and marked "No automated check covers this control" so they can be evidenced manually.</p>
+<h3>CMMC Level 1 (17 practices, 13 automated)</h3>
+<p><strong>Access Control (AC):</strong> 4 practices<br />
+<strong>Identification &amp; Authentication (IA):</strong> 2 practices<br />
+<strong>Media Protection (MP):</strong> 1 practice<br />
+<strong>Physical Protection (PE):</strong> 4 practices<br />
+<strong>System &amp; Communications Protection (SC):</strong> 2 practices<br />
+<strong>System &amp; Information Integrity (SI):</strong> 4 practices</p>
+<h3>CMMC Level 2 (110 practices - reported free, automated in Pro)</h3>
+<p>All Level 1 practices plus 93 additional practices across 14 domains. The Community Edition reports all 110 for evidence tracking and marks the ones it cannot check automatically; automated Level 2 checks are an AuditKit Pro feature.</p>
+<p><strong><a href="../frameworks/cmmc.html">View CMMC details →</a></strong></p>
+<h2>Running AWS Scans</h2>
+<div class="code-block"># Configure credentials
+aws configure
+
+# Scan for SOC2
+./auditkit scan -provider aws -framework soc2
+
+# Scan for PCI-DSS
+./auditkit scan -provider aws -framework pci
+
+# Scan for CMMC Level 1
+./auditkit scan -provider aws -framework cmmc
+
+# Scan for CMMC Level 2 (Pro only)
+./auditkit-pro scan -provider aws -framework cmmc
+
+# Generate report
+./auditkit scan -provider aws -framework soc2 -format pdf -output aws-report.pdf
+</div>
+<h2>Multi-Account Scanning</h2>
+<p><strong>Free version:</strong> One account at a time</p>
+<div class="code-block"># Switch profiles
+auditkit scan -provider aws -profile production
+auditkit scan -provider aws -profile staging
+</div>
+<p><strong>Pro version:</strong> Scan entire AWS Organization</p>
+<div class="code-block"># Scan all accounts
+auditkit-pro scan -provider aws --scan-all
+
+# Limit concurrency
+auditkit-pro scan -provider aws --scan-all --max-concurrent 5
+
+# Generate consolidated report
+auditkit-pro scan -provider aws --scan-all -format pdf -output org-report.pdf
+</div>
+<p><strong><a href="https://auditkit.io/pro/">Try Pro free for 14 days →</a></strong></p>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../setup/aws.html">AWS Setup Guide →</a></strong></li>
+<li><strong><a href="../getting-started.html">Getting Started →</a></strong></li>
+<li><strong><a href="../cli-reference.html">CLI Reference →</a></strong></li>
+<li><strong><a href="../frameworks/">Framework Guides →</a></strong></li>
+</ul>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Start scanning</h3>
+                <p style="margin-bottom: 1.25rem;">Full results in about thirty minutes, with a remediation command and a console link on every finding.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
+            </div>
+        </div>
+    </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p style="margin-bottom: 2rem; color: var(--slate-300); font-size: 1rem;">
+                <strong style="color: var(--white);">Built for compliance teams, by engineers who understand the audit process.</strong>
+            </p>
+
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/">AuditKit</a></li>
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/community.html">Community Edition (Open Source)</a></li>
+                        <li><a href="/about.html">About</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="/docs/getting-started.html">Quick Start Guide</a></li>
+                        <li><a href="/docs/installation.html">Installation</a></li>
+                        <li><a href="/docs/cli-reference.html">CLI Reference</a></li>
+                        <li><a href="/docs/faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Frameworks</h4>
+                    <ul>
+                        <li><a href="/docs/frameworks/cmmc.html">CMMC</a></li>
+                        <li><a href="/docs/frameworks/soc2.html">SOC2</a></li>
+                        <li><a href="/docs/frameworks/pci-dss.html">PCI-DSS</a></li>
+                        <li><a href="/docs/frameworks/hipaa.html">HIPAA</a></li>
+                        <li><a href="/docs/frameworks/nist-800-53.html">NIST 800-53</a></li>
+                        <li><a href="/docs/frameworks/iso27001.html">ISO 27001</a></li>
+                        <li><a href="/docs/frameworks/fedramp.html">FedRAMP</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/docs/setup/aws.html">AWS Setup</a></li>
+                        <li><a href="/docs/setup/azure.html">Azure Setup</a></li>
+                        <li><a href="/docs/setup/gcp.html">GCP Setup</a></li>
+                        <li><a href="/docs/setup/m365.html">M365 Setup</a></li>
+                        <li><a href="/examples/">Examples</a></li>
+                        <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition">GitHub</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>Community Edition is Apache 2.0. AuditKit is commercially licensed.</p>
+                <p>&copy; 2026 Guardian Nexus LLC</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../cookie-consent.js"></script>
+    <script src="../../main.js"></script>
+    <script>
+        (function() {
+            var toggle = document.querySelector('.nav-toggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function() {
+                    var open = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', open);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
