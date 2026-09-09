@@ -1,6 +1,6 @@
 # Pricing
 
-Free for most use cases. Pro for DoW contractors and advanced GCP users.
+Free to find your gaps. Paid for the evidence package, multi-account scanning, and staying compliant between audits.
 
 ---
 
@@ -39,11 +39,11 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 - Community support
 
 **Best for:**
-- Startups preparing for SOC2
-- Companies without DoW contracts
+- Finding out where you stand, on one account
+- Closing gaps before you engage an auditor
 - Basic GCP users (Storage, Compute, SQL)
-- Single account/project scanning
-- Budget-conscious teams
+- Teams working from the CLI
+- Any of the ten frameworks, nothing gated
 
 **[Get Started →](./docs/getting-started.md)**
 
@@ -91,10 +91,11 @@ Free for most use cases. Pro for DoW contractors and advanced GCP users.
 - Hardware-locked activation
 
 **Best for:**
-- DoW contractors (CMMC Level 2 required)
-- Companies using GKE or Vertex AI
-- Multi-cloud organizations
-- Enterprises needing priority support
+- Handing an assessor a documented evidence package
+- Scanning a whole AWS Org, Azure MG or GCP Folder
+- Staying compliant between audits (drift detection, alerts)
+- Documenting a CMMC Level 2 self-assessment
+- GKE or Vertex AI environments
 
 **[Start Free Trial →](https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01)**
 
