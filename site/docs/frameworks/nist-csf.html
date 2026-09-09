@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIST CSF 2.0 - AuditKit</title>
+    <title>NIST CSF 2.0 Scanning - AuditKit</title>
+    <meta name="description" content="Scan AWS, Azure and GCP against NIST Cybersecurity Framework 2.0 subcategories.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="NIST CSF 2.0 Scanning - AuditKit">
+    <meta property="og:description" content="Scan AWS, Azure and GCP against NIST Cybersecurity Framework 2.0 subcategories.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/frameworks/nist-csf.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,122 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
-            <h1>NIST CSF 2.0</h1>
-            <p class="subtitle">Framework guide for AuditKit</p>
+            <h1>NIST CSF 2.0 Scanning</h1>
+            <p class="subtitle">Scan AWS, Azure and GCP against NIST Cybersecurity Framework 2.0 subcategories.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/frameworks/nist-csf.md">View full NIST CSF 2.0 documentation on GitHub &rarr;</a></p>
+<p>The NIST Cybersecurity Framework, version 2.0.</p>
+<h2>Overview</h2>
+<p><strong>NIST CSF 2.0</strong> is a voluntary framework for organising and communicating cybersecurity risk, released in February 2024.</p>
+<p><strong>Who needs it:</strong> Anyone who wants a common language for security posture; often asked for by insurers, boards and enterprise customers
+<strong>Status in AuditKit:</strong> Production
+<strong>Coverage:</strong> 63 subcategories on GCP, 65 on AWS and 62 on Azure, out of the 106 subcategories a CSF scan lists (71 are in the crosswalk)
+<strong>How it works:</strong> Derived from your SOC2, PCI DSS and CMMC results through NIST 800-53</p>
+<h2>Important Disclaimer</h2>
+<p><strong>CSF is a framework for organising risk management, not a certification. There is nothing to pass or fail.</strong></p>
+<p>CSF 2.0 has six functions. AuditKit's scanning speaks to the technical parts of
+four of them. Govern, added in 2.0 and arguably the most important change from
+1.1, is almost entirely organisational: roles, policy, risk appetite, supply
+chain strategy. A scanner cannot assess it.</p>
+<p><strong>What AuditKit covers</strong></p>
+<ul>
+<li><strong>Identify</strong> - asset inventory and risk assessment that follows from what the scan enumerates</li>
+<li><strong>Protect</strong> - access control, data security, platform hardening</li>
+<li><strong>Detect</strong> - logging, monitoring and alerting configuration</li>
+<li><strong>Respond</strong> - the detection and notification prerequisites of an incident response process</li>
+</ul>
+<p><strong>What AuditKit covers only in part</strong></p>
+<ul>
+<li><strong>Govern</strong> - 12 of the 31 GV subcategories are reachable, from configuration evidence only. Organisational context, risk strategy, roles and oversight are not.</li>
+<li><strong>Recover</strong> - 3 of the 8 RC subcategories, from backup and restore configuration. Recovery plan execution and communications are not.</li>
+</ul>
+<p><strong>What AuditKit does not cover</strong></p>
+<ul>
+<li>Anything requiring evidence of a process rather than a configuration</li>
+</ul>
+<h2>Running a CSF scan</h2>
+<div class="code-block">auditkit scan -provider aws -framework nist-csf
+auditkit scan -provider azure -framework nist-csf
+auditkit scan -provider gcp -framework nist-csf
+</div>
+<p><code class="code-inline">csf</code> is accepted as a shorthand:</p>
+<div class="code-block">auditkit scan -provider aws -framework csf -format pdf -output csf-posture.pdf
+</div>
+<h2>Coverage by function</h2>
+<p>AuditKit does not run separate CSF checks. Every control it already assesses maps
+to NIST 800-53, and 800-53 maps to CSF subcategories, so coverage is a
+consequence of the SOC2, PCI DSS and CMMC scanning you already ran.</p>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Subcategories in crosswalk</th>
+<th>What drives coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Identify</strong> (ID)</td>
+<td>17</td>
+<td>Asset enumeration, risk assessment controls</td>
+</tr>
+<tr>
+<td><strong>Protect</strong> (PR)</td>
+<td>20</td>
+<td>Access control, encryption, platform hardening</td>
+</tr>
+<tr>
+<td><strong>Detect</strong> (DE)</td>
+<td>10</td>
+<td>Logging, monitoring, anomaly detection</td>
+</tr>
+<tr>
+<td><strong>Respond</strong> (RS)</td>
+<td>9</td>
+<td>Alerting and incident notification controls</td>
+</tr>
+<tr>
+<td><strong>Recover</strong> (RC)</td>
+<td>3</td>
+<td>Backup and restore controls</td>
+</tr>
+<tr>
+<td><strong>Govern</strong> (GV)</td>
+<td>12</td>
+<td>Only the parts a configuration scan can see; the strategy, roles and policy subcategories are not covered</td>
+</tr>
+</tbody>
+</table></div>
+<p>71 subcategories are in the crosswalk. How many reach your report depends on the
+provider: 65 on AWS, 62 on Azure, 63 on GCP, out of the 106 the CSF catalog lists.</p>
+<p>The absence of Govern is not a gap in AuditKit so much as a statement about what
+configuration scanning can see. If a customer asks for CSF 2.0 coverage, expect
+to answer for Govern separately.</p>
+<h2>Related</h2>
+<ul>
+<li><strong><a href="./nist-800-53.md">NIST 800-53</a></strong> - the crosswalk CSF coverage is derived through</li>
+<li><strong><a href="./soc2.md">SOC 2</a></strong> - the criteria most CSF technical subcategories come from</li>
+<li><strong><a href="./cmmc.md">CMMC</a></strong> - also derived through 800-53, for defence contractors</li>
+</ul>
+<p><strong><a href="./">All frameworks</a></strong></p>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Scan your environment</h3>
+                <p style="margin-bottom: 1.25rem;">Point AuditKit at AWS, Azure or GCP with read-only credentials and get every finding with the command to fix it. Full results in about thirty minutes.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed framework documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">

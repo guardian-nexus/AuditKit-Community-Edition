@@ -7,6 +7,7 @@ The Center for Internet Security (CIS) Benchmarks are globally recognized best p
 ## What Are CIS Benchmarks?
 
 CIS Benchmarks provide:
+
 - **Prescriptive guidance** for hardening cloud environments
 - **Industry consensus** on security best practices
 - **Detailed remediation steps** for each control
@@ -24,6 +25,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 **Command:** `./auditkit scan -provider aws -framework cis-aws`
 
 **What's Covered:**
+
 - **Section 1:** Identity and Access Management (IAM) - 21/22 automated controls (only 1.7 is not automated)
   - CIS-1.3: Credentials unused 45+ days (NEW)
   - CIS-1.5: Root account MFA enabled (LABELED)
@@ -50,6 +52,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 **Command:** `./auditkit scan -provider azure -framework cis-azure`
 
 **Current Coverage:**
+
 - Identity and Access Management (Azure AD)
 - Storage Accounts
 - SQL Databases
@@ -66,6 +69,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 **Command:** `./auditkit scan -provider gcp -framework cis-gcp`
 
 **What's Covered:**
+
 - **Section 1:** Identity and Access Management - 9 automated controls
   - CIS-1.1, 1.4, 1.5, 1.7: Corporate login, service accounts, key rotation
   - NEW: CIS-1.9, 1.10: KMS separation of duties and key rotation
@@ -111,6 +115,7 @@ CIS Benchmarks are organized into Implementation Groups (IGs) based on organizat
 **AuditKit Coverage:** AuditKit scans the CIS Foundations Benchmarks, which are not tagged by Implementation Group. Map benchmark findings to your IG tier manually.
 
 **Example Controls:**
+
 - Enable MFA for all users
 - Encrypt data at rest
 - Enable logging and monitoring
@@ -123,6 +128,7 @@ CIS Benchmarks are organized into Implementation Groups (IGs) based on organizat
 **AuditKit Coverage:** Most IG2 controls automated
 
 **Example Controls:**
+
 - Automated vulnerability scanning
 - Network segmentation
 - Centralized log management
@@ -287,6 +293,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
 
 ### Q: How often should I run CIS scans?
 **A:** 
+
 - **Weekly:** For production environments
 - **Daily:** For highly sensitive environments or during security initiatives
 - **After changes:** Any infrastructure or configuration changes
@@ -319,6 +326,7 @@ Then parse the JSON in your automation workflows.
 ## Contributing
 
 Help us expand CIS coverage:
+
 - Add Azure CIS checks
 - Add GCP CIS checks
 - Improve remediation guidance

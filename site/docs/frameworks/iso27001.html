@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ISO 27001 - AuditKit</title>
+    <title>ISO 27001:2022 Scanning - AuditKit</title>
+    <meta name="description" content="Scan cloud infrastructure against ISO 27001:2022 Annex A controls, derived by crosswalk from SOC 2 and CIS.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="ISO 27001:2022 Scanning - AuditKit">
+    <meta property="og:description" content="Scan cloud infrastructure against ISO 27001:2022 Annex A controls, derived by crosswalk from SOC 2 and CIS.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/frameworks/iso27001.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,487 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
-            <h1>ISO 27001</h1>
-            <p class="subtitle">Framework guide for AuditKit</p>
+            <h1>ISO 27001:2022 Scanning</h1>
+            <p class="subtitle">Scan cloud infrastructure against ISO 27001:2022 Annex A controls, derived by crosswalk from SOC 2 and CIS.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/frameworks/iso27001.md">View full ISO 27001 documentation on GitHub &rarr;</a></p>
+<p>International information security management standard guide.</p>
+<h2>Overview</h2>
+<p><strong>ISO/IEC 27001</strong> is the international standard for information security management systems (ISMS).</p>
+<p><strong>Who needs it:</strong> Organizations worldwide seeking information security certification
+<strong>Status in AuditKit:</strong> Production
+<strong>Coverage:</strong> 46 controls, derived via the NIST 800-53 crosswalk - 48 on AWS, out of the 93 controls in Annex A
+<strong>What's covered:</strong> Technical controls (A.8), organizational (A.5), people (A.6), physical (A.7)</p>
+<h2>Important Disclaimer</h2>
+<p><strong>AuditKit's ISO 27001 support covers technical controls only - NOT sufficient for ISO 27001 certification.</strong></p>
+<p><strong>What AuditKit covers:</strong></p>
+<ul>
+<li>Annex A technological controls (A.8) - 32 of 34 automated</li>
+<li>Some organizational controls (A.5) - via configuration checks</li>
+<li>Limited people controls (A.6) - user/account management only</li>
+<li>Limited physical controls (A.7) - cloud provider inheritance</li>
+</ul>
+<p><strong>What AuditKit does NOT cover:</strong></p>
+<ul>
+<li>ISMS documentation (policies, procedures, records)</li>
+<li>Risk assessment and treatment</li>
+<li>Internal audits</li>
+<li>Management review</li>
+<li>Continual improvement processes</li>
+<li>Organizational controls requiring human processes</li>
+</ul>
+<p><strong>Use for:</strong> Technical control assessment as part of ISO 27001 compliance program
+<strong>Don't use for:</strong> Sole evidence of ISO 27001 certification
+<strong>Hire a consultant for:</strong> Complete ISMS implementation and certification audit</p>
+<h2>ISO 27001:2022 Changes</h2>
+<p>The 2022 version reduced controls from 114 to 93 and reorganized into 4 themes:</p>
+<p><strong>Changes from 2013 version:</strong></p>
+<ul>
+<li>Consolidated from 14 to 4 control categories</li>
+<li>11 new controls (cloud, threat intelligence, data masking)</li>
+<li>24 merged controls</li>
+<li>58 controls with updated titles</li>
+<li>Stronger focus on cloud security</li>
+</ul>
+<p><strong>AuditKit supports ISO 27001:2022</strong></p>
+<h2>Annex A Controls</h2>
+<h3>A.5: Organizational Controls (37 controls)</h3>
+<p>Focus on policies, roles, responsibilities, asset management:</p>
+<p><strong>AuditKit Coverage:</strong></p>
+<ul>
+<li>A.5.1: Information security policies</li>
+<li>A.5.9: Asset inventory</li>
+<li>A.5.10: Acceptable use</li>
+<li>A.5.14: Information transfer</li>
+<li>A.5.23: Information security for cloud services</li>
+<li>A.5.30: ICT readiness for business continuity</li>
+</ul>
+<p><strong>Manual/Organizational:</strong></p>
+<ul>
+<li>Risk assessment processes</li>
+<li>Roles and responsibilities</li>
+<li>Contact with authorities</li>
+<li>Project management security</li>
+<li>Supplier relationships</li>
+</ul>
+<h3>A.6: People Controls (8 controls)</h3>
+<p>Focus on HR security, awareness, training:</p>
+<p><strong>AuditKit Coverage:</strong></p>
+<ul>
+<li>A.6.2: Terms and conditions of employment (via account policies)</li>
+<li>A.6.3: Information security awareness (training logs)</li>
+</ul>
+<p><strong>Manual/Organizational:</strong></p>
+<ul>
+<li>Background screening</li>
+<li>Security responsibilities documentation</li>
+<li>Disciplinary process</li>
+</ul>
+<h3>A.7: Physical Controls (14 controls)</h3>
+<p>Focus on facility security, equipment protection:</p>
+<p><strong>AuditKit Coverage:</strong></p>
+<ul>
+<li>A.7.4: Physical security monitoring (cloud provider docs)</li>
+<li>A.7.13: Equipment maintenance (cloud provider SLAs)</li>
+</ul>
+<p><strong>Manual/Organizational (or Cloud Provider Inherited):</strong></p>
+<ul>
+<li>Physical security perimeters</li>
+<li>Physical entry controls</li>
+<li>Securing offices and facilities</li>
+<li>Clear desk and screen policies</li>
+<li>Equipment disposal</li>
+</ul>
+<h3>A.8: Technological Controls (34 controls) - PRIMARY FOCUS</h3>
+<p><strong>Fully Automated by AuditKit:</strong></p>
+<ul>
+<li>A.8.2: Privileged access rights</li>
+<li>A.8.3: Information access restriction</li>
+<li>A.8.5: Secure authentication</li>
+<li>A.8.6: Capacity management</li>
+<li>A.8.7: Protection against malware</li>
+<li>A.8.8: Management of technical vulnerabilities</li>
+<li>A.8.9: Configuration management</li>
+<li>A.8.10: Information deletion</li>
+<li>A.8.13: Information backup</li>
+<li>A.8.15: Logging</li>
+<li>A.8.16: Monitoring activities</li>
+<li>A.8.20: Networks security</li>
+<li>A.8.21: Security of network services</li>
+<li>A.8.22: Segregation of networks</li>
+<li>A.8.24: Use of cryptography</li>
+<li>A.8.32: Change management</li>
+</ul>
+<p><strong>Partially Automated:</strong></p>
+<ul>
+<li>A.8.1: User endpoint devices (cloud access policies)</li>
+<li>A.8.4: Access to source code (repository settings)</li>
+<li>A.8.17: Clock synchronization (NTP configuration)</li>
+<li>A.8.23: Web filtering (network policies)</li>
+</ul>
+<p><strong>Manual/Policy-Based (the only two A.8 controls with no automated check):</strong></p>
+<ul>
+<li>A.8.14: Redundancy of information processing facilities</li>
+<li>A.8.25: Secure development life cycle</li>
+</ul>
+<h2>Running ISO 27001 Scans</h2>
+<div class="code-block"># ISO 27001 scan
+auditkit scan -provider aws -framework iso27001
+
+# Azure
+auditkit scan -provider azure -framework iso27001
+
+# GCP
+auditkit scan -provider gcp -framework iso27001
+
+# Generate report
+auditkit scan -provider aws -framework iso27001 -format pdf -output iso27001-report.pdf
+
+# CSV for control tracking
+auditkit scan -provider aws -framework iso27001 -format csv -output iso27001-controls.csv
+</div>
+<h2>ISO 27001 Certification Process</h2>
+<h3>Stage 1: Planning (Months 1-6)</h3>
+<ol>
+<li>
+<p><strong>Gap Analysis</strong>
+   - Run AuditKit to assess technical controls
+   - Identify missing organizational controls
+   - Document current state</p>
+</li>
+<li>
+<p><strong>ISMS Design</strong>
+   - Define ISMS scope
+   - Establish security policy
+   - Conduct risk assessment
+   - Create Statement of Applicability (SoA)</p>
+</li>
+<li>
+<p><strong>Implementation Plan</strong>
+   - Prioritize control implementation
+   - Assign responsibilities
+   - Set timelines</p>
+</li>
+</ol>
+<h3>Stage 2: Implementation (Months 7-12)</h3>
+<ol>
+<li>
+<p><strong>Technical Controls</strong>
+   - Remediate gaps found by AuditKit
+   - Implement security configurations
+   - Deploy monitoring and logging</p>
+</li>
+<li>
+<p><strong>Documentation</strong>
+   - Develop policies and procedures
+   - Create work instructions
+   - Document control implementation</p>
+</li>
+<li>
+<p><strong>Training</strong>
+   - Security awareness for all staff
+   - Role-specific training
+   - ISMS process training</p>
+</li>
+</ol>
+<h3>Stage 3: Internal Audit (Month 13)</h3>
+<ul>
+<li>Conduct internal ISMS audit</li>
+<li>Test control effectiveness</li>
+<li>Document findings</li>
+<li>Remediate gaps</li>
+</ul>
+<h3>Stage 4: Management Review (Month 14)</h3>
+<ul>
+<li>Present ISMS performance to management</li>
+<li>Review audit findings</li>
+<li>Approve changes and improvements</li>
+</ul>
+<h3>Stage 5: Certification Audit (Months 15-16)</h3>
+<ol>
+<li>
+<p><strong>Stage 1 Audit</strong> (Documentation review)
+   - Certifying body reviews ISMS documentation
+   - Checks scope definition
+   - Reviews SoA
+   - Identifies major gaps</p>
+</li>
+<li>
+<p><strong>Stage 2 Audit</strong> (On-site assessment)
+   - Certifying body assesses control implementation
+   - Interviews staff
+   - Reviews evidence
+   - Tests control effectiveness</p>
+</li>
+<li>
+<p><strong>Certification Decision</strong>
+   - Address any non-conformities
+   - Receive ISO 27001 certificate (valid 3 years)</p>
+</li>
+</ol>
+<h3>Stage 6: Surveillance (Ongoing)</h3>
+<ul>
+<li>Annual surveillance audits</li>
+<li>Continuous improvement</li>
+<li>Internal audits (at least annually)</li>
+<li>Management reviews (at least annually)</li>
+<li>Recertification every 3 years</li>
+</ul>
+<h2>ISO 27001 vs Other Frameworks</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Overlap with ISO 27001</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SOC2</strong></td>
+<td>High</td>
+<td>Similar technical controls</td>
+</tr>
+<tr>
+<td><strong>NIST 800-53</strong></td>
+<td>Very High</td>
+<td>Most ISO controls map to 800-53</td>
+</tr>
+<tr>
+<td><strong>PCI-DSS</strong></td>
+<td>Medium</td>
+<td>PCI more prescriptive</td>
+</tr>
+<tr>
+<td><strong>CMMC</strong></td>
+<td>High</td>
+<td>Both based on similar principles</td>
+</tr>
+<tr>
+<td><strong>ISO 27017</strong></td>
+<td>Extension</td>
+<td>ISO 27001 + cloud-specific controls</td>
+</tr>
+<tr>
+<td><strong>ISO 27018</strong></td>
+<td>Extension</td>
+<td>ISO 27001 + privacy controls</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Key Differentiators:</strong></p>
+<ul>
+<li>ISO 27001 is international (global recognition)</li>
+<li>Requires formal ISMS (not just controls)</li>
+<li>Risk-based approach (tailor controls to risks)</li>
+<li>3-year certification cycle</li>
+<li>Requires internal audits and management review</li>
+</ul>
+<h2>Cost Breakdown</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Small Org (&lt;50 people)</th>
+<th>Medium Org (50-250)</th>
+<th>Large Org (250+)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AuditKit Free</td>
+<td>$0</td>
+<td>$0</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Gap analysis</td>
+<td>$5K-15K</td>
+<td>$15K-30K</td>
+<td>$30K-60K</td>
+</tr>
+<tr>
+<td>ISMS implementation</td>
+<td>$20K-50K</td>
+<td>$50K-100K</td>
+<td>$100K-200K</td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td>$10K-25K</td>
+<td>$25K-50K</td>
+<td>$50K-100K</td>
+</tr>
+<tr>
+<td>Training</td>
+<td>$5K-10K</td>
+<td>$10K-25K</td>
+<td>$25K-50K</td>
+</tr>
+<tr>
+<td>Internal audit</td>
+<td>$5K-10K</td>
+<td>$10K-20K</td>
+<td>$20K-40K</td>
+</tr>
+<tr>
+<td>Certification audit</td>
+<td>$10K-20K</td>
+<td>$20K-40K</td>
+<td>$40K-80K</td>
+</tr>
+<tr>
+<td><strong>Initial certification</strong></td>
+<td><strong>$55K-130K</strong></td>
+<td><strong>$130K-265K</strong></td>
+<td><strong>$265K-530K</strong></td>
+</tr>
+<tr>
+<td><strong>Annual surveillance</strong></td>
+<td><strong>$10K-20K</strong></td>
+<td><strong>$20K-40K</strong></td>
+<td><strong>$40K-80K</strong></td>
+</tr>
+<tr>
+<td><strong>Recertification (Year 3)</strong></td>
+<td><strong>$10K-20K</strong></td>
+<td><strong>$20K-40K</strong></td>
+<td><strong>$40K-80K</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Timeline:</strong> 12-18 months from start to certification</p>
+<h2>Choosing a Certification Body</h2>
+<p>Accredited certification bodies (CB) vary by:</p>
+<p><strong>Accreditation:</strong> Look for UKAS (UK), ANAB (US), DAkkS (Germany), JAB (Japan)</p>
+<p><strong>Industry Experience:</strong> Choose CB with experience in your industry</p>
+<p><strong>Global Recognition:</strong> Major CBs:</p>
+<ul>
+<li>BSI (British Standards Institution)</li>
+<li>SGS</li>
+<li>Bureau Veritas</li>
+<li>LRQA</li>
+<li>TUV</li>
+<li>DNV</li>
+</ul>
+<p><strong>Cost:</strong> $10K-80K depending on organization size and scope</p>
+<h2>Common ISO 27001 Gaps</h2>
+<p>Based on certification audit findings:</p>
+<ol>
+<li><strong>Incomplete risk assessment</strong> (most common)</li>
+<li><strong>Inadequate ISMS documentation</strong></li>
+<li><strong>Insufficient logging and monitoring</strong> (A.8.15, A.8.16)</li>
+<li><strong>Weak access controls</strong> (A.8.2, A.8.3, A.8.5)</li>
+<li><strong>Missing internal audits</strong></li>
+<li><strong>Poor change management</strong> (A.8.32)</li>
+<li><strong>Inadequate security awareness</strong> (A.6.3)</li>
+<li><strong>Incomplete Statement of Applicability</strong></li>
+</ol>
+<p><strong>AuditKit helps with #3, #4, #6</strong> - you need consultants for #1, #2, #5, #7, #8</p>
+<h2>FAQ</h2>
+<p><strong>Q: Can I get ISO 27001 certified using only AuditKit?</strong>
+A: No. AuditKit covers technical controls, but ISO 27001 requires complete ISMS documentation, risk assessments, internal audits, and formal certification audit. Hire a consultant.</p>
+<p><strong>Q: How long does ISO 27001 certification take?</strong>
+A: 12-18 months for initial certification. Smaller organizations may achieve it faster (9-12 months).</p>
+<p><strong>Q: What's the difference between ISO 27001 and ISO 27002?</strong>
+A: ISO 27001 is the certifiable standard (requirements). ISO 27002 is the implementation guide (best practices). You get certified to 27001, not 27002.</p>
+<p><strong>Q: Do I need to implement all 93 controls?</strong>
+A: No. ISO 27001 allows risk-based exclusions. Document justification in your Statement of Applicability (SoA).</p>
+<p><strong>Q: How much does ISO 27001 certification cost?</strong>
+A: Small org: $55K-130K initial, $10K-20K annual. Medium org: $130K-265K initial, $20K-40K annual.</p>
+<p><strong>Q: Is ISO 27001 recognized globally?</strong>
+A: Yes. ISO 27001 is the most widely recognized information security certification worldwide.</p>
+<p><strong>Q: What happens if I fail the certification audit?</strong>
+A: You receive non-conformity reports. Address them within specified timeframe, then CB re-audits. Most organizations pass on second attempt.</p>
+<p><strong>Q: Can I transfer my certificate if I change certification bodies?</strong>
+A: Yes, though the new CB may require a transfer audit to verify your ISMS.</p>
+<p><strong>Q: Does ISO 27001 help with GDPR compliance?</strong>
+A: Yes. ISO 27001 addresses many GDPR security requirements, though GDPR has additional privacy-specific requirements.</p>
+<h2>ISO 27001 and Cloud</h2>
+<p><strong>Shared Responsibility:</strong></p>
+<ul>
+<li>Cloud providers (AWS, Azure, GCP) have ISO 27001 certification for their infrastructure</li>
+<li>You're responsible for your applications and configurations</li>
+<li>Use cloud provider inherited controls in your SoA</li>
+</ul>
+<p><strong>Cloud-Specific Controls:</strong></p>
+<ul>
+<li>A.5.23: Information security for use of cloud services</li>
+<li>A.8.20-22: Network security (cloud networks)</li>
+<li>A.8.24: Cryptography (cloud encryption)</li>
+</ul>
+<p><strong>AuditKit helps verify your cloud configurations align with ISO 27001 requirements.</strong></p>
+<h2>Recommended Path</h2>
+<h3>Phase 1: Assessment (Months 1-3)</h3>
+<ul>
+<li>Run AuditKit for technical gap analysis</li>
+<li>Conduct full ISMS gap assessment</li>
+<li>Define ISMS scope</li>
+<li>Select certification body</li>
+</ul>
+<h3>Phase 2: Design (Months 4-6)</h3>
+<ul>
+<li>Establish security policy</li>
+<li>Conduct risk assessment</li>
+<li>Create Statement of Applicability</li>
+<li>Design ISMS processes</li>
+</ul>
+<h3>Phase 3: Implementation (Months 7-12)</h3>
+<ul>
+<li>Implement controls (use AuditKit for technical)</li>
+<li>Develop ISMS documentation</li>
+<li>Deploy monitoring and logging</li>
+<li>Train all personnel</li>
+</ul>
+<h3>Phase 4: Audit (Months 13-15)</h3>
+<ul>
+<li>Conduct internal audit</li>
+<li>Management review</li>
+<li>Remediate findings</li>
+<li>Prepare for certification audit</li>
+</ul>
+<h3>Phase 5: Certification (Months 16-18)</h3>
+<ul>
+<li>Stage 1 audit (documentation review)</li>
+<li>Address Stage 1 findings</li>
+<li>Stage 2 audit (on-site assessment)</li>
+<li>Receive ISO 27001 certificate</li>
+</ul>
+<h3>Phase 6: Maintain (Ongoing)</h3>
+<ul>
+<li>Annual surveillance audits</li>
+<li>Internal audits (minimum annually)</li>
+<li>Management reviews (minimum annually)</li>
+<li>Continuous improvement</li>
+<li>Recertification every 3 years</li>
+</ul>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../getting-started.md">Run ISO 27001 technical scan</a></strong></li>
+<li><strong><a href="./soc2.md">Compare to SOC2</a></strong></li>
+<li><strong><a href="./nist-800-53.md">Compare to NIST 800-53</a></strong></li>
+<li><strong><a href="https://www.iso.org/">Find certification body</a></strong></li>
+<li><strong><a href="https://www.iso.org/standard/27001">ISO 27001 official standard</a></strong></li>
+</ul>
+<p><strong>Remember:</strong> AuditKit covers technical controls (Annex A.8). Hire an ISO 27001 consultant for complete ISMS implementation and certification.</p>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Scan your environment</h3>
+                <p style="margin-bottom: 1.25rem;">Point AuditKit at AWS, Azure or GCP with read-only credentials and get every finding with the command to fix it. Full results in about thirty minutes.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed framework documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">

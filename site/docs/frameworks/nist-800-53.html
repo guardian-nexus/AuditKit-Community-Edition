@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIST 800-53 - AuditKit</title>
+    <title>NIST 800-53 Rev 5 Scanning - AuditKit</title>
+    <meta name="description" content="Scan AWS, Azure and GCP against NIST 800-53 Rev 5 technical controls.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="NIST 800-53 Rev 5 Scanning - AuditKit">
+    <meta property="og:description" content="Scan AWS, Azure and GCP against NIST 800-53 Rev 5 technical controls.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/frameworks/nist-800-53.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,309 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
-            <h1>NIST 800-53</h1>
-            <p class="subtitle">Framework guide for AuditKit</p>
+            <h1>NIST 800-53 Rev 5 Scanning</h1>
+            <p class="subtitle">Scan AWS, Azure and GCP against NIST 800-53 Rev 5 technical controls.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/frameworks/nist-800-53.md">View full NIST 800-53 documentation on GitHub &rarr;</a></p>
+<p>NIST Special Publication 800-53 Revision 5 guide.</p>
+<h2>Overview</h2>
+<p><strong>NIST 800-53</strong> is a catalog of security and privacy controls for federal information systems.</p>
+<p><strong>Who needs it:</strong> Federal contractors, FedRAMP Cloud Service Providers<br />
+<strong>Certification:</strong> Not a certification itself (used by FedRAMP, FISMA)<br />
+<strong>Total controls:</strong> 1,196 controls<br />
+<strong>AuditKit coverage:</strong> 95 automated technical controls, reached through the SOC 2 / PCI / CMMC crosswalk<br />
+<strong>What's not covered:</strong> the remaining 1,101 organizational and policy controls</p>
+<h2>How AuditKit Uses 800-53</h2>
+<p><strong>Framework crosswalk:</strong> AuditKit maps existing SOC2, PCI-DSS, and CMMC controls to NIST 800-53 control families.</p>
+<p><strong>Example:</strong></p>
+<div class="code-block">Your SOC2 control: CC6.6 - MFA enforcement
+
+Maps to NIST 800-53:
+- IA-2: Identification and Authentication
+- IA-2(1): Multi-Factor Authentication
+- IA-5: Authenticator Management
+</div>
+<p><strong>Benefit:</strong> Run one scan, see compliance across all frameworks</p>
+<h2>Control Families</h2>
+<p>NIST 800-53 has 20 control families. AuditKit reaches controls in 18 of them; PT (Personally Identifiable Information Processing) and SR (Supply Chain Risk Management) have no automated coverage:</p>
+<h3>AC - Access Control</h3>
+<p><strong>AuditKit checks:</strong> IAM policies, MFA, least privilege, access key rotation</p>
+<p><strong>Example controls:</strong></p>
+<ul>
+<li>AC-2: Account Management</li>
+<li>AC-3: Access Enforcement</li>
+<li>AC-17: Remote Access</li>
+</ul>
+<h3>AU - Audit and Accountability</h3>
+<p><strong>AuditKit checks:</strong> CloudTrail, logging, log retention, audit trails</p>
+<p><strong>Example controls:</strong></p>
+<ul>
+<li>AU-2: Event Logging</li>
+<li>AU-3: Content of Audit Records</li>
+<li>AU-12: Audit Record Generation</li>
+</ul>
+<h3>CA - Assessment, Authorization, &amp; Monitoring</h3>
+<p><strong>AuditKit checks:</strong> Security Hub, Config, compliance monitoring</p>
+<p><strong>Example controls:</strong></p>
+<ul>
+<li>CA-7: Continuous Monitoring</li>
+</ul>
+<h3>CM - Configuration Management</h3>
+<p><strong>AuditKit checks:</strong> Config baselines, change tracking, patch management</p>
+<p><strong>Example controls:</strong></p>
+<ul>
+<li>CM-2: Baseline Configuration</li>
+<li>CM-6: Configuration Settings</li>
+</ul>
+<h3>IA - Identification and Authentication</h3>
+<p><strong>AuditKit checks:</strong> MFA, password policies, authenticator management</p>
+<p><strong>Example controls:</strong></p>
+<ul>
+<li>IA-2: Identification and Authentication</li>
+<li>IA-5: Authenticator Management</li>
+</ul>
+<h3>IR - Incident Response</h3>
+<p><strong>AuditKit checks:</strong> GuardDuty, Defender, Security Command Center, alerting</p>
+<p><strong>Example controls:</strong></p>
+<ul>
+<li>IR-4: Incident Handling</li>
+<li>IR-6: Incident Reporting</li>
+</ul>
+<h3>MA - Maintenance</h3>
+<p><strong>AuditKit checks:</strong> Systems Manager, Update Management, maintenance windows</p>
+<p><strong>Example controls:</strong></p>
+<ul>
+<li>MA-2: Controlled Maintenance</li>
+</ul>
+<h3>MP - Media Protection</h3>
+<p><strong>AuditKit checks:</strong> Storage encryption, secure deletion policies</p>
+<p><strong>Example controls:</strong></p>
+<ul>
+<li>MP-5: Media Transport</li>
+</ul>
+<h3>PE - Physical and Environmental Protection</h3>
+<p><strong>What AuditKit checks:</strong> Limited - mostly manual verification</p>
+<h3>PL - Planning</h3>
+<p><strong>What AuditKit checks:</strong> Limited - mostly organizational policies</p>
+<h3>PM - Program Management</h3>
+<p><strong>What AuditKit checks:</strong> Limited - mostly organizational policies</p>
+<h3>PS - Personnel Security</h3>
+<p><strong>What AuditKit checks:</strong> Limited - mostly organizational policies</p>
+<h3>RA - Risk Assessment</h3>
+<p><strong>AuditKit checks:</strong> Vulnerability scanning, threat detection</p>
+<p><strong>Example controls:</strong></p>
+<ul>
+<li>RA-5: Vulnerability Monitoring and Scanning</li>
+</ul>
+<h3>SA - System and Services Acquisition</h3>
+<p><strong>What AuditKit checks:</strong> Limited - mostly organizational policies</p>
+<h3>SC - System and Communications Protection</h3>
+<p><strong>AuditKit checks:</strong> Encryption, network segmentation, firewalls, TLS</p>
+<p><strong>Example controls:</strong></p>
+<ul>
+<li>SC-7: Boundary Protection</li>
+<li>SC-8: Transmission Confidentiality</li>
+<li>SC-13: Cryptographic Protection</li>
+</ul>
+<h3>SI - System and Information Integrity</h3>
+<p><strong>AuditKit checks:</strong> Malware protection, patch management, flaw remediation</p>
+<p><strong>Example controls:</strong></p>
+<ul>
+<li>SI-2: Flaw Remediation</li>
+<li>SI-3: Malicious Code Protection</li>
+</ul>
+<h3>SR - Supply Chain Risk Management</h3>
+<p><strong>What AuditKit checks:</strong> Limited - mostly organizational policies</p>
+<h2>What AuditKit Automates</h2>
+<p><strong>Technical controls (95):</strong></p>
+<ul>
+<li>Access controls and authentication</li>
+<li>Logging and monitoring</li>
+<li>Encryption and key management</li>
+<li>Network security</li>
+<li>Vulnerability management</li>
+<li>Configuration management</li>
+<li>Incident detection</li>
+<li>Backup and recovery</li>
+</ul>
+<p><strong>What AuditKit doesn't cover (~850 controls):</strong></p>
+<ul>
+<li>Organizational policies</li>
+<li>Training programs</li>
+<li>HR procedures</li>
+<li>Physical security</li>
+<li>Risk assessments</li>
+<li>Contingency planning</li>
+<li>System acquisition</li>
+<li>Privacy controls</li>
+</ul>
+<h2>Running 800-53 Scan</h2>
+<div class="code-block"># AWS
+auditkit scan -provider aws -framework 800-53
+
+# Azure
+auditkit scan -provider azure -framework 800-53
+
+# GCP
+auditkit scan -provider gcp -framework 800-53
+
+# Generate report
+auditkit scan -provider aws -framework 800-53 -format pdf -output nist-report.pdf
+</div>
+<p><strong>Output shows:</strong></p>
+<div class="code-block">[FAIL] IA-2, IA-2(1), IA-5 - Authentication Controls (via CC6.6)
+  Issue: 12 users without MFA enabled
+  Source: SOC2 CC6.6 maps to NIST IA-2
+
+[PASS] AU-2, AU-3, AU-12 - Audit Logging (via CC7.1)
+  Source: SOC2 CC7.1 maps to NIST AU-2
+</div>
+<h2>FedRAMP Baselines</h2>
+<p>NIST 800-53 is used by <strong>FedRAMP</strong> (Federal Risk and Authorization Management Program) for cloud services.</p>
+<h3>FedRAMP LOW</h3>
+<ul>
+<li>~125 controls</li>
+<li>Low-impact data</li>
+<li>Public information</li>
+</ul>
+<h3>FedRAMP MODERATE</h3>
+<ul>
+<li>~325 controls</li>
+<li>Moderate-impact data</li>
+<li>Most common baseline</li>
+</ul>
+<h3>FedRAMP HIGH</h3>
+<ul>
+<li>~421 controls</li>
+<li>High-impact data</li>
+<li>National security systems</li>
+</ul>
+<p><strong>Note:</strong> AuditKit helps with technical controls, but FedRAMP requires full 800-53 implementation including all organizational controls.</p>
+<h2>800-53 vs Other Frameworks</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Total Controls</th>
+<th>Automated by AuditKit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NIST 800-53</td>
+<td>1,196</td>
+<td>95 (8%)</td>
+</tr>
+<tr>
+<td>SOC2</td>
+<td>43 criteria</td>
+<td>38 on AWS (88%)</td>
+</tr>
+<tr>
+<td>PCI-DSS</td>
+<td>312 requirements</td>
+<td>69 (22%)</td>
+</tr>
+<tr>
+<td>CMMC Level 2</td>
+<td>110 practices</td>
+<td>13 in Community, 42 cloud-queried in Pro</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Key insight:</strong> SOC2/PCI-DSS/CMMC are subsets of 800-53. Pass those, you're partway to 800-53 compliance.</p>
+<h2>Common Use Cases</h2>
+<h3>Federal Contractor</h3>
+<p><strong>Need:</strong> NIST 800-53 compliance for FISMA</p>
+<p><strong>AuditKit approach:</strong>
+1. Scan for automated technical controls (~150)
+2. Document organizational controls manually (~850)
+3. Use scan results as evidence for technical controls
+4. Complete remaining documentation</p>
+<h3>FedRAMP Applicant</h3>
+<p><strong>Need:</strong> FedRAMP authorization</p>
+<p><strong>AuditKit approach:</strong>
+1. Start with SOC2 or CMMC (smaller scope)
+2. Use 800-53 scan to see gaps
+3. Work with FedRAMP 3PAO for full assessment
+4. AuditKit provides technical control evidence</p>
+<h3>CMMC + Federal Work</h3>
+<p><strong>Need:</strong> CMMC Level 2 + NIST 800-53</p>
+<p><strong>AuditKit approach:</strong>
+1. Use Pro for CMMC Level 2 (110 practices)
+2. Run 800-53 scan to see additional gaps
+3. CMMC Level 2 covers ~30% of 800-53 technical controls
+4. Document remaining controls</p>
+<h2>Cost Estimate</h2>
+<p>NIST 800-53 compliance costs vary widely:</p>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Cost (Estimate)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AuditKit Free</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Gap assessment</td>
+<td>$10,000 - $50,000</td>
+</tr>
+<tr>
+<td>Implementation</td>
+<td>$50,000 - $500,000</td>
+</tr>
+<tr>
+<td>Consulting</td>
+<td>$100,000 - $1,000,000</td>
+</tr>
+<tr>
+<td>FedRAMP 3PAO (if applicable)</td>
+<td>$250,000 - $1,500,000</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Timeline:</strong> 12-24 months for full implementation</p>
+<p><strong>Note:</strong> These are estimates. Actual costs depend on organization size and current security posture.</p>
+<h2>FAQ</h2>
+<p><strong>Q: Is NIST 800-53 a certification?</strong><br />
+A: No. It's a control catalog used by FedRAMP, FISMA, and other compliance programs.</p>
+<p><strong>Q: Do I need all 1,000 controls?</strong><br />
+A: No. Tailor based on your system's impact level (LOW/MODERATE/HIGH).</p>
+<p><strong>Q: Can AuditKit help with FedRAMP?</strong><br />
+A: Yes, for technical controls. You'll still need organizational documentation and 3PAO assessment.</p>
+<p><strong>Q: What's the difference between Rev 4 and Rev 5?</strong><br />
+A: Rev 5 (2020) added supply chain, privacy controls, and reorganized families. AuditKit uses Rev 5.</p>
+<p><strong>Q: Should I start with 800-53 or SOC2?</strong><br />
+A: Start with SOC2. It's faster, cheaper, and maps to 800-53 technical controls.</p>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../getting-started.md">Run 800-53 scan →</a></strong></li>
+<li><strong><a href="./cmmc.md">Compare to CMMC →</a></strong></li>
+<li><strong><a href="./soc2.md">Compare to SOC2 →</a></strong></li>
+<li><strong><a href="https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final">NIST 800-53 official docs →</a></strong></li>
+</ul>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Scan your environment</h3>
+                <p style="margin-bottom: 1.25rem;">Point AuditKit at AWS, Azure or GCP with read-only credentials and get every finding with the command to fix it. Full results in about thirty minutes.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed framework documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">

@@ -93,8 +93,6 @@ Policies and procedures to ensure directives are carried out
 Configuration management, system components, data
 
 - CC8.1: Encryption at rest (S3, RDS, disks)
-(delete both lines - CC8.1 is the only criterion in the CC8 series)
-
 ### CC9 - Risk Mitigation
 System changes, incident management, business continuity
 
@@ -106,6 +104,7 @@ System changes, incident management, business continuity
 ## What AuditKit Automates
 
 **Criteria assessed on AWS (38 of the 43 in the catalog), by group:**
+
 - CC1 Control environment - 5 of 5 criteria
 - CC2 Communication and information - 3 of 3
 - CC3 Risk assessment - 4 of 4
@@ -120,6 +119,7 @@ System changes, incident management, business continuity
 - PI1 Processing integrity - 0 of 5
 
 **What AuditKit doesn't cover:**
+
 - Organizational policies
 - HR procedures
 - Vendor management
@@ -173,30 +173,35 @@ auditkit evidence -output evidence.html
 ## Typical Timeline
 
 **Month 1-2: Technical prep**
+
 - Run AuditKit scan
 - Fix critical findings
 - Enable security services
 - Configure logging
 
 **Month 3-4: Organizational prep**
+
 - Write policies and procedures
 - Implement training
 - Document vendor management
 - Create incident response plan
 
 **Month 5-6: Pre-audit**
+
 - Re-scan with AuditKit
 - Collect evidence
 - Conduct internal audit
 - Select CPA firm
 
 **Month 7-18: Observation period**
+
 - 3-12 month period (auditor decides)
 - Quarterly AuditKit scans
 - Track changes and incidents
 - Collect evidence continuously
 
 **Month 19: Audit**
+
 - CPA firm conducts audit
 - Reviews controls and evidence
 - Issues SOC2 report

@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIS Benchmarks - AuditKit</title>
+    <title>CIS Benchmarks Scanning - AuditKit</title>
+    <meta name="description" content="Scan against CIS Benchmarks for AWS, Azure and GCP - the largest automated check set in AuditKit.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="CIS Benchmarks Scanning - AuditKit">
+    <meta property="og:description" content="Scan against CIS Benchmarks for AWS, Azure and GCP - the largest automated check set in AuditKit.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/frameworks/cis-benchmarks.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,320 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
-            <h1>CIS Benchmarks</h1>
-            <p class="subtitle">Framework guide for AuditKit</p>
+            <h1>CIS Benchmarks Scanning</h1>
+            <p class="subtitle">Scan against CIS Benchmarks for AWS, Azure and GCP - the largest automated check set in AuditKit.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/frameworks/cis-benchmarks.md">View full CIS Benchmarks documentation on GitHub &rarr;</a></p>
+<p>The Center for Internet Security (CIS) Benchmarks are globally recognized best practices for securing IT systems and data. AuditKit scans your cloud infrastructure against CIS Benchmarks to identify security misconfigurations.</p>
+<h2>What Are CIS Benchmarks?</h2>
+<p>CIS Benchmarks provide:</p>
+<ul>
+<li><strong>Prescriptive guidance</strong> for hardening cloud environments</li>
+<li><strong>Industry consensus</strong> on security best practices</li>
+<li><strong>Detailed remediation steps</strong> for each control</li>
+<li><strong>Risk-based prioritization</strong> (Implementation Groups)</li>
+</ul>
+<p>Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on <strong>technical security hardening</strong>.</p>
+<h2>Supported Benchmarks</h2>
+<h3>AWS Foundations Benchmark</h3>
+<p><strong>Status:</strong> Production (v0.8.6)
+<strong>Controls:</strong> 158 unique AWS controls implemented
+<strong>Command:</strong> <code class="code-inline">./auditkit scan -provider aws -framework cis-aws</code></p>
+<p><strong>What's Covered:</strong></p>
+<ul>
+<li><strong>Section 1:</strong> Identity and Access Management (IAM) - 21/22 automated controls (only 1.7 is not automated)</li>
+<li>CIS-1.3: Credentials unused 45+ days (NEW)</li>
+<li>CIS-1.5: Root account MFA enabled (LABELED)</li>
+<li>CIS-1.11: No root access keys (LABELED)</li>
+<li>CIS-1.14: Access key rotation (90 days) (LABELED)</li>
+<li>CIS-1.16: IAM policies on groups/roles only (NEW)</li>
+<li><strong>Section 2:</strong> Storage (S3, EBS, RDS) - Multiple automated controls</li>
+<li>CIS-2.1.x: S3 encryption, versioning, logging</li>
+<li><strong>Section 3:</strong> Logging (CloudTrail, CloudWatch) - 11/11 automated controls (100% coverage)</li>
+<li>CIS-3.1: CloudTrail enabled in all regions (LABELED)</li>
+<li>CIS-3.9: VPC Flow Logs enabled (LABELED)</li>
+<li><strong>Section 4:</strong> Monitoring (Metric Filters &amp; Alarms) - 16/16 controls (100% coverage)</li>
+<li><strong>Section 5:</strong> Networking (VPC, Security Groups) - 20/20 automated controls (100% coverage)</li>
+<li>CIS-5.8: VPC peering routing least access (NEW)</li>
+<li>CIS-5.20: VPC endpoints for S3 (NEW)</li>
+<li><strong>Sections 6-22:</strong> Service-specific controls across EC2, RDS, Lambda, and more</li>
+<li><strong>Total Coverage:</strong> AWS 158, Azure 108, GCP 71 benchmark controls</li>
+</ul>
+<h3>Azure Foundations Benchmark</h3>
+<p><strong>Status:</strong> Production
+<strong>Automated Controls:</strong> 108 checks (CIS Microsoft Azure Foundations Benchmark v3.0)
+<strong>Command:</strong> <code class="code-inline">./auditkit scan -provider azure -framework cis-azure</code></p>
+<p><strong>Current Coverage:</strong></p>
+<ul>
+<li>Identity and Access Management (Azure AD)</li>
+<li>Storage Accounts</li>
+<li>SQL Databases</li>
+<li>Virtual Machines</li>
+<li>Networking (NSGs, VNets)</li>
+<li>Monitoring and Logging</li>
+<li>Security Center</li>
+</ul>
+<h3>GCP Foundations Benchmark</h3>
+<p><strong>Status:</strong> Production - <strong>NEAR-COMPLETE COVERAGE</strong>
+<strong>Controls:</strong> 71 GCP benchmark controls
+<strong>Command:</strong> <code class="code-inline">./auditkit scan -provider gcp -framework cis-gcp</code></p>
+<p><strong>What's Covered:</strong></p>
+<ul>
+<li><strong>Section 1:</strong> Identity and Access Management - 9 automated controls</li>
+<li>CIS-1.1, 1.4, 1.5, 1.7: Corporate login, service accounts, key rotation</li>
+<li>NEW: CIS-1.9, 1.10: KMS separation of duties and key rotation</li>
+<li><strong>Section 2:</strong> Logging and Monitoring - 8 automated + 9 manual = 17 controls</li>
+<li>NEW: CIS-2.2, 2.3, 2.13: Log sinks, retention, DNS logging</li>
+<li>Manual: CIS-2.4-2.12: Log metric filters and alerts</li>
+<li><strong>Section 3:</strong> Networking - 6 automated controls</li>
+<li>CIS-3.1, 3.3, 3.6-3.10: VPC, DNSSEC, firewall, flow logs</li>
+<li><strong>Section 4:</strong> Compute Engine - 11 automated controls</li>
+<li>CIS-4.1, 4.3-4.6, 4.8-4.9: Disk encryption, OS login, Shielded VM</li>
+<li><strong>Section 5:</strong> Cloud Storage - 4 automated controls</li>
+<li>CIS-5.1-5.3: Uniform access, encryption, versioning</li>
+<li><strong>Section 6:</strong> Cloud SQL - 7 automated controls</li>
+<li>CIS-6.1-6.3: Public IP, backups, SSL</li>
+<li>NEW: CIS-6.1.1, 6.2.1, 6.2.2: Database security flags</li>
+<li><strong>Section 7:</strong> BigQuery - 3 automated controls</li>
+<li>NEW: CIS-7.1, 7.2, 7.3: Public access, CMEK encryption</li>
+<li><strong>Total Coverage:</strong> 71 CIS GCP Foundations controls</li>
+</ul>
+<h2>CIS vs Other Frameworks</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Purpose</th>
+<th>Focus</th>
+<th>When to Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CIS Benchmarks</strong></td>
+<td>Security hardening</td>
+<td>Technical configuration</td>
+<td>Proactive security posture</td>
+</tr>
+<tr>
+<td><strong>SOC2</strong></td>
+<td>Audit compliance</td>
+<td>Trust services</td>
+<td>SaaS sales requirements</td>
+</tr>
+<tr>
+<td><strong>PCI-DSS</strong></td>
+<td>Payment security</td>
+<td>Cardholder data</td>
+<td>Processing payments</td>
+</tr>
+<tr>
+<td><strong>CMMC</strong></td>
+<td>Defense contracts</td>
+<td>CUI protection</td>
+<td>DoW contractor requirements</td>
+</tr>
+<tr>
+<td><strong>NIST 800-53</strong></td>
+<td>Federal compliance</td>
+<td>Risk management</td>
+<td>Government work</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Best Practice:</strong> Use CIS Benchmarks alongside compliance frameworks for comprehensive security.</p>
+<h2>Implementation Groups</h2>
+<p>CIS Benchmarks are organized into Implementation Groups (IGs) based on organization size and resources:</p>
+<h3>IG1 - Basic Cyber Hygiene</h3>
+<p><strong>Target:</strong> Small organizations, limited security resources<br />
+<strong>Controls:</strong> ~56 essential safeguards<br />
+<strong>AuditKit Coverage:</strong> AuditKit scans the CIS Foundations Benchmarks, which are not tagged by Implementation Group. Map benchmark findings to your IG tier manually.</p>
+<p><strong>Example Controls:</strong></p>
+<ul>
+<li>Enable MFA for all users</li>
+<li>Encrypt data at rest</li>
+<li>Enable logging and monitoring</li>
+<li>Remove unnecessary services</li>
+<li>Patch systems regularly</li>
+</ul>
+<h3>IG2 - Enterprise Security</h3>
+<p><strong>Target:</strong> Medium organizations, dedicated security team<br />
+<strong>Controls:</strong> IG1 + ~74 additional controls<br />
+<strong>AuditKit Coverage:</strong> Most IG2 controls automated</p>
+<p><strong>Example Controls:</strong></p>
+<ul>
+<li>Automated vulnerability scanning</li>
+<li>Network segmentation</li>
+<li>Centralized log management</li>
+<li>Incident response procedures</li>
+<li>Regular penetration testing</li>
+</ul>
+<h3>IG3 - Advanced Security</h3>
+<p><strong>Target:</strong> Large enterprises, mature security programs<br />
+<strong>Controls:</strong> IG1 + IG2 + ~23 advanced controls<br />
+<strong>AuditKit Coverage:</strong> Some IG3 controls (requires manual processes)</p>
+<h2>How AuditKit Scans CIS Benchmarks</h2>
+<h3>Automated Checks (AWS Example)</h3>
+<p><strong>Section 1: IAM</strong></p>
+<div class="code-block">[PASS] Root account MFA enabled
+[FAIL] IAM password policy requires minimum length of 14 characters
+[FAIL] Access keys rotated within 90 days
+[PASS] Credentials unused for 90 days are disabled
+</div>
+<p><strong>Section 2: Storage</strong></p>
+<div class="code-block">[PASS] S3 buckets have encryption enabled
+[FAIL] S3 buckets have MFA delete enabled
+[PASS] EBS volumes are encrypted
+[FAIL] RDS instances have automatic backups enabled
+</div>
+<p><strong>Section 3: Logging</strong></p>
+<div class="code-block">[PASS] CloudTrail enabled in all regions
+[PASS] CloudTrail log file validation enabled
+[FAIL] CloudWatch log groups encrypted with KMS
+</div>
+<h2>Running CIS Scans</h2>
+<h3>AWS Foundations Benchmark</h3>
+<p><strong>Basic scan:</strong></p>
+<div class="code-block">./auditkit scan -provider aws -framework cis-aws
+</div>
+<p><strong>Verbose output:</strong></p>
+<div class="code-block">./auditkit scan -provider aws -framework cis-aws -verbose
+</div>
+<p><strong>Generate PDF report:</strong></p>
+<div class="code-block">./auditkit scan -provider aws -framework cis-aws -format pdf -output cis-aws-report.pdf
+</div>
+<p><strong>JSON output for automation:</strong></p>
+<div class="code-block">./auditkit scan -provider aws -framework cis-aws -format json -output cis-aws.json
+</div>
+<h2>Example Output</h2>
+<div class="code-block">CIS AWS Foundations Benchmark Scan Results
+==========================================
+
+Overall Compliance: Sample output (actual coverage depends on your infrastructure)
+
+CRITICAL - Fix Immediately (5 failures):
+  ✗ [CIS-1.4] Eliminate use of the root account
+  ✗ [CIS-1.5] Ensure MFA is enabled for the root account
+  ✗ [CIS-2.1.1] Ensure S3 bucket encryption is enabled
+  ✗ [CIS-3.1] Ensure CloudTrail is enabled in all regions
+  ✗ [CIS-5.2] Ensure no security groups allow ingress from 0.0.0.0/0 to port 22
+
+HIGH PRIORITY (8 failures):
+  ✗ [CIS-1.14] Ensure access keys are rotated every 90 days
+  ✗ [CIS-2.1.2] Ensure S3 bucket versioning is enabled
+  ...
+
+MEDIUM PRIORITY (9 failures):
+  ...
+
+PASSED (36 controls):
+  [PASS] [CIS-1.6] Ensure hardware MFA is enabled for root account
+  [PASS] [CIS-2.1.3] Ensure S3 bucket logging is enabled
+  ...
+</div>
+<h2>Remediation Examples</h2>
+<h3>CIS-1.5: Enable Root Account MFA</h3>
+<p><strong>Manual Steps:</strong>
+1. AWS Console → IAM → Dashboard
+2. Click "Activate MFA on your root account"
+3. Follow wizard to add virtual or hardware MFA</p>
+<p><strong>AWS CLI:</strong></p>
+<div class="code-block"># Enable virtual MFA for root account
+aws iam enable-mfa-device \
+  --user-name root \
+  --serial-number arn:aws:iam::ACCOUNT_ID:mfa/root \
+  --authentication-code-1 123456 \
+  --authentication-code-2 789012
+</div>
+<p><strong>Terraform:</strong></p>
+<div class="code-block"># Root account MFA must be configured manually
+# Add to your security checklist
+</div>
+<h3>CIS-2.1.1: Enable S3 Bucket Encryption</h3>
+<p><strong>AWS CLI:</strong></p>
+<div class="code-block"># Enable default encryption for all S3 buckets
+aws s3api put-bucket-encryption \
+  --bucket your-bucket-name \
+  --server-side-encryption-configuration '{
+    &quot;Rules&quot;: [{
+      &quot;ApplyServerSideEncryptionByDefault&quot;: {
+        &quot;SSEAlgorithm&quot;: &quot;AES256&quot;
+      }
+    }]
+  }'
+</div>
+<p><strong>Terraform:</strong></p>
+<div class="code-block">resource &quot;aws_s3_bucket_server_side_encryption_configuration&quot; &quot;example&quot; {
+  bucket = aws_s3_bucket.example.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = &quot;AES256&quot;
+    }
+  }
+}
+</div>
+<h2>Frequently Asked Questions</h2>
+<h3>Q: Do I need to run CIS scans if I'm already SOC2 compliant?</h3>
+<p><strong>A:</strong> Yes! SOC2 focuses on business controls and governance. CIS Benchmarks provide technical security hardening that goes beyond compliance requirements. Many SOC2-compliant companies still have security misconfigurations that CIS would catch.</p>
+<h3>Q: How often should I run CIS scans?</h3>
+<p><strong>A:</strong> </p>
+<ul>
+<li><strong>Weekly:</strong> For production environments</li>
+<li><strong>Daily:</strong> For highly sensitive environments or during security initiatives</li>
+<li><strong>After changes:</strong> Any infrastructure or configuration changes</li>
+<li><strong>Before audits:</strong> To verify security posture</li>
+</ul>
+<h3>Q: Does AuditKit replace tools like Prowler or AWS Security Hub?</h3>
+<p><strong>A:</strong> No, AuditKit complements them. We focus on compliance frameworks and provide auditor-friendly reports. For comprehensive AWS-specific security scanning, use both AuditKit (for compliance reporting) and Prowler (for deep AWS security checks).</p>
+<h3>Q: Which CIS version should I use - v1.4 or v3.0?</h3>
+<p><strong>A:</strong> AuditKit combines both! v3.0 is newer and consolidated, but v1.4 has some additional checks that are still valuable. Our implementation gives you the best of both versions (158 unique controls).</p>
+<h3>Q: Can I export results to my SIEM or ticketing system?</h3>
+<p><strong>A:</strong> Yes! Use JSON output:</p>
+<div class="code-block">./auditkit scan -provider aws -framework cis-aws -format json -output cis.json
+</div>
+<p>Then parse the JSON in your automation workflows.</p>
+<h2>Official CIS Resources</h2>
+<ul>
+<li><strong>CIS Benchmarks:</strong> https://www.cisecurity.org/cis-benchmarks</li>
+<li><strong>CIS AWS Benchmark v1.4:</strong> Available from CIS website</li>
+<li><strong>CIS AWS Benchmark v3.0:</strong> Available from CIS website</li>
+<li><strong>CIS Controls v8:</strong> https://www.cisecurity.org/controls/v8</li>
+</ul>
+<h2>Contributing</h2>
+<p>Help us expand CIS coverage:</p>
+<ul>
+<li>Add Azure CIS checks</li>
+<li>Add GCP CIS checks</li>
+<li>Improve remediation guidance</li>
+<li>Add Terraform/CloudFormation templates</li>
+</ul>
+<p><strong><a href="../../../CONTRIBUTING.md">Contributing Guide →</a></strong></p>
+<h2>Support</h2>
+<ul>
+<li><strong>Issues:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/issues">GitHub Issues</a></li>
+<li><strong>Questions:</strong> info@auditkit.io</li>
+<li><strong>Pro Support:</strong> Priority email support</li>
+</ul>
+<p><strong>Last Updated:</strong> September 2026</p>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Scan your environment</h3>
+                <p style="margin-bottom: 1.25rem;">Point AuditKit at AWS, Azure or GCP with read-only credentials and get every finding with the command to fix it. Full results in about thirty minutes.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed framework documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">

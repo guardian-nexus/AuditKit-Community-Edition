@@ -20,6 +20,7 @@ Payment Card Industry Data Security Standard guide.
 **AuditKit's PCI-DSS support covers technical and some organizational controls - assessment by QSA required for certification.**
 
 **What AuditKit covers:**
+
 - Network security controls (Req 1)
 - Configuration management (Req 2)
 - Data encryption at rest and in transit (Req 3, 4)
@@ -29,6 +30,7 @@ Payment Card Industry Data Security Standard guide.
 - Documentation guidance for organizational controls (Req 5, 9, 12)
 
 **What AuditKit does NOT replace:**
+
 - Qualified Security Assessor (QSA) evaluation
 - Penetration testing by approved vendors
 - Quarterly ASV vulnerability scans
@@ -46,6 +48,7 @@ Payment Card Industry Data Security Standard guide.
 PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 
 **Major changes:**
+
 - Enhanced multi-factor authentication requirements
 - Stronger encryption standards
 - More detailed logging requirements
@@ -53,6 +56,7 @@ PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 - Service provider responsibilities clarified
 
 **Timeline:**
+
 - March 31, 2024: v4.0 mandatory (v3.2.1 retired)
 - March 31, 2025: All v4.0 future-dated requirements become effective
 
@@ -63,12 +67,14 @@ PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 ### Build and Maintain a Secure Network
 
 **Requirement 1: Install and maintain network security controls**
+
 - Firewalls between untrusted networks and CDE
 - Network segmentation of cardholder data environment (CDE)
 - Restrict inbound/outbound traffic to only what's necessary
 - No direct public access from internet to CDE
 
 **Requirement 2: Apply secure configurations to all system components**
+
 - Change vendor-supplied defaults (passwords, SNMP strings)
 - Disable unnecessary services and protocols
 - Configure security parameters to prevent misuse
@@ -77,12 +83,14 @@ PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 ### Protect Cardholder Data
 
 **Requirement 3: Protect stored cardholder data**
+
 - Minimize data retention (store only what's necessary)
 - Encrypt cardholder data at rest (AES-256 or equivalent)
 - Mask PAN when displayed (first 6 and last 4 digits max)
 - Render cardholder data unreadable
 
 **Requirement 4: Protect cardholder data with strong cryptography during transmission**
+
 - Use TLS 1.2+ for transmission over open/public networks
 - Never send unencrypted PANs via email, messaging, chat
 - Verify certificates are valid and not expired
@@ -91,11 +99,13 @@ PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 ### Maintain a Vulnerability Management Program
 
 **Requirement 5: Protect all systems and networks from malicious software**
+
 - Deploy anti-malware on all systems commonly affected
 - Ensure anti-malware is current and actively running
 - Generate audit logs and retain per Requirement 10
 
 **Requirement 6: Develop and maintain secure systems and software**
+
 - Patch critical vulnerabilities within 30 days
 - Implement secure development lifecycle
 - Deploy web application firewall (WAF) for public-facing applications
@@ -104,12 +114,14 @@ PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 ### Implement Strong Access Control Measures
 
 **Requirement 7: Restrict access to system components and cardholder data by business need to know**
+
 - Define access based on job function
 - Implement least privilege
 - Document and approve all access
 - Review access rights every 6 months
 
 **Requirement 8: Identify users and authenticate access to system components**
+
 - Unique ID for each user
 - Multi-factor authentication (MFA) for all access to CDE
 - Strong password policies (minimum 12 characters for v4.0)
@@ -120,12 +132,14 @@ PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 ### Regularly Monitor and Test Networks
 
 **Requirement 9: Restrict physical access to cardholder data**
+
 - Physical access controls (badges, locks, cameras)
 - Visitor logs and escorts
 - Secure media storage and destruction
 - Point-of-sale device protection
 
 **Requirement 10: Log and monitor all access to system components and cardholder data**
+
 - Audit logs for all access to cardholder data
 - Automated audit trails for critical events
 - Log retention for at least 12 months (3 months readily available)
@@ -133,6 +147,7 @@ PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 - Time synchronization using NTP
 
 **Requirement 11: Test security of systems and networks regularly**
+
 - Quarterly external vulnerability scans by Approved Scanning Vendor (ASV)
 - Internal vulnerability scans quarterly and after significant changes
 - Annual penetration testing
@@ -142,6 +157,7 @@ PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 ### Maintain an Information Security Policy
 
 **Requirement 12: Support information security with organizational policies and programs**
+
 - Establish, publish, maintain security policy
 - Annual risk assessment
 - Acceptable use policies for critical technologies
@@ -157,28 +173,33 @@ PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 ### Automated Technical Controls
 
 **Network Security (Req 1):**
+
 - VPC/VNet segmentation
 - Security group/NSG rules for 0.0.0.0/0 exposure
 - Firewall configuration
 - Network ACLs
 
 **Secure Configurations (Req 2):**
+
 - Default password warnings
 - Default security group checks
 - Service configuration review
 
 **Data Encryption (Req 3, 4):**
+
 - Storage encryption at rest (S3, Azure Storage, GCS, EBS, managed disks)
 - Database encryption (RDS, SQL Database, Cloud SQL)
 - TLS/SSL enforcement
 - Secure transport policies
 
 **Vulnerability Management (Req 6, 11):**
+
 - Patch management status (INFO - cannot auto-verify patching)
 - WAF deployment guidance
 - Change detection mechanisms (AWS Config, Azure Policy, GCP Security Command Center)
 
 **Access Control (Req 7, 8):**
+
 - IAM user least privilege
 - MFA enforcement on all accounts
 - Root/admin account usage
@@ -186,6 +207,7 @@ PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 - Access key rotation (90 days)
 
 **Logging and Monitoring (Req 10):**
+
 - CloudTrail/Activity Log/Cloud Audit Logs enabled
 - Log retention configuration
 - Log integrity validation
@@ -194,16 +216,19 @@ PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:
 ### INFO/MANUAL Controls
 
 **Malware Protection (Req 5):**
+
 - Guidance for endpoint protection deployment
 - Anti-malware update verification
 - Log retention for anti-malware events
 
 **Physical Security (Req 9):**
+
 - Cloud provider physical security documentation (inherited controls)
 - Organizational physical access procedures
 - Media handling and destruction procedures
 
 **Organizational Controls (Req 12):**
+
 - Security policy establishment
 - Risk assessment procedures
 - Acceptable use policies
@@ -329,6 +354,7 @@ Based on Verizon Payment Security Reports:
 | **ISO 27001** | Information security | High - comprehensive security management |
 
 **Key PCI-DSS differentiators:**
+
 - Specific to payment card data
 - Quarterly vulnerability scanning required
 - 12-month log retention (longer than most frameworks)

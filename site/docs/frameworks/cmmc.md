@@ -9,6 +9,7 @@ Complete guide to CMMC Level 1 and Level 2 compliance with AuditKit.
 **CMMC** is a cybersecurity framework required for DoW contractors.
 
 **Why CMMC matters:**
+
 - In force since November 10, 2025, when the 48 CFR rule took effect
 - Protects Federal Contract Information (FCI) and Controlled Unclassified Information (CUI)
 - Phase 1 is live: self-assessment for Level 1 and Level 2 on applicable contracts
@@ -34,6 +35,7 @@ SPRS score postings and annual affirmations.
 **Cost:** Free with AuditKit
 
 **What is FCI?**
+
 - Contract awards
 - Pricing information
 - Business plans
@@ -50,6 +52,7 @@ SPRS score postings and annual affirmations.
 **Cost:** $297/month with AuditKit
 
 **What is CUI?**
+
 - Technical specifications
 - Mission plans
 - Personnel records
@@ -103,6 +106,7 @@ level and NIST SP 800-171 Rev 2 requirement number.
 ### What AuditKit Checks (Level 1)
 
 **Queried automatically from your cloud configuration (13 of the 17 on AWS and Azure, 9 of 17 on GCP):**
+
 - IAM password policy configuration
 - MFA enforcement
 - Access key rotation
@@ -113,6 +117,7 @@ level and NIST SP 800-171 Rev 2 requirement number.
 - Patch management
 
 **No automated check - manual verification required (4 practices):**
+
 - AC.L1-3.1.20 - Verify and control connections to external systems
 - AC.L1-3.1.22 - Control publicly posted information
 - SI.L1-3.14.4 - Update malicious code protection mechanisms
@@ -232,8 +237,6 @@ Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14
 - Access logs
 - Asset monitoring
 
-(delete this heading and its two bullets entirely)
-
 #### Risk Assessment (RA) - 3 practices
 - Risk assessments
 - Vulnerability scanning
@@ -269,6 +272,7 @@ Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14
 **Queried automatically from your cloud configuration (42 of the 110); the remaining 68 are
 assessed as structured evidence guidance, telling you what an assessor needs to see:**
 All technical controls across:
+
 - IAM and authentication
 - Network security
 - Encryption
@@ -283,6 +287,7 @@ All technical controls across:
 
 **Structured evidence guidance (68 practices):**
 Organizational controls:
+
 - Policies and procedures
 - Training programs
 - Physical security
@@ -346,6 +351,7 @@ auditkit-pro evidence -output cmmc-evidence.html
 AuditKit maps all 110 CMMC Level 2 practices to their corresponding NIST SP 800-171 controls.
 
 **Example mapping:**
+
 - CMMC AC.L1-3.1.2 → NIST 800-171 3.1.2
 - CMMC IA.L2-3.5.3 → NIST 800-171 3.5.3
 - CMMC SC.L1-3.13.1 → NIST 800-171 3.13.1
@@ -378,6 +384,7 @@ This means passing CMMC Level 2 = compliance with NIST SP 800-171.
 ### During Assessment
 
 **C3PAO will:**
+
 - Review all 110 practices
 - Interview personnel
 - Inspect facilities
@@ -390,11 +397,13 @@ This means passing CMMC Level 2 = compliance with NIST SP 800-171.
 ### After Assessment
 
 **If you pass:**
+
 - Receive CMMC certification
 - Valid for 3 years
 - Include in contract bids
 
 **If you fail:**
+
 - Receive POA&M with gaps
 - Remediate and re-assess
 - May require 3-6 months
@@ -455,11 +464,13 @@ Based on C3PAO assessments, here are the most common failures:
 ## CMMC Resources
 
 **Official:**
+
 - CMMC Model: https://dodcio.defense.gov/CMMC/
 - CMMC FAQ: https://dodcio.defense.gov/CMMC/FAQ/
 - C3PAO Directory: https://cyberab.org/Catalog
 
 **AuditKit:**
+
 - [Pro trial →](https://auditkit.io/pro/)
 - [Getting started →](../getting-started.md)
 - [CLI reference →](../cli-reference.md)

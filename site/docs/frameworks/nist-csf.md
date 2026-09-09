@@ -37,6 +37,7 @@ chain strategy. A scanner cannot assess it.
 - **Recover** - 3 of the 8 RC subcategories, from backup and restore configuration. Recovery plan execution and communications are not.
 
 **What AuditKit does not cover**
+
 - Anything requiring evidence of a process rather than a configuration
 
 ---

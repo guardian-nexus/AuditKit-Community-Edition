@@ -20,12 +20,14 @@ Federal Risk and Authorization Management Program guide.
 **AuditKit's FedRAMP support covers technical controls only - NOT sufficient for FedRAMP authorization.**
 
 **What AuditKit covers:**
+
 - Technical control scanning based on NIST 800-53 Rev 5
 - Automated verification of cloud configurations
 - Baseline filtering (Low/Moderate/High impact levels)
 - Remediation guidance with cloud-specific commands
 
 **What AuditKit does NOT replace:**
+
 - FedRAMP Third-Party Assessment Organization (3PAO) assessment
 - Security Assessment Plan (SAP) development
 - Security Assessment Report (SAR) creation
@@ -46,11 +48,13 @@ FedRAMP defines three security impact levels based on FIPS 199:
 ### Low Impact (149 controls total, 56 automatable)
 
 **When to use:**
+
 - Low-impact SaaS applications
 - Non-sensitive federal data
 - No PII, no mission-critical systems
 
 **Examples:**
+
 - Collaboration tools (non-sensitive)
 - Public-facing websites
 - General productivity applications
@@ -63,11 +67,13 @@ FedRAMP defines three security impact levels based on FIPS 199:
 ### Moderate Impact (287 controls total, 77 automatable)
 
 **When to use:** (Most common - 80%+ of FedRAMP authorizations)
+
 - Most SaaS and cloud services
 - Moderate-impact federal data
 - Some PII, mission-supportive systems
 
 **Examples:**
+
 - CRM systems with PII
 - Financial management systems
 - HR and benefits platforms
@@ -81,12 +87,14 @@ FedRAMP defines three security impact levels based on FIPS 199:
 ### High Impact (370 controls total, 78 automatable)
 
 **When to use:**
+
 - High-impact systems
 - Law enforcement data
 - Financial or health information
 - National security systems
 
 **Examples:**
+
 - Critical mission systems
 - Law enforcement databases
 - National security applications
@@ -211,6 +219,7 @@ AuditKit scans for technical controls that map to FedRAMP baselines via NIST 800
 | **StateRAMP** | Very High | State-level equivalent |
 
 **Key Differentiators:**
+
 - FedRAMP requires formal 3PAO assessment
 - Continuous monitoring mandatory
 - FedRAMP PMO oversight

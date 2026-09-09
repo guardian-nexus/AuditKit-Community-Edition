@@ -26,6 +26,7 @@ AuditKit supports multiple compliance frameworks for automated technical control
 
 ### Production Ready
 Fully tested, comprehensive coverage, used in production environments:
+
 - **SOC2 Type II** - For SaaS companies and startups
 - **PCI-DSS v4.0.1** - For payment card processing
 - **CMMC Level 1** - For all DoW contractors
@@ -38,6 +39,7 @@ Fully tested, comprehensive coverage, used in production environments:
 Community reports all 110 CMMC Level 1 and Level 2 practices and automates Level 1
 (13 of the 17 Level 1 practices carry checks on AWS and Azure, 9 on GCP).
 An AuditKit subscription adds the automated Level 2 checks:
+
 - **CMMC Level 2** - For DoW contractors handling CUI. Of the 110 practices Pro assesses, 42 query the cloud and 68 are structured evidence guidance.
 
 ---
@@ -93,10 +95,12 @@ An AuditKit subscription adds the automated Level 2 checks:
 ### CMMC
 **Purpose:** Cybersecurity Maturity Model Certification for DoW  
 **Certification:**  
+
 - Level 1: Self-assessment  
 - Level 2: Self-assessment under Phase 1. C3PAO ($25,000 - $150,000) applies only if Phase 2 resumes, suspended since July 13, 2026
 
 **Timeline:**  
+
 - Level 1: 2-4 weeks  
 - Level 2: 3-6 months
 
@@ -109,6 +113,7 @@ An AuditKit subscription adds the automated Level 2 checks:
 **Timeline:** 2-4 weeks for basic hardening (IG1)
 
 **Current Coverage:**
+
 - AWS: 158 automated controls (Production)
 - Azure: 108 automated controls (Production)
 - GCP: 71 automated controls (Production)
@@ -168,6 +173,7 @@ auditkit scan -provider aws -framework all
 AuditKit maps controls across frameworks. For example:
 
 **AWS IAM MFA enforcement** maps to:
+
 - SOC2: CC6.6
 - PCI-DSS: Requirement 8.3
 - CMMC: IA.L2-3.5.3
@@ -204,6 +210,7 @@ This means fixing one control improves compliance across multiple frameworks.
 Many organizations need multiple frameworks:
 
 **Common combinations:**
+
 - SOC2 + PCI-DSS (SaaS with payment processing)
 - SOC2 + CIS Benchmarks (SaaS with strong security posture)
 - CMMC + NIST 800-53 (DoW + federal work)
@@ -230,6 +237,7 @@ Many organizations need multiple frameworks:
 ## Getting Help
 
 **Framework-specific questions:**
+
 - [SOC2 FAQ](./soc2.md#faq)
 - [PCI-DSS FAQ](./pci-dss.md#faq)
 - [CMMC FAQ](./cmmc.md#faq)
@@ -237,6 +245,7 @@ Many organizations need multiple frameworks:
 - [NIST 800-53 FAQ](./nist-800-53.md#faq)
 
 **General support:**
+
 - [Main FAQ](../faq.md)
 - [GitHub Issues](https://github.com/guardian-nexus/AuditKit-Community-Edition/issues)
 - Email: info@auditkit.io

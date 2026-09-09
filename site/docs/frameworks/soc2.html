@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOC2 - AuditKit</title>
+    <title>SOC 2 Compliance Scanning - AuditKit</title>
+    <meta name="description" content="Scan AWS, Azure and GCP against the SOC 2 Trust Services Criteria, with remediation and evidence for every finding.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="SOC 2 Compliance Scanning - AuditKit">
+    <meta property="og:description" content="Scan AWS, Azure and GCP against the SOC 2 Trust Services Criteria, with remediation and evidence for every finding.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/frameworks/soc2.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,257 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
-            <h1>SOC2</h1>
-            <p class="subtitle">Framework guide for AuditKit</p>
+            <h1>SOC 2 Compliance Scanning</h1>
+            <p class="subtitle">Scan AWS, Azure and GCP against the SOC 2 Trust Services Criteria, with remediation and evidence for every finding.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/frameworks/soc2.md">View full SOC2 documentation on GitHub &rarr;</a></p>
+<p>System and Organization Controls (SOC) 2 framework guide.</p>
+<h2>Overview</h2>
+<p><strong>SOC2 Type II</strong> is a compliance framework for service organizations (SaaS, cloud providers, data centers).</p>
+<p><strong>Who needs it:</strong> SaaS companies selling to enterprise customers<br />
+<strong>Auditor:</strong> CPA firm<br />
+<strong>Cost:</strong> $15,000 - $30,000 for audit<br />
+<strong>Timeline:</strong> 3-6 months prep + 3-12 month observation period<br />
+<strong>AuditKit coverage:</strong> 38 of the 43 SOC 2 criteria on AWS (37 on Azure, 32 on GCP)</p>
+<h2>Trust Services Criteria</h2>
+<p>SOC2 is based on 5 Trust Services Criteria:</p>
+<h3>Security (Required)</h3>
+<p>Controls to protect system resources against unauthorized access</p>
+<h3>Availability (Optional)</h3>
+<p>System is available for operation and use as committed</p>
+<h3>Processing Integrity (Optional)</h3>
+<p>System processing is complete, valid, accurate, timely, and authorized</p>
+<h3>Confidentiality (Optional)</h3>
+<p>Information designated as confidential is protected</p>
+<h3>Privacy (Optional)</h3>
+<p>Personal information is collected, used, retained, disclosed, and disposed properly</p>
+<p><strong>Most companies:</strong> Security + Availability</p>
+<h2>Common Criteria (CC) Categories</h2>
+<h3>CC1 - Control Environment</h3>
+<p>Integrity and ethical values, board oversight, organizational structure</p>
+<p><strong>What AuditKit checks:</strong> Limited - mostly organizational policies</p>
+<h3>CC2 - Communication &amp; Information</h3>
+<p>Internal and external communication of information</p>
+<p><strong>What AuditKit checks:</strong> Limited - mostly organizational policies</p>
+<h3>CC3 - Risk Assessment</h3>
+<p>Risk identification and analysis processes</p>
+<p><strong>What AuditKit checks:</strong> Limited - mostly organizational policies</p>
+<h3>CC5 - Control Activities</h3>
+<p>Policies and procedures to ensure directives are carried out</p>
+<p><strong>What AuditKit checks:</strong> Limited - mostly organizational policies</p>
+<h3>CC6 - Logical &amp; Physical Access Controls</h3>
+<p><strong>Most technical controls - AuditKit covers all 8 CC6 criteria (CC6.1-CC6.8) on AWS</strong></p>
+<ul>
+<li>CC6.1: Access key rotation, unused credentials</li>
+<li>CC6.2: S3 public access, Storage account security</li>
+<li>CC6.6: MFA enforcement for users</li>
+<li>CC6.7: Root/admin MFA</li>
+<li>CC6.8: Least privilege access</li>
+</ul>
+<p><strong>Example scan output:</strong></p>
+<div class="code-block">[FAIL] CC6.6 - User MFA Enforcement
+  Issue: 12 users without MFA enabled
+  Fix: aws iam enable-mfa-device --user-name USERNAME
+
+[FAIL] CC6.2 - S3 Bucket Public Access
+  Issue: 3 buckets allow public access: customer-data, invoices, backups
+  Fix: aws s3api put-public-access-block --bucket BUCKET_NAME
+</div>
+<h3>CC7 - System Operations</h3>
+<p><strong>Most automated controls - AuditKit automates 12 checks</strong></p>
+<ul>
+<li>CC7.1: CloudTrail/logging enabled</li>
+<li>CC7.2: Log retention and monitoring</li>
+<li>CC7.3: Backup and recovery</li>
+<li>CC7.4: Automated backups configured</li>
+</ul>
+<h3>CC8 - Change Management</h3>
+<p>Configuration management, system components, data</p>
+<ul>
+<li>CC8.1: Encryption at rest (S3, RDS, disks)</li>
+</ul>
+<h3>CC9 - Risk Mitigation</h3>
+<p>System changes, incident management, business continuity</p>
+<ul>
+<li>CC9.1: Risk mitigation - RDS encryption at rest (only reported when RDS instances exist)</li>
+<li>CC9.2: Vendor and business partner risk - S3 default encryption</li>
+</ul>
+<h2>What AuditKit Automates</h2>
+<p><strong>Criteria assessed on AWS (38 of the 43 in the catalog), by group:</strong></p>
+<ul>
+<li>CC1 Control environment - 5 of 5 criteria</li>
+<li>CC2 Communication and information - 3 of 3</li>
+<li>CC3 Risk assessment - 4 of 4</li>
+<li>CC4 Monitoring activities - 2 of 2</li>
+<li>CC5 Control activities - 3 of 3</li>
+<li>CC6 Logical and physical access - 8 of 8</li>
+<li>CC7 System operations - 5 of 5</li>
+<li>CC8 Change management - 1 of 1</li>
+<li>CC9 Risk mitigation - 2 of 2</li>
+<li>A1 Availability - 3 of 3</li>
+<li>C1 Confidentiality - 2 of 2</li>
+<li>PI1 Processing integrity - 0 of 5</li>
+</ul>
+<p><strong>What AuditKit doesn't cover:</strong></p>
+<ul>
+<li>Organizational policies</li>
+<li>HR procedures</li>
+<li>Vendor management</li>
+<li>Physical security</li>
+<li>Training programs</li>
+<li>Incident response documentation</li>
+</ul>
+<h2>SOC2 Type I vs Type II</h2>
+<h3>Type I</h3>
+<ul>
+<li>Point-in-time assessment</li>
+<li>"Do you have the right controls?"</li>
+<li>2-4 weeks</li>
+<li>$10,000 - $15,000</li>
+</ul>
+<h3>Type II</h3>
+<ul>
+<li>3-12 month observation period</li>
+<li>"Do your controls work over time?"</li>
+<li>3-12 months</li>
+<li>$15,000 - $30,000</li>
+<li><strong>Required by most enterprise customers</strong></li>
+</ul>
+<h2>Running SOC2 Scan</h2>
+<div class="code-block"># AWS
+auditkit scan -provider aws -framework soc2
+
+# Azure
+auditkit scan -provider azure -framework soc2
+
+# GCP
+auditkit scan -provider gcp -framework soc2
+
+# All providers
+auditkit scan -provider aws -framework soc2 -output aws-soc2.pdf
+auditkit scan -provider azure -framework soc2 -output azure-soc2.pdf
+auditkit scan -provider gcp -framework soc2 -output gcp-soc2.pdf
+
+# Generate evidence tracker
+# Evidence tracker (covers every framework; -framework and -format are not honoured here)
+auditkit evidence -output evidence.html
+</div>
+<h2>Typical Timeline</h2>
+<p><strong>Month 1-2: Technical prep</strong></p>
+<ul>
+<li>Run AuditKit scan</li>
+<li>Fix critical findings</li>
+<li>Enable security services</li>
+<li>Configure logging</li>
+</ul>
+<p><strong>Month 3-4: Organizational prep</strong></p>
+<ul>
+<li>Write policies and procedures</li>
+<li>Implement training</li>
+<li>Document vendor management</li>
+<li>Create incident response plan</li>
+</ul>
+<p><strong>Month 5-6: Pre-audit</strong></p>
+<ul>
+<li>Re-scan with AuditKit</li>
+<li>Collect evidence</li>
+<li>Conduct internal audit</li>
+<li>Select CPA firm</li>
+</ul>
+<p><strong>Month 7-18: Observation period</strong></p>
+<ul>
+<li>3-12 month period (auditor decides)</li>
+<li>Quarterly AuditKit scans</li>
+<li>Track changes and incidents</li>
+<li>Collect evidence continuously</li>
+</ul>
+<p><strong>Month 19: Audit</strong></p>
+<ul>
+<li>CPA firm conducts audit</li>
+<li>Reviews controls and evidence</li>
+<li>Issues SOC2 report</li>
+</ul>
+<h2>Common Failures</h2>
+<p>Based on SOC2 audits, most common technical failures:</p>
+<ol>
+<li>No MFA enforcement (CC6.6)</li>
+<li>Public S3 buckets (CC6.2)</li>
+<li>CloudTrail not enabled (CC7.1)</li>
+<li>Weak password policies (CC6.1)</li>
+<li>No log retention (CC7.2)</li>
+<li>Encryption not enabled (CC8.1)</li>
+<li>Access keys not rotated (CC6.1)</li>
+<li>No backup testing (CC7.3)</li>
+</ol>
+<p><strong>AuditKit catches all of these automatically</strong></p>
+<h2>Cost Breakdown</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Cost (Estimate)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AuditKit Free</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Policy templates</td>
+<td>$0 - $500</td>
+</tr>
+<tr>
+<td>CPA firm audit</td>
+<td>$15,000 - $30,000</td>
+</tr>
+<tr>
+<td>Consultant (optional)</td>
+<td>$0 - $30,000</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$15,000 - $60,500</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Compare to:</strong> Traditional consultant-led prep: $50,000 - $100,000</p>
+<h2>FAQ</h2>
+<p><strong>Q: Can I use AuditKit's scan results with my auditor?</strong><br />
+A: Yes. Generate PDF reports to share with your CPA firm.</p>
+<p><strong>Q: Does SOC2 expire?</strong><br />
+A: Reports are valid for 12 months. Most companies get annual audits.</p>
+<p><strong>Q: What if I fail the audit?</strong><br />
+A: Address findings and re-audit. Use AuditKit to verify fixes before re-audit.</p>
+<p><strong>Q: Do I need SOC2 Type II or Type I?</strong><br />
+A: Enterprise customers typically require Type II.</p>
+<p><strong>Q: How long is the observation period?</strong><br />
+A: 3-12 months. Auditor decides based on your controls maturity.</p>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../getting-started.md">Run your first SOC2 scan →</a></strong></li>
+<li><strong><a href="../providers/">View provider coverage →</a></strong></li>
+<li><strong><a href="./README.md">Compare to other frameworks →</a></strong></li>
+<li><strong><a href="../cli-reference.md#evidence">Generate evidence tracker →</a></strong></li>
+</ul>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Scan your environment</h3>
+                <p style="margin-bottom: 1.25rem;">Point AuditKit at AWS, Azure or GCP with read-only credentials and get every finding with the command to fix it. Full results in about thirty minutes.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed framework documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">

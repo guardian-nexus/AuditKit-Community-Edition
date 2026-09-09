@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PCI-DSS - AuditKit</title>
+    <title>PCI-DSS v4.0.1 Scanning - AuditKit</title>
+    <meta name="description" content="Scan your cardholder data environment against PCI-DSS v4.0.1 requirements across AWS, Azure and GCP.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="PCI-DSS v4.0.1 Scanning - AuditKit">
+    <meta property="og:description" content="Scan your cardholder data environment against PCI-DSS v4.0.1 requirements across AWS, Azure and GCP.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/frameworks/pci-dss.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,507 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
-            <h1>PCI-DSS</h1>
-            <p class="subtitle">Framework guide for AuditKit</p>
+            <h1>PCI-DSS v4.0.1 Scanning</h1>
+            <p class="subtitle">Scan your cardholder data environment against PCI-DSS v4.0.1 requirements across AWS, Azure and GCP.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/frameworks/pci-dss.md">View full PCI-DSS documentation on GitHub &rarr;</a></p>
+<p>Payment Card Industry Data Security Standard guide.</p>
+<h2>Overview</h2>
+<p><strong>PCI-DSS</strong> protects payment card data for businesses that store, process, or transmit cardholder information.</p>
+<p><strong>Who needs it:</strong> Merchants, service providers, payment processors, anyone handling credit/debit card data
+<strong>Status in AuditKit:</strong> Production
+<strong>Coverage:</strong> 69 requirements across all 12 groups (AWS 59, Azure 59, GCP 49)
+<strong>What's covered:</strong> Technical controls for network security, encryption, access control, monitoring, testing, and policy</p>
+<h2>Important Disclaimer</h2>
+<p><strong>AuditKit's PCI-DSS support covers technical and some organizational controls - assessment by QSA required for certification.</strong></p>
+<p><strong>What AuditKit covers:</strong></p>
+<ul>
+<li>Network security controls (Req 1)</li>
+<li>Configuration management (Req 2)</li>
+<li>Data encryption at rest and in transit (Req 3, 4)</li>
+<li>Technical vulnerability management (Req 6, 11)</li>
+<li>Access controls and authentication (Req 7, 8)</li>
+<li>Audit logging and monitoring (Req 10)</li>
+<li>Documentation guidance for organizational controls (Req 5, 9, 12)</li>
+</ul>
+<p><strong>What AuditKit does NOT replace:</strong></p>
+<ul>
+<li>Qualified Security Assessor (QSA) evaluation</li>
+<li>Penetration testing by approved vendors</li>
+<li>Quarterly ASV vulnerability scans</li>
+<li>Formal risk assessments</li>
+<li>Complete policy and procedure documentation</li>
+</ul>
+<p><strong>Use for:</strong> Technical control assessment and remediation as part of PCI-DSS compliance program
+<strong>Don't use for:</strong> Sole evidence of PCI-DSS compliance
+<strong>Hire a QSA for:</strong> Annual assessment and Report on Compliance (ROC) or Self-Assessment Questionnaire (SAQ) validation</p>
+<h2>PCI-DSS v4.0.1</h2>
+<p>PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:</p>
+<p><strong>Major changes:</strong></p>
+<ul>
+<li>Enhanced multi-factor authentication requirements</li>
+<li>Stronger encryption standards</li>
+<li>More detailed logging requirements</li>
+<li>Quarterly vulnerability scanning now explicitly required</li>
+<li>Service provider responsibilities clarified</li>
+</ul>
+<p><strong>Timeline:</strong></p>
+<ul>
+<li>March 31, 2024: v4.0 mandatory (v3.2.1 retired)</li>
+<li>March 31, 2025: All v4.0 future-dated requirements become effective</li>
+</ul>
+<h2>The 12 Requirements</h2>
+<h3>Build and Maintain a Secure Network</h3>
+<p><strong>Requirement 1: Install and maintain network security controls</strong></p>
+<ul>
+<li>Firewalls between untrusted networks and CDE</li>
+<li>Network segmentation of cardholder data environment (CDE)</li>
+<li>Restrict inbound/outbound traffic to only what's necessary</li>
+<li>No direct public access from internet to CDE</li>
+</ul>
+<p><strong>Requirement 2: Apply secure configurations to all system components</strong></p>
+<ul>
+<li>Change vendor-supplied defaults (passwords, SNMP strings)</li>
+<li>Disable unnecessary services and protocols</li>
+<li>Configure security parameters to prevent misuse</li>
+<li>Maintain configuration standards</li>
+</ul>
+<h3>Protect Cardholder Data</h3>
+<p><strong>Requirement 3: Protect stored cardholder data</strong></p>
+<ul>
+<li>Minimize data retention (store only what's necessary)</li>
+<li>Encrypt cardholder data at rest (AES-256 or equivalent)</li>
+<li>Mask PAN when displayed (first 6 and last 4 digits max)</li>
+<li>Render cardholder data unreadable</li>
+</ul>
+<p><strong>Requirement 4: Protect cardholder data with strong cryptography during transmission</strong></p>
+<ul>
+<li>Use TLS 1.2+ for transmission over open/public networks</li>
+<li>Never send unencrypted PANs via email, messaging, chat</li>
+<li>Verify certificates are valid and not expired</li>
+<li>Use only strong cryptographic protocols</li>
+</ul>
+<h3>Maintain a Vulnerability Management Program</h3>
+<p><strong>Requirement 5: Protect all systems and networks from malicious software</strong></p>
+<ul>
+<li>Deploy anti-malware on all systems commonly affected</li>
+<li>Ensure anti-malware is current and actively running</li>
+<li>Generate audit logs and retain per Requirement 10</li>
+</ul>
+<p><strong>Requirement 6: Develop and maintain secure systems and software</strong></p>
+<ul>
+<li>Patch critical vulnerabilities within 30 days</li>
+<li>Implement secure development lifecycle</li>
+<li>Deploy web application firewall (WAF) for public-facing applications</li>
+<li>Separate development/test from production</li>
+</ul>
+<h3>Implement Strong Access Control Measures</h3>
+<p><strong>Requirement 7: Restrict access to system components and cardholder data by business need to know</strong></p>
+<ul>
+<li>Define access based on job function</li>
+<li>Implement least privilege</li>
+<li>Document and approve all access</li>
+<li>Review access rights every 6 months</li>
+</ul>
+<p><strong>Requirement 8: Identify users and authenticate access to system components</strong></p>
+<ul>
+<li>Unique ID for each user</li>
+<li>Multi-factor authentication (MFA) for all access to CDE</li>
+<li>Strong password policies (minimum 12 characters for v4.0)</li>
+<li>Password change every 90 days</li>
+<li>Account lockout after 6 failed attempts</li>
+<li>Session timeout after 15 minutes of inactivity</li>
+</ul>
+<h3>Regularly Monitor and Test Networks</h3>
+<p><strong>Requirement 9: Restrict physical access to cardholder data</strong></p>
+<ul>
+<li>Physical access controls (badges, locks, cameras)</li>
+<li>Visitor logs and escorts</li>
+<li>Secure media storage and destruction</li>
+<li>Point-of-sale device protection</li>
+</ul>
+<p><strong>Requirement 10: Log and monitor all access to system components and cardholder data</strong></p>
+<ul>
+<li>Audit logs for all access to cardholder data</li>
+<li>Automated audit trails for critical events</li>
+<li>Log retention for at least 12 months (3 months readily available)</li>
+<li>Daily log review or automated alerting</li>
+<li>Time synchronization using NTP</li>
+</ul>
+<p><strong>Requirement 11: Test security of systems and networks regularly</strong></p>
+<ul>
+<li>Quarterly external vulnerability scans by Approved Scanning Vendor (ASV)</li>
+<li>Internal vulnerability scans quarterly and after significant changes</li>
+<li>Annual penetration testing</li>
+<li>File integrity monitoring (FIM) on critical files</li>
+<li>Intrusion detection/prevention systems (IDS/IPS)</li>
+</ul>
+<h3>Maintain an Information Security Policy</h3>
+<p><strong>Requirement 12: Support information security with organizational policies and programs</strong></p>
+<ul>
+<li>Establish, publish, maintain security policy</li>
+<li>Annual risk assessment</li>
+<li>Acceptable use policies for critical technologies</li>
+<li>Assign information security responsibilities</li>
+<li>Security awareness training for all personnel</li>
+<li>Service provider management program</li>
+<li>Incident response plan tested at least annually</li>
+</ul>
+<h2>What AuditKit Checks</h2>
+<h3>Automated Technical Controls</h3>
+<p><strong>Network Security (Req 1):</strong></p>
+<ul>
+<li>VPC/VNet segmentation</li>
+<li>Security group/NSG rules for 0.0.0.0/0 exposure</li>
+<li>Firewall configuration</li>
+<li>Network ACLs</li>
+</ul>
+<p><strong>Secure Configurations (Req 2):</strong></p>
+<ul>
+<li>Default password warnings</li>
+<li>Default security group checks</li>
+<li>Service configuration review</li>
+</ul>
+<p><strong>Data Encryption (Req 3, 4):</strong></p>
+<ul>
+<li>Storage encryption at rest (S3, Azure Storage, GCS, EBS, managed disks)</li>
+<li>Database encryption (RDS, SQL Database, Cloud SQL)</li>
+<li>TLS/SSL enforcement</li>
+<li>Secure transport policies</li>
+</ul>
+<p><strong>Vulnerability Management (Req 6, 11):</strong></p>
+<ul>
+<li>Patch management status (INFO - cannot auto-verify patching)</li>
+<li>WAF deployment guidance</li>
+<li>Change detection mechanisms (AWS Config, Azure Policy, GCP Security Command Center)</li>
+</ul>
+<p><strong>Access Control (Req 7, 8):</strong></p>
+<ul>
+<li>IAM user least privilege</li>
+<li>MFA enforcement on all accounts</li>
+<li>Root/admin account usage</li>
+<li>Password policy compliance</li>
+<li>Access key rotation (90 days)</li>
+</ul>
+<p><strong>Logging and Monitoring (Req 10):</strong></p>
+<ul>
+<li>CloudTrail/Activity Log/Cloud Audit Logs enabled</li>
+<li>Log retention configuration</li>
+<li>Log integrity validation</li>
+<li>Centralized logging</li>
+</ul>
+<h3>INFO/MANUAL Controls</h3>
+<p><strong>Malware Protection (Req 5):</strong></p>
+<ul>
+<li>Guidance for endpoint protection deployment</li>
+<li>Anti-malware update verification</li>
+<li>Log retention for anti-malware events</li>
+</ul>
+<p><strong>Physical Security (Req 9):</strong></p>
+<ul>
+<li>Cloud provider physical security documentation (inherited controls)</li>
+<li>Organizational physical access procedures</li>
+<li>Media handling and destruction procedures</li>
+</ul>
+<p><strong>Organizational Controls (Req 12):</strong></p>
+<ul>
+<li>Security policy establishment</li>
+<li>Risk assessment procedures</li>
+<li>Acceptable use policies</li>
+<li>Security awareness training</li>
+<li>Service provider management</li>
+<li>Incident response planning</li>
+</ul>
+<h2>Running PCI-DSS Scan</h2>
+<div class="code-block"># AWS
+auditkit scan -provider aws -framework pci
+
+# Azure
+auditkit scan -provider azure -framework pci
+
+# GCP
+auditkit scan -provider gcp -framework pci
+
+# Generate report
+auditkit scan -provider aws -framework pci -format pdf -output pci-report.pdf
+</div>
+<p><strong>Note:</strong> Report provides technical control assessment but does not replace QSA evaluation</p>
+<h2>PCI-DSS Validation Levels</h2>
+<p>Your validation requirements depend on transaction volume:</p>
+<h3>Level 1 (Highest)</h3>
+<p><strong>Volume:</strong> 6 million+ transactions/year
+<strong>Validation:</strong> Annual Report on Compliance (ROC) by QSA
+<strong>Scans:</strong> Quarterly ASV scans
+<strong>Cost:</strong> $15,000 - $50,000 for QSA assessment</p>
+<h3>Level 2</h3>
+<p><strong>Volume:</strong> 1-6 million transactions/year
+<strong>Validation:</strong> Annual Self-Assessment Questionnaire (SAQ)
+<strong>Scans:</strong> Quarterly ASV scans
+<strong>May require:</strong> QSA validation depending on acquiring bank</p>
+<h3>Level 3</h3>
+<p><strong>Volume:</strong> 20,000 - 1 million e-commerce transactions/year
+<strong>Validation:</strong> Annual SAQ
+<strong>Scans:</strong> Quarterly ASV scans</p>
+<h3>Level 4 (Lowest)</h3>
+<p><strong>Volume:</strong> Fewer than 20,000 e-commerce transactions/year or up to 1 million other transactions/year
+<strong>Validation:</strong> Annual SAQ
+<strong>Scans:</strong> Quarterly ASV scans (recommended, may be required by acquirer)</p>
+<h2>Self-Assessment Questionnaires (SAQs)</h2>
+<p>Different SAQs for different business models:</p>
+<p><strong>SAQ A:</strong> E-commerce with fully outsourced payment processing (no cardholder data touches your systems)
+<strong>SAQ A-EP:</strong> E-commerce with outsourced processing but your website involved
+<strong>SAQ B:</strong> Imprint machines or standalone dial-out terminals only
+<strong>SAQ B-IP:</strong> Standalone, PTS-approved payment terminals with IP connection
+<strong>SAQ C:</strong> Payment application systems connected to the internet
+<strong>SAQ C-VT:</strong> Web-based virtual payment terminals
+<strong>SAQ D (Merchant):</strong> All other merchants (most comprehensive)
+<strong>SAQ D (Service Provider):</strong> All service providers</p>
+<p><strong>Most cloud-hosted applications:</strong> SAQ D-Merchant (all 12 requirements apply)</p>
+<h2>Compliance Timeline</h2>
+<h3>New Merchant Timeline (from zero)</h3>
+<p><strong>Months 1-2:</strong> Scope your CDE, inventory systems
+<strong>Months 3-4:</strong> Implement technical controls (AuditKit helps here)
+<strong>Months 5-6:</strong> Policies, procedures, documentation
+<strong>Month 7:</strong> Remediate gaps from AuditKit scan
+<strong>Month 8:</strong> Internal audit and testing
+<strong>Month 9:</strong> Quarterly ASV scan (first of four)
+<strong>Month 10-11:</strong> Address ASV findings
+<strong>Month 12:</strong> QSA assessment or SAQ validation
+<strong>Ongoing:</strong> Quarterly ASV scans, annual reassessment</p>
+<h3>Existing Merchant (maintenance)</h3>
+<p><strong>Quarterly:</strong> ASV vulnerability scans
+<strong>Quarterly:</strong> Internal vulnerability scans
+<strong>Annually:</strong> Penetration testing
+<strong>Annually:</strong> QSA assessment or SAQ attestation
+<strong>Continuously:</strong> Log monitoring, change management, access reviews</p>
+<h2>Common PCI-DSS Violations</h2>
+<p>Based on Verizon Payment Security Reports:</p>
+<ol>
+<li><strong>Insufficient logging and monitoring</strong> (Req 10)</li>
+<li><strong>Lack of network segmentation</strong> (Req 1)</li>
+<li><strong>Weak or default passwords</strong> (Req 2, 8)</li>
+<li><strong>Unencrypted cardholder data</strong> (Req 3, 4)</li>
+<li><strong>No MFA for remote access</strong> (Req 8)</li>
+<li><strong>Missing or outdated patches</strong> (Req 6)</li>
+<li><strong>No vulnerability scanning</strong> (Req 11)</li>
+<li><strong>Inadequate access controls</strong> (Req 7)</li>
+<li><strong>Missing security policies</strong> (Req 12)</li>
+<li><strong>No anti-malware or outdated definitions</strong> (Req 5)</li>
+</ol>
+<p><strong>AuditKit helps identify #1-8</strong> - you need policies and procedures for #9-10</p>
+<h2>PCI-DSS vs Other Frameworks</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Focus</th>
+<th>Overlap with PCI-DSS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SOC2</strong></td>
+<td>Trust Services</td>
+<td>Medium - encryption, access control, logging</td>
+</tr>
+<tr>
+<td><strong>HIPAA</strong></td>
+<td>Healthcare data</td>
+<td>Medium - similar technical controls</td>
+</tr>
+<tr>
+<td><strong>CMMC</strong></td>
+<td>DoW contractors</td>
+<td>High - many aligned security controls</td>
+</tr>
+<tr>
+<td><strong>ISO 27001</strong></td>
+<td>Information security</td>
+<td>High - comprehensive security management</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Key PCI-DSS differentiators:</strong></p>
+<ul>
+<li>Specific to payment card data</li>
+<li>Quarterly vulnerability scanning required</li>
+<li>12-month log retention (longer than most frameworks)</li>
+<li>90-day password rotation (stricter than SOC2)</li>
+<li>Annual penetration testing mandatory</li>
+<li>Enforced by payment brands (Visa, Mastercard, etc.)</li>
+</ul>
+<p><strong>Best approach:</strong> Implement PCI-DSS controls, map to other frameworks for efficiency</p>
+<h2>Cost Breakdown</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Level 1</th>
+<th>Level 2-4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AuditKit Free</td>
+<td>$0</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>QSA Assessment (ROC)</td>
+<td>$15,000 - $50,000</td>
+<td>-</td>
+</tr>
+<tr>
+<td>SAQ Validation</td>
+<td>-</td>
+<td>$2,000 - $10,000</td>
+</tr>
+<tr>
+<td>ASV Scans (quarterly)</td>
+<td>$2,000 - $8,000/year</td>
+<td>$2,000 - $8,000/year</td>
+</tr>
+<tr>
+<td>Penetration Testing</td>
+<td>$10,000 - $30,000</td>
+<td>$10,000 - $30,000</td>
+</tr>
+<tr>
+<td>Remediation costs</td>
+<td>$20,000 - $100,000</td>
+<td>$10,000 - $50,000</td>
+</tr>
+<tr>
+<td><strong>First year total</strong></td>
+<td><strong>$47,000 - $188,000</strong></td>
+<td><strong>$24,000 - $98,000</strong></td>
+</tr>
+<tr>
+<td><strong>Ongoing (annual)</strong></td>
+<td><strong>$27,000 - $88,000</strong></td>
+<td><strong>$22,000 - $88,000</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Note:</strong> Costs vary significantly based on environment complexity, number of locations, and current security posture</p>
+<h2>FAQ</h2>
+<p><strong>Q: Do I need PCI-DSS compliance?</strong>
+A: If you store, process, or transmit credit/debit card information, yes. Even if you use a payment processor, you may still have PCI-DSS obligations (depends on your SAQ type).</p>
+<p><strong>Q: Can I self-assess or do I need a QSA?</strong>
+A: Depends on your validation level. Level 1 requires QSA. Levels 2-4 may self-assess with SAQ, but your acquiring bank may require QSA validation.</p>
+<p><strong>Q: What happens if I'm not PCI-DSS compliant?</strong>
+A: Fines from $5,000 to $100,000 per month by payment brands. Loss of ability to process cards. Liability for breaches. Reputational damage.</p>
+<p><strong>Q: How long does PCI-DSS compliance take?</strong>
+A: First-time: 6-12 months. Maintenance: ongoing quarterly scans and annual reassessment.</p>
+<p><strong>Q: Do cloud providers make me PCI-DSS compliant?</strong>
+A: No. AWS, Azure, and GCP are PCI-DSS compliant (for their infrastructure), but you're responsible for your applications and configurations. Review the Shared Responsibility Model.</p>
+<p><strong>Q: What is "cardholder data environment" (CDE)?</strong>
+A: The CDE includes systems that store, process, or transmit cardholder data, plus systems that connect to those systems. Proper network segmentation reduces CDE scope.</p>
+<p><strong>Q: Can I store CVV/CVC codes?</strong>
+A: No. Never. Not even encrypted. It's explicitly forbidden by PCI-DSS. Only store PAN (and only if absolutely necessary).</p>
+<p><strong>Q: What's an Approved Scanning Vendor (ASV)?</strong>
+A: PCI SSC-approved company authorized to perform external vulnerability scans. Required quarterly. Find list at pcisecuritystandards.org.</p>
+<p><strong>Q: Is PCI-DSS compliance the same as being "secure"?</strong>
+A: No. PCI-DSS is a minimum baseline. Many breached companies were PCI-compliant at time of breach. Use PCI-DSS as foundation, add additional security controls.</p>
+<h2>Recommended Path</h2>
+<p><strong>For e-commerce/online payments:</strong></p>
+<ol>
+<li>
+<p><strong>Months 1-3:</strong> Technical infrastructure (AuditKit helps)
+   - Network segmentation
+   - Encryption at rest and in transit
+   - Access controls and MFA
+   - Logging and monitoring</p>
+</li>
+<li>
+<p><strong>Months 4-6:</strong> Policies and procedures
+   - Security policy
+   - Acceptable use policies
+   - Incident response plan
+   - Vendor management</p>
+</li>
+<li>
+<p><strong>Months 7-9:</strong> Testing and validation
+   - First quarterly ASV scan
+   - Internal vulnerability scans
+   - Penetration test
+   - Address findings</p>
+</li>
+<li>
+<p><strong>Months 10-12:</strong> Assessment
+   - Complete SAQ or prepare for QSA
+   - Gather evidence
+   - Final remediation
+   - Attestation of Compliance</p>
+</li>
+<li>
+<p><strong>Ongoing:</strong> Maintain compliance
+   - Quarterly ASV scans
+   - Quarterly internal scans
+   - Annual penetration test
+   - Annual reassessment
+   - Continuous monitoring</p>
+</li>
+</ol>
+<p><strong>Don't skip the QSA or ignore timelines.</strong> Non-compliance can result in losing ability to process payments.</p>
+<h2>Reducing PCI-DSS Scope</h2>
+<p><strong>Strategies to minimize CDE scope:</strong></p>
+<ol>
+<li>
+<p><strong>Don't store cardholder data</strong>
+   - Use payment service providers (Stripe, Square, etc.)
+   - Tokenization
+   - Point-to-point encryption (P2PE)</p>
+</li>
+<li>
+<p><strong>Network segmentation</strong>
+   - Isolate CDE from other networks
+   - Reduce number of in-scope systems
+   - Document network flows</p>
+</li>
+<li>
+<p><strong>Outsource when possible</strong>
+   - Hosted payment pages
+   - Payment gateways
+   - Cloud-based solutions with PCI-DSS attestations</p>
+</li>
+<li>
+<p><strong>Data minimization</strong>
+   - Only collect what's necessary
+   - Don't store CVV/CVC
+   - Truncate PAN for display
+   - Purge data when no longer needed</p>
+</li>
+</ol>
+<p><strong>Smaller scope = lower costs and reduced complexity</strong></p>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../getting-started.md">Run PCI-DSS technical scan </a></strong></li>
+<li><strong><a href="./soc2.md">Compare to SOC2 </a></strong></li>
+<li><strong><a href="https://www.pcisecuritystandards.org/assessors_and_solutions/qualified_security_assessors">Find QSA </a></strong></li>
+<li><strong><a href="https://www.pcisecuritystandards.org/assessors_and_solutions/approved_scanning_vendors">Find ASV </a></strong></li>
+<li><strong><a href="https://www.pcisecuritystandards.org/">PCI SSC official site </a></strong></li>
+<li><strong><a href="https://www.pcisecuritystandards.org/document_library">Download SAQs </a></strong></li>
+</ul>
+<p><strong>Remember:</strong> AuditKit covers technical controls. Hire a QSA for complete validation and annual assessment.</p>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Scan your environment</h3>
+                <p style="margin-bottom: 1.25rem;">Point AuditKit at AWS, Azure or GCP with read-only credentials and get every finding with the command to fix it. Full results in about thirty minutes.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed framework documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">

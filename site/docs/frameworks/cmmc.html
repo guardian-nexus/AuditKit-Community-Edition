@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CMMC - AuditKit</title>
+    <title>CMMC Compliance Scanning - AuditKit</title>
+    <meta name="description" content="Assess all 110 CMMC Level 2 practices across AWS, Azure and GCP, with evidence guidance for your self-assessment.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="CMMC Compliance Scanning - AuditKit">
+    <meta property="og:description" content="Assess all 110 CMMC Level 2 practices across AWS, Azure and GCP, with evidence guidance for your self-assessment.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/frameworks/cmmc.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,569 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
-            <h1>CMMC</h1>
-            <p class="subtitle">Framework guide for AuditKit</p>
+            <h1>CMMC Compliance Scanning</h1>
+            <p class="subtitle">Assess all 110 CMMC Level 2 practices across AWS, Azure and GCP, with evidence guidance for your self-assessment.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/frameworks/cmmc.md">View full CMMC documentation on GitHub &rarr;</a></p>
+<p>Complete guide to CMMC Level 1 and Level 2 compliance with AuditKit.</p>
+<h2>Overview</h2>
+<p><strong>CMMC</strong> is a cybersecurity framework required for DoW contractors.</p>
+<p><strong>Why CMMC matters:</strong></p>
+<ul>
+<li>In force since November 10, 2025, when the 48 CFR rule took effect</li>
+<li>Protects Federal Contract Information (FCI) and Controlled Unclassified Information (CUI)</li>
+<li>Phase 1 is live: self-assessment for Level 1 and Level 2 on applicable contracts</li>
+<li>Where a solicitation carries the CMMC clause, you cannot bid without meeting it</li>
+</ul>
+<p><strong>Current status (September 2026):</strong> the rollout is in Phase 1. On July 13, 2026
+the Department of War suspended the move to Phase 2 pending a reform review, so
+third-party C3PAO assessment is <strong>not</strong> currently mandated. Phase 1 obligations
+continue unchanged: self-assessment, DFARS 252.204-7012, NIST SP 800-171 Rev 2,
+SPRS score postings and annual affirmations.</p>
+<p><strong>Certification:</strong> C3PAO (CMMC Third-Party Assessor Organization) assessment applies from Phase 2, which is currently suspended. Level 2 is self-assessed under Phase 1.</p>
+<h2>CMMC Levels</h2>
+<h3>Level 1: Foundational (17 Practices)</h3>
+<p><strong>Protects:</strong> Federal Contract Information (FCI)<br />
+<strong>Required for:</strong> All DoW contractors<br />
+<strong>Assessment:</strong> Self-assessment allowed<br />
+<strong>Cost:</strong> Free with AuditKit</p>
+<p><strong>What is FCI?</strong></p>
+<ul>
+<li>Contract awards</li>
+<li>Pricing information</li>
+<li>Business plans</li>
+<li>Financial reports</li>
+<li>Technical data (non-sensitive)</li>
+</ul>
+<p><strong>Timeline:</strong> Required now for new contracts</p>
+<h3>Level 2: Advanced (110 Practices)</h3>
+<p><strong>Protects:</strong> Controlled Unclassified Information (CUI)<br />
+<strong>Required for:</strong> DoW contractors handling CUI<br />
+<strong>Assessment:</strong> Self-assessment under Phase 1. C3PAO assessment was scheduled for Phase 2, which is suspended.<br />
+<strong>Cost:</strong> $297/month with AuditKit</p>
+<p><strong>What is CUI?</strong></p>
+<ul>
+<li>Technical specifications</li>
+<li>Mission plans</li>
+<li>Personnel records</li>
+<li>Logistics data</li>
+<li>Operational procedures</li>
+<li>Export-controlled technical data</li>
+</ul>
+<p><strong>Timeline:</strong> In force since November 10, 2025 (Phase 1)</p>
+<h2>CMMC Level 1 (Free)</h2>
+<h3>The 17 Practices</h3>
+<p>AuditKit reports all 17 practices. 13 carry an automated check on AWS and Azure, 9 on GCP; the rest are reported for evidence tracking:</p>
+<h4>Access Control (AC)</h4>
+<ol>
+<li><strong>AC.L1-3.1.1</strong> - Limit system access to authorized users</li>
+<li><strong>AC.L1-3.1.2</strong> - Limit system access to the types of transactions and functions authorized users are permitted to execute</li>
+<li><strong>AC.L1-3.1.20</strong> - Verify and control connections to and use of external systems</li>
+<li><strong>AC.L1-3.1.22</strong> - Control information posted or processed on publicly accessible systems</li>
+</ol>
+<h4>Identification &amp; Authentication (IA)</h4>
+<ol start="5">
+<li><strong>IA.L1-3.5.1</strong> - Identify system users, processes acting on behalf of users, and devices</li>
+<li><strong>IA.L1-3.5.2</strong> - Authenticate the identities of those users, processes and devices</li>
+</ol>
+<h4>Media Protection (MP)</h4>
+<ol start="7">
+<li><strong>MP.L1-3.8.3</strong> - Sanitize or destroy media containing FCI before disposal or reuse</li>
+</ol>
+<h4>Physical Protection (PE)</h4>
+<ol start="8">
+<li><strong>PE.L1-3.10.1</strong> - Limit physical access to systems, equipment and operating environments</li>
+<li><strong>PE.L1-3.10.3</strong> - Escort visitors and monitor visitor activity</li>
+<li><strong>PE.L1-3.10.4</strong> - Maintain audit logs of physical access</li>
+<li><strong>PE.L1-3.10.5</strong> - Control and manage physical access devices</li>
+</ol>
+<h4>System &amp; Communications Protection (SC)</h4>
+<ol start="12">
+<li><strong>SC.L1-3.13.1</strong> - Monitor, control and protect communications at external and key internal boundaries</li>
+<li><strong>SC.L1-3.13.5</strong> - Implement subnetworks for publicly accessible components, separated from internal networks</li>
+</ol>
+<h4>System &amp; Information Integrity (SI)</h4>
+<ol start="14">
+<li><strong>SI.L1-3.14.1</strong> - Identify, report and correct system flaws in a timely manner</li>
+<li><strong>SI.L1-3.14.2</strong> - Provide protection from malicious code at designated locations</li>
+<li><strong>SI.L1-3.14.4</strong> - Update malicious code protection mechanisms when new releases are available</li>
+<li><strong>SI.L1-3.14.5</strong> - Perform periodic scans of the system and real-time scans of files from external sources</li>
+</ol>
+<p>These are the identifiers the scanner emits. The older <code class="code-inline">AC.1.001</code> form belongs to
+CMMC 1.0, which was withdrawn; CMMC 2.0 identifies each practice by its domain,
+level and NIST SP 800-171 Rev 2 requirement number.</p>
+<h3>What AuditKit Checks (Level 1)</h3>
+<p><strong>Queried automatically from your cloud configuration (13 of the 17 on AWS and Azure, 9 of 17 on GCP):</strong></p>
+<ul>
+<li>IAM password policy configuration</li>
+<li>MFA enforcement</li>
+<li>Access key rotation</li>
+<li>CloudTrail/logging enabled</li>
+<li>Security group rules</li>
+<li>Public access on storage</li>
+<li>Encryption at rest</li>
+<li>Patch management</li>
+</ul>
+<p><strong>No automated check - manual verification required (4 practices):</strong></p>
+<ul>
+<li>AC.L1-3.1.20 - Verify and control connections to external systems</li>
+<li>AC.L1-3.1.22 - Control publicly posted information</li>
+<li>SI.L1-3.14.4 - Update malicious code protection mechanisms</li>
+<li>SI.L1-3.14.5 - Perform periodic and real-time scans</li>
+<li>Physical security measures</li>
+<li>Visitor escort procedures</li>
+<li>Media sanitization procedures</li>
+<li>Network monitoring processes</li>
+<li>Vulnerability scanning schedule</li>
+<li>Security alert response</li>
+<li>System update procedures</li>
+</ul>
+<h3>Running Level 1 Scan</h3>
+<div class="code-block"># Scan for CMMC Level 1
+auditkit scan -provider aws -framework cmmc
+auditkit scan -provider azure -framework cmmc
+auditkit scan -provider gcp -framework cmmc
+
+# Generate assessment report
+auditkit scan -provider aws -framework cmmc -format pdf -output cmmc-l1-report.pdf
+
+# Generate evidence tracker for manual practices
+# Evidence tracker (covers every framework; -framework and -format are not honoured here)
+auditkit evidence -output cmmc-evidence.html
+</div>
+<h3>Level 1 Timeline</h3>
+<p><strong>Typical preparation:</strong> 2-4 weeks</p>
+<p><strong>Steps:</strong>
+1. Run AuditKit scan
+2. Fix automated findings (1-2 weeks)
+3. Document manual practices (1-2 weeks)
+4. Self-assess compliance
+5. Include CMMC Level 1 statement in contract bids</p>
+<h2>CMMC Level 2 (reported in Community, automated in Pro)</h2>
+<h3>The 110 Practices</h3>
+<p>Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14 domains.</p>
+<p><strong>Free in Community for reporting all 110 practices. Automated Level 2 checks require Pro:</strong> $297/month with 14-day free trial</p>
+<h3>CMMC Level 2 Domains</h3>
+<h4>Access Control (AC) - 22 practices</h4>
+<ul>
+<li>Least privilege</li>
+<li>Separation of duties</li>
+<li>Unsuccessful login attempts</li>
+<li>Remote access controls</li>
+<li>Session termination</li>
+<li>Access enforcement</li>
+</ul>
+<h4>Awareness &amp; Training (AT) - 3 practices</h4>
+<ul>
+<li>Security awareness training</li>
+<li>Role-based training</li>
+<li>Insider threat awareness</li>
+<li>Physical security training</li>
+</ul>
+<h4>Audit &amp; Accountability (AU) - 9 practices</h4>
+<ul>
+<li>Audit logging</li>
+<li>Audit review and analysis</li>
+<li>Audit retention</li>
+<li>Audit failure response</li>
+<li>Audit record generation</li>
+</ul>
+<h4>Configuration Management (CM) - 9 practices</h4>
+<ul>
+<li>Baseline configurations</li>
+<li>Configuration change control</li>
+<li>Security impact analysis</li>
+<li>Access restrictions for change</li>
+<li>Configuration settings</li>
+</ul>
+<h4>Identification &amp; Authentication (IA) - 11 practices</h4>
+<ul>
+<li>MFA for all access</li>
+<li>Device identification</li>
+<li>Authenticator management</li>
+<li>Cryptographic authentication</li>
+<li>Password complexity</li>
+</ul>
+<h4>Incident Response (IR) - 3 practices</h4>
+<ul>
+<li>Incident handling</li>
+<li>Incident monitoring</li>
+<li>Incident reporting</li>
+<li>Incident response testing</li>
+<li>Incident response training</li>
+</ul>
+<h4>Maintenance (MA) - 6 practices</h4>
+<ul>
+<li>Controlled maintenance</li>
+<li>Remote maintenance controls</li>
+<li>Maintenance tools</li>
+<li>Maintenance personnel</li>
+</ul>
+<h4>Media Protection (MP) - 9 practices</h4>
+<ul>
+<li>Media access controls</li>
+<li>Media marking</li>
+<li>Media storage and transport</li>
+<li>Media sanitization</li>
+<li>Media accountability</li>
+</ul>
+<h4>Personnel Security (PS) - 2 practices</h4>
+<ul>
+<li>Personnel screening</li>
+<li>Termination procedures</li>
+<li>Personnel sanctions</li>
+<li>Transfer procedures</li>
+</ul>
+<h4>Physical Protection (PE) - 6 practices</h4>
+<ul>
+<li>Physical access controls</li>
+<li>Physical access authorizations</li>
+<li>Visitor control</li>
+<li>Access logs</li>
+<li>Asset monitoring</li>
+</ul>
+<h4>Risk Assessment (RA) - 3 practices</h4>
+<ul>
+<li>Risk assessments</li>
+<li>Vulnerability scanning</li>
+<li>Remediation tracking</li>
+<li>Threat analysis</li>
+</ul>
+<h4>Security Assessment (CA) - 4 practices</h4>
+<ul>
+<li>Security assessments</li>
+<li>Plan of Action &amp; Milestones (POA&amp;M)</li>
+<li>Security authorization</li>
+<li>Continuous monitoring</li>
+</ul>
+<h4>System &amp; Communications Protection (SC) - 16 practices</h4>
+<ul>
+<li>Boundary protection</li>
+<li>Network segmentation</li>
+<li>Cryptographic protection</li>
+<li>Mobile code restrictions</li>
+<li>Voice over IP protections</li>
+<li>Session authenticity</li>
+<li>Denial of service protection</li>
+</ul>
+<h4>System &amp; Information Integrity (SI) - 7 practices</h4>
+<ul>
+<li>Flaw remediation</li>
+<li>Malicious code protection</li>
+<li>System monitoring</li>
+<li>Security alerts and advisories</li>
+<li>Software update validation</li>
+<li>Spam protection</li>
+<li>Information input validation</li>
+</ul>
+<h3>What AuditKit Checks (Level 2)</h3>
+<p><strong>Queried automatically from your cloud configuration (42 of the 110); the remaining 68 are
+assessed as structured evidence guidance, telling you what an assessor needs to see:</strong>
+All technical controls across:</p>
+<ul>
+<li>IAM and authentication</li>
+<li>Network security</li>
+<li>Encryption</li>
+<li>Logging and monitoring</li>
+<li>Backup and recovery</li>
+<li>Vulnerability management</li>
+<li>Patch management</li>
+<li>Access controls</li>
+<li>Security groups/firewalls</li>
+<li>Key rotation</li>
+<li>Public access controls</li>
+</ul>
+<p><strong>Structured evidence guidance (68 practices):</strong>
+Organizational controls:</p>
+<ul>
+<li>Policies and procedures</li>
+<li>Training programs</li>
+<li>Physical security</li>
+<li>Personnel screening</li>
+<li>Incident response plans</li>
+<li>Risk assessments</li>
+<li>Security assessments</li>
+</ul>
+<h3>Running a Level 2 Scan</h3>
+<div class="code-block"># Scan for CMMC Level 2 (requires Pro license)
+auditkit-pro scan -provider aws -framework cmmc
+auditkit-pro scan -provider azure -framework cmmc
+auditkit-pro scan -provider gcp -framework cmmc
+
+# Generate complete assessment report
+auditkit-pro scan -provider aws -framework cmmc -format pdf -output cmmc-report.pdf
+
+# Generate the evidence tracker (covers every framework; -framework does not scope it)
+auditkit-pro evidence -output cmmc-evidence.html
+</div>
+<h3>Level 2 Timeline</h3>
+<p><strong>Typical preparation:</strong> 3-6 months</p>
+<p><strong>Steps:</strong>
+1. Gap assessment (Week 1)
+2. Technical remediation (Months 1-2)
+3. Policy/procedure documentation (Months 2-4)
+4. Training implementation (Months 3-5)
+5. Pre-assessment audit (Month 5)
+6. C3PAO assessment (Month 6) - applies if and when Phase 2 resumes</p>
+<p><strong><a href="https://auditkit.io/pro/">Start Pro trial →</a></strong></p>
+<h2>Level 1 vs Level 2 Comparison</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Level 1</th>
+<th>Level 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Practices</strong></td>
+<td>17</td>
+<td>110</td>
+</tr>
+<tr>
+<td><strong>Protects</strong></td>
+<td>FCI</td>
+<td>CUI</td>
+</tr>
+<tr>
+<td><strong>Assessment</strong></td>
+<td>Self-assessment</td>
+<td>Self-assessment (Phase 1); C3PAO deferred with Phase 2</td>
+</tr>
+<tr>
+<td><strong>Cost (AuditKit)</strong></td>
+<td>Free</td>
+<td>$297/month</td>
+</tr>
+<tr>
+<td><strong>Cost (Assessment)</strong></td>
+<td>$0</td>
+<td>$0 under Phase 1; $25,000-$150,000 if C3PAO resumes</td>
+</tr>
+<tr>
+<td><strong>Timeline</strong></td>
+<td>2-4 weeks</td>
+<td>3-6 months</td>
+</tr>
+<tr>
+<td><strong>Automated Checks</strong></td>
+<td>13 of 17</td>
+<td>42 of 110 query the cloud</td>
+</tr>
+<tr>
+<td><strong>Manual Docs</strong></td>
+<td>4</td>
+<td>68 assessed as evidence guidance</td>
+</tr>
+<tr>
+<td><strong>Required For</strong></td>
+<td>All DoW contracts</td>
+<td>CUI contracts</td>
+</tr>
+<tr>
+<td><strong>Deadline</strong></td>
+<td>Now</td>
+<td>Now (Phase 1, self-assessment)</td>
+</tr>
+</tbody>
+</table></div>
+<h2>CMMC &amp; NIST SP 800-171</h2>
+<p><strong>CMMC Level 2 is based on NIST SP 800-171 Rev 2</strong></p>
+<p>AuditKit maps all 110 CMMC Level 2 practices to their corresponding NIST SP 800-171 controls.</p>
+<p><strong>Example mapping:</strong></p>
+<ul>
+<li>CMMC AC.L1-3.1.2 → NIST 800-171 3.1.2</li>
+<li>CMMC IA.L2-3.5.3 → NIST 800-171 3.5.3</li>
+<li>CMMC SC.L1-3.13.1 → NIST 800-171 3.13.1</li>
+</ul>
+<p>This means passing CMMC Level 2 = compliance with NIST SP 800-171.</p>
+<h2>C3PAO Assessment Process</h2>
+<div class="callout">
+<p><strong>Note:</strong> C3PAO assessment belongs to Phase 2 of the CMMC rollout, which the
+Department of War suspended on July 13, 2026. The section below describes the
+process for when it resumes. Under Phase 1 today, Level 2 is self-assessed.</p>
+</div>
+<h3>Before Assessment</h3>
+<p><strong>6-12 months before:</strong>
+1. Gap assessment with AuditKit
+2. Remediate technical findings
+3. Document policies/procedures
+4. Implement training programs
+5. Create POA&amp;M for unresolved items</p>
+<p><strong>3 months before:</strong>
+1. Pre-assessment scan
+2. Fix remaining issues
+3. Complete evidence collection
+4. Schedule C3PAO</p>
+<h3>During Assessment</h3>
+<p><strong>C3PAO will:</strong></p>
+<ul>
+<li>Review all 110 practices</li>
+<li>Interview personnel</li>
+<li>Inspect facilities</li>
+<li>Test technical controls</li>
+<li>Review documentation</li>
+<li>Verify evidence</li>
+</ul>
+<p><strong>Timeline:</strong> 3-7 days on-site</p>
+<h3>After Assessment</h3>
+<p><strong>If you pass:</strong></p>
+<ul>
+<li>Receive CMMC certification</li>
+<li>Valid for 3 years</li>
+<li>Include in contract bids</li>
+</ul>
+<p><strong>If you fail:</strong></p>
+<ul>
+<li>Receive POA&amp;M with gaps</li>
+<li>Remediate and re-assess</li>
+<li>May require 3-6 months</li>
+</ul>
+<h2>Cost Breakdown</h2>
+<h3>Level 1 Costs (Estimate)</h3>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AuditKit Free</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Policy templates</td>
+<td>$0-$500</td>
+</tr>
+<tr>
+<td>Training</td>
+<td>$0-$1,000</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$0-$1,500</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3>Level 2 Costs (Estimate)</h3>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Cost Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AuditKit (annual)</td>
+<td>$3,564</td>
+</tr>
+<tr>
+<td>C3PAO assessment</td>
+<td>$25,000-$150,000</td>
+</tr>
+<tr>
+<td>Consultant (if needed)</td>
+<td>$0-$50,000</td>
+</tr>
+<tr>
+<td>Training programs</td>
+<td>$5,000-$15,000</td>
+</tr>
+<tr>
+<td>Physical security upgrades</td>
+<td>$0-$25,000</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$33,564-$243,564</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Compare to:</strong> Traditional full-service CMMC prep: $100,000-$325,000</p>
+<h2>Common CMMC Failures</h2>
+<p>Based on C3PAO assessments, here are the most common failures:</p>
+<h3>Level 1 Failures</h3>
+<ol>
+<li>Weak password policies</li>
+<li>No MFA enforcement</li>
+<li>Missing audit logs</li>
+<li>Public-facing storage</li>
+<li>No vulnerability scanning</li>
+</ol>
+<h3>Level 2 Failures</h3>
+<ol>
+<li>Inadequate access controls (AC.L2-3.1.5, least privilege)</li>
+<li>Missing audit logs (AU.L2-3.3.1)</li>
+<li>No security awareness training (AT.L2-3.2.1)</li>
+<li>Weak incident response (IR.L2-3.6.1)</li>
+<li>No vulnerability management (RA.L2-3.11.2)</li>
+<li>Missing system hardening (CM.L2-3.4.1, baseline configurations)</li>
+<li>No cryptographic protection (SC.L2-3.13.11)</li>
+<li>Inadequate media protection (MP.L2-3.8.1)</li>
+</ol>
+<p><strong>AuditKit catches all technical failures before assessment.</strong></p>
+<h2>CMMC Resources</h2>
+<p><strong>Official:</strong></p>
+<ul>
+<li>CMMC Model: https://dodcio.defense.gov/CMMC/</li>
+<li>CMMC FAQ: https://dodcio.defense.gov/CMMC/FAQ/</li>
+<li>C3PAO Directory: https://cyberab.org/Catalog</li>
+</ul>
+<p><strong>AuditKit:</strong></p>
+<ul>
+<li><a href="https://auditkit.io/pro/">Pro trial →</a></li>
+<li><a href="../getting-started.md">Getting started →</a></li>
+<li><a href="../cli-reference.md">CLI reference →</a></li>
+</ul>
+<h2>Next Steps</h2>
+<h3>For Level 1:</h3>
+<ol>
+<li><a href="../getting-started.md">Run free CMMC scan →</a></li>
+<li>Fix technical findings</li>
+<li>Document manual practices</li>
+<li>Self-assess compliance</li>
+<li>Include in contract bids</li>
+</ol>
+<h3>For Level 2:</h3>
+<ol>
+<li><a href="https://auditkit.io/pro/">Start Pro trial →</a></li>
+<li>Download auditkit-pro binary</li>
+<li>Run gap assessment</li>
+<li>Remediate technical findings (2-4 months)</li>
+<li>Document policies/procedures (2-4 months)</li>
+<li>Schedule C3PAO assessment</li>
+<li>Pass assessment, receive certification</li>
+</ol>
+<p><strong>Questions?</strong> Email info@auditkit.io</p>
+<h2>Related Documentation</h2>
+<ul>
+<li><strong><a href="../getting-started.md">Getting Started →</a></strong></li>
+<li><strong><a href="../cli-reference.md">CLI Reference →</a></strong></li>
+<li><strong><a href="../../pricing.md">Pricing (Free vs Pro) →</a></strong></li>
+<li><strong><a href="../setup/">Cloud Setup Guides →</a></strong></li>
+</ul>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Scan your environment</h3>
+                <p style="margin-bottom: 1.25rem;">Point AuditKit at AWS, Azure or GCP with read-only credentials and get every finding with the command to fix it. Full results in about thirty minutes.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed framework documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">

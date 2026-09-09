@@ -20,11 +20,13 @@ Health Insurance Portability and Accountability Act guide.
 **AuditKit's HIPAA support covers the Technical Safeguards and part of the Administrative Safeguards - NOT sufficient for HIPAA certification.**
 
 **What AuditKit covers:**
+
 - Technical Safeguards (164.312) - Fully mapped across all cloud providers
 - Framework crosswalk to existing SOC2/PCI-DSS controls
 - Automated scanning of technical configurations
 
 **What AuditKit does NOT cover:**
+
 - Administrative Safeguards (164.308) beyond the 15 covered - risk analysis as a document, workforce training records, sanction policy, BAA management
 - Physical Safeguards (164.310) - Facility access, workstation security
 - Business Associate Agreements
@@ -57,21 +59,26 @@ The HIPAA Security Rule has 3 types of safeguards:
 
 ### Technical Safeguards (Partially covered)
 **164.312(a)(1) - Access Control**
+
 - Unique user identification
 - Emergency access procedure
 - Automatic logoff
 - Encryption and decryption
 
 **164.312(b) - Audit Controls**
+
 - Hardware, software, and procedural mechanisms to record and examine activity
 
 **164.312(c) - Integrity**
+
 - Mechanisms to ensure ePHI is not improperly altered or destroyed
 
 **164.312(d) - Person or Entity Authentication**
+
 - Verify person or entity seeking access to ePHI is who/what they claim
 
 **164.312(e) - Transmission Security**
+
 - Implement technical security measures to guard against unauthorized access to ePHI transmitted over electronic networks
 
 ---
@@ -131,6 +138,7 @@ auditkit scan -provider aws -framework hipaa -format pdf -output hipaa-report.pd
 AuditKit does NOT check:
 
 **Administrative Safeguards:**
+
 - Risk analysis and management
 - Workforce training
 - Security policies and procedures
@@ -140,6 +148,7 @@ AuditKit does NOT check:
 - Access authorization procedures
 
 **Physical Safeguards:**
+
 - Data center physical security
 - Workstation security
 - Device disposal procedures
@@ -147,6 +156,7 @@ AuditKit does NOT check:
 - Visitor logs
 
 **Additional Technical Requirements:**
+
 - Application-level access controls
 - ePHI-specific encryption
 - De-identification procedures
@@ -164,6 +174,7 @@ AuditKit does NOT check:
 | **Overlap** | Significant - most technical controls map across both | Strong |
 
 **Key differences:**
+
 - HIPAA is healthcare-specific
 - HIPAA requires 6-year log retention (vs 90 days for SOC2)
 - HIPAA has specific PHI requirements
@@ -246,6 +257,7 @@ A: AuditKit is a tool. Your organization must achieve HIPAA compliance through p
 
 **Q: What's a business associate agreement (BAA)?**  
 A: Legal contract requiring vendors to protect PHI. You need BAAs with:
+
 - Cloud providers (AWS, Azure, GCP)
 - SaaS vendors
 - Any vendor accessing PHI

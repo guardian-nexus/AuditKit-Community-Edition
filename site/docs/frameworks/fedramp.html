@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FedRAMP - AuditKit</title>
+    <title>FedRAMP Compliance Scanning - AuditKit</title>
+    <meta name="description" content="Scan against FedRAMP Low, Moderate and High baselines built on NIST 800-53 Rev 5.">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
+    <meta property="og:title" content="FedRAMP Compliance Scanning - AuditKit">
+    <meta property="og:description" content="Scan against FedRAMP Low, Moderate and High baselines built on NIST 800-53 Rev 5.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://auditkit.io/docs/frameworks/fedramp.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,23 +35,404 @@
         </div>
     </nav>
 
+    <main id="main">
+
     <section class="page-header">
         <div class="container">
-            <h1>FedRAMP</h1>
-            <p class="subtitle">Framework guide for AuditKit</p>
+            <h1>FedRAMP Compliance Scanning</h1>
+            <p class="subtitle">Scan against FedRAMP Low, Moderate and High baselines built on NIST 800-53 Rev 5.</p>
         </div>
     </section>
 
     <section class="section">
         <div class="container-prose">
-            <div class="callout">
-                <p><strong>Complete guide:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/site/docs/frameworks/fedramp.md">View full FedRAMP documentation on GitHub &rarr;</a></p>
+<p>Federal Risk and Authorization Management Program guide.</p>
+<h2>Overview</h2>
+<p><strong>FedRAMP</strong> standardizes security assessments for cloud services used by US federal agencies.</p>
+<p><strong>Who needs it:</strong> Cloud service providers (CSPs) serving federal agencies
+<strong>Status in AuditKit:</strong> Production
+<strong>Coverage:</strong> Low: 56 of 149, Moderate: 77 of 287, High: 78 of 370 controls carry an automated check on AWS
+<strong>What's covered:</strong> Technical controls from NIST 800-53 Rev 5</p>
+<h2>Important Disclaimer</h2>
+<p><strong>AuditKit's FedRAMP support covers technical controls only - NOT sufficient for FedRAMP authorization.</strong></p>
+<p><strong>What AuditKit covers:</strong></p>
+<ul>
+<li>Technical control scanning based on NIST 800-53 Rev 5</li>
+<li>Automated verification of cloud configurations</li>
+<li>Baseline filtering (Low/Moderate/High impact levels)</li>
+<li>Remediation guidance with cloud-specific commands</li>
+</ul>
+<p><strong>What AuditKit does NOT replace:</strong></p>
+<ul>
+<li>FedRAMP Third-Party Assessment Organization (3PAO) assessment</li>
+<li>Security Assessment Plan (SAP) development</li>
+<li>Security Assessment Report (SAR) creation</li>
+<li>Plan of Action and Milestones (POA&amp;M) management</li>
+<li>Continuous monitoring requirements</li>
+<li>Formal authorization process</li>
+</ul>
+<p><strong>Use for:</strong> Technical control assessment and gap analysis as part of FedRAMP compliance program
+<strong>Don't use for:</strong> Sole evidence of FedRAMP authorization or compliance attestation
+<strong>Hire a 3PAO for:</strong> Complete FedRAMP authorization package and assessment</p>
+<h2>FedRAMP Baselines</h2>
+<p>FedRAMP defines three security impact levels based on FIPS 199:</p>
+<h3>Low Impact (149 controls total, 56 automatable)</h3>
+<p><strong>When to use:</strong></p>
+<ul>
+<li>Low-impact SaaS applications</li>
+<li>Non-sensitive federal data</li>
+<li>No PII, no mission-critical systems</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<ul>
+<li>Collaboration tools (non-sensitive)</li>
+<li>Public-facing websites</li>
+<li>General productivity applications</li>
+</ul>
+<p><strong>Timeline:</strong> 3-6 months for initial authorization
+<strong>Cost:</strong> $50,000 - $150,000 (3PAO + infrastructure)</p>
+<p><strong>AuditKit Coverage:</strong> 56 of the 149 Low controls carry an automated check on AWS</p>
+<h3>Moderate Impact (287 controls total, 77 automatable)</h3>
+<p><strong>When to use:</strong> (Most common - 80%+ of FedRAMP authorizations)</p>
+<ul>
+<li>Most SaaS and cloud services</li>
+<li>Moderate-impact federal data</li>
+<li>Some PII, mission-supportive systems</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<ul>
+<li>CRM systems with PII</li>
+<li>Financial management systems</li>
+<li>HR and benefits platforms</li>
+<li>Most cloud infrastructure services</li>
+</ul>
+<p><strong>Timeline:</strong> 6-12 months for initial authorization
+<strong>Cost:</strong> $250,000 - $500,000 (3PAO + infrastructure)</p>
+<p><strong>AuditKit Coverage:</strong> 77 of the 287 Moderate controls carry an automated check on AWS</p>
+<h3>High Impact (370 controls total, 78 automatable)</h3>
+<p><strong>When to use:</strong></p>
+<ul>
+<li>High-impact systems</li>
+<li>Law enforcement data</li>
+<li>Financial or health information</li>
+<li>National security systems</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<ul>
+<li>Critical mission systems</li>
+<li>Law enforcement databases</li>
+<li>National security applications</li>
+</ul>
+<p><strong>Timeline:</strong> 12-18 months for initial authorization
+<strong>Cost:</strong> $500,000+ (3PAO + infrastructure)</p>
+<p><strong>AuditKit Coverage:</strong> 78 of the 370 High controls carry an automated check on AWS</p>
+<h2>Running FedRAMP Scans</h2>
+<p>Baseline filtering is supported directly via <code class="code-inline">fedramp-low</code>, <code class="code-inline">fedramp-moderate</code>
+and <code class="code-inline">fedramp-high</code>. NIST 800-53 covers all FedRAMP requirements if you prefer
+the full control set.</p>
+<div class="code-block"># Filter to a specific FedRAMP baseline
+auditkit scan -provider aws -framework fedramp-moderate
+
+# NIST 800-53 (covers all FedRAMP baselines)
+auditkit scan -provider aws -framework 800-53
+
+# Generate PDF report
+auditkit scan -provider aws -framework 800-53 -format pdf -output fedramp-report.pdf
+
+# CSV export for POA&amp;M tracking
+auditkit scan -provider aws -framework 800-53 -format csv -output fedramp-gaps.csv
+</div>
+<p><strong>FedRAMP baseline filtering:</strong></p>
+<div class="code-block"># FedRAMP Low baseline
+auditkit scan -provider aws -framework fedramp-low
+
+# FedRAMP Moderate baseline
+auditkit scan -provider aws -framework fedramp-moderate
+
+# FedRAMP High baseline
+auditkit scan -provider aws -framework fedramp-high
+</div>
+<h2>What AuditKit Checks</h2>
+<p>AuditKit scans for technical controls that map to FedRAMP baselines via NIST 800-53 Rev 5:</p>
+<h3>Access Control (AC)</h3>
+<ul>
+<li>AC-2: Account Management</li>
+<li>AC-3: Access Enforcement</li>
+<li>AC-6: Least Privilege</li>
+<li>AC-17: Remote Access</li>
+</ul>
+<h3>Audit and Accountability (AU)</h3>
+<ul>
+<li>AU-2: Audit Events</li>
+<li>AU-3: Content of Audit Records</li>
+<li>AU-6: Audit Review</li>
+<li>AU-12: Audit Generation</li>
+</ul>
+<h3>Configuration Management (CM)</h3>
+<ul>
+<li>CM-2: Baseline Configuration</li>
+<li>CM-6: Configuration Settings</li>
+<li>CM-7: Least Functionality</li>
+</ul>
+<h3>Identification and Authentication (IA)</h3>
+<ul>
+<li>IA-2: User Identification and Authentication</li>
+<li>IA-2(1): Multi-factor Authentication</li>
+<li>IA-5: Authenticator Management</li>
+</ul>
+<h3>System and Communications Protection (SC)</h3>
+<ul>
+<li>SC-7: Boundary Protection</li>
+<li>SC-8: Transmission Confidentiality</li>
+<li>SC-13: Cryptographic Protection</li>
+<li>SC-28: Protection of Information at Rest</li>
+</ul>
+<h3>System and Information Integrity (SI)</h3>
+<ul>
+<li>SI-2: Flaw Remediation</li>
+<li>SI-3: Malicious Code Protection</li>
+<li>SI-4: Information System Monitoring</li>
+</ul>
+<h2>FedRAMP Authorization Process</h2>
+<h3>1. Prepare (Months 1-6)</h3>
+<ul>
+<li>Choose authorization path (Agency, JAB, CSP Supplied)</li>
+<li>Select FedRAMP baseline (Low/Moderate/High)</li>
+<li>Implement technical controls (AuditKit helps here)</li>
+<li>Develop System Security Plan (SSP)</li>
+</ul>
+<h3>2. Assess (Months 7-9)</h3>
+<ul>
+<li>Engage FedRAMP-approved 3PAO</li>
+<li>3PAO performs Security Assessment</li>
+<li>Produce Security Assessment Report (SAR)</li>
+<li>Create Plan of Action &amp; Milestones (POA&amp;M)</li>
+</ul>
+<h3>3. Authorize (Months 10-12)</h3>
+<ul>
+<li>Submit authorization package</li>
+<li>FedRAMP PMO review</li>
+<li>Agency or JAB authorization decision</li>
+<li>Receive Authority to Operate (ATO)</li>
+</ul>
+<h3>4. Monitor (Ongoing)</h3>
+<ul>
+<li>Continuous monitoring</li>
+<li>Monthly vulnerability scanning</li>
+<li>Annual assessment</li>
+<li>Configuration management</li>
+<li>Incident reporting</li>
+</ul>
+<h2>FedRAMP vs Other Frameworks</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Overlap with FedRAMP</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NIST 800-53</strong></td>
+<td>100%</td>
+<td>FedRAMP is subset of 800-53</td>
+</tr>
+<tr>
+<td><strong>CMMC Level 2</strong></td>
+<td>High</td>
+<td>Both based on NIST 800-171</td>
+</tr>
+<tr>
+<td><strong>SOC2</strong></td>
+<td>Medium</td>
+<td>Similar technical controls</td>
+</tr>
+<tr>
+<td><strong>ISO 27001</strong></td>
+<td>High</td>
+<td>Many aligned controls</td>
+</tr>
+<tr>
+<td><strong>StateRAMP</strong></td>
+<td>Very High</td>
+<td>State-level equivalent</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Key Differentiators:</strong></p>
+<ul>
+<li>FedRAMP requires formal 3PAO assessment</li>
+<li>Continuous monitoring mandatory</li>
+<li>FedRAMP PMO oversight</li>
+<li>Specific to federal cloud services</li>
+<li>Reciprocity across federal agencies</li>
+</ul>
+<h2>Authorization Paths</h2>
+<h3>JAB Provisional ATO (P-ATO)</h3>
+<p><strong>Best for:</strong> CSPs serving multiple agencies
+<strong>Timeline:</strong> 12-18 months
+<strong>Cost:</strong> Higher (multiple agency coordination)
+<strong>Benefit:</strong> Highest level of reciprocity</p>
+<h3>Agency ATO</h3>
+<p><strong>Best for:</strong> CSPs serving specific agency
+<strong>Timeline:</strong> 6-12 months
+<strong>Cost:</strong> Lower (single agency)
+<strong>Benefit:</strong> Faster, focused on agency needs</p>
+<h3>CSP Supplied Package</h3>
+<p><strong>Best for:</strong> Initial assessment, later pursuing JAB/Agency
+<strong>Timeline:</strong> 6-9 months
+<strong>Cost:</strong> CSP bears assessment cost
+<strong>Benefit:</strong> Demonstrates readiness, pre-authorization</p>
+<h2>Cost Breakdown</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Low</th>
+<th>Moderate</th>
+<th>High</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AuditKit Free</td>
+<td>$0</td>
+<td>$0</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>Infrastructure hardening</td>
+<td>$20K-50K</td>
+<td>$50K-150K</td>
+<td>$150K-300K</td>
+</tr>
+<tr>
+<td>3PAO Initial Assessment</td>
+<td>$50K-100K</td>
+<td>$150K-300K</td>
+<td>$300K-500K</td>
+</tr>
+<tr>
+<td>Documentation (SSP/SAR/POA&amp;M)</td>
+<td>$20K-50K</td>
+<td>$50K-100K</td>
+<td>$100K-200K</td>
+</tr>
+<tr>
+<td>Continuous monitoring tools</td>
+<td>$10K-30K/year</td>
+<td>$30K-80K/year</td>
+<td>$80K-150K/year</td>
+</tr>
+<tr>
+<td>Annual 3PAO assessment</td>
+<td>$30K-60K</td>
+<td>$75K-150K</td>
+<td>$150K-300K</td>
+</tr>
+<tr>
+<td><strong>Initial authorization</strong></td>
+<td><strong>$100K-230K</strong></td>
+<td><strong>$325K-630K</strong></td>
+<td><strong>$730K-1.3M</strong></td>
+</tr>
+<tr>
+<td><strong>Ongoing (annual)</strong></td>
+<td><strong>$40K-90K</strong></td>
+<td><strong>$105K-230K</strong></td>
+<td><strong>$230K-450K</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h2>Common FedRAMP Gaps</h2>
+<p>Based on 3PAO findings across hundreds of assessments:</p>
+<ol>
+<li><strong>Incomplete continuous monitoring</strong> (AC, SI families)</li>
+<li><strong>Insufficient audit logging</strong> (AU family)</li>
+<li><strong>Weak access controls</strong> (AC, IA families)</li>
+<li><strong>Missing configuration baselines</strong> (CM family)</li>
+<li><strong>Inadequate incident response</strong> (IR family)</li>
+<li><strong>Poor change management</strong> (CM family)</li>
+<li><strong>Incomplete vulnerability management</strong> (RA, SI families)</li>
+<li><strong>Missing security awareness training</strong> (AT family)</li>
+</ol>
+<p><strong>AuditKit helps identify #1, #2, #3, #4, #6, #7</strong> - you need policies and training for #5, #8</p>
+<h2>FAQ</h2>
+<p><strong>Q: Do I need FedRAMP compliance?</strong>
+A: Only if you're a cloud service provider (CSP) serving federal agencies. If you're a federal contractor, you may need CMMC instead.</p>
+<p><strong>Q: How long does FedRAMP authorization take?</strong>
+A: Low: 3-6 months, Moderate: 6-12 months, High: 12-18 months (from start to ATO).</p>
+<p><strong>Q: Can I self-assess for FedRAMP?</strong>
+A: No. FedRAMP requires independent assessment by FedRAMP-approved 3PAO.</p>
+<p><strong>Q: What's the difference between FedRAMP and NIST 800-53?</strong>
+A: FedRAMP is a specific subset of NIST 800-53 controls for cloud services, with additional continuous monitoring and authorization requirements.</p>
+<p><strong>Q: Does FedRAMP authorization apply to all agencies?</strong>
+A: JAB P-ATO provides widest reciprocity. Agency ATOs are specific to that agency, though other agencies may leverage them.</p>
+<p><strong>Q: How much does FedRAMP cost?</strong>
+A: Moderate (most common): $325K-630K initial, $105K-230K annual. See cost breakdown above.</p>
+<p><strong>Q: What's the pass rate for FedRAMP?</strong>
+A: About 60-70% of CSPs pass initial assessment (with POA&amp;Ms). Many take 2-3 attempts.</p>
+<p><strong>Q: Can I start with FedRAMP Low and upgrade later?</strong>
+A: Yes, but most agencies require Moderate. Starting with Low may delay useful authorization.</p>
+<p><strong>Q: Do cloud providers (AWS, Azure, GCP) help with FedRAMP?</strong>
+A: Yes! AWS, Azure, and GCP all have FedRAMP-authorized regions and inherit controls from their infrastructure. Use the Shared Responsibility Model.</p>
+<h2>Recommended Path</h2>
+<h3>Months 1-3: Planning</h3>
+<ul>
+<li>Determine correct baseline (Low/Moderate/High)</li>
+<li>Choose authorization path (JAB/Agency/CSP)</li>
+<li>Run AuditKit to identify gaps</li>
+<li>Begin SSP development</li>
+</ul>
+<h3>Months 4-6: Implementation</h3>
+<ul>
+<li>Remediate technical gaps (use AuditKit)</li>
+<li>Implement continuous monitoring</li>
+<li>Complete policies and procedures</li>
+<li>Engage 3PAO</li>
+</ul>
+<h3>Months 7-9: Assessment</h3>
+<ul>
+<li>3PAO performs security assessment</li>
+<li>Address findings in real-time</li>
+<li>Develop POA&amp;M for remaining gaps</li>
+<li>Complete SAR</li>
+</ul>
+<h3>Months 10-12: Authorization</h3>
+<ul>
+<li>Submit authorization package to FedRAMP PMO</li>
+<li>Address PMO feedback</li>
+<li>Agency/JAB authorization decision</li>
+<li>Receive ATO</li>
+</ul>
+<h3>Ongoing: Maintain</h3>
+<ul>
+<li>Monthly vulnerability scanning</li>
+<li>Continuous monitoring</li>
+<li>Quarterly POA&amp;M updates</li>
+<li>Annual 3PAO assessment</li>
+</ul>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../getting-started.md">Run FedRAMP technical scan</a></strong></li>
+<li><strong><a href="./nist-800-53.md">Compare to NIST 800-53</a></strong></li>
+<li><strong><a href="https://marketplace.fedramp.gov/assessors">Find approved 3PAO</a></strong></li>
+<li><strong><a href="https://www.fedramp.gov/">FedRAMP official site</a></strong></li>
+<li><strong><a href="https://marketplace.fedramp.gov/">FedRAMP Marketplace</a></strong></li>
+</ul>
+<p><strong>Remember:</strong> AuditKit covers technical controls. Hire a FedRAMP-approved 3PAO for complete authorization package and formal assessment.</p>
+
+            <div class="callout" style="margin-top: 3rem;">
+                <h3>Scan your environment</h3>
+                <p style="margin-bottom: 1.25rem;">Point AuditKit at AWS, Azure or GCP with read-only credentials and get every finding with the command to fix it. Full results in about thirty minutes.</p>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start 14-Day Free Trial</a>
+                <p class="text-sm text-muted" style="margin-top: 1rem; margin-bottom: 0;">$297/month after the trial. Cancel any time. The <a href="/community.html">Community Edition</a> is free and open source.</p>
             </div>
-            <p class="text-center text-lg" style="margin-top: 2rem;">
-                Detailed framework documentation is available on GitHub.
-            </p>
         </div>
     </section>
+
+    </main>
 
     <footer class="site-footer">
         <div class="footer-inner">
