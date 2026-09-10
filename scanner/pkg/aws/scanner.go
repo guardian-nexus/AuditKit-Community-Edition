@@ -46,6 +46,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/aws/checks"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/awsinspector"
 )
 
 type AWSScanner struct {
@@ -445,7 +446,44 @@ func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 		fmt.Println("Visit https://auditkit.io/pro for full CMMC Level 2")
 	}
 
+	// Vulnerability scan coverage, read from Inspector rather than asked for as
+	// a document. Answers RA.L2-3.11.2 with real PASS/FAIL.
+	results = append(results, s.runVulnCoverage(ctx, checks.EmitCMMC)...)
+
 	return results
+}
+
+// runVulnCoverage builds the vulnerability coverage check for one framework and
+// converts its results. emit keeps the CMMC and PCI passes from each reporting
+// the other's control, which would double-count it on a scan of all frameworks.
+func (s *AWSScanner) runVulnCoverage(ctx context.Context, emit checks.Emit) []ScanResult {
+	vc := checks.NewVulnCoverageChecks(awsinspector.Clients{
+		Inspector: s.inspector2Client,
+		EC2:       s.ec2Client,
+		Lambda:    s.lambdaClient,
+		ECR:       s.ecrClient,
+	}, s.GetAccountID(ctx), emit)
+
+	crs, err := vc.Run(ctx)
+	if err != nil {
+		return nil
+	}
+	out := make([]ScanResult, 0, len(crs))
+	for _, cr := range crs {
+		out = append(out, ScanResult{
+			Control:           cr.Control,
+			Name:              cr.Name,
+			Status:            cr.Status,
+			Evidence:          cr.Evidence,
+			Remediation:       cr.Remediation,
+			RemediationDetail: cr.RemediationDetail,
+			Severity:          cr.Severity,
+			ScreenshotGuide:   cr.ScreenshotGuide,
+			ConsoleURL:        cr.ConsoleURL,
+			Frameworks:        cr.Frameworks,
+		})
+	}
+	return out
 }
 
 func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
@@ -606,6 +644,10 @@ func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 			}
 		}
 	}
+
+	// PCI-DSS 11.3.1 wants scans quarterly across every in-scope system, which
+	// "Inspector is enabled" never established.
+	results = append(results, s.runVulnCoverage(ctx, checks.EmitPCI)...)
 
 	return results
 }

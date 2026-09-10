@@ -243,7 +243,7 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 			ConsoleURL:        "https://console.aws.amazon.com/inspector/v2/home",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.4", "SOC2": "CC8.1", "PCI-DSS": "6.3.3, 11.3.1"},
+			Frameworks:        map[string]string{"CIS-AWS": "9.4", "SOC2": "CC8.1"},
 		}, nil
 	}
 
