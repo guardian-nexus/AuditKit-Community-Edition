@@ -31,6 +31,9 @@ type (
 	InspectorAPI interface {
 		BatchGetAccountStatus(context.Context, *inspector2.BatchGetAccountStatusInput, ...func(*inspector2.Options)) (*inspector2.BatchGetAccountStatusOutput, error)
 		ListCoverage(context.Context, *inspector2.ListCoverageInput, ...func(*inspector2.Options)) (*inspector2.ListCoverageOutput, error)
+		// FindingsAPI is embedded so one client satisfies both halves; coverage
+		// is collected on its own and findings only when asked for.
+		FindingsAPI
 	}
 	EC2API interface {
 		DescribeInstances(context.Context, *ec2.DescribeInstancesInput, ...func(*ec2.Options)) (*ec2.DescribeInstancesOutput, error)

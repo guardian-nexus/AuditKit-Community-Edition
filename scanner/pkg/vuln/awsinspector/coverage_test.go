@@ -22,9 +22,18 @@ import (
 type fakeInspector struct {
 	accountErr  error
 	coverageErr error
+	findingsErr error
 	enabled     bool
 	classes     map[string]bool // "ec2", "ecr", "lambda"
 	resources   []inspectortypes.CoveredResource
+	findings    []inspectortypes.Finding
+}
+
+func (f *fakeInspector) ListFindings(context.Context, *inspector2.ListFindingsInput, ...func(*inspector2.Options)) (*inspector2.ListFindingsOutput, error) {
+	if f.findingsErr != nil {
+		return nil, f.findingsErr
+	}
+	return &inspector2.ListFindingsOutput{Findings: f.findings}, nil
 }
 
 func (f *fakeInspector) BatchGetAccountStatus(context.Context, *inspector2.BatchGetAccountStatusInput, ...func(*inspector2.Options)) (*inspector2.BatchGetAccountStatusOutput, error) {
@@ -301,4 +310,96 @@ func findAssessment(t *testing.T, all []vuln.Assessment, key vuln.AssessmentKey)
 	}
 	t.Fatalf("no %s assessment in %+v", key, all)
 	return vuln.Assessment{}
+}
+
+
+func finding(cve string, sev inspectortypes.Severity, firstSeen time.Time, fix inspectortypes.FixAvailable) inspectortypes.Finding {
+	id, arn := cve, "arn:aws:inspector2:::finding/"+cve
+	return inspectortypes.Finding{
+		FindingArn:      &arn,
+		Severity:        sev,
+		FixAvailable:    fix,
+		FirstObservedAt: &firstSeen,
+		PackageVulnerabilityDetails: &inspectortypes.PackageVulnerabilityDetails{
+			VulnerabilityId: &id,
+		},
+	}
+}
+
+func TestRemediationAgeingAgainstThePolicyWindow(t *testing.T) {
+	policy := vuln.DefaultPolicy() // critical 30, high 90, medium 180
+	now := time.Now()
+	insp := &fakeInspector{enabled: true, classes: allOn(),
+		resources: []inspectortypes.CoveredResource{
+			covered("i-1", "SUCCESSFUL", ago(time.Hour)),
+		},
+		findings: []inspectortypes.Finding{
+			finding("CVE-2024-0001", inspectortypes.SeverityCritical, now.AddDate(0, 0, -94), inspectortypes.FixAvailableYes),
+			finding("CVE-2024-0002", inspectortypes.SeverityCritical, now.AddDate(0, 0, -5), inspectortypes.FixAvailableYes),
+			finding("CVE-2024-0003", inspectortypes.SeverityHigh, now.AddDate(0, 0, -100), inspectortypes.FixAvailableYes),
+			// past every window, but there is no patch: needs a compensating
+			// control, so it must not count as overdue
+			finding("CVE-2024-0004", inspectortypes.SeverityCritical, now.AddDate(0, 0, -400), inspectortypes.FixAvailableNo),
+			// no window in policy for LOW, so never overdue
+			finding("CVE-2024-0005", inspectortypes.SeverityLow, now.AddDate(0, 0, -900), inspectortypes.FixAvailableYes),
+		}}
+
+	p := Collect(context.Background(), Clients{Inspector: insp}, policy, "")
+	CollectFindings(context.Background(), insp, p)
+	if len(p.Findings) != 5 {
+		t.Fatalf("want 5 findings, got %d", len(p.Findings))
+	}
+
+	a := findAssessment(t, vuln.Evaluate(p, policy, now), vuln.AssessRemediation)
+	if a.Status != vuln.StatusFail {
+		t.Fatalf("two overdue findings should fail, got %s: %s", a.Status, a.Evidence)
+	}
+	if a.Severity != "CRITICAL" {
+		t.Errorf("an overdue critical should raise the severity, got %q", a.Severity)
+	}
+	if !strings.Contains(a.Evidence, "2 findings are past") {
+		t.Errorf("expected exactly 2 overdue in the evidence: %s", a.Evidence)
+	}
+	if !strings.Contains(a.Evidence, "CVE-2024-0003") {
+		t.Errorf("the oldest overdue finding should be named: %s", a.Evidence)
+	}
+	if !strings.Contains(a.Detail, "no fix available") {
+		t.Errorf("the unpatchable finding should be called out: %s", a.Detail)
+	}
+}
+
+// Findings that were never collected must not read as "nothing overdue".
+func TestRemediationSilentWhenFindingsNotCollected(t *testing.T) {
+	insp := &fakeInspector{enabled: true, classes: allOn(),
+		resources: []inspectortypes.CoveredResource{covered("i-1", "SUCCESSFUL", ago(time.Hour))}}
+	p := Collect(context.Background(), Clients{Inspector: insp}, vuln.DefaultPolicy(), "")
+	for _, a := range vuln.Evaluate(p, vuln.DefaultPolicy(), time.Now()) {
+		if a.Key == vuln.AssessRemediation {
+			t.Fatalf("remediation must not be assessed when findings were not fetched: %+v", a)
+		}
+	}
+}
+
+func TestFindingsReadFailureIsRecorded(t *testing.T) {
+	insp := &fakeInspector{enabled: true, classes: allOn(), findingsErr: errors.New("AccessDeniedException")}
+	p := Collect(context.Background(), Clients{Inspector: insp}, vuln.DefaultPolicy(), "")
+	CollectFindings(context.Background(), insp, p)
+	if len(p.Errors) == 0 {
+		t.Fatal("a denied ListFindings must be recorded")
+	}
+	got := vuln.Evaluate(p, vuln.DefaultPolicy(), time.Now())
+	if len(got) != 1 || got[0].Status != vuln.StatusError {
+		t.Fatalf("want a single ERROR assessment, got %+v", got)
+	}
+}
+
+func TestNoFindingsIsACleanPass(t *testing.T) {
+	insp := &fakeInspector{enabled: true, classes: allOn(),
+		resources: []inspectortypes.CoveredResource{covered("i-1", "SUCCESSFUL", ago(time.Hour))}}
+	p := Collect(context.Background(), Clients{Inspector: insp}, vuln.DefaultPolicy(), "")
+	CollectFindings(context.Background(), insp, p)
+	a := findAssessment(t, vuln.Evaluate(p, vuln.DefaultPolicy(), time.Now()), vuln.AssessRemediation)
+	if a.Status != vuln.StatusPass {
+		t.Fatalf("an empty active-findings list is a pass, got %s", a.Status)
+	}
 }

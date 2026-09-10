@@ -28,6 +28,8 @@ const (
 	AssessCoverage AssessmentKey = "coverage"
 	// AssessFreshness - has it looked recently enough.
 	AssessFreshness AssessmentKey = "freshness"
+	// AssessRemediation - are findings being fixed inside the policy window.
+	AssessRemediation AssessmentKey = "remediation"
 )
 
 // Assessment is one framework-neutral judgement, ready for an adapter to map
@@ -96,7 +98,137 @@ func Evaluate(p *Posture, policy Policy, now time.Time) []Assessment {
 
 	out = append(out, assessCoverage(p, total, policy))
 	out = append(out, assessFreshness(p, total, policy, now))
+	if a, ok := assessRemediation(p, policy, now); ok {
+		out = append(out, a)
+	}
 	return out
+}
+
+// Aging buckets the findings by severity against the policy window. Severities
+// the policy says nothing about - low, informational, untriaged - are counted
+// but never overdue, because the tool must not invent a window it was not given.
+func Aging(findings []Finding, policy Policy, now time.Time) []SeverityAging {
+	order := []string{"CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL", "UNTRIAGED"}
+	rank := map[string]int{}
+	for i, s := range order {
+		rank[s] = i
+	}
+	by := map[string]*SeverityAging{}
+	for _, f := range findings {
+		sev := strings.ToUpper(f.Severity)
+		a, ok := by[sev]
+		if !ok {
+			a = &SeverityAging{Severity: sev, WindowDays: policy.RemediationDays[sev]}
+			by[sev] = a
+		}
+		a.Total++
+		if f.ExploitAvailable {
+			a.ExploitAvailable++
+		}
+		if !f.Fixable() {
+			a.NoFixAvailable++
+			continue
+		}
+		if a.WindowDays <= 0 {
+			continue
+		}
+		if age := f.AgeDays(now); age > a.WindowDays {
+			a.Overdue++
+			a.OverdueIDs = append(a.OverdueIDs, f.ID)
+			if age > a.OldestOverdueDays {
+				a.OldestOverdueDays, a.OldestOverdueID = age, f.ID
+			}
+		}
+	}
+	out := make([]SeverityAging, 0, len(by))
+	for _, a := range by {
+		out = append(out, *a)
+	}
+	sort.Slice(out, func(i, j int) bool {
+		ri, oki := rank[out[i].Severity]
+		rj, okj := rank[out[j].Severity]
+		if !oki {
+			ri = len(order)
+		}
+		if !okj {
+			rj = len(order)
+		}
+		return ri < rj
+	})
+	return out
+}
+
+func assessRemediation(p *Posture, policy Policy, now time.Time) (Assessment, bool) {
+	if p.Findings == nil {
+		// Findings were not collected. Silence is not a pass, so say nothing
+		// rather than reporting zero overdue from data we never asked for.
+		return Assessment{}, false
+	}
+	a := Assessment{Key: AssessRemediation}
+	aging := Aging(p.Findings, policy, now)
+
+	if len(p.Findings) == 0 {
+		a.Status = StatusPass
+		a.Evidence = "No unremediated vulnerability findings reported by " + p.Source
+		a.Detail = policy.Describe()
+		return a, true
+	}
+
+	overdue, worstSev, oldest, oldestID, noFix := 0, "", 0, "", 0
+	for _, s := range aging {
+		overdue += s.Overdue
+		noFix += s.NoFixAvailable
+		if s.Overdue > 0 && worstSev == "" {
+			worstSev = s.Severity // aging is severity-ordered
+		}
+		if s.OldestOverdueDays > oldest {
+			oldest, oldestID = s.OldestOverdueDays, s.OldestOverdueID
+		}
+	}
+
+	detail := []string{policy.Describe(), agingTable(aging)}
+	if noFix > 0 {
+		detail = append(detail, fmt.Sprintf(
+			"%d findings have no fix available and are excluded from the window. Those need a "+
+				"compensating control and a documented risk acceptance, not a patch.", noFix))
+	}
+
+	if overdue == 0 {
+		a.Status = StatusPass
+		a.Evidence = fmt.Sprintf("All %d findings are inside the remediation window", len(p.Findings))
+		a.Detail = strings.Join(detail, "\n\n")
+		return a, true
+	}
+
+	a.Status = StatusFail
+	a.Severity = "HIGH"
+	if worstSev == "CRITICAL" {
+		a.Severity = "CRITICAL"
+	}
+	a.Evidence = fmt.Sprintf("%d findings are past the remediation window; the oldest is %d days old (%s)",
+		overdue, oldest, oldestID)
+	a.Remediation = "Remediate the overdue findings, or record a risk acceptance with an expiry against each"
+	a.Detail = strings.Join(detail, "\n\n")
+	return a, true
+}
+
+func agingTable(aging []SeverityAging) string {
+	var b strings.Builder
+	b.WriteString("Findings by severity:")
+	for _, s := range aging {
+		window := "no window in policy"
+		if s.WindowDays > 0 {
+			window = fmt.Sprintf("%dd window", s.WindowDays)
+		}
+		fmt.Fprintf(&b, "\n  %-14s %3d total, %3d overdue  (%s)", s.Severity, s.Total, s.Overdue, window)
+		if s.OldestOverdueDays > 0 {
+			fmt.Fprintf(&b, "  oldest %dd", s.OldestOverdueDays)
+		}
+		if s.ExploitAvailable > 0 {
+			fmt.Fprintf(&b, "  %d with a known exploit", s.ExploitAvailable)
+		}
+	}
+	return b.String()
 }
 
 func assessCoverage(p *Posture, total Coverage, policy Policy) Assessment {

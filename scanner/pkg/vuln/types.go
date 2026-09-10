@@ -101,6 +101,7 @@ type Posture struct {
 
 	Coverage []Coverage `json:"coverage,omitempty"`
 	Assets   []Asset    `json:"assets,omitempty"`
+	Findings []Finding  `json:"findings,omitempty"`
 
 	// Errors holds calls that did not complete. A collector that could not read
 	// coverage records the failure here and Evaluate emits ERROR, because a
@@ -108,6 +109,51 @@ type Posture struct {
 	// call that never returned is how the GCP PCI 8.6.3 and 10.4.1.1 defects
 	// shipped.
 	Errors []string `json:"errors,omitempty"`
+}
+
+// Finding is one unremediated vulnerability on one asset. Severity and score
+// are the provider's own: this package does not re-score anything, so a
+// disagreement with the scanner is impossible by construction.
+type Finding struct {
+	ID       string `json:"id"`
+	Title    string `json:"title"`
+	Severity string `json:"severity"`
+	AssetID  string `json:"asset_id"`
+	// FirstObserved is the remediation clock. Age runs from when the scanner
+	// first saw the finding, not from when the CVE was published: the
+	// obligation starts when you could have known.
+	FirstObserved time.Time  `json:"first_observed"`
+	LastObserved  *time.Time `json:"last_observed,omitempty"`
+	// FixAvailable separates "you have not patched" from "there is no patch",
+	// which are different conversations with an assessor.
+	FixAvailable    string   `json:"fix_available,omitempty"`
+	ExploitAvailable bool    `json:"exploit_available,omitempty"`
+	Score           *float64 `json:"score,omitempty"`
+}
+
+// AgeDays is how long the finding has gone unremediated.
+func (f Finding) AgeDays(now time.Time) int {
+	return int(now.Sub(f.FirstObserved).Hours() / 24)
+}
+
+// Fixable reports whether a patch exists. A finding with no fix cannot be
+// remediated by patching and needs a compensating control instead, so it is
+// counted and reported but never held against the remediation window.
+func (f Finding) Fixable() bool {
+	return f.FixAvailable != "NO"
+}
+
+// SeverityAging is the remediation picture for one severity band.
+type SeverityAging struct {
+	Severity          string   `json:"severity"`
+	WindowDays        int      `json:"window_days"`
+	Total             int      `json:"total"`
+	Overdue           int      `json:"overdue"`
+	OverdueIDs        []string `json:"overdue_ids,omitempty"`
+	OldestOverdueDays int      `json:"oldest_overdue_days,omitempty"`
+	OldestOverdueID   string   `json:"oldest_overdue_id,omitempty"`
+	NoFixAvailable    int      `json:"no_fix_available,omitempty"`
+	ExploitAvailable  int      `json:"exploit_available,omitempty"`
 }
 
 // Coverage for one class, and whether it was collected at all.
