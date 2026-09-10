@@ -69,6 +69,14 @@ func newWithClients(clients gcposconfig.Clients, projectID string, emit Emit, in
 		policy: vuln.DefaultPolicy(), initErr: initErr}
 }
 
+// NewVulnCoverageChecksWithClients is the injectable constructor, matching the
+// AWS adapter whose exported constructor already takes its clients. GCP was the
+// one provider whose control mapping could only be reached with live
+// credentials, and it is the one whose adapter shipped unreachable once.
+func NewVulnCoverageChecksWithClients(clients gcposconfig.Clients, projectID string, emit Emit) *VulnCoverageChecks {
+	return newWithClients(clients, projectID, emit, nil)
+}
+
 // NewVulnCoverageChecks builds its clients from application default
 // credentials, matching how the other GCP checkers in this package work.
 func NewVulnCoverageChecks(ctx context.Context, projectID string, emit Emit) *VulnCoverageChecks {

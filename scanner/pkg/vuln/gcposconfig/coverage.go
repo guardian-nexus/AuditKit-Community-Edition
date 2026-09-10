@@ -66,12 +66,28 @@ func Collect(ctx context.Context, c Clients, policy vuln.Policy, projectID strin
 
 	reports, err := listReports(ctx, c.Reports, projectID)
 	if err != nil {
-		// A project that has never enabled the API answers with a permission or
-		// service-disabled error. That is "nothing is scanning", not a coverage
-		// number, and it must not read as a pass.
-		if isDisabled(err) {
-			p.Errors = append(p.Errors, fmt.Sprintf(
-				"VM Manager is not enabled on project %s: %v", projectID, err))
+		// Two very different answers arrive with the same HTTP status, and
+		// they must not share a verdict.
+		//
+		// "The API is not enabled on this project" means nothing is scanning
+		// these instances, which is the finding RA.L2-3.11.2 exists to report.
+		// It belongs in the score as a FAIL, the way the AWS and Azure
+		// collectors report the same state. Filing it as an error instead put
+		// it in neither half of passed/(passed+failed), so a GCP project with
+		// no vulnerability scanning at all scored better than an AWS account
+		// in the identical state.
+		//
+		// A permission denial means we could not tell, and stays an error: a
+		// call that did not complete proves nothing about posture.
+		if isServiceDisabled(err) {
+			// ScannerEnabled is already false; the note carries the specific
+			// reason into the evidence package the way Defender's does, since
+			// Evaluate's own message can only say "reports disabled".
+			p.Coverage = append(p.Coverage, vuln.Coverage{
+				Class: vuln.ClassInstance,
+				Note: fmt.Sprintf("VM Manager is not enabled on project %s, so nothing is "+
+					"scanning its instances for vulnerabilities: %v", projectID, err),
+			})
 			return p
 		}
 		p.Errors = append(p.Errors, fmt.Sprintf("vulnerabilityReports.list: %v", err))
@@ -257,9 +273,17 @@ func parseTime(s string) *time.Time {
 	return &t
 }
 
-func isDisabled(err error) bool {
+// isServiceDisabled reports whether the error says the API is switched off for
+// this project, as opposed to the caller being denied.
+//
+// A bare "403" was matched here once, which conflated the two: Google returns
+// SERVICE_DISABLED with HTTP 403, so the specific markers already catch the
+// disabled case, while the generic one swallowed genuine permission denials -
+// and matched any error text that happened to contain 403 at all, a project
+// number or a quota figure included.
+func isServiceDisabled(err error) bool {
 	s := err.Error()
-	for _, marker := range []string{"has not been used", "SERVICE_DISABLED", "accessNotConfigured", "403"} {
+	for _, marker := range []string{"has not been used", "SERVICE_DISABLED", "accessNotConfigured"} {
 		if strings.Contains(s, marker) {
 			return true
 		}

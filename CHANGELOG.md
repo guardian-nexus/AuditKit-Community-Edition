@@ -2,6 +2,20 @@
 
 All notable changes to AuditKit will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- GCP: a project with VM Manager not enabled now FAILs `RA.L2-3.11.2` and
+  `PCI-11.3.1` instead of reporting an error. **This lowers the reported score
+  for GCP projects without VM Manager.** The score is
+  `passed / (passed + failed)`, so an error was counted in neither half and the
+  control dropped out entirely - a project with no vulnerability scanning at all
+  scored better than one being scanned badly, and better than an AWS or Azure
+  account in the identical state. "Nothing is scanning these instances" is the
+  finding the control exists to report, so it is now scored as one. A genuine
+  permission denial is unchanged and still reports an error, because a call that
+  did not complete proves nothing about posture.
+
 ## [0.8.6] - 2026-09-07
 
 ### Changed

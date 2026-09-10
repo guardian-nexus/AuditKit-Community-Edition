@@ -127,14 +127,36 @@ func TestUncoveredInstanceFailsTheControl(t *testing.T) {
 	}
 }
 
-// A read that did not complete must never produce a pass.
+// A read that did not complete must never produce a pass. The fixture is a
+// real permission denial: SERVICE_DISABLED is a different case, below, and
+// using it here meant this test was asserting the wrong thing about it.
 func TestCollectionFailureIsAnError(t *testing.T) {
-	clients := gcposconfig.Clients{Reports: stubReports{err: errors.New("SERVICE_DISABLED")}}
+	clients := gcposconfig.Clients{Reports: stubReports{
+		err: errors.New("googleapi: Error 403: Permission denied on resource project proj")}}
 	for _, emit := range []Emit{EmitCMMC, EmitPCI} {
 		for _, r := range run(t, clients, emit) {
 			if r.Status != StatusError {
 				t.Errorf("%s should be ERROR when the read failed, got %s", r.Control, r.Status)
 			}
+		}
+	}
+}
+
+// VM Manager switched off is the finding, not a failed read, so it FAILs and
+// counts. An ERROR is excluded from passed/(passed+failed) entirely, which let
+// a project with no vulnerability scanning score better than one being scanned
+// badly - and better than an AWS account in the identical state.
+func TestServiceDisabledFailsRatherThanDroppingOutOfTheScore(t *testing.T) {
+	clients := gcposconfig.Clients{Reports: stubReports{
+		err: errors.New("googleapi: Error 403: OS Config API has not been used in project proj")}}
+	for _, emit := range []Emit{EmitCMMC, EmitPCI} {
+		res := run(t, clients, emit)
+		if len(res) != 1 {
+			t.Fatalf("want one control, got %+v", res)
+		}
+		if res[0].Status != StatusFail {
+			t.Errorf("%s should FAIL when nothing is scanning, got %s (%s)",
+				res[0].Control, res[0].Status, res[0].Evidence)
 		}
 	}
 }

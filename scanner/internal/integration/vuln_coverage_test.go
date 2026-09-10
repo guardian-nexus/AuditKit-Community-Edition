@@ -9,7 +9,10 @@ import (
 
 	inspectortypes "github.com/aws/aws-sdk-go-v2/service/inspector2/types"
 	awschecks "github.com/guardian-nexus/auditkit/scanner/pkg/aws/checks"
+	gcpchecks "github.com/guardian-nexus/auditkit/scanner/pkg/gcp/checks"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/awsinspector"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/gcposconfig"
+	osconfig "google.golang.org/api/osconfig/v1"
 )
 
 func run(t *testing.T, c awsinspector.Clients, emit awschecks.Emit) []awschecks.CheckResult {
@@ -144,4 +147,51 @@ func TestCommunityScannerOffIsNotClean(t *testing.T) {
 			}
 		}
 	}
+}
+
+// VM Manager switched off is the finding this feature exists to report, so it
+// must FAIL and be counted. The score is passed/(passed+failed), so an ERROR
+// lands in neither half and the control disappears - which let a GCP project
+// with no vulnerability scanning at all score better than an AWS account in
+// the identical state.
+func TestGCPServiceDisabledIsScoredNotSkipped(t *testing.T) {
+	for _, tc := range []struct {
+		name, err, want string
+	}{
+		{"api not enabled",
+			"googleapi: Error 403: OS Config API has not been used in project proj-1", "FAIL"},
+		{"permission denied, which proves nothing",
+			"googleapi: Error 403: Permission denied on resource project proj-1", "ERROR"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			clients := gcposconfig.Clients{Reports: fakeReports{err: errors.New(tc.err)}}
+			res, err := gcpchecks.NewVulnCoverageChecksWithClients(clients, "proj-1", gcpchecks.EmitCMMC).
+				Run(context.Background())
+			if err != nil {
+				t.Fatalf("gcp adapter: %v", err)
+			}
+			if len(res) != 1 {
+				t.Fatalf("want one control, got %+v", res)
+			}
+			if res[0].Status != tc.want {
+				t.Errorf("want %s, got %s (%s)", tc.want, res[0].Status, res[0].Evidence)
+			}
+			scoreable := res[0].Status == "PASS" || res[0].Status == "FAIL"
+			if tc.want == "FAIL" && !scoreable {
+				t.Error("a FAIL is scoreable; an ERROR would drop out of the denominator")
+			}
+			if tc.want == "ERROR" && scoreable {
+				t.Error("an ERROR must not be scored - nothing was measured")
+			}
+		})
+	}
+}
+
+type fakeReports struct{ err error }
+
+func (f fakeReports) List(_ context.Context, _ string, _ string) (*osconfig.ListVulnerabilityReportsResponse, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
+	return &osconfig.ListVulnerabilityReportsResponse{}, nil
 }

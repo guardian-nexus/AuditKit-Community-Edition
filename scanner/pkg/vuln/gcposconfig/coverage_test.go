@@ -69,9 +69,12 @@ func vulnerability(cve, severity string, firstSeen time.Time, fixAvailable bool)
 	return v
 }
 
-// VM Manager not being enabled is not zero coverage, it is an unanswered
-// question, and must never read as a pass.
-func TestServiceDisabledIsAnError(t *testing.T) {
+// VM Manager not being enabled means nothing is scanning these instances,
+// which is the finding RA.L2-3.11.2 exists to report. It has to FAIL and be
+// counted: the score is passed/(passed+failed), so an ERROR here landed in
+// neither half and a GCP project with no vulnerability scanning at all scored
+// better than an AWS account in the identical state.
+func TestServiceDisabledFailsAndIsCounted(t *testing.T) {
 	for _, msg := range []string{
 		"googleapi: Error 403: OS Config API has not been used in project",
 		"SERVICE_DISABLED",
@@ -79,8 +82,38 @@ func TestServiceDisabledIsAnError(t *testing.T) {
 	} {
 		p := Collect(context.Background(), Clients{Reports: fakeReports{err: errors.New(msg)}},
 			vuln.DefaultPolicy(), project)
+		if len(p.Errors) != 0 {
+			t.Fatalf("%q is a finding, not a failed read: %v", msg, p.Errors)
+		}
+		if p.ScannerEnabled {
+			t.Fatalf("%q: nothing is scanning, so the scanner is not enabled", msg)
+		}
+		got := vuln.Evaluate(p, vuln.DefaultPolicy(), time.Now())
+		if len(got) != 1 || got[0].Status != vuln.StatusFail {
+			t.Fatalf("%q: want a single FAIL, got %+v", msg, got)
+		}
+		// Evaluate can only say "reports disabled", so the specific reason has
+		// to travel to the evidence package on the coverage note, the way
+		// Defender's does.
+		if len(p.Coverage) != 1 || !strings.Contains(p.Coverage[0].Note, "not enabled on project") {
+			t.Fatalf("%q: the reason must reach the evidence package: %+v", msg, p.Coverage)
+		}
+	}
+}
+
+// A denied call is the opposite case and must stay an error. Asserting a
+// verdict from a call that never returned is how two earlier GCP defects
+// shipped, and a 403 that is a real denial must not be read as "switched off".
+func TestPermissionDenialIsStillAnError(t *testing.T) {
+	for _, msg := range []string{
+		"googleapi: Error 403: Permission denied on resource project " + project,
+		"googleapi: Error 403: PERMISSION_DENIED",
+		"rpc error: code = PermissionDenied desc = caller lacks osconfig.vulnerabilityReports.list",
+	} {
+		p := Collect(context.Background(), Clients{Reports: fakeReports{err: errors.New(msg)}},
+			vuln.DefaultPolicy(), project)
 		if len(p.Errors) == 0 {
-			t.Fatalf("%q should be recorded as an error", msg)
+			t.Fatalf("%q: a read that did not complete must be recorded as an error", msg)
 		}
 		got := vuln.Evaluate(p, vuln.DefaultPolicy(), time.Now())
 		if len(got) != 1 || got[0].Status != vuln.StatusError {
