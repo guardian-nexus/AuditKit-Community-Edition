@@ -416,7 +416,38 @@ td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--slate-200); font-size
 tr:last-child td { border-bottom: none; }
 
 /* ---------- Callouts ---------- */
-.callout {
+/* Three devices for three jobs, told apart by how loud they are. A note
+   annotates the body text and stays quieter than it. A warning is louder,
+   because missing one costs the reader something. A CTA block closes a page
+   and reads as an action. They do not share a treatment, so the treatment
+   carries meaning. */
+
+/* Note: an aside, subordinate to the prose it sits beside. */
+.note {
+  border-left: 3px solid var(--slate-300);
+  padding: 0.35rem 0 0.35rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.note h3, .note h4 { font-size: 1.05rem; color: var(--text-heading); margin-bottom: 0.4rem; }
+.note p { color: var(--text-muted); margin-bottom: 0; }
+.note p + p { margin-top: 0.75rem; }
+
+/* Warning: rare on purpose. Tint and radius are what make it louder than a note. */
+.callout-warning {
+  border-left: 3px solid var(--warning);
+  background: #fffbeb;
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+}
+
+.callout-warning h3, .callout-warning h4 { color: #92400e; }
+.callout-warning p { color: var(--text); margin-bottom: 0; }
+
+/* Success: reserved for a state that genuinely went right, which on this site
+   is the post-checkout confirmation and nothing else. */
+.callout-success {
   border-left: 3px solid var(--emerald);
   background: var(--emerald-light);
   padding: 1.25rem 1.5rem;
@@ -424,15 +455,22 @@ tr:last-child td { border-bottom: none; }
   margin-bottom: 1.5rem;
 }
 
-.callout h3, .callout h4 { color: #064e3b; }
-.callout p { color: var(--text); margin-bottom: 0; }
+.callout-success h3, .callout-success h4 { color: #064e3b; }
+.callout-success p { color: var(--text); margin-bottom: 0; }
 
-.callout-warning {
-  border-left-color: var(--warning);
-  background: #fffbeb;
+/* CTA block: a panel, not an admonition. The button carries the colour. */
+.cta-block {
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem 2rem;
+  text-align: center;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
 }
 
-.callout-warning h3, .callout-warning h4 { color: #92400e; }
+.cta-block h3 { font-size: 1.35rem; margin-bottom: 0.6rem; }
+.cta-block p { color: var(--text-muted); max-width: 52ch; margin: 0 auto 1.25rem; }
+.section-dark .cta-block { border-color: rgba(255,255,255,0.14); }
 
 /* ---------- FAQ ---------- */
 .faq-section { margin-bottom: 3rem; }
