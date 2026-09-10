@@ -90,8 +90,13 @@ func (c *VulnCoverageChecks) scanningControl(a map[vuln.AssessmentKey]vuln.Asses
 	}
 
 	// The worse of the two decides the control, and both are reported.
+	// Freshness can fail a control but must not make it unknown. A provider
+	// that reports coverage without scan timestamps leaves the cadence
+	// unproven, not disproven, and demoting a proven coverage result to INFO
+	// would drop it out of the score and under-report the provider. The
+	// caveat is appended to the evidence instead.
 	decided := cov
-	if hasFresh && cov.Status == vuln.StatusPass && fresh.Status != vuln.StatusPass {
+	if hasFresh && cov.Status == vuln.StatusPass && fresh.Status == vuln.StatusFail {
 		decided = fresh
 	}
 	res = applyAssessment(res, decided)
@@ -137,9 +142,18 @@ func (c *VulnCoverageChecks) pciInternalScanControl(a map[vuln.AssessmentKey]vul
 		res.Remediation = "Scanning must reach every in-scope system for 11.3.1; bring the uncovered assets into scope"
 		return res
 	}
+	// 11.3.1 names a cadence explicitly - at least quarterly, and rescans
+	// until resolved - so an unproven cadence cannot be a pass here even
+	// though it can stand for RA.L2-3.11.2. A failure and an unknown are
+	// carried through with their own statuses rather than collapsed together.
 	if hasFresh && fresh.Status != vuln.StatusPass {
 		res = applyAssessment(res, fresh)
-		res.Remediation = "11.3.1 requires scans at least quarterly and rescans until findings are resolved"
+		if fresh.Status == vuln.StatusFail {
+			res.Remediation = "11.3.1 requires scans at least quarterly and rescans until findings are resolved"
+		} else {
+			res.Remediation = "Capture the scan cadence from the provider's console for the evidence package; " +
+				"11.3.1 requires at least quarterly scans and this API does not report scan dates"
+		}
 		return res
 	}
 

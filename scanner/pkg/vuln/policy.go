@@ -19,7 +19,10 @@ import (
 // it measures against a stated policy and says which policy it used.
 type Policy struct {
 	// RemediationDays maps a severity to the number of days allowed before a
-	// finding is out of policy. Consumed in phase 2; declared here so the
+	// finding is out of policy. Keys are the provider's own severity words,
+	// upper-cased. Not every provider uses all of them: Microsoft Defender's
+	// scale stops at HIGH and has no CRITICAL band, so an Azure finding is
+	// never measured against the critical window. Consumed in phase 2; declared here so the
 	// config file has one shape from the start.
 	RemediationDays map[string]int `yaml:"remediation_days"`
 

@@ -21,6 +21,11 @@ const maxSubAssessmentPages = 100
 // CollectFindings appends Defender's vulnerability sub-assessments to the
 // posture.
 //
+// Note that Defender's severity scale is High, Medium, Low - it has no Critical
+// band at all. So the policy's critical window never applies to an Azure
+// finding, and what another scanner would call critical arrives here as High
+// and is measured against the high window instead.
+//
 // Only sub-assessments whose additional data is one of the vulnerability shapes
 // are taken. Defender's sub-assessments also carry configuration and posture
 // findings, and counting those as vulnerabilities would inflate every number

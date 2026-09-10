@@ -290,6 +290,21 @@ func assessFreshness(p *Posture, total Coverage, policy Policy, now time.Time) A
 	a := Assessment{Key: AssessFreshness}
 	cutoff := policy.StaleBefore(now)
 
+	// Freshness needs scan timestamps, and not every provider reports them.
+	// Defender for Cloud gives none, so a posture with covered assets and no
+	// dates would otherwise pass with "every covered asset was scanned within
+	// 30 days" - an assertion made from no data. Say it is unknown instead.
+	if !anyScanDate(p) {
+		a.Status = StatusInfo
+		a.Evidence = fmt.Sprintf("%s does not report when each asset was last scanned, "+
+			"so scan freshness could not be assessed", p.Source)
+		a.Remediation = "Confirm the scan cadence in the provider's console, and capture it for the evidence package"
+		a.Detail = policy.Describe() + "\n\nCoverage was still assessed; only the age of each " +
+			"scan is unavailable. A provider that reports coverage without a timestamp cannot " +
+			"show that scanning is ongoing rather than historic."
+		return a
+	}
+
 	if total.Stale == 0 {
 		a.Status = StatusPass
 		a.Evidence = fmt.Sprintf("Every covered asset was scanned within %d days", policy.StaleAfterDays)
@@ -317,6 +332,22 @@ func assessFreshness(p *Posture, total Coverage, policy Policy, now time.Time) A
 
 // perClass renders the coverage breakdown, skipping classes with no assets so
 // an account with no containers does not read as having a container problem.
+// anyScanDate reports whether the provider gave a last-scanned time for at
+// least one asset it claims to cover.
+func anyScanDate(p *Posture) bool {
+	for _, a := range p.Assets {
+		if a.LastScanned != nil {
+			return true
+		}
+	}
+	for _, c := range p.Coverage {
+		if c.OldestScan != nil {
+			return true
+		}
+	}
+	return false
+}
+
 func perClass(p *Posture) string {
 	var b strings.Builder
 	b.WriteString("Coverage by asset class:")
