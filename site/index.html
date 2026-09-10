@@ -99,11 +99,13 @@
     <!-- Free vs Paid -->
     <section class="section" id="why-paid">
         <div class="container">
-            <h2 class="text-center">The Scanner Is Free. The Audit Is the Hard Part.</h2>
-            <p class="text-center text-muted text-lg mb-3">
-                Community Edition scans all ten frameworks across AWS, Azure and GCP, and it stays free.
-                AuditKit is for everything that happens after the scan finds something.
-            </p>
+            <div class="section-header" style="max-width: 1000px; margin-left: auto; margin-right: auto;">
+                <h2>The Scanner Is Free. The Audit Is the Hard Part.</h2>
+                <p class="section-intro">
+                    Community Edition scans all ten frameworks across AWS, Azure and GCP, and it stays free.
+                    AuditKit is for everything that happens after the scan finds something.
+                </p>
+            </div>
 
             <div class="grid-3" style="max-width: 1000px; margin: 2rem auto 0;">
                 <div class="card">
@@ -120,7 +122,7 @@
                 </div>
             </div>
 
-            <p class="text-center text-muted" style="margin-top: 2rem;">
+            <p class="text-muted" style="max-width: 1000px; margin: 2rem auto 0;">
                 Same ten frameworks either way. <a href="./pricing.html">Compare the editions &rarr;</a>
             </p>
         </div>
@@ -129,7 +131,9 @@
     <!-- Cost Comparison -->
     <section class="section section-alt">
         <div class="container">
-            <h2 class="text-center">Stop Paying Consultants to Run Scans</h2>
+            <div class="section-header" style="max-width: 800px; margin-left: auto; margin-right: auto;">
+                <h2>Stop Paying Consultants to Run Scans</h2>
+            </div>
 
             <div style="max-width: 800px; margin: 2rem auto 0;">
                 <h3>What AuditKit Replaces</h3>
@@ -155,7 +159,7 @@
                 </div>
             </div>
 
-            <p class="text-center text-emerald" style="margin-top: 2rem; font-weight: 700; font-size: 1.35rem;">
+            <p class="text-emerald" style="max-width: 800px; margin: 2rem auto 0; font-weight: 700; font-size: 1.35rem;">
                 That's $46,000+ back in your budget.
             </p>
         </div>
@@ -164,10 +168,12 @@
     <!-- One Platform, Two Interfaces -->
     <section class="section">
         <div class="container">
-            <h2 class="text-center">One Platform, Two Interfaces</h2>
-            <p class="text-center text-muted text-lg mb-3">
-                A CLI scanner for engineers who automate everything, and a desktop dashboard for teams who need visibility. Both included with AuditKit Pro.
-            </p>
+            <div class="section-header" style="max-width: 1000px; margin-left: auto; margin-right: auto;">
+                <h2>One Platform, Two Interfaces</h2>
+                <p class="section-intro">
+                    A CLI scanner for engineers who automate everything, and a desktop dashboard for teams who need visibility. Both included with AuditKit Pro.
+                </p>
+            </div>
 
             <div class="grid-2" style="max-width: 1000px; margin: 0 auto;">
                 <div class="card card-flex">
@@ -202,10 +208,12 @@
     <!-- Desktop GUI Showcase -->
     <section class="section section-dark">
         <div class="container">
-            <h2 class="text-center">Desktop GUI</h2>
-            <p class="text-center text-lg mb-3" style="color: var(--slate-300);">
-                Web-based dashboard that runs locally. No cloud dependencies. Air-gap compatible.
-            </p>
+            <div class="section-header">
+                <h2>Desktop GUI</h2>
+                <p class="section-intro" style="color: var(--slate-300);">
+                    Web-based dashboard that runs locally. No cloud dependencies. Air-gap compatible.
+                </p>
+            </div>
 
             <!-- Screenshot Carousel -->
             <div class="carousel-wrapper">
@@ -272,7 +280,9 @@
     <!-- How It Works (CLI) -->
     <section class="section">
         <div class="container">
-            <h2 class="text-center">How It Works</h2>
+            <div class="section-header">
+                <h2>How It Works</h2>
+            </div>
 
             <div class="container-prose">
                 <div class="code-block"><span class="comment"># 1. Install AuditKit (private repo access provided after signup)</span>
@@ -308,12 +318,14 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
     <!-- CMMC Spotlight -->
     <section class="section section-alt" id="cmmc">
         <div class="container">
-            <h2 class="text-center">Built for CMMC Level 2 Self-Assessment</h2>
-            <p class="text-center text-muted text-lg mb-3">
-                Every one of the 110 CMMC Level 2 practices assessed: automated checks where your cloud
-                configuration can prove it, and structured evidence guidance where an assessor needs a
-                document or a screenshot. Documented, so you can show your work.
-            </p>
+            <div class="section-header" style="max-width: 900px; margin-left: auto; margin-right: auto;">
+                <h2>Built for CMMC Level 2 Self-Assessment</h2>
+                <p class="section-intro">
+                    Every one of the 110 CMMC Level 2 practices assessed: automated checks where your cloud
+                    configuration can prove it, and structured evidence guidance where an assessor needs a
+                    document or a screenshot. Documented, so you can show your work.
+                </p>
+            </div>
 
             <div class="grid-4 mb-3" style="max-width: 900px; margin-left: auto; margin-right: auto;">
                 <div class="stat">
@@ -344,7 +356,7 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
                 </p>
             </div>
 
-            <div class="container-prose" style="margin-top: 2rem;">
+            <div style="max-width: 900px; margin: 2rem auto 0;">
                 <div class="code-block"><span class="comment"># CMMC Level 2 scan with evidence package</span>
 ./auditkit-pro scan -provider aws -framework cmmc -verbose
 
@@ -365,8 +377,12 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
     <!-- Pro Features -->
     <section class="section" id="features">
         <div class="container">
-            <h2 class="text-center">Pro Features</h2>
-            <p class="text-center text-muted text-lg mb-3">Available with an AuditKit Pro subscription.</p>
+            <div class="section-header">
+                <h2>Pro Features</h2>
+                <p class="section-intro">
+                    Available with an AuditKit Pro subscription.
+                </p>
+            </div>
 
             <div class="grid-3">
                 <div class="card card-flex">
@@ -413,10 +429,12 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
     <!-- Evidence Package Detail -->
     <section class="section section-alt">
         <div class="container">
-            <h2 class="text-center">Auditor-Ready Evidence Packages</h2>
-            <p class="text-center text-muted text-lg mb-3">
-                The <code>evidence-package</code> command generates an organized folder of evidence for every control, or a ZIP archive when the output path ends in <code>.zip</code>.
-            </p>
+            <div class="section-header">
+                <h2>Auditor-Ready Evidence Packages</h2>
+                <p class="section-intro">
+                    The <code>evidence-package</code> command generates an organized folder of evidence for every control, or a ZIP archive when the output path ends in <code>.zip</code>.
+                </p>
+            </div>
 
             <div class="container-prose">
                 <div class="code-block" style="font-size: 0.8rem; line-height: 1.8;">
@@ -445,8 +463,12 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
     <!-- What AuditKit Finds -->
     <section class="section">
         <div class="container">
-            <h2 class="text-center">What AuditKit Finds</h2>
-            <p class="text-center text-muted text-lg mb-3">Representative scenarios from real compliance scans.</p>
+            <div class="section-header">
+                <h2>What AuditKit Finds</h2>
+                <p class="section-intro">
+                    Representative scenarios from real compliance scans.
+                </p>
+            </div>
 
             <div class="grid-3">
                 <div class="card">
@@ -473,7 +495,9 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
     <!-- FAQ -->
     <section class="section section-alt">
         <div class="container-prose">
-            <h2 class="text-center">Frequently Asked Questions</h2>
+            <div class="section-header">
+                <h2>Frequently Asked Questions</h2>
+            </div>
 
             <div class="faq-item">
                 <h3>What compliance frameworks does AuditKit support?</h3>
@@ -713,7 +737,7 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
             }
 
             // Section content: cards, callouts, code blocks, stats, approach cards, carousel
-            var revealSelectors = '.card, .callout, .code-block, .stat, .approach-card, .carousel-wrapper, .faq-item, section > .container > h2, section > .container-prose > h2, section > .container > p.text-center';
+            var revealSelectors = '.card, .note, .callout-warning, .callout-success, .cta-block, .code-block, .stat, .approach-card, .carousel-wrapper, .faq-item, .section-header';
             var revealElements = document.querySelectorAll(revealSelectors);
             revealElements.forEach(function(el) {
                 // Don't double-apply to hero elements
