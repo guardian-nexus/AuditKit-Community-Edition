@@ -8,7 +8,8 @@
   --navy: #0f172a;
   --navy-light: #1e293b;
   --navy-mid: #334155;
-  --emerald: #10b981;
+  --emerald: #10b981;       /* on dark surfaces, borders, decorative marks */
+  --emerald-text: #047857;  /* green carrying text on a light ground: AA at 5.48:1 */
   --emerald-dark: #059669;
   --emerald-light: #ecfdf5;
   --emerald-border: #d1fae5;
@@ -29,7 +30,7 @@
   --text-muted: #64748b;
   --text-on-dark: #e2e8f0;
   --text-on-dark-muted: #94a3b8;
-  --link: #10b981;
+  --link: #047857;
   --danger: #ef4444;
   --warning: #f59e0b;
 
@@ -48,7 +49,7 @@
   position: absolute;
   top: -100%;
   left: 1rem;
-  background: var(--emerald);
+  background: var(--emerald-text);
   color: var(--white);
   padding: 0.5rem 1rem;
   border-radius: var(--radius);
@@ -116,7 +117,7 @@ pre code { background: none; padding: 0; }
 .section-dark p { color: var(--text-on-dark); }
 .section-dark a { color: var(--emerald); }
 .section-dark .btn { color: var(--white); }
-.section-dark .btn-primary { background: var(--emerald); color: var(--white); }
+.section-dark .btn-primary { background: var(--emerald-text); color: var(--white); }
 .section-dark .btn-outline-light { color: var(--white); }
 .section-dark .text-muted { color: var(--text-on-dark-muted); }
 
@@ -164,7 +165,7 @@ pre code { background: none; padding: 0; }
 }
 
 .nav-cta {
-  background: var(--emerald) !important;
+  background: var(--emerald-text) !important;
   color: var(--white) !important;
   padding: 0.5rem 1.25rem;
   border-radius: var(--radius);
@@ -173,7 +174,7 @@ pre code { background: none; padding: 0; }
 }
 
 .nav-cta:hover {
-  background: var(--emerald-dark) !important;
+  background: #065f46 !important;
   text-decoration: none !important;
 }
 
@@ -305,9 +306,9 @@ pre code { background: none; padding: 0; }
 
 .badge-outline { border: 1px solid var(--slate-300); color: var(--text-muted); }
 .badge-dark { background: rgba(255,255,255,0.08); color: var(--slate-300); border: 1px solid rgba(255,255,255,0.1); }
-.badge-emerald { background: var(--emerald-light); color: var(--emerald-dark); }
-.badge-pro { background: var(--emerald); color: var(--white); font-size: 0.7rem; padding: 0.2rem 0.6rem; vertical-align: middle; margin-left: 0.5rem; }
-.badge-new { background: var(--emerald); color: var(--white); font-size: 0.7rem; padding: 0.2rem 0.6rem; vertical-align: middle; margin-left: 0.5rem; }
+.badge-emerald { background: var(--emerald-light); color: var(--emerald-text); }
+.badge-pro { background: var(--emerald-text); color: var(--white); font-size: 0.7rem; padding: 0.2rem 0.6rem; vertical-align: middle; margin-left: 0.5rem; }
+.badge-new { background: var(--emerald-text); color: var(--white); font-size: 0.7rem; padding: 0.2rem 0.6rem; vertical-align: middle; margin-left: 0.5rem; }
 .badge-experimental { background: var(--warning); color: var(--white); font-size: 0.7rem; padding: 0.2rem 0.6rem; vertical-align: middle; margin-left: 0.5rem; }
 
 /* ---------- Buttons ---------- */
@@ -326,8 +327,8 @@ pre code { background: none; padding: 0; }
 }
 
 .btn:hover { text-decoration: none; }
-.btn-primary { background: var(--emerald); color: var(--white); box-shadow: 0 2px 8px rgba(16,185,129,0.25); }
-.btn-primary:hover { background: var(--emerald-dark); box-shadow: 0 4px 12px rgba(16,185,129,0.35); }
+.btn-primary { background: var(--emerald-text); color: var(--white); box-shadow: 0 2px 8px rgba(4,120,87,0.25); }
+.btn-primary:hover { background: #065f46; box-shadow: 0 4px 12px rgba(4,120,87,0.35); }
 .btn-secondary { background: var(--navy); color: var(--white); }
 .btn-secondary:hover { background: var(--navy-light); }
 .btn-outline { border: 2px solid var(--slate-200); color: var(--text-heading); background: transparent; }
@@ -456,7 +457,7 @@ tr:last-child td { border-bottom: none; }
   min-width: 1.75rem;
   height: 1.75rem;
   border-radius: 50%;
-  background: var(--emerald);
+  background: var(--emerald-text);
   color: var(--white);
   font-size: 0.8rem;
   font-weight: 700;
@@ -469,7 +470,7 @@ tr:last-child td { border-bottom: none; }
 .feature-list { list-style: none; padding: 0; }
 .feature-list li { padding: 0.75rem 0; border-bottom: 1px solid var(--slate-100); color: var(--text); display: flex; align-items: baseline; gap: 0.75rem; }
 .feature-list li:last-child { border-bottom: none; }
-.feature-list li::before { content: "\2713"; color: var(--emerald); font-weight: 700; flex-shrink: 0; }
+.feature-list li::before { content: "\2713"; color: var(--emerald-text); font-weight: 700; flex-shrink: 0; }
 
 /* ---------- Approach Comparison ---------- */
 .approach-comparison {
@@ -553,7 +554,7 @@ tr:last-child td { border-bottom: none; }
 .comparison-card h3 { font-size: 1.5rem; margin-bottom: 1rem; }
 .comparison-card .price { font-family: var(--font-heading); font-size: 2.5rem; font-weight: 400; margin: 1rem 0; }
 .comparison-card.traditional .price { color: var(--slate-400); }
-.comparison-card.auditkit .price { color: var(--emerald); }
+.comparison-card.auditkit .price { color: var(--emerald-text); }
 .comparison-card.auditkit { border-color: var(--emerald); }
 .comparison-card.auditkit:hover { box-shadow: 0 8px 24px rgba(16,185,129,0.12); }
 .comparison-card ul { list-style: none; padding: 0; }
@@ -595,7 +596,7 @@ tr:last-child td { border-bottom: none; }
 }
 
 .pricing-card-badge {
-  background: var(--emerald);
+  background: var(--emerald-text);
   color: var(--white);
   text-align: center;
   padding: 0.4rem 1rem;
@@ -625,7 +626,7 @@ tr:last-child td { border-bottom: none; }
 }
 
 .pricing-card-featured .pricing-price {
-  color: var(--emerald-dark);
+  color: var(--emerald-text);
 }
 
 .pricing-period {
@@ -662,7 +663,7 @@ tr:last-child td { border-bottom: none; }
 
 .pricing-features li.included::before {
   content: "\2713";
-  color: var(--emerald);
+  color: var(--emerald-text);
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -753,9 +754,9 @@ tr:last-child td { border-bottom: none; }
 }
 
 .code-copy-btn.copied {
-  background: var(--emerald);
+  background: var(--emerald-text);
   color: var(--white);
-  border-color: var(--emerald);
+  border-color: var(--emerald-text);
 }
 
 /* ---------- Footer ---------- */
@@ -841,7 +842,7 @@ tr:last-child td { border-bottom: none; }
 .text-center { text-align: center; }
 .text-muted { color: var(--text-muted); }
 .text-danger { color: var(--danger); }
-.text-emerald { color: var(--emerald-dark); }
+.text-emerald { color: var(--emerald-text); }
 .section-dark .text-emerald { color: var(--emerald); }
 .text-white { color: var(--white); }
 .text-on-dark-muted { color: var(--text-on-dark-muted); }
