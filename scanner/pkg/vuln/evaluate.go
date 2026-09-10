@@ -129,6 +129,10 @@ func Aging(findings []Finding, policy Policy, now time.Time) []SeverityAging {
 			a.NoFixAvailable++
 			continue
 		}
+		if !f.HasAge() {
+			a.NoAgeReported++
+			continue
+		}
 		if a.WindowDays <= 0 {
 			continue
 		}
@@ -174,10 +178,11 @@ func assessRemediation(p *Posture, policy Policy, now time.Time) (Assessment, bo
 		return a, true
 	}
 
-	overdue, worstSev, oldest, oldestID, noFix := 0, "", 0, "", 0
+	overdue, worstSev, oldest, oldestID, noFix, noAge := 0, "", 0, "", 0, 0
 	for _, s := range aging {
 		overdue += s.Overdue
 		noFix += s.NoFixAvailable
+		noAge += s.NoAgeReported
 		if s.Overdue > 0 && worstSev == "" {
 			worstSev = s.Severity // aging is severity-ordered
 		}
@@ -192,10 +197,30 @@ func assessRemediation(p *Posture, policy Policy, now time.Time) (Assessment, bo
 			"%d findings have no fix available and are excluded from the window. Those need a "+
 				"compensating control and a documented risk acceptance, not a patch.", noFix))
 	}
+	if noAge > 0 {
+		detail = append(detail, fmt.Sprintf(
+			"%d findings carry no first-observed date from %s, so no remediation age can be "+
+				"measured for them. They are counted above and listed in the evidence package. "+
+				"Ageing them from the CVE's publication date would fail a host for a "+
+				"vulnerability disclosed before that host existed.", noAge, p.Source))
+	}
 
+	if overdue == 0 && noAge == len(p.Findings) && noAge > 0 {
+		// Nothing was measurable, so this is not a pass. INFO keeps it out of
+		// the score rather than crediting a window nothing was checked against.
+		a.Status = StatusInfo
+		a.Evidence = fmt.Sprintf("%d findings reported, none with a first-observed date from %s, "+
+			"so remediation age could not be assessed", len(p.Findings), p.Source)
+		a.Remediation = "Track age from first detection by scanning on a schedule and keeping scan history"
+		a.Detail = strings.Join(detail, "\n\n")
+		return a, true
+	}
 	if overdue == 0 {
 		a.Status = StatusPass
 		a.Evidence = fmt.Sprintf("All %d findings are inside the remediation window", len(p.Findings))
+		if noAge > 0 {
+			a.Evidence += fmt.Sprintf(" (%d could not be aged)", noAge)
+		}
 		a.Detail = strings.Join(detail, "\n\n")
 		return a, true
 	}
@@ -221,6 +246,9 @@ func agingTable(aging []SeverityAging) string {
 			window = fmt.Sprintf("%dd window", s.WindowDays)
 		}
 		fmt.Fprintf(&b, "\n  %-14s %3d total, %3d overdue  (%s)", s.Severity, s.Total, s.Overdue, window)
+		if s.NoAgeReported > 0 {
+			fmt.Fprintf(&b, "  %d not ageable", s.NoAgeReported)
+		}
 		if s.OldestOverdueDays > 0 {
 			fmt.Fprintf(&b, "  oldest %dd", s.OldestOverdueDays)
 		}
@@ -293,7 +321,7 @@ func perClass(p *Posture) string {
 	var b strings.Builder
 	b.WriteString("Coverage by asset class:")
 	for _, c := range p.Coverage {
-		if c.InScope()+c.Excluded+c.NotEligible+c.Pending == 0 {
+		if c.InScope()+c.Excluded+c.NotEligible+c.Pending == 0 && c.Note == "" {
 			continue
 		}
 		fmt.Fprintf(&b, "\n  %-18s covered %d, stale %d, uncovered %d",
@@ -306,6 +334,9 @@ func perClass(p *Posture) string {
 		}
 		if c.Pending > 0 {
 			fmt.Fprintf(&b, ", first scan pending %d", c.Pending)
+		}
+		if c.Note != "" {
+			fmt.Fprintf(&b, "\n%22s%s", "", c.Note)
 		}
 	}
 	return b.String()

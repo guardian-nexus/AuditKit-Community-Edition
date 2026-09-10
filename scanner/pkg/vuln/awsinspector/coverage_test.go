@@ -403,3 +403,45 @@ func TestNoFindingsIsACleanPass(t *testing.T) {
 		t.Fatalf("an empty active-findings list is a pass, got %s", a.Status)
 	}
 }
+
+// Microsoft Defender reports a CVE's publication date and the time its
+// assessment last ran, but never when a finding first appeared on the estate.
+// Ageing from publication would fail a host for a vulnerability disclosed
+// before that host existed, so a finding with no first-observed date must be
+// counted and never overdue.
+func TestFindingsWithNoAgeAreNeverOverdue(t *testing.T) {
+	policy := vuln.DefaultPolicy()
+	now := time.Now()
+	p := &vuln.Posture{
+		Source: "azure-defender", Provider: "azure", ScannerEnabled: true,
+		Coverage: []vuln.Coverage{{Class: vuln.ClassInstance, Covered: 1}},
+		Findings: []vuln.Finding{
+			// zero FirstObserved: the scanner did not say
+			{ID: "CVE-2019-0001", Severity: "CRITICAL", FixAvailable: "YES"},
+			{ID: "CVE-2020-0002", Severity: "HIGH", FixAvailable: "YES"},
+		},
+	}
+	a := findAssessment(t, vuln.Evaluate(p, policy, now), vuln.AssessRemediation)
+	if a.Status != vuln.StatusInfo {
+		t.Fatalf("nothing measurable is INFO, not a pass or a fail; got %s: %s", a.Status, a.Evidence)
+	}
+	if !strings.Contains(a.Detail, "no first-observed date") {
+		t.Errorf("the reason should be stated: %s", a.Detail)
+	}
+
+	// Mixed: one ageable and overdue, one not ageable.
+	p.Findings = append(p.Findings, vuln.Finding{
+		ID: "CVE-2024-0003", Severity: "CRITICAL", FixAvailable: "YES",
+		FirstObserved: now.AddDate(0, 0, -120),
+	})
+	a = findAssessment(t, vuln.Evaluate(p, policy, now), vuln.AssessRemediation)
+	if a.Status != vuln.StatusFail {
+		t.Fatalf("one overdue ageable finding must still fail; got %s", a.Status)
+	}
+	if !strings.Contains(a.Evidence, "1 findings are past") {
+		t.Errorf("only the ageable one counts as overdue: %s", a.Evidence)
+	}
+	if !strings.Contains(a.Detail, "2 findings carry no first-observed date") {
+		t.Errorf("the unageable pair should be reported: %s", a.Detail)
+	}
+}

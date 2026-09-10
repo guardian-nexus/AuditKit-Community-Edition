@@ -74,6 +74,12 @@ type Coverage struct {
 	StaleIDs []string `json:"stale_ids,omitempty"`
 	// OldestScan is the least recently scanned covered asset in the class.
 	OldestScan *time.Time `json:"oldest_scan,omitempty"`
+	// Note is a provider statement about the class that is not a count.
+	// Microsoft Defender reports coverage per plan as FullyCovered,
+	// PartiallyCovered or NotCovered without naming the resources behind it, so
+	// "partially covered" has to be said rather than turned into a number the
+	// provider never gave us.
+	Note string `json:"note,omitempty"`
 }
 
 // InScope is every asset the class expects a scanner to reach: what is covered
@@ -122,6 +128,13 @@ type Finding struct {
 	// FirstObserved is the remediation clock. Age runs from when the scanner
 	// first saw the finding, not from when the CVE was published: the
 	// obligation starts when you could have known.
+	//
+	// Zero means the scanner does not report one. Microsoft Defender is the
+	// case that matters: a sub-assessment carries the CVE's PublishedTime and
+	// the time the assessment last ran, neither of which is "when this first
+	// appeared on your estate". Ageing from PublishedTime would fail a host for
+	// a CVE disclosed three years before the host existed, so a finding with no
+	// first-observed date is counted and reported but never overdue.
 	FirstObserved time.Time  `json:"first_observed"`
 	LastObserved  *time.Time `json:"last_observed,omitempty"`
 	// FixAvailable separates "you have not patched" from "there is no patch",
@@ -131,9 +144,17 @@ type Finding struct {
 	Score           *float64 `json:"score,omitempty"`
 }
 
-// AgeDays is how long the finding has gone unremediated.
+// AgeDays is how long the finding has gone unremediated. Only meaningful when
+// HasAge reports true.
 func (f Finding) AgeDays(now time.Time) int {
 	return int(now.Sub(f.FirstObserved).Hours() / 24)
+}
+
+// HasAge reports whether the scanner told us when it first saw this finding.
+// Without that date there is no defensible remediation clock, and inventing
+// one from the CVE's publication date would manufacture false failures.
+func (f Finding) HasAge() bool {
+	return !f.FirstObserved.IsZero()
 }
 
 // Fixable reports whether a patch exists. A finding with no fix cannot be
@@ -154,6 +175,10 @@ type SeverityAging struct {
 	OldestOverdueID   string   `json:"oldest_overdue_id,omitempty"`
 	NoFixAvailable    int      `json:"no_fix_available,omitempty"`
 	ExploitAvailable  int      `json:"exploit_available,omitempty"`
+	// NoAgeReported counts findings the scanner gave no first-observed date
+	// for. They are real findings and are reported as such; they simply cannot
+	// be measured against a window.
+	NoAgeReported int `json:"no_age_reported,omitempty"`
 }
 
 // Coverage for one class, and whether it was collected at all.

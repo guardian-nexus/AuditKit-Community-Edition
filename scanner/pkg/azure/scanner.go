@@ -16,6 +16,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/sql/armsql"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/azure/checks"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/azuredefender"
 	msgraphsdk "github.com/microsoftgraph/msgraph-sdk-go"
 )
 
@@ -41,6 +42,7 @@ type AzureScanner struct {
 	roleClient          *armauthorization.RoleAssignmentsClient
 	roleDefClient       *armauthorization.RoleDefinitionsClient
 	securityClient      *armsecurity.PricingsClient                 // For Defender checks
+	subAssessClient     *armsecurity.SubAssessmentsClient
 	autoProvisionClient *armsecurity.AutoProvisioningSettingsClient // For auto-provisioning
 	contactsClient      *armsecurity.ContactsClient                 // For security contacts
 }
@@ -165,6 +167,11 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		return nil, fmt.Errorf("failed to create security pricing client: %v", err)
 	}
 
+	subAssessClient, err := armsecurity.NewSubAssessmentsClient(cred, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create sub-assessments client: %v", err)
+	}
+
 	autoProvisionClient, err := armsecurity.NewAutoProvisioningSettingsClient(subscriptionID, cred, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create auto-provisioning client: %v", err)
@@ -197,6 +204,7 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		roleClient:          roleClient,
 		roleDefClient:       roleDefClient,
 		securityClient:      securityClient,
+		subAssessClient:     subAssessClient,
 		autoProvisionClient: autoProvisionClient,
 		contactsClient:      contactsClient,
 	}, nil
@@ -307,6 +315,37 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 	return results
 }
 
+// runVulnCoverage builds the vulnerability coverage check for one framework and
+// converts its results. emit keeps the CMMC and PCI passes from each reporting
+// the other's control, which would double-count it on a scan of all frameworks.
+func (s *AzureScanner) runVulnCoverage(ctx context.Context, emit checks.Emit) []ScanResult {
+	vc := checks.NewVulnCoverageChecks(azuredefender.Clients{
+		Pricing:        s.securityClient,
+		SubAssessments: s.subAssessClient,
+		VMs:            s.computeClient,
+	}, s.subscriptionID, emit)
+	crs, err := vc.Run(ctx)
+	if err != nil {
+		return nil
+	}
+	out := make([]ScanResult, 0, len(crs))
+	for _, cr := range crs {
+		out = append(out, ScanResult{
+			Control:           cr.Control,
+			Name:              cr.Name,
+			Status:            cr.Status,
+			Evidence:          cr.Evidence,
+			Remediation:       cr.Remediation,
+			RemediationDetail: cr.RemediationDetail,
+			Severity:          cr.Severity,
+			ScreenshotGuide:   cr.ScreenshotGuide,
+			ConsoleURL:        cr.ConsoleURL,
+			Frameworks:        cr.Frameworks,
+		})
+	}
+	return out
+}
+
 func (s *AzureScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResult {
 	var results []ScanResult
 
@@ -342,6 +381,9 @@ func (s *AzureScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanRes
 			Frameworks:        cr.Frameworks,
 		})
 	}
+
+	// PCI-DSS 11.3.1 wants scans quarterly across every in-scope system.
+	results = append(results, s.runVulnCoverage(ctx, checks.EmitPCI)...)
 
 	return results
 }
@@ -393,6 +435,9 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 		fmt.Println("")
 		fmt.Println("Visit https://auditkit.io/pro for full CMMC Level 2")
 	}
+
+	// Vulnerability scan coverage, read from Defender rather than asked for as a document.
+	results = append(results, s.runVulnCoverage(ctx, checks.EmitCMMC)...)
 
 	return results
 }
