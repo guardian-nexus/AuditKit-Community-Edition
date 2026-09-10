@@ -214,14 +214,6 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 
 	// LOGGING & MONITORING
-	"LOGGING_ENABLED": {
-		FrameworkSOC2:  "CC7.2",
-		FrameworkPCI:   "10.2.1.1, 10.3.1",
-		FrameworkCMMC:  "AU.L2-3.3.1",
-		FrameworkNIST:  "AU-2, AU-12",
-		FrameworkHIPAA: "164.312(b)",
-		FrameworkCIS:   "2.1, 2.2, 2.3",
-	},
 	"LOG_SINKS": {
 		FrameworkSOC2:  "CC7.2",
 		FrameworkPCI:   "10.5.1",
@@ -348,12 +340,6 @@ var FrameworkMappings = map[string]map[string]string{
 		FrameworkHIPAA: "164.312(e)(1)",
 		FrameworkCIS:   "6.3",
 	},
-	"SQL_AUTO_BACKUPS": {
-		FrameworkSOC2:  "A1.2",
-		FrameworkPCI:   "9.5.1",
-		FrameworkHIPAA: "164.312(c)(1)",
-		FrameworkCIS:   "6.7",
-	},
 
 	// KMS CONTROLS
 	"KMS_ROTATION_ENABLED": {
@@ -386,44 +372,6 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 
 	// GKE / KUBERNETES CONTROLS
-	"GKE_BINARY_AUTHORIZATION": {
-		FrameworkSOC2:  "CC8.1",
-		FrameworkPCI:   "2.2.1",
-		FrameworkCMMC:  "CM.L2-3.4.8",
-		FrameworkNIST:  "CM-7",
-		FrameworkHIPAA: "164.312(c)(1)",
-		FrameworkCIS:   "8.1",
-	},
-	"GKE_NETWORK_POLICY": {
-		FrameworkSOC2:  "CC6.6",
-		FrameworkPCI:   "1.4.2",
-		FrameworkCMMC:  "SC.L1-3.13.1",
-		FrameworkNIST:  "SC-7",
-		FrameworkHIPAA: "164.312(e)(1)",
-		FrameworkCIS:   "8.2",
-	},
-	"GKE_DASHBOARD_DISABLED": {
-		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "2.2.4",
-		FrameworkHIPAA: "164.308(a)(3)(i)",
-		FrameworkCIS:   "8.3",
-	},
-	"GKE_POD_SECURITY_POLICY": {
-		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "2.2.1",
-		FrameworkCMMC:  "CM.L2-3.4.6",
-		FrameworkNIST:  "CM-6",
-		FrameworkHIPAA: "164.312(c)(1)",
-		FrameworkCIS:   "8.4",
-	},
-	"GKE_WORKLOAD_IDENTITY": {
-		FrameworkSOC2:  "CC6.1",
-		FrameworkPCI:   "8.2.2",
-		FrameworkCMMC:  "IA.L2-3.5.3",
-		FrameworkNIST:  "IA-3",
-		FrameworkHIPAA: "164.312(a)(2)(i)",
-		FrameworkCIS:   "8.5",
-	},
 	"CLOUD_AUDIT_LOGS": {
 		FrameworkSOC2:  "CC7.2",
 		FrameworkPCI:   "10.2.1",

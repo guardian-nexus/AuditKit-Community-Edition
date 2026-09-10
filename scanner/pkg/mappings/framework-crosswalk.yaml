@@ -296,8 +296,8 @@ cmmc_to_800_53:
   SI.L1-3.14.1: [SI-2]                  # Flaw remediation
   SI.L1-3.14.2: [SI-3]                  # Malicious code protection
   SI.L1-3.14.4: [SI-3(1)]               # Update malicious code
-  SI.L1-3.14.5: [SI-4]                  # System monitoring
-  SI.L2-3.14.3: [SI-3]                  # Malicious code at entry/exit
+  SI.L1-3.14.5: [SI-3]                  # Periodic and real-time malicious-code scanning
+  SI.L2-3.14.3: [SI-5]                  # Security alerts, advisories and directives
   SI.L2-3.14.6: [SI-4]                  # Monitor communications
   SI.L2-3.14.7: [SI-4(2)]               # Automated tools
 

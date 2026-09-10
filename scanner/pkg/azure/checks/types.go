@@ -110,13 +110,6 @@ var AzureFrameworkMappings = map[string]map[string]string{
 	},
 
 	// Microsoft Defender for Cloud (Section 2) - ENHANCED with granular mappings
-	"DEFENDER_ENABLED": {
-		FrameworkSOC2:     "CC7.2",
-		FrameworkPCI:      "11.5.2",
-		FrameworkHIPAA:    "164.308(a)(1)(ii)(A)",
-		FrameworkISO:      "A.8.8",
-		FrameworkCISAzure: "2.1, 2.2, 2.3",
-	},
 	"DEFENDER_SERVERS": {
 		FrameworkSOC2:     "CC7.2",
 		FrameworkPCI:      "11.5.2",
@@ -130,13 +123,6 @@ var AzureFrameworkMappings = map[string]map[string]string{
 		FrameworkHIPAA:    "164.308(a)(1)(ii)(A)",
 		FrameworkISO:      "A.8.8",
 		FrameworkCISAzure: "2.1.2",
-	},
-	"DEFENDER_DATABASES": {
-		FrameworkSOC2:     "CC7.2",
-		FrameworkPCI:      "11.5.2",
-		FrameworkHIPAA:    "164.308(a)(1)(ii)(A)",
-		FrameworkISO:      "A.8.8",
-		FrameworkCISAzure: "2.1.3, 2.1.4, 2.1.5, 2.1.6",
 	},
 	"DEFENDER_SQL": {
 		FrameworkSOC2:     "CC7.2",
@@ -208,26 +194,12 @@ var AzureFrameworkMappings = map[string]map[string]string{
 		FrameworkISO:      "A.8.8",
 		FrameworkCISAzure: "2.1.12",
 	},
-	"DEFENDER_AUTO_PROVISIONING": {
-		FrameworkSOC2:     "CC7.3",
-		FrameworkPCI:      "11.5.2",
-		FrameworkHIPAA:    "164.308(a)(1)(ii)(A)",
-		FrameworkISO:      "A.8.8",
-		FrameworkCISAzure: "2.1.17",
-	},
 	"DEFENDER_AUTOPROVISION": { // Alias
 		FrameworkSOC2:     "CC7.3",
 		FrameworkPCI:      "11.5.2",
 		FrameworkHIPAA:    "164.308(a)(1)(ii)(A)",
 		FrameworkISO:      "A.8.8",
 		FrameworkCISAzure: "2.1.17",
-	},
-	"DEFENDER_CONTACT": {
-		FrameworkSOC2:     "CC7.4",
-		FrameworkPCI:      "12.10.1",
-		FrameworkHIPAA:    "164.308(a)(6)(ii)",
-		FrameworkISO:      "A.6.8",
-		FrameworkCISAzure: "2.1.19",
 	},
 	"DEFENDER_CONTACTS": { // Alias
 		FrameworkSOC2:     "CC7.4",
@@ -259,13 +231,6 @@ var AzureFrameworkMappings = map[string]map[string]string{
 		FrameworkISO:      "A.8.24",
 		FrameworkCISAzure: "3.3, 3.4",
 	},
-	"STORAGE_INFRASTRUCTURE_ENCRYPTION": {
-		FrameworkSOC2:     "CC6.3",
-		FrameworkPCI:      "3.5.1",
-		FrameworkHIPAA:    "164.312(a)(2)(iv)",
-		FrameworkISO:      "A.8.24",
-		FrameworkCISAzure: "4.2",
-	},
 	"STORAGE_SECURE_TRANSFER": {
 		FrameworkSOC2:     "CC6.7",
 		FrameworkPCI:      "4.2.1",
@@ -280,33 +245,12 @@ var AzureFrameworkMappings = map[string]map[string]string{
 		FrameworkISO:      "A.8.13",
 		FrameworkCISAzure: "3.6, 3.7",
 	},
-	"STORAGE_PUBLIC_NETWORK_ACCESS": {
-		FrameworkSOC2:     "CC6.1",
-		FrameworkPCI:      "1.4.2, 1.3.2",
-		FrameworkHIPAA:    "164.312(a)(1)",
-		FrameworkISO:      "A.8.20",
-		FrameworkCISAzure: "4.6",
-	},
 	"STORAGE_NETWORK_RULES": {
 		FrameworkSOC2:     "CC6.1",
 		FrameworkPCI:      "1.4.2",
 		FrameworkHIPAA:    "164.312(e)(1)",
 		FrameworkISO:      "A.8.22",
 		FrameworkCISAzure: "3.8, 3.9, 4.7",
-	},
-	"STORAGE_BLOB_ANONYMOUS": {
-		FrameworkSOC2:     "CC6.1",
-		FrameworkPCI:      "1.4.2, 1.3.2",
-		FrameworkHIPAA:    "164.312(a)(1)",
-		FrameworkISO:      "A.8.20",
-		FrameworkCISAzure: "4.17",
-	},
-	"STORAGE_CROSS_TENANT": {
-		FrameworkSOC2:     "CC6.1",
-		FrameworkPCI:      "1.4.2",
-		FrameworkHIPAA:    "164.312(a)(1)",
-		FrameworkISO:      "A.8.20",
-		FrameworkCISAzure: "4.16",
 	},
 
 	// Database Services (Section 4/5) - ENHANCED
@@ -338,13 +282,6 @@ var AzureFrameworkMappings = map[string]map[string]string{
 		FrameworkISO:      "A.8.22",
 		FrameworkCISAzure: "4.6",
 	},
-	"SQL_PUBLIC_ACCESS": {
-		FrameworkSOC2:     "CC6.1",
-		FrameworkPCI:      "1.4.2, 1.3.2",
-		FrameworkHIPAA:    "164.312(a)(1)",
-		FrameworkISO:      "A.8.20",
-		FrameworkCISAzure: "5.1.2, 5.1.7",
-	},
 	"SQL_ENTRA_AUTH": {
 		FrameworkSOC2:     "CC6.1",
 		FrameworkPCI:      "8.2.2",
@@ -361,13 +298,6 @@ var AzureFrameworkMappings = map[string]map[string]string{
 		FrameworkISO:      "A.8.15",
 		FrameworkCISAzure: "5.1, 5.2, 5.1.2, 5.1.3, 5.1.4",
 	},
-	"ACTIVITY_LOG_RETENTION": {
-		FrameworkSOC2:     "CC7.1",
-		FrameworkPCI:      "10.5.1",
-		FrameworkHIPAA:    "164.312(b)",
-		FrameworkISO:      "A.8.15",
-		FrameworkCISAzure: "5.3",
-	},
 	"DIAGNOSTIC_SETTINGS": {
 		FrameworkSOC2:     "CC7.2",
 		FrameworkPCI:      "10.2.1.1",
@@ -383,34 +313,6 @@ var AzureFrameworkMappings = map[string]map[string]string{
 		FrameworkHIPAA:    "164.312(e)(1)",
 		FrameworkISO:      "A.8.22",
 		FrameworkCISAzure: "6.1, 6.2, 6.3",
-	},
-	"NETWORK_RDP_RESTRICTED": {
-		FrameworkSOC2:     "CC6.1, CC6.6",
-		FrameworkPCI:      "1.4.2, 1.4.1, 2.2.1",
-		FrameworkHIPAA:    "164.312(e)(1)",
-		FrameworkISO:      "A.8.22",
-		FrameworkCISAzure: "7.1",
-	},
-	"NETWORK_SSH_RESTRICTED": {
-		FrameworkSOC2:     "CC6.1, CC6.6",
-		FrameworkPCI:      "1.4.2, 1.4.1, 2.2.1",
-		FrameworkHIPAA:    "164.312(e)(1)",
-		FrameworkISO:      "A.8.22",
-		FrameworkCISAzure: "7.2",
-	},
-	"NETWORK_UDP_RESTRICTED": {
-		FrameworkSOC2:     "CC6.1",
-		FrameworkPCI:      "1.4.2, 1.4.1",
-		FrameworkHIPAA:    "164.312(e)(1)",
-		FrameworkISO:      "A.8.22",
-		FrameworkCISAzure: "7.3",
-	},
-	"NETWORK_HTTP_ACCESS": {
-		FrameworkSOC2:     "CC6.1",
-		FrameworkPCI:      "1.4.2",
-		FrameworkHIPAA:    "164.312(e)(1)",
-		FrameworkISO:      "A.8.22",
-		FrameworkCISAzure: "7.4",
 	},
 	"NSG_FLOW_LOGS": {
 		FrameworkSOC2:     "CC7.2",
@@ -472,20 +374,6 @@ var AzureFrameworkMappings = map[string]map[string]string{
 		FrameworkISO:      "A.8.24",
 		FrameworkCISAzure: "8.1, 8.2, 3.3.5",
 	},
-	"KEYVAULT_PURGE_PROTECTION": { // Alias
-		FrameworkSOC2:     "CC6.3",
-		FrameworkPCI:      "3.5.1",
-		FrameworkHIPAA:    "164.312(a)(2)(iv)",
-		FrameworkISO:      "A.8.24",
-		FrameworkCISAzure: "3.3.5",
-	},
-	"KEYVAULT_SOFT_DELETE": {
-		FrameworkSOC2:     "CC6.3",
-		FrameworkPCI:      "3.5.1",
-		FrameworkHIPAA:    "164.312(a)(2)(iv)",
-		FrameworkISO:      "A.8.24",
-		FrameworkCISAzure: "3.3.5",
-	},
 	"KEYVAULT_RBAC": {
 		FrameworkSOC2:     "CC6.2",
 		FrameworkPCI:      "7.2.2",
@@ -499,13 +387,6 @@ var AzureFrameworkMappings = map[string]map[string]string{
 		FrameworkHIPAA:    "164.312(e)(1)",
 		FrameworkISO:      "A.8.22",
 		FrameworkCISAzure: "3.3.7",
-	},
-	"KEYVAULT_FIREWALL": {
-		FrameworkSOC2:     "CC6.1",
-		FrameworkPCI:      "1.4.2",
-		FrameworkHIPAA:    "164.312(e)(1)",
-		FrameworkISO:      "A.8.22",
-		FrameworkCISAzure: "8.3",
 	},
 	"KEYVAULT_NETWORK_RULES": { // Alias
 		FrameworkSOC2:     "CC6.1",

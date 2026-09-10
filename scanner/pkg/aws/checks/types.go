@@ -110,35 +110,11 @@ var FrameworkMappings = map[string]map[string]string{
 		FrameworkHIPAA: "164.312(a)(2)(i)",
 		FrameworkCIS:   "1.4",
 	},
-	"ROOT_USAGE": {
-		FrameworkSOC2:  "CC6.6",
-		FrameworkPCI:   "8.4.2",
-		FrameworkHIPAA: "164.312(a)(2)(i)",
-		FrameworkCIS:   "1.7",
-	},
 	"PASSWORD_POLICY": {
 		FrameworkSOC2:  "CC6.7",
 		FrameworkPCI:   "8.3.6, 8.3.9, 8.3.7",
 		FrameworkHIPAA: "164.308(a)(5)(ii)(D)",
 		FrameworkCIS:   "1.8, 1.9, 1.10, 1.11, 1.20, 1.21",
-	},
-	"PASSWORD_MIN_LENGTH": {
-		FrameworkSOC2:  "CC6.7",
-		FrameworkPCI:   "8.3.6",
-		FrameworkHIPAA: "164.308(a)(5)(ii)(D)",
-		FrameworkCIS:   "1.8",
-	},
-	"PASSWORD_REUSE": {
-		FrameworkSOC2:  "CC6.7",
-		FrameworkPCI:   "8.3.9",
-		FrameworkHIPAA: "164.308(a)(5)(ii)(D)",
-		FrameworkCIS:   "1.9",
-	},
-	"PASSWORD_EXPIRY": {
-		FrameworkSOC2:  "CC6.7",
-		FrameworkPCI:   "8.3.7",
-		FrameworkHIPAA: "164.308(a)(5)(ii)(D)",
-		FrameworkCIS:   "1.11",
 	},
 	"ACCESS_KEY_ROTATION": {
 		FrameworkSOC2:  "CC6.8",
@@ -158,12 +134,6 @@ var FrameworkMappings = map[string]map[string]string{
 		FrameworkHIPAA: "164.312(a)(2)(i)",
 		FrameworkCIS:   "1.10",
 	},
-	"IAM_CREDENTIAL_REPORT": {
-		FrameworkSOC2:  "CC6.7",
-		FrameworkPCI:   "8.2.6",
-		FrameworkHIPAA: "164.308(a)(4)(ii)(C)",
-		FrameworkCIS:   "1.3",
-	},
 	"IAM_SUPPORT_ROLE": {
 		FrameworkSOC2:  "CC6.6",
 		FrameworkPCI:   "7.2.1",
@@ -175,18 +145,6 @@ var FrameworkMappings = map[string]map[string]string{
 		FrameworkPCI:   "7.2.1",
 		FrameworkHIPAA: "164.308(a)(3)(i)",
 		FrameworkCIS:   "1.19",
-	},
-	"IAM_FULL_ADMIN_PRIVILEGES": {
-		FrameworkSOC2:  "CC6.6",
-		FrameworkPCI:   "7.2.1",
-		FrameworkHIPAA: "164.308(a)(3)(i)",
-		FrameworkCIS:   "1.16",
-	},
-	"PRIVILEGED_ROLES": {
-		FrameworkSOC2:  "CC6.6",
-		FrameworkPCI:   "7.2.1",
-		FrameworkHIPAA: "164.308(a)(3)(i)",
-		FrameworkCIS:   "1.16, 1.22",
 	},
 	"IAM_POLICIES_ATTACHED": {
 		FrameworkSOC2:  "CC6.6",
@@ -401,12 +359,6 @@ var FrameworkMappings = map[string]map[string]string{
 		FrameworkPCI:   "8.2.6",
 		FrameworkHIPAA: "164.308(a)(4)(ii)(C)",
 		FrameworkCIS:   "1.3",
-	},
-	"IAM_INITIAL_ACCESS_KEYS": {
-		FrameworkSOC2:  "CC6.6",
-		FrameworkPCI:   "8.4.2",
-		FrameworkHIPAA: "164.312(a)(2)(i)",
-		FrameworkCIS:   "1.4",
 	},
 	"S3_OBJECT_LOCK": {
 		FrameworkSOC2:  "A1.2",
