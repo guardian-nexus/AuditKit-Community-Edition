@@ -295,6 +295,10 @@ iso27001_to_800_53:
   A.5.23: [SI-4]                   # Information security for cloud
   A.5.30: [CP-2, CP-9]             # ICT readiness for business continuity
 
+  A.5.17: [IA-5]                   # Authentication information
+  A.5.18: [AC-2, AC-3]             # Access rights
+  A.6.8: [IR-6]                    # Information security event reporting
+
   # A.6: People Controls
   A.6.1: [PS-3]                    # Screening
   A.6.2: [PS-7]                    # Terms and conditions of employment
