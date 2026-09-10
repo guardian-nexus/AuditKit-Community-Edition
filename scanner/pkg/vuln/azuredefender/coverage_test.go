@@ -354,9 +354,9 @@ func TestDefenderFindingsCarryNoAge(t *testing.T) {
 	}
 }
 
-// A finding with no patch is excluded from the window regardless of whether it
-// could be dated: there is nothing to apply, so it needs a compensating control.
-func TestUnpatchableFindingPassesWithAnExplanation(t *testing.T) {
+// A finding with no patch is excluded from the window, and with nothing left to
+// measure the remediation practice is unproven rather than satisfied.
+func TestUnpatchableFindingIsUnprovenNotPassed(t *testing.T) {
 	p := &vuln.Posture{Source: "azure-defender", ScannerEnabled: true,
 		Coverage: []vuln.Coverage{{Class: vuln.ClassInstance, Covered: 1}}}
 	CollectFindings(context.Background(), fakeSubAssess{items: []*armsecurity.SubAssessment{
@@ -369,8 +369,8 @@ func TestUnpatchableFindingPassesWithAnExplanation(t *testing.T) {
 			rem = a
 		}
 	}
-	if rem.Status != vuln.StatusPass {
-		t.Fatalf("nothing is overdue when nothing can be patched; got %s: %s", rem.Status, rem.Evidence)
+	if rem.Status != vuln.StatusInfo {
+		t.Fatalf("nothing measurable is INFO, not %s: %s", rem.Status, rem.Evidence)
 	}
 	if !strings.Contains(rem.Detail, "compensating control") {
 		t.Errorf("the detail should say what to do instead: %s", rem.Detail)

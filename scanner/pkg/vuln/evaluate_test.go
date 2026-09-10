@@ -8,8 +8,11 @@ import (
 
 func ptr(t time.Time) *time.Time { return &t }
 
+// posture models a cloud collector: it enumerates the estate, so it can report
+// a coverage fraction. Imported scan files cannot - see TestImportedCoverage.
 func posture(mut ...func(*Posture)) *Posture {
-	p := &Posture{Source: "test-scanner", Provider: "test", ScannerEnabled: true}
+	p := &Posture{Source: "test-scanner", Provider: "test", ScannerEnabled: true,
+		CoverageAuthoritative: true}
 	for _, m := range mut {
 		m(p)
 	}
@@ -246,19 +249,57 @@ func TestRemediationSeverityFollowsTheWorstOverdue(t *testing.T) {
 	}
 }
 
-func TestUnfixableFindingIsReportedNotFailed(t *testing.T) {
+func TestUnfixableFindingIsNeverOverdue(t *testing.T) {
 	now := time.Now()
+	// One unpatchable finding and nothing else: nothing was compared against
+	// the window, so this is not a pass. RA.L2-3.11.3 asks whether
+	// vulnerabilities are remediated, and "there was nothing we could measure"
+	// does not demonstrate that - the compensating control and risk acceptance
+	// that would are not visible to a scan.
 	p := posture(func(p *Posture) {
 		p.Coverage = []Coverage{{Class: ClassInstance, Covered: 1, OldestScan: ptr(now)}}
 		p.Findings = []Finding{{ID: "CVE-1", Severity: "CRITICAL", FixAvailable: "NO",
 			FirstObserved: now.AddDate(0, 0, -900)}}
 	})
 	a := find(t, Evaluate(p, DefaultPolicy(), now), AssessRemediation)
-	if a.Status != StatusPass {
-		t.Fatalf("a finding with no patch is not an overdue remediation; got %s: %s", a.Status, a.Evidence)
+	if a.Status != StatusInfo {
+		t.Fatalf("nothing measurable is INFO, not %s: %s", a.Status, a.Evidence)
 	}
 	if !strings.Contains(a.Detail, "compensating control") {
 		t.Errorf("the detail should say what to do instead of patching: %s", a.Detail)
+	}
+
+	// Alongside findings that WERE measured, the unpatchable one is excluded
+	// from the window rather than failing it, and the pass stands.
+	p.Findings = append(p.Findings, Finding{ID: "CVE-2", Severity: "HIGH",
+		FixAvailable: "YES", FirstObserved: now.AddDate(0, 0, -2)})
+	a = find(t, Evaluate(p, DefaultPolicy(), now), AssessRemediation)
+	if a.Status != StatusPass {
+		t.Fatalf("one measured finding inside the window is a pass; got %s: %s", a.Status, a.Evidence)
+	}
+	if !strings.Contains(a.Evidence, "All 1 measured findings") {
+		t.Errorf("the pass should say how many it actually measured: %s", a.Evidence)
+	}
+}
+
+// A pass must never be claimed from findings that were all excluded one way or
+// another. This is the same defect class as freshness passing without dates.
+func TestPassRequiresSomethingToHaveBeenMeasured(t *testing.T) {
+	now := time.Now()
+	p := posture(func(p *Posture) {
+		p.Coverage = []Coverage{{Class: ClassInstance, Covered: 1, OldestScan: ptr(now)}}
+		p.Findings = []Finding{
+			{ID: "no-fix", Severity: "CRITICAL", FixAvailable: "NO", FirstObserved: now.AddDate(0, 0, -900)},
+			{ID: "no-date", Severity: "CRITICAL", FixAvailable: "YES"},
+			{ID: "no-window", Severity: "LOW", FixAvailable: "YES", FirstObserved: now.AddDate(0, 0, -900)},
+		}
+	})
+	a := find(t, Evaluate(p, DefaultPolicy(), now), AssessRemediation)
+	if a.Status != StatusInfo {
+		t.Fatalf("three findings, none measurable, is INFO not %s: %s", a.Status, a.Evidence)
+	}
+	if !strings.Contains(a.Evidence, "none of which could be measured") {
+		t.Errorf("the evidence must say why: %s", a.Evidence)
 	}
 }
 
@@ -335,5 +376,53 @@ func TestCoverageForReportsWhetherAClassWasCollected(t *testing.T) {
 	}
 	if _, ok := p.CoverageFor(ClassImage); ok {
 		t.Error("a class nobody looked at must not report as collected")
+	}
+}
+
+// An imported scan file lists the hosts the scanner looked at. The hosts nobody
+// pointed it at appear nowhere in the file, so "all assets covered" would be
+// true of a file containing one host out of a thousand.
+func TestImportedCoverageIsNotAFraction(t *testing.T) {
+	p := posture(func(p *Posture) {
+		p.Source = "nessus"
+		p.CoverageAuthoritative = false
+		p.Coverage = []Coverage{{Class: ClassInstance, Covered: 3,
+			OldestScan: ptr(time.Now().Add(-time.Hour))}}
+	})
+	a := find(t, Evaluate(p, DefaultPolicy(), time.Now()), AssessCoverage)
+	if a.Status != StatusInfo {
+		t.Fatalf("an import cannot establish coverage, so INFO not %s: %s", a.Status, a.Evidence)
+	}
+	if !strings.Contains(a.Evidence, "3 scanned assets") {
+		t.Errorf("what was scanned should still be reported: %s", a.Evidence)
+	}
+	if !strings.Contains(a.Evidence, "cannot establish what it did not reach") {
+		t.Errorf("the limit must be stated: %s", a.Evidence)
+	}
+	if !strings.Contains(a.Detail, "floor, not a fraction") {
+		t.Errorf("the detail should explain the difference: %s", a.Detail)
+	}
+	if !strings.Contains(a.Remediation, "target list") {
+		t.Errorf("the reader needs to know what to supply instead: %s", a.Remediation)
+	}
+}
+
+// A gap an import does happen to find is still worth nothing as a fraction, but
+// the finding data behind it is unaffected.
+func TestImportedPostureStillAgesFindings(t *testing.T) {
+	now := time.Now()
+	p := posture(func(p *Posture) {
+		p.Source = "nessus"
+		p.CoverageAuthoritative = false
+		p.Coverage = []Coverage{{Class: ClassInstance, Covered: 1, OldestScan: ptr(now)}}
+		p.Findings = []Finding{{ID: "CVE-1", Severity: "CRITICAL", FixAvailable: "YES",
+			FirstObserved: now.AddDate(0, 0, -100)}}
+	})
+	all := Evaluate(p, DefaultPolicy(), now)
+	if a := find(t, all, AssessCoverage); a.Status != StatusInfo {
+		t.Fatalf("coverage is still INFO for an import, got %s", a.Status)
+	}
+	if a := find(t, all, AssessRemediation); a.Status != StatusFail {
+		t.Fatalf("an overdue finding still fails remediation regardless of coverage authority, got %s", a.Status)
 	}
 }

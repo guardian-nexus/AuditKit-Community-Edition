@@ -52,10 +52,12 @@ const maxPages = 100
 // coverage already fetches them.
 func Collect(ctx context.Context, c Clients, policy vuln.Policy, projectID string) *vuln.Posture {
 	p := &vuln.Posture{
-		Source:    "gcp-vm-manager",
-		Provider:  "gcp",
-		AccountID: projectID,
-		Collected: time.Now(),
+		Source: "gcp-vm-manager",
+		// this collector enumerates the account, so it knows what it did not reach
+		CoverageAuthoritative: true,
+		Provider:              "gcp",
+		AccountID:             projectID,
+		Collected:             time.Now(),
 	}
 	if c.Reports == nil || projectID == "" {
 		p.Errors = append(p.Errors, "VM Manager client or project id not configured")

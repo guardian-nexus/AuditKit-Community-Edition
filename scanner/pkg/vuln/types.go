@@ -105,6 +105,13 @@ type Posture struct {
 	// assets in it is a gap with a much more useful reason than "not covered".
 	ClassEnabled map[AssetClass]bool `json:"class_enabled,omitempty"`
 
+	// CoverageAuthoritative is whether this source can see the whole estate.
+	// A cloud collector enumerates the account and knows what it did not reach.
+	// An imported scan file lists what the scanner looked at and cannot know
+	// what it missed, so its coverage is a floor, not a fraction, and Evaluate
+	// reports it as INFO rather than claiming a percentage.
+	CoverageAuthoritative bool `json:"coverage_authoritative"`
+
 	Coverage []Coverage `json:"coverage,omitempty"`
 	Assets   []Asset    `json:"assets,omitempty"`
 	Findings []Finding  `json:"findings,omitempty"`
@@ -179,6 +186,10 @@ type SeverityAging struct {
 	// for. They are real findings and are reported as such; they simply cannot
 	// be measured against a window.
 	NoAgeReported int `json:"no_age_reported,omitempty"`
+	// Measured counts findings that had a fix, a date and a policy window, and
+	// so were actually compared against it. A pass claims remediation is
+	// inside the window, which is only sayable when something was measured.
+	Measured int `json:"measured,omitempty"`
 }
 
 // Coverage for one class, and whether it was collected at all.

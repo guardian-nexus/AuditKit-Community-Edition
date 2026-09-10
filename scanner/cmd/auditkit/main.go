@@ -24,6 +24,8 @@ import (
 	"github.com/guardian-nexus/auditkit/scanner/pkg/report"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/tracker"
 	"github.com/guardian-nexus/auditkit/scanner/pkg/updater"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/importers"
 )
 
 var CurrentVersion = "v0.8.7"
@@ -296,6 +298,10 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 			os.Exit(1)
 		}
 
+	case "nessus", "trivy", "grype":
+		runVulnImport(source, file, verbose)
+		return
+
 	case "prowler":
 		if file == "" {
 			fmt.Fprintf(os.Stderr, "Error: -file flag required for Prowler integration\n")
@@ -373,7 +379,8 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown integration source: %s\n", source)
-		fmt.Fprintf(os.Stderr, "Supported sources: scubagear, prowler\n")
+		fmt.Fprintf(os.Stderr, "Supported sources: scubagear, prowler, %s\n",
+			strings.Join(importers.Supported(), ", "))
 		os.Exit(1)
 	}
 }
@@ -3401,4 +3408,63 @@ func controlDisplayName(name, controlID string) string {
 		return name
 	}
 	return getControlName(controlID)
+}
+
+// runVulnImport turns a third-party scan file into the same vulnerability
+// evidence the cloud collectors produce.
+//
+// Kept separate from runIntegration because the shapes genuinely differ:
+// IntegrationResult is one row per control, while a vulnerability scan is one
+// row per finding per asset. Forcing this through that type would discard the
+// per-asset detail and the severity counts, which is the evidence.
+func runVulnImport(source, file string, verbose bool) {
+	if detected := importers.Detect(file); detected != "" && detected != source {
+		fmt.Fprintf(os.Stderr,
+			"Error: %s looks like a %s report, not %s. Re-run with -source %s.\n",
+			file, detected, source, detected)
+		os.Exit(1)
+	}
+
+	policy := vuln.DefaultPolicy()
+
+	posture, err := importers.Parse(source, file, policy)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("\nImported %s scan: %s\n", source, file)
+	if posture.AccountID != "" {
+		fmt.Printf("  Target:       %s\n", posture.AccountID)
+	}
+	assets := 0
+	for _, c := range posture.Coverage {
+		assets += c.Covered + c.Stale
+	}
+	fmt.Printf("  Assets:       %d scanned\n", assets)
+	fmt.Printf("  Findings:     %d\n", len(posture.Findings))
+	fmt.Printf("  %s\n\n", policy.Describe())
+
+	for _, sev := range vuln.Aging(posture.Findings, policy, time.Now()) {
+		fmt.Printf("  %-14s %3d", sev.Severity, sev.Total)
+		if sev.NoFixAvailable > 0 {
+			fmt.Printf("  (%d with no fix available)", sev.NoFixAvailable)
+		}
+		fmt.Printf("\n")
+	}
+	fmt.Printf("\n")
+
+	for _, a := range vuln.Evaluate(posture, policy, time.Now()) {
+		fmt.Printf("  [%s] %s\n", a.Status, a.Evidence)
+		if verbose && a.Detail != "" {
+			for _, line := range strings.Split(a.Detail, "\n") {
+				fmt.Printf("      %s\n", line)
+			}
+			fmt.Printf("\n")
+		}
+	}
+
+	fmt.Printf("\nAn imported scan establishes what was examined, not what was missed.\n")
+	fmt.Printf("Keep the scanner's target list with this output; an assessor asking for\n")
+	fmt.Printf("scan coverage wants both.\n")
 }

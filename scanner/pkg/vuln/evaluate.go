@@ -136,6 +136,7 @@ func Aging(findings []Finding, policy Policy, now time.Time) []SeverityAging {
 		if a.WindowDays <= 0 {
 			continue
 		}
+		a.Measured++
 		if age := f.AgeDays(now); age > a.WindowDays {
 			a.Overdue++
 			a.OverdueIDs = append(a.OverdueIDs, f.ID)
@@ -178,11 +179,12 @@ func assessRemediation(p *Posture, policy Policy, now time.Time) (Assessment, bo
 		return a, true
 	}
 
-	overdue, worstSev, oldest, oldestID, noFix, noAge := 0, "", 0, "", 0, 0
+	overdue, worstSev, oldest, oldestID, noFix, noAge, measured := 0, "", 0, "", 0, 0, 0
 	for _, s := range aging {
 		overdue += s.Overdue
 		noFix += s.NoFixAvailable
 		noAge += s.NoAgeReported
+		measured += s.Measured
 		if s.Overdue > 0 && worstSev == "" {
 			worstSev = s.Severity // aging is severity-ordered
 		}
@@ -205,19 +207,28 @@ func assessRemediation(p *Posture, policy Policy, now time.Time) (Assessment, bo
 				"vulnerability disclosed before that host existed.", noAge, p.Source))
 	}
 
-	if overdue == 0 && noAge == len(p.Findings) && noAge > 0 {
-		// Nothing was measurable, so this is not a pass. INFO keeps it out of
-		// the score rather than crediting a window nothing was checked against.
+	if measured == 0 {
+		// Nothing was compared against the window, so a pass would assert
+		// something nobody checked. INFO keeps it out of the score.
 		a.Status = StatusInfo
-		a.Evidence = fmt.Sprintf("%d findings reported, none with a first-observed date from %s, "+
-			"so remediation age could not be assessed", len(p.Findings), p.Source)
+		a.Evidence = fmt.Sprintf("%d findings reported by %s, none of which could be measured "+
+			"against the remediation window", len(p.Findings), p.Source)
+		if noAge > 0 {
+			a.Evidence += fmt.Sprintf(" (%d carry no first-observed date", noAge)
+			if noFix > 0 {
+				a.Evidence += fmt.Sprintf(", %d have no fix available", noFix)
+			}
+			a.Evidence += ")"
+		} else if noFix > 0 {
+			a.Evidence += fmt.Sprintf(" (%d have no fix available)", noFix)
+		}
 		a.Remediation = "Track age from first detection by scanning on a schedule and keeping scan history"
 		a.Detail = strings.Join(detail, "\n\n")
 		return a, true
 	}
 	if overdue == 0 {
 		a.Status = StatusPass
-		a.Evidence = fmt.Sprintf("All %d findings are inside the remediation window", len(p.Findings))
+		a.Evidence = fmt.Sprintf("All %d measured findings are inside the remediation window", measured)
 		if noAge > 0 {
 			a.Evidence += fmt.Sprintf(" (%d could not be aged)", noAge)
 		}
@@ -263,6 +274,24 @@ func assessCoverage(p *Posture, total Coverage, policy Policy) Assessment {
 	a := Assessment{Key: AssessCoverage}
 	detail := []string{policy.Describe(), perClass(p)}
 
+	// A source that cannot see the whole estate cannot report a coverage
+	// fraction. An imported scan file lists the hosts the scanner looked at;
+	// the hosts nobody pointed it at appear nowhere in the file, so "all
+	// assets covered" would be true of a file containing one host out of a
+	// thousand. Report what was scanned and say the denominator is unknown.
+	if !p.CoverageAuthoritative {
+		a.Status = StatusInfo
+		a.Evidence = fmt.Sprintf("%s reported %d scanned assets; an imported scan cannot "+
+			"establish what it did not reach, so coverage is not assessed",
+			p.Source, total.Covered+total.Stale)
+		a.Remediation = "Confirm the scanner's target list covers every in-scope system, and keep that list with the evidence"
+		detail = append(detail, "This is a floor, not a fraction: it shows the assets the "+
+			"scanner examined, not the assets it should have. An assessor asking for scan "+
+			"coverage wants the target list alongside this.")
+		a.Detail = strings.Join(detail, "\n\n")
+		return a
+	}
+
 	if total.Gaps == 0 {
 		a.Status = StatusPass
 		a.Evidence = fmt.Sprintf("All %d in-scope assets are covered by %s",
@@ -302,6 +331,20 @@ func assessFreshness(p *Posture, total Coverage, policy Policy, now time.Time) A
 		a.Detail = policy.Describe() + "\n\nCoverage was still assessed; only the age of each " +
 			"scan is unavailable. A provider that reports coverage without a timestamp cannot " +
 			"show that scanning is ongoing rather than historic."
+		return a
+	}
+
+	// Do not take the collector's word for it. A source that reports an oldest
+	// scan outside the window while marking nothing stale is contradicting
+	// itself, and the earlier version printed "scanned within 30 days (oldest
+	// scan 367 days ago)" in the same sentence.
+	if total.Stale == 0 && total.OldestScan != nil && total.OldestScan.Before(cutoff) {
+		a.Status = StatusFail
+		a.Severity = "MEDIUM"
+		a.Evidence = fmt.Sprintf("The oldest scan %s reported is %d days old, past the %d-day window",
+			p.Source, daysAgo(*total.OldestScan, now), policy.StaleAfterDays)
+		a.Remediation = "Scan on a schedule; a scan this old reports the findings that were true when it ran"
+		a.Detail = policy.Describe()
 		return a
 	}
 

@@ -65,10 +65,12 @@ const (
 // Collect reads Defender coverage for a subscription.
 func Collect(ctx context.Context, c Clients, policy vuln.Policy, subscriptionID string) *vuln.Posture {
 	p := &vuln.Posture{
-		Source:    "azure-defender",
-		Provider:  "azure",
-		AccountID: subscriptionID,
-		Collected: nowFunc(),
+		Source: "azure-defender",
+		// this collector enumerates the account, so it knows what it did not reach
+		CoverageAuthoritative: true,
+		Provider:              "azure",
+		AccountID:             subscriptionID,
+		Collected:             nowFunc(),
 	}
 	if c.Pricing == nil || subscriptionID == "" {
 		p.Errors = append(p.Errors, "Defender pricing client or subscription id not configured")

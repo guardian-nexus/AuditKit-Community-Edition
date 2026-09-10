@@ -102,10 +102,12 @@ func dispositionFor(reason inspectortypes.ScanStatusReason) vuln.Disposition {
 // silently narrowing the denominator.
 func Collect(ctx context.Context, c Clients, policy vuln.Policy, accountID string) *vuln.Posture {
 	p := &vuln.Posture{
-		Source:    "aws-inspector2",
-		Provider:  "aws",
-		AccountID: accountID,
-		Collected: time.Now(),
+		Source: "aws-inspector2",
+		// this collector enumerates the account, so it knows what it did not reach
+		CoverageAuthoritative: true,
+		Provider:              "aws",
+		AccountID:             accountID,
+		Collected:             time.Now(),
 	}
 
 	if c.Inspector == nil {
