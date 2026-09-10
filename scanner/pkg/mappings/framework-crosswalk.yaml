@@ -171,6 +171,21 @@ cmmc_to_800_53:
   AC.L2-3.1.5: [AC-6]                   # Least privilege
   AC.L2-3.1.6: [AC-6(1)]                # Non-privileged account use
   
+  AC.L2-3.1.4: [AC-5]                   # Separation of duties
+  AC.L2-3.1.7: [AC-6(9), AC-6(10)]      # Privileged function use audited
+  AC.L2-3.1.8: [AC-7]                   # Unsuccessful logon attempts limited
+  AC.L2-3.1.9: [AC-8]                   # Privacy and security notices
+  AC.L2-3.1.10: [AC-11, AC-11(1)]       # Session lock with pattern hiding
+  AC.L2-3.1.11: [AC-12]                 # Session termination
+  AC.L2-3.1.12: [AC-17(1)]              # Remote access monitored and controlled
+  AC.L2-3.1.13: [AC-17(2)]              # Remote access cryptographically protected
+  AC.L2-3.1.14: [AC-17(3)]              # Remote access routed through control points
+  AC.L2-3.1.15: [AC-17(4)]              # Privileged remote access authorized
+  AC.L2-3.1.16: [AC-18]                 # Wireless access authorized
+  AC.L2-3.1.17: [AC-18(1)]              # Wireless authentication and encryption
+  AC.L2-3.1.18: [AC-19]                 # Mobile device connection controlled
+  AC.L2-3.1.19: [AC-19(5)]              # CUI encrypted on mobile devices
+  AC.L2-3.1.21: [AC-20(2)]              # Portable storage on external systems limited
   # Awareness and Training (AT)
   AT.L2-3.2.1: [AT-2]                   # Security awareness
   AT.L2-3.2.2: [AT-3]                   # Role-based training
@@ -223,6 +238,7 @@ cmmc_to_800_53:
   MA.L2-3.7.4: [MA-5]                   # Maintenance personnel
   MA.L2-3.7.5: [MA-6]                   # Timely maintenance
   
+  MA.L2-3.7.6: [MA-5]                   # Maintenance personnel supervised
   # Media Protection (MP)
   MP.L1-3.8.3: [MP-6]                   # Media sanitization
   MP.L2-3.8.2: [MP-2]                   # Media access control
@@ -234,6 +250,9 @@ cmmc_to_800_53:
   MP.L2-3.8.8: [MP-4]                   # Media downgrading
   MP.L2-3.8.9: [MP-8]                   # Media accountability
   
+  # Personnel Security (PS)
+  PS.L2-3.9.1: [PS-3]                   # Personnel screening
+  PS.L2-3.9.2: [PS-4, PS-5]             # CUI protected through personnel actions
   # Physical Protection (PE)
   PE.L1-3.10.1: [PE-2]                  # Physical access
   PE.L1-3.10.3: [PE-3]                  # Escort visitors
@@ -616,3 +635,8 @@ hipaa_to_800_53:
   "164.312(e)(1)": [SC-8, SC-8(1)]      # Transmission security
   "164.312(e)(2)(i)": [SI-7]            # Integrity controls
   "164.312(e)(2)(ii)": [SC-13, SC-8]    # Encryption
+  "164.308(a)(4)(ii)(C)": [AC-2]        # Access establishment and modification
+  "164.308(a)(7)(ii)(A)": [CP-9]        # Data backup plan
+  "164.308(a)(8)": [CA-2, CA-7]         # Evaluation
+  "164.308(b)(1)": [SA-9, PS-7]         # Business associate contracts
+
