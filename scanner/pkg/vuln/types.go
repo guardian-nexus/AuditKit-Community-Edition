@@ -139,9 +139,9 @@ type Finding struct {
 	LastObserved  *time.Time `json:"last_observed,omitempty"`
 	// FixAvailable separates "you have not patched" from "there is no patch",
 	// which are different conversations with an assessor.
-	FixAvailable    string   `json:"fix_available,omitempty"`
-	ExploitAvailable bool    `json:"exploit_available,omitempty"`
-	Score           *float64 `json:"score,omitempty"`
+	FixAvailable     string   `json:"fix_available,omitempty"`
+	ExploitAvailable bool     `json:"exploit_available,omitempty"`
+	Score            *float64 `json:"score,omitempty"`
 }
 
 // AgeDays is how long the finding has gone unremediated. Only meaningful when

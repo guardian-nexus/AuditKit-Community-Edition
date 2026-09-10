@@ -164,18 +164,18 @@ func TestScannerDisabledIsOneClearFailure(t *testing.T) {
 func TestDispositionBuckets(t *testing.T) {
 	cases := map[inspectortypes.ScanStatusReason]vuln.Disposition{
 		// wire values, matching dispositionFor - see the comment there
-		"SUCCESSFUL":           vuln.DispCovered,
+		"SUCCESSFUL":             vuln.DispCovered,
 		"PENDING_INITIAL_SCAN":   vuln.DispPending,
 		"SCAN_IN_PROGRESS":       vuln.DispPending,
 		"EXCLUDED_BY_TAG":        vuln.DispExcluded,
-		"UNSUPPORTED_OS":        vuln.DispNotEligible,
-		"UNSUPPORTED_RUNTIME":   vuln.DispNotEligible,
+		"UNSUPPORTED_OS":         vuln.DispNotEligible,
+		"UNSUPPORTED_RUNTIME":    vuln.DispNotEligible,
 		"EC2_INSTANCE_STOPPED":   vuln.DispNotEligible,
-		"RESOURCE_TERMINATED":   vuln.DispNotEligible,
+		"RESOURCE_TERMINATED":    vuln.DispNotEligible,
 		"UNMANAGED_EC2_INSTANCE": vuln.DispGap,
-		"NO_INVENTORY":          vuln.DispGap,
-		"STALE_INVENTORY":       vuln.DispGap,
-		"ACCESS_DENIED":         vuln.DispGap,
+		"NO_INVENTORY":           vuln.DispGap,
+		"STALE_INVENTORY":        vuln.DispGap,
+		"ACCESS_DENIED":          vuln.DispGap,
 		// Scan-on-push means the image is never re-examined, so a CVE disclosed
 		// after the push is never noticed. That is a gap against RA.L2-3.11.2.
 		"SCAN_FREQUENCY_SCAN_ON_PUSH": vuln.DispGap,
@@ -311,7 +311,6 @@ func findAssessment(t *testing.T, all []vuln.Assessment, key vuln.AssessmentKey)
 	t.Fatalf("no %s assessment in %+v", key, all)
 	return vuln.Assessment{}
 }
-
 
 func finding(cve string, sev inspectortypes.Severity, firstSeen time.Time, fix inspectortypes.FixAvailable) inspectortypes.Finding {
 	id, arn := cve, "arn:aws:inspector2:::finding/"+cve

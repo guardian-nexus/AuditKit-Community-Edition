@@ -36,7 +36,7 @@ const (
 	FrameworkSOC2     = "SOC2"
 	FrameworkPCI      = "PCI-DSS"
 	FrameworkHIPAA    = "HIPAA"
-	FrameworkISO      = "ISO27001"  // must match the crosswalk key exactly
+	FrameworkISO      = "ISO27001" // must match the crosswalk key exactly
 	FrameworkCISAzure = "CIS-Azure"
 )
 

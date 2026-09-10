@@ -41,7 +41,7 @@ type AzureScanner struct {
 	blobServiceClient   *armstorage.BlobServicesClient
 	roleClient          *armauthorization.RoleAssignmentsClient
 	roleDefClient       *armauthorization.RoleDefinitionsClient
-	securityClient      *armsecurity.PricingsClient                 // For Defender checks
+	securityClient      *armsecurity.PricingsClient // For Defender checks
 	subAssessClient     *armsecurity.SubAssessmentsClient
 	autoProvisionClient *armsecurity.AutoProvisioningSettingsClient // For auto-provisioning
 	contactsClient      *armsecurity.ContactsClient                 // For security contacts

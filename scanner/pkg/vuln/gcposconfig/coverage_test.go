@@ -49,7 +49,7 @@ func inst(name, status string, labels map[string]string) *compute.Instance {
 
 func report(instance string, updated time.Time, vulns ...*osconfig.VulnerabilityReportVulnerability) *osconfig.VulnerabilityReport {
 	return &osconfig.VulnerabilityReport{
-		Name: "projects/" + project + "/locations/us-central1-a/instances/" + instance + "/vulnerabilityReport",
+		Name:            "projects/" + project + "/locations/us-central1-a/instances/" + instance + "/vulnerabilityReport",
 		UpdateTime:      updated.Format(time.RFC3339),
 		Vulnerabilities: vulns,
 	}
@@ -288,8 +288,8 @@ func TestReportNameParsing(t *testing.T) {
 	cases := map[string]string{
 		"projects/p/locations/us-central1-a/instances/vm-1/vulnerabilityReport": "vm-1",
 		"projects/p/locations/l/instances/vm-2":                                 "vm-2",
-		"nonsense":                                                             "",
-		"":                                                                     "",
+		"nonsense":                                                              "",
+		"":                                                                      "",
 	}
 	for in, want := range cases {
 		if got := instanceFromReportName(in); got != want {
