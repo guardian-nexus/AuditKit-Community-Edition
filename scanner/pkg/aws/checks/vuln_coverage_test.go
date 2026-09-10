@@ -102,8 +102,13 @@ func TestAWSEmitSelectsDisjointControls(t *testing.T) {
 	for _, r := range runAWS(t, c, EmitPCI) {
 		pci[r.Control] = true
 	}
-	if !cmmc["RA.L2-3.11.2"] || !cmmc["RA.L2-3.11.3"] {
-		t.Errorf("the CMMC pass answers both risk-assessment practices, got %v", cmmc)
+	if !cmmc["RA.L2-3.11.2"] {
+		t.Errorf("the CMMC pass answers RA.L2-3.11.2, got %v", cmmc)
+	}
+	// Remediation ageing is a Pro feature, so the free edition must not answer
+	// RA.L2-3.11.3 - see .github/scripts/check-edition-split.py in the Pro repo.
+	if cmmc["RA.L2-3.11.3"] {
+		t.Error("RA.L2-3.11.3 is a Pro control and must not be reported by the Community edition")
 	}
 	if !pci["PCI-11.3.1"] {
 		t.Errorf("the PCI pass answers PCI-11.3.1, got %v", pci)
@@ -171,18 +176,20 @@ func TestAWSCollectionFailureIsAnError(t *testing.T) {
 	}
 }
 
-// RA.L2-3.11.3 must be absent rather than passing when findings were not
-// fetched, which is what the PCI pass does.
-func TestAWSRemediationOnlyReportedWhenFindingsWereCollected(t *testing.T) {
+// The free edition does not fetch findings at all, so RA.L2-3.11.3 must be
+// absent from both passes rather than passing on empty data.
+func TestAWSNeverReportsRemediationInTheFreeEdition(t *testing.T) {
 	now := time.Now()
 	c := awsinspector.Clients{
 		Inspector: stubInspector{enabled: true, resources: []inspectortypes.CoveredResource{
 			coveredResource("i-1", "SUCCESSFUL", &now)}},
 		EC2: stubEC2{ids: []string{"i-1"}},
 	}
-	for _, r := range runAWS(t, c, EmitPCI) {
-		if r.Control == "RA.L2-3.11.3" {
-			t.Error("the PCI pass does not fetch findings, so it must not report remediation")
+	for _, emit := range []Emit{EmitCMMC, EmitPCI} {
+		for _, r := range runAWS(t, c, emit) {
+			if r.Control == "RA.L2-3.11.3" {
+				t.Error("remediation ageing is a Pro feature; the free edition must not report it")
+			}
 		}
 	}
 }

@@ -37,6 +37,13 @@ func (s stubInstances) AggregatedList(context.Context, string, string) (*compute
 	}, nil
 }
 
+func freeEditionClients() gcposconfig.Clients {
+	return gcposconfig.Clients{
+		Reports:   stubReports{},
+		Instances: stubInstances{names: []string{"vm-1"}},
+	}
+}
+
 func run(t *testing.T, clients gcposconfig.Clients, emit Emit) []CheckResult {
 	t.Helper()
 	res, err := newWithClients(clients, "proj", emit, nil).Run(context.Background())
@@ -146,5 +153,20 @@ func TestClientInitFailureIsAnErrorWithTheRightControl(t *testing.T) {
 	}
 	if !strings.Contains(res[0].Remediation, "osconfig") {
 		t.Errorf("the remediation should name the permissions needed: %s", res[0].Remediation)
+	}
+}
+
+// Remediation ageing is a Pro feature. The free edition must not answer
+// RA.L2-3.11.3 on either pass - asserted here as well as in the Pro repo's
+// check-edition-split.py, because a test that runs in this tree catches it
+// sooner than a cross-repo guard.
+func TestNeverReportsRemediationInTheFreeEdition(t *testing.T) {
+	c := freeEditionClients()
+	for _, emit := range []Emit{EmitCMMC, EmitPCI} {
+		for _, r := range run(t, c, emit) {
+			if r.Control == "RA.L2-3.11.3" {
+				t.Errorf("%s pass reported RA.L2-3.11.3, which is a Pro control", "vuln")
+			}
+		}
 	}
 }

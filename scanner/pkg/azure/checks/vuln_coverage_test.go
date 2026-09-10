@@ -59,6 +59,14 @@ func (stubSubAssess) NewListAllPager(string, *armsecurity.SubAssessmentsClientLi
 	return stubPager(armsecurity.SubAssessmentsClientListAllResponse{})
 }
 
+func freeEditionClients() azuredefender.Clients {
+	return azuredefender.Clients{
+		Pricing:        stubPricing{standard: map[string]bool{"VirtualMachines": true}},
+		SubAssessments: stubSubAssess{},
+		VMs:            stubVMs{ids: []string{"/vm/1"}},
+	}
+}
+
 func runAzure(t *testing.T, c azuredefender.Clients, emit Emit) []CheckResult {
 	t.Helper()
 	res, err := NewVulnCoverageChecks(c, testSub, emit).Run(context.Background())
@@ -166,6 +174,21 @@ func TestAzureCollectionFailureIsAnError(t *testing.T) {
 		for _, r := range runAzure(t, c, emit) {
 			if r.Status != StatusError {
 				t.Errorf("%s should be ERROR when the read failed, got %s", r.Control, r.Status)
+			}
+		}
+	}
+}
+
+// Remediation ageing is a Pro feature. The free edition must not answer
+// RA.L2-3.11.3 on either pass - asserted here as well as in the Pro repo's
+// check-edition-split.py, because a test that runs in this tree catches it
+// sooner than a cross-repo guard.
+func TestNeverReportsRemediationInTheFreeEdition(t *testing.T) {
+	c := freeEditionClients()
+	for _, emit := range []Emit{EmitCMMC, EmitPCI} {
+		for _, r := range runAzure(t, c, emit) {
+			if r.Control == "RA.L2-3.11.3" {
+				t.Errorf("%s pass reported RA.L2-3.11.3, which is a Pro control", "vuln")
 			}
 		}
 	}

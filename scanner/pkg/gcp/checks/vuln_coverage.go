@@ -1,3 +1,8 @@
+// The Community edition answers whether scanning is happening and whether it
+// reaches every in-scope asset. It deliberately does not fetch findings, so no
+// remediation ageing is performed and RA.L2-3.11.3 is not reported: measuring
+// findings against a remediation window, and the evidence package built from
+// it, are AuditKit Pro. Third-party scan import is Pro for the same reason.
 package checks
 
 import (
@@ -98,6 +103,10 @@ func (c *VulnCoverageChecks) Run(ctx context.Context) ([]CheckResult, error) {
 			"Could not reach VM Manager: "+c.initErr.Error())}, nil
 	}
 	posture := gcposconfig.Collect(ctx, c.clients, c.policy, c.projectID)
+	// VM Manager returns findings inside the same call that establishes
+	// coverage, so they are discarded here rather than never fetched.
+	// Remediation ageing is a Pro feature.
+	posture.Findings = nil
 	assessments := map[vuln.AssessmentKey]vuln.Assessment{}
 	for _, a := range vuln.Evaluate(posture, c.policy, time.Now()) {
 		assessments[a.Key] = a
@@ -106,11 +115,7 @@ func (c *VulnCoverageChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	if c.emit == EmitPCI {
 		return []CheckResult{c.pciInternalScanControl(assessments)}, nil
 	}
-	out := []CheckResult{c.scanningControl(assessments)}
-	if r, ok := c.remediationControl(assessments); ok {
-		out = append(out, r)
-	}
-	return out, nil
+	return []CheckResult{c.scanningControl(assessments)}, nil
 }
 
 func (c *VulnCoverageChecks) scanningControl(a map[vuln.AssessmentKey]vuln.Assessment) CheckResult {
@@ -201,26 +206,6 @@ func (c *VulnCoverageChecks) pciInternalScanControl(a map[vuln.AssessmentKey]vul
 	}
 	res.RemediationDetail = cov.Detail
 	return res
-}
-
-// RA.L2-3.11.3 - remediate vulnerabilities in accordance with risk
-// assessments. VM Manager reports when each vulnerability was first detected,
-// so unlike Defender for Cloud these can be aged against the policy window.
-func (c *VulnCoverageChecks) remediationControl(a map[vuln.AssessmentKey]vuln.Assessment) (CheckResult, bool) {
-	rem, ok := a[vuln.AssessRemediation]
-	if !ok {
-		return CheckResult{}, false
-	}
-	res := CheckResult{
-		Control:         "RA.L2-3.11.3",
-		Name:            "[CMMC L2] Remediate Vulnerabilities",
-		Priority:        PriorityCritical,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "Compute Engine -> VM Manager -> Screenshot the oldest unremediated critical and high vulnerabilities with their first-detected dates | Screenshot the risk acceptance for anything deliberately not patched",
-		ConsoleURL:      "https://console.cloud.google.com/compute/osPatchManagement",
-		Frameworks:      map[string]string{"CMMC": "RA.L2-3.11.3", "NIST 800-171": "3.11.3"},
-	}
-	return applyAssessment(res, rem), true
 }
 
 func applyAssessment(res CheckResult, a vuln.Assessment) CheckResult {

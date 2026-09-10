@@ -1,3 +1,8 @@
+// The Community edition answers whether scanning is happening and whether it
+// reaches every in-scope asset. It deliberately does not fetch findings, so no
+// remediation ageing is performed and RA.L2-3.11.3 is not reported: measuring
+// findings against a remediation window, and the evidence package built from
+// it, are AuditKit Pro. Third-party scan import is Pro for the same reason.
 package checks
 
 import (
@@ -40,11 +45,6 @@ func (c *VulnCoverageChecks) Name() string { return "Vulnerability Scan Coverage
 
 func (c *VulnCoverageChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	posture := awsinspector.Collect(ctx, c.clients, c.policy, c.accountID)
-	// Remediation ageing needs the findings as well as the coverage. Only the
-	// CMMC pass asks for them, so a PCI-only scan does not pay for the walk.
-	if c.emit == EmitCMMC && posture.ScannerEnabled && len(posture.Errors) == 0 {
-		awsinspector.CollectFindings(ctx, c.clients.Inspector, posture)
-	}
 	assessments := map[vuln.AssessmentKey]vuln.Assessment{}
 	for _, a := range vuln.Evaluate(posture, c.policy, time.Now()) {
 		assessments[a.Key] = a
@@ -53,11 +53,7 @@ func (c *VulnCoverageChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	if c.emit == EmitPCI {
 		return []CheckResult{c.pciInternalScanControl(assessments)}, nil
 	}
-	out := []CheckResult{c.scanningControl(assessments)}
-	if r, ok := c.remediationControl(assessments); ok {
-		out = append(out, r)
-	}
-	return out, nil
+	return []CheckResult{c.scanningControl(assessments)}, nil
 }
 
 // RA.L2-3.11.2 - scan for vulnerabilities periodically and when new ones are
@@ -165,27 +161,6 @@ func (c *VulnCoverageChecks) pciInternalScanControl(a map[vuln.AssessmentKey]vul
 	}
 	res.RemediationDetail = detailWithPolicy(cov, fresh, hasFresh)
 	return res
-}
-
-// RA.L2-3.11.3 - remediate vulnerabilities in accordance with risk
-// assessments. The practice names no window, so the check measures against the
-// stated policy and reports which one it used. Reported only when findings were
-// actually collected: zero overdue from data nobody fetched is not a pass.
-func (c *VulnCoverageChecks) remediationControl(a map[vuln.AssessmentKey]vuln.Assessment) (CheckResult, bool) {
-	rem, ok := a[vuln.AssessRemediation]
-	if !ok {
-		return CheckResult{}, false
-	}
-	res := CheckResult{
-		Control:         "RA.L2-3.11.3",
-		Name:            "[CMMC L2] Remediate Vulnerabilities",
-		Priority:        PriorityCritical,
-		Timestamp:       time.Now(),
-		ScreenshotGuide: "Inspector Console -> Findings -> Sort by first-observed date -> Screenshot the oldest unremediated critical and high findings | Exceptions -> Screenshot the risk acceptance for anything deliberately not patched",
-		ConsoleURL:      "https://console.aws.amazon.com/inspector/v2/home#/findings",
-		Frameworks:      map[string]string{"CMMC": "RA.L2-3.11.3", "NIST 800-171": "3.11.3"},
-	}
-	return applyAssessment(res, rem), true
 }
 
 func applyAssessment(res CheckResult, a vuln.Assessment) CheckResult {
