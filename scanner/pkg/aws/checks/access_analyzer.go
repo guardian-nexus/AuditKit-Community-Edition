@@ -42,7 +42,7 @@ func (c *AccessAnalyzerChecks) CheckAccessAnalyzerEnabled(ctx context.Context) (
 	resp, err := c.client.ListAnalyzers(ctx, &accessanalyzer.ListAnalyzersInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-2.8",
+			Control:    "CIS-2.18",
 			Name:       "IAM Access Analyzer Enabled",
 			Status:     "FAIL",
 			Evidence:   fmt.Sprintf("Unable to check IAM Access Analyzer: %v", err),
@@ -55,7 +55,7 @@ func (c *AccessAnalyzerChecks) CheckAccessAnalyzerEnabled(ctx context.Context) (
 
 	if len(resp.Analyzers) == 0 {
 		return CheckResult{
-			Control:     "CIS-2.8",
+			Control:     "CIS-2.18",
 			Name:        "IAM Access Analyzer Enabled",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -106,7 +106,7 @@ aws accessanalyzer create-analyzer \
 
 	if activeAnalyzers == 0 {
 		return CheckResult{
-			Control:     "CIS-2.8",
+			Control:     "CIS-2.18",
 			Name:        "IAM Access Analyzer Enabled",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -129,7 +129,7 @@ aws accessanalyzer create-analyzer \
 	}
 
 	return CheckResult{
-		Control:    "CIS-2.8",
+		Control:    "CIS-2.18",
 		Name:       "IAM Access Analyzer Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("IAM Access Analyzer is active in region %s (%d active analyzer(s): %v) | Meets CIS AWS 1.8 (external access monitoring)", c.region, activeAnalyzers, analyzerNames),

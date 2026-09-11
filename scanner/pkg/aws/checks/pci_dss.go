@@ -498,6 +498,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 			Timestamp:         time.Now(),
 			Frameworks: map[string]string{
 				"PCI-DSS": "4.2.1",
+				"CIS-AWS": "3.1.1",
 			},
 		})
 	}

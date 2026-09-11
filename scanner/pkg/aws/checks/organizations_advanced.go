@@ -129,7 +129,7 @@ func (c *OrganizationsAdvancedChecks) CheckMultiAccountStructure(ctx context.Con
 	accounts, err := c.orgClient.ListAccounts(ctx, &organizations.ListAccountsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-2.1.4",
+			Control:     "CC5.2",
 			Name:        "Multi-Account Structure",
 			Status:      "INFO",
 			Evidence:    "Not using AWS Organizations or no permissions",
@@ -144,7 +144,7 @@ func (c *OrganizationsAdvancedChecks) CheckMultiAccountStructure(ctx context.Con
 
 	if accountCount <= 1 {
 		return CheckResult{
-			Control:     "CIS-2.1.4",
+			Control:     "CC5.2",
 			Name:        "Multi-Account Structure",
 			Status:      "FAIL",
 			Evidence:    "Using single AWS account - no workload isolation",
@@ -172,7 +172,7 @@ Benefits:
 	}
 
 	return CheckResult{
-		Control:     "CIS-2.1.4",
+		Control:     "CC5.2",
 		Name:        "Multi-Account Structure",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("Using multi-account structure with %d accounts for workload isolation", accountCount),

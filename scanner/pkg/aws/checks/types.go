@@ -180,7 +180,10 @@ var FrameworkMappings = map[string]map[string]string{
 		FrameworkSOC2:  "CC6.1",
 		FrameworkPCI:   "1.4.2",
 		FrameworkHIPAA: "164.312(e)(1)",
-		FrameworkCIS:   "3.2.1",
+		// 3.2.3, not 3.2.1: the old table used 2.3.1 for both public access and
+		// encryption at rest, and a number-level remap sent this one to
+		// encryption.
+		FrameworkCIS: "3.2.3",
 	},
 	"RDS_ENCRYPTION": {
 		FrameworkSOC2:  "CC6.3",
@@ -542,7 +545,9 @@ var FrameworkMappings = map[string]map[string]string{
 	"ORGANIZATIONS_MULTI_ACCOUNT": {
 		FrameworkSOC2: "CC5.2",
 		FrameworkPCI:  "6.2.4",
-		FrameworkCIS:  "2.1.4",
+		// No CIS entry: using Organizations at all is not v7.0.0 2.1.4, which
+		// asks whether organizational units are structured by environment and
+		// sensitivity.
 	},
 	"ORGANIZATIONS_TRAIL": {
 		FrameworkSOC2: "CC7.2",
