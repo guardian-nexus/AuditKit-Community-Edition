@@ -417,11 +417,15 @@ func (c *CloudTrailChecks) CheckCloudTrailS3BucketPolicy(ctx context.Context) (C
 // CIS 3.8 - Ensure KMS key rotation is enabled for CloudTrail encryption keys
 func (c *CloudTrailChecks) CheckCloudTrailKMSKey(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control:           "CIS-4.6",
-		Name:              "CloudTrail KMS Key Rotation",
-		Status:            "INFO",
-		Evidence:          "MANUAL CHECK: Verify KMS keys used for CloudTrail encryption have automatic rotation enabled",
-		Remediation:       "Enable automatic key rotation for KMS keys",
+		Control: "CIS-4.6",
+		Name:    "Customer-Managed KMS Key Rotation",
+		Status:  "INFO",
+		// v7.0.0 4.6 covers every customer-created symmetric CMK, not only the
+		// key CloudTrail uses. The wording was narrower than the recommendation
+		// it claims, which is an overclaim by omission: a pass here said nothing
+		// about the other keys in the account.
+		Evidence:          "MANUAL CHECK: Verify automatic rotation is enabled on every customer-created symmetric KMS key, including but not limited to the key CloudTrail encrypts with",
+		Remediation:       "Enable automatic annual rotation on each customer-managed symmetric KMS key",
 		RemediationDetail: "1. Go to KMS Console\n2. Find key used by CloudTrail\n3. Enable automatic key rotation\n4. Verify rotation is enabled: aws kms get-key-rotation-status --key-id [KEY_ID]",
 		ScreenshotGuide:   "KMS Console → Customer managed keys → CloudTrail key → Key rotation → Screenshot showing 'Automatically rotate this KMS key every year: Enabled'",
 		ConsoleURL:        "https://console.aws.amazon.com/kms/home#/kms/keys",

@@ -1129,7 +1129,7 @@ func (c *IAMChecks) CheckIAMRolesSeparation(ctx context.Context) (CheckResult, e
 
 	if !hasIAMAdminRole || !hasIAMLimitedRole {
 		return CheckResult{
-			Control:     "CIS-2.16",
+			Control:     "CC6.3",
 			Name:        "IAM Master and Manager Roles",
 			Status:      "INFO",
 			Severity:    "MEDIUM",
@@ -1148,25 +1148,28 @@ aws iam put-role-policy --role-name IAMManagerRole --policy-name IAMLimitedAcces
 			ConsoleURL:      "https://console.aws.amazon.com/iam/home#/roles",
 			Priority:        PriorityMedium,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "2.16", "SOC2": "CC6.3"},
+			// No CIS claim: this is the v1.2-era "IAM Master and IAM Manager
+			// roles" recommendation, which CIS removed in v1.4. It is not
+			// 2.16, which is instance roles.
+			Frameworks: map[string]string{"SOC2": "CC6.3"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-2.16",
+		Control:    "CC6.3",
 		Name:       "IAM Master and Manager Roles",
 		Status:     "PASS",
 		Evidence:   "IAM management roles detected | Meets CIS 1.18",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "2.16", "SOC2": "CC6.3"},
+		Frameworks: map[string]string{"SOC2": "CC6.3"},
 	}, nil
 }
 
 // CIS 1.22 - Ensure IAM user access is reviewed periodically
 func (c *IAMChecks) CheckIAMUserAccessReview(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:     "CIS-2.13",
+		Control:     "CC6.3",
 		Name:        "IAM User Access Review",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Verify IAM user access is reviewed at least every 90 days",
