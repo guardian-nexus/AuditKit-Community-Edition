@@ -267,6 +267,9 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 
 	// Run SOC2 CC1-CC9 check modules
 	soc2Checks := []checks.Check{
+		checks.NewDefenderChecks(s.subscriptionID, s.securityClient, s.autoProvisionClient, s.contactsClient),
+		checks.NewAzureCISManualChecks(s.subscriptionID),
+		checks.NewAppServiceChecks(s.subscriptionID),
 		checks.NewAzureCC1Checks(s.roleClient, s.roleDefClient),
 		checks.NewAzureCC2Checks(),
 		checks.NewAzureCC3Checks(s.monitorClient),

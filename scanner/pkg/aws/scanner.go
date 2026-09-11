@@ -247,6 +247,8 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 
 	// Run existing AWS check modules - they return results with Frameworks map
 	checkModules := []checks.Check{
+		checks.NewPCIDSSChecks(s.iamClient, s.ec2Client, s.s3Client, s.ctClient, s.configClient),
+		checks.NewIAMAdvancedChecks(s.iamClient),
 		checks.NewIAMChecks(s.iamClient),
 		checks.NewS3Checks(s.s3Client, s.s3controlClient, s.stsClient),
 		checks.NewEC2Checks(s.ec2Client),
@@ -500,6 +502,7 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 	// Initialize SOC2 checks
 	soc2Checks := []checks.Check{
 		// CC1 & CC2: Control Environment & Communication
+		checks.NewMonitoringChecks(s.cwClient, s.snsClient, s.shClient),
 		checks.NewCC1Checks(s.iamClient, s.orgClient, s.ssmClient),
 		checks.NewKMSChecks(s.kmsClient), // claims SOC2 and PCI; must run in those scans
 		checks.NewEFSChecks(s.efsClient), // claims SOC2 and PCI; must run in those scans
@@ -625,6 +628,34 @@ func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 
 	// Also run basic checks but filter for PCI relevance
 	basicChecks := []checks.Check{
+		checks.NewVPCChecks(s.ec2Client),
+		checks.NewSecurityServicesChecks(s.gdClient, s.macieClient, s.shClient, s.inspector2Client),
+		checks.NewSecretsManagerChecks(s.secretsManagerClient),
+		checks.NewSageMakerChecks(s.sagemakerClient),
+		checks.NewSSMChecks(s.ssmClient),
+		checks.NewRoute53Checks(s.route53Client),
+		checks.NewRedshiftChecks(s.redshiftClient),
+		checks.NewOrganizationsAdvancedChecks(s.orgClient, s.ctClient),
+		checks.NewOpenSearchChecks(s.opensearchClient),
+		checks.NewNetworkFirewallChecks(s.nfwClient, s.ec2Client),
+		checks.NewMonitoringChecks(s.cwClient, s.snsClient, s.shClient),
+		checks.NewMessagingChecks(s.snsClient, s.sqsClient),
+		checks.NewLambdaChecks(s.lambdaClient),
+		checks.NewIAMExtendedChecks(s.iamClient),
+		checks.NewElastiCacheChecks(s.elasticacheClient),
+		checks.NewEKSChecks(s.eksClient),
+		checks.NewECSChecks(s.ecsClient),
+		checks.NewECRChecks(s.ecrClient),
+		checks.NewDynamoDBChecks(s.dynamodbClient),
+		checks.NewConfigChecks(s.configClient),
+		checks.NewCloudFormationChecks(s.cloudFormationClient),
+		checks.NewCISManualChecks(),
+		checks.NewBeanstalkChecks(s.beanstalkClient),
+		checks.NewBackupVaultChecks(s.backupClient),
+		checks.NewAuroraChecks(s.rdsClient),
+		checks.NewAccessAnalyzerChecks(s.accessAnalyzerClient, s.cfg.Region),
+		checks.NewAPIGatewayChecks(s.apigwClient, s.apigwv2Client),
+		checks.NewACMChecks(s.acmClient),
 		checks.NewIAMChecks(s.iamClient),                               // For password policy, MFA, key rotation
 		checks.NewKMSChecks(s.kmsClient),                               // claims SOC2 and PCI; must run in those scans
 		checks.NewEFSChecks(s.efsClient),                               // claims SOC2 and PCI; must run in those scans
