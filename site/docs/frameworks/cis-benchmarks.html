@@ -58,8 +58,8 @@
 <p>Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on <strong>technical security hardening</strong>.</p>
 <h2>Supported Benchmarks</h2>
 <h3>AWS Foundations Benchmark</h3>
-<p><strong>Status:</strong> Production (v0.8.6)
-<strong>Controls:</strong> 158 unique AWS controls implemented
+<p><strong>Status:</strong> Production (v0.8.6)<br>
+<strong>Controls:</strong> 158 unique AWS controls implemented<br>
 <strong>Command:</strong> <code class="code-inline">./auditkit scan -provider aws -framework cis-aws</code></p>
 <p><strong>What's Covered:</strong></p>
 <ul>
@@ -82,8 +82,8 @@
 <li><strong>Total Coverage:</strong> AWS 158, Azure 108, GCP 71 benchmark controls</li>
 </ul>
 <h3>Azure Foundations Benchmark</h3>
-<p><strong>Status:</strong> Production
-<strong>Automated Controls:</strong> 108 checks (CIS Microsoft Azure Foundations Benchmark v3.0)
+<p><strong>Status:</strong> Production<br>
+<strong>Automated Controls:</strong> 108 checks (CIS Microsoft Azure Foundations Benchmark v3.0)<br>
 <strong>Command:</strong> <code class="code-inline">./auditkit scan -provider azure -framework cis-azure</code></p>
 <p><strong>Current Coverage:</strong></p>
 <ul>
@@ -96,8 +96,8 @@
 <li>Security Center</li>
 </ul>
 <h3>GCP Foundations Benchmark</h3>
-<p><strong>Status:</strong> Production - <strong>NEAR-COMPLETE COVERAGE</strong>
-<strong>Controls:</strong> 71 GCP benchmark controls
+<p><strong>Status:</strong> Production - <strong>NEAR-COMPLETE COVERAGE</strong><br>
+<strong>Controls:</strong> 71 GCP benchmark controls<br>
 <strong>Command:</strong> <code class="code-inline">./auditkit scan -provider gcp -framework cis-gcp</code></p>
 <p><strong>What's Covered:</strong></p>
 <ul>
@@ -167,8 +167,8 @@
 <h2>Implementation Groups</h2>
 <p>CIS Benchmarks are organized into Implementation Groups (IGs) based on organization size and resources:</p>
 <h3>IG1 - Basic Cyber Hygiene</h3>
-<p><strong>Target:</strong> Small organizations, limited security resources<br />
-<strong>Controls:</strong> ~56 essential safeguards<br />
+<p><strong>Target:</strong> Small organizations, limited security resources<br /><br>
+<strong>Controls:</strong> ~56 essential safeguards<br /><br>
 <strong>AuditKit Coverage:</strong> AuditKit scans the CIS Foundations Benchmarks, which are not tagged by Implementation Group. Map benchmark findings to your IG tier manually.</p>
 <p><strong>Example Controls:</strong></p>
 <ul>
@@ -179,8 +179,8 @@
 <li>Patch systems regularly</li>
 </ul>
 <h3>IG2 - Enterprise Security</h3>
-<p><strong>Target:</strong> Medium organizations, dedicated security team<br />
-<strong>Controls:</strong> IG1 + ~74 additional controls<br />
+<p><strong>Target:</strong> Medium organizations, dedicated security team<br /><br>
+<strong>Controls:</strong> IG1 + ~74 additional controls<br /><br>
 <strong>AuditKit Coverage:</strong> Most IG2 controls automated</p>
 <p><strong>Example Controls:</strong></p>
 <ul>
@@ -191,8 +191,8 @@
 <li>Regular penetration testing</li>
 </ul>
 <h3>IG3 - Advanced Security</h3>
-<p><strong>Target:</strong> Large enterprises, mature security programs<br />
-<strong>Controls:</strong> IG1 + IG2 + ~23 advanced controls<br />
+<p><strong>Target:</strong> Large enterprises, mature security programs<br /><br>
+<strong>Controls:</strong> IG1 + IG2 + ~23 advanced controls<br /><br>
 <strong>AuditKit Coverage:</strong> Some IG3 controls (requires manual processes)</p>
 <h2>How AuditKit Scans CIS Benchmarks</h2>
 <h3>Automated Checks (AWS Example)</h3>

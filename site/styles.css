@@ -398,7 +398,23 @@ pre, .code-block {
 .code-block .url { color: #569cd6; }
 .code-block .fix { color: #569cd6; }
 
+/* Inline code inside prose. This was display:block, which broke every
+   sentence containing a code span into three stacked fragments - the class is
+   named inline and 72 of its 80 uses are a <code> element mid-paragraph. The
+   eight that were deliberately blocks are cards, and they use .card-command. */
 .code-inline {
+  background: var(--slate-100);
+  color: var(--navy);
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  /* No nowrap: an ARN or a policy path is longer than a phone is wide. */
+  overflow-wrap: break-word;
+}
+
+/* A command sitting on its own at the foot of a card. */
+.card-command {
   background: #0d1117;
   color: var(--slate-200);
   padding: 0.75rem 1rem;
@@ -407,6 +423,7 @@ pre, .code-block {
   font-size: 0.8rem;
   display: block;
   margin-top: 1rem;
+  overflow-x: auto;
 }
 
 /* ---------- Tables ---------- */

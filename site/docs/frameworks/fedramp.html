@@ -49,9 +49,9 @@
 <p>Federal Risk and Authorization Management Program guide.</p>
 <h2>Overview</h2>
 <p><strong>FedRAMP</strong> standardizes security assessments for cloud services used by US federal agencies.</p>
-<p><strong>Who needs it:</strong> Cloud service providers (CSPs) serving federal agencies
-<strong>Status in AuditKit:</strong> Production
-<strong>Coverage:</strong> Low: 56 of 149, Moderate: 77 of 287, High: 78 of 370 controls carry an automated check on AWS
+<p><strong>Who needs it:</strong> Cloud service providers (CSPs) serving federal agencies<br>
+<strong>Status in AuditKit:</strong> Production<br>
+<strong>Coverage:</strong> Low: 56 of 149, Moderate: 77 of 287, High: 78 of 370 controls carry an automated check on AWS<br>
 <strong>What's covered:</strong> Technical controls from NIST 800-53 Rev 5</p>
 <h2>Important Disclaimer</h2>
 <p><strong>AuditKit's FedRAMP support covers technical controls only - NOT sufficient for FedRAMP authorization.</strong></p>
@@ -71,8 +71,8 @@
 <li>Continuous monitoring requirements</li>
 <li>Formal authorization process</li>
 </ul>
-<p><strong>Use for:</strong> Technical control assessment and gap analysis as part of FedRAMP compliance program
-<strong>Don't use for:</strong> Sole evidence of FedRAMP authorization or compliance attestation
+<p><strong>Use for:</strong> Technical control assessment and gap analysis as part of FedRAMP compliance program<br>
+<strong>Don't use for:</strong> Sole evidence of FedRAMP authorization or compliance attestation<br>
 <strong>Hire a 3PAO for:</strong> Complete FedRAMP authorization package and assessment</p>
 <h2>FedRAMP Baselines</h2>
 <p>FedRAMP defines three security impact levels based on FIPS 199:</p>
@@ -89,7 +89,7 @@
 <li>Public-facing websites</li>
 <li>General productivity applications</li>
 </ul>
-<p><strong>Timeline:</strong> 3-6 months for initial authorization
+<p><strong>Timeline:</strong> 3-6 months for initial authorization<br>
 <strong>Cost:</strong> $50,000 - $150,000 (3PAO + infrastructure)</p>
 <p><strong>AuditKit Coverage:</strong> 56 of the 149 Low controls carry an automated check on AWS</p>
 <h3>Moderate Impact (287 controls total, 77 automatable)</h3>
@@ -106,7 +106,7 @@
 <li>HR and benefits platforms</li>
 <li>Most cloud infrastructure services</li>
 </ul>
-<p><strong>Timeline:</strong> 6-12 months for initial authorization
+<p><strong>Timeline:</strong> 6-12 months for initial authorization<br>
 <strong>Cost:</strong> $250,000 - $500,000 (3PAO + infrastructure)</p>
 <p><strong>AuditKit Coverage:</strong> 77 of the 287 Moderate controls carry an automated check on AWS</p>
 <h3>High Impact (370 controls total, 78 automatable)</h3>
@@ -123,7 +123,7 @@
 <li>Law enforcement databases</li>
 <li>National security applications</li>
 </ul>
-<p><strong>Timeline:</strong> 12-18 months for initial authorization
+<p><strong>Timeline:</strong> 12-18 months for initial authorization<br>
 <strong>Cost:</strong> $500,000+ (3PAO + infrastructure)</p>
 <p><strong>AuditKit Coverage:</strong> 78 of the 370 High controls carry an automated check on AWS</p>
 <h2>Running FedRAMP Scans</h2>
@@ -270,19 +270,19 @@ auditkit scan -provider aws -framework fedramp-high
 </ul>
 <h2>Authorization Paths</h2>
 <h3>JAB Provisional ATO (P-ATO)</h3>
-<p><strong>Best for:</strong> CSPs serving multiple agencies
-<strong>Timeline:</strong> 12-18 months
-<strong>Cost:</strong> Higher (multiple agency coordination)
+<p><strong>Best for:</strong> CSPs serving multiple agencies<br>
+<strong>Timeline:</strong> 12-18 months<br>
+<strong>Cost:</strong> Higher (multiple agency coordination)<br>
 <strong>Benefit:</strong> Highest level of reciprocity</p>
 <h3>Agency ATO</h3>
-<p><strong>Best for:</strong> CSPs serving specific agency
-<strong>Timeline:</strong> 6-12 months
-<strong>Cost:</strong> Lower (single agency)
+<p><strong>Best for:</strong> CSPs serving specific agency<br>
+<strong>Timeline:</strong> 6-12 months<br>
+<strong>Cost:</strong> Lower (single agency)<br>
 <strong>Benefit:</strong> Faster, focused on agency needs</p>
 <h3>CSP Supplied Package</h3>
-<p><strong>Best for:</strong> Initial assessment, later pursuing JAB/Agency
-<strong>Timeline:</strong> 6-9 months
-<strong>Cost:</strong> CSP bears assessment cost
+<p><strong>Best for:</strong> Initial assessment, later pursuing JAB/Agency<br>
+<strong>Timeline:</strong> 6-9 months<br>
+<strong>Cost:</strong> CSP bears assessment cost<br>
 <strong>Benefit:</strong> Demonstrates readiness, pre-authorization</p>
 <h2>Cost Breakdown</h2>
 <div style="overflow-x:auto;"><table>

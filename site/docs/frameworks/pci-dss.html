@@ -49,9 +49,9 @@
 <p>Payment Card Industry Data Security Standard guide.</p>
 <h2>Overview</h2>
 <p><strong>PCI-DSS</strong> protects payment card data for businesses that store, process, or transmit cardholder information.</p>
-<p><strong>Who needs it:</strong> Merchants, service providers, payment processors, anyone handling credit/debit card data
-<strong>Status in AuditKit:</strong> Production
-<strong>Coverage:</strong> 69 requirements across all 12 groups (AWS 59, Azure 59, GCP 49)
+<p><strong>Who needs it:</strong> Merchants, service providers, payment processors, anyone handling credit/debit card data<br>
+<strong>Status in AuditKit:</strong> Production<br>
+<strong>Coverage:</strong> 69 requirements across all 12 groups (AWS 59, Azure 59, GCP 49)<br>
 <strong>What's covered:</strong> Technical controls for network security, encryption, access control, monitoring, testing, and policy</p>
 <h2>Important Disclaimer</h2>
 <p><strong>AuditKit's PCI-DSS support covers technical and some organizational controls - assessment by QSA required for certification.</strong></p>
@@ -73,8 +73,8 @@
 <li>Formal risk assessments</li>
 <li>Complete policy and procedure documentation</li>
 </ul>
-<p><strong>Use for:</strong> Technical control assessment and remediation as part of PCI-DSS compliance program
-<strong>Don't use for:</strong> Sole evidence of PCI-DSS compliance
+<p><strong>Use for:</strong> Technical control assessment and remediation as part of PCI-DSS compliance program<br>
+<strong>Don't use for:</strong> Sole evidence of PCI-DSS compliance<br>
 <strong>Hire a QSA for:</strong> Annual assessment and Report on Compliance (ROC) or Self-Assessment Questionnaire (SAQ) validation</p>
 <h2>PCI-DSS v4.0.1</h2>
 <p>PCI-DSS v4.0.1 became mandatory on March 31, 2024. Key updates from v3.2.1:</p>
@@ -270,50 +270,50 @@ auditkit scan -provider aws -framework pci -format pdf -output pci-report.pdf
 <h2>PCI-DSS Validation Levels</h2>
 <p>Your validation requirements depend on transaction volume:</p>
 <h3>Level 1 (Highest)</h3>
-<p><strong>Volume:</strong> 6 million+ transactions/year
-<strong>Validation:</strong> Annual Report on Compliance (ROC) by QSA
-<strong>Scans:</strong> Quarterly ASV scans
+<p><strong>Volume:</strong> 6 million+ transactions/year<br>
+<strong>Validation:</strong> Annual Report on Compliance (ROC) by QSA<br>
+<strong>Scans:</strong> Quarterly ASV scans<br>
 <strong>Cost:</strong> $15,000 - $50,000 for QSA assessment</p>
 <h3>Level 2</h3>
-<p><strong>Volume:</strong> 1-6 million transactions/year
-<strong>Validation:</strong> Annual Self-Assessment Questionnaire (SAQ)
-<strong>Scans:</strong> Quarterly ASV scans
+<p><strong>Volume:</strong> 1-6 million transactions/year<br>
+<strong>Validation:</strong> Annual Self-Assessment Questionnaire (SAQ)<br>
+<strong>Scans:</strong> Quarterly ASV scans<br>
 <strong>May require:</strong> QSA validation depending on acquiring bank</p>
 <h3>Level 3</h3>
-<p><strong>Volume:</strong> 20,000 - 1 million e-commerce transactions/year
-<strong>Validation:</strong> Annual SAQ
+<p><strong>Volume:</strong> 20,000 - 1 million e-commerce transactions/year<br>
+<strong>Validation:</strong> Annual SAQ<br>
 <strong>Scans:</strong> Quarterly ASV scans</p>
 <h3>Level 4 (Lowest)</h3>
-<p><strong>Volume:</strong> Fewer than 20,000 e-commerce transactions/year or up to 1 million other transactions/year
-<strong>Validation:</strong> Annual SAQ
+<p><strong>Volume:</strong> Fewer than 20,000 e-commerce transactions/year or up to 1 million other transactions/year<br>
+<strong>Validation:</strong> Annual SAQ<br>
 <strong>Scans:</strong> Quarterly ASV scans (recommended, may be required by acquirer)</p>
 <h2>Self-Assessment Questionnaires (SAQs)</h2>
 <p>Different SAQs for different business models:</p>
-<p><strong>SAQ A:</strong> E-commerce with fully outsourced payment processing (no cardholder data touches your systems)
-<strong>SAQ A-EP:</strong> E-commerce with outsourced processing but your website involved
-<strong>SAQ B:</strong> Imprint machines or standalone dial-out terminals only
-<strong>SAQ B-IP:</strong> Standalone, PTS-approved payment terminals with IP connection
-<strong>SAQ C:</strong> Payment application systems connected to the internet
-<strong>SAQ C-VT:</strong> Web-based virtual payment terminals
-<strong>SAQ D (Merchant):</strong> All other merchants (most comprehensive)
+<p><strong>SAQ A:</strong> E-commerce with fully outsourced payment processing (no cardholder data touches your systems)<br>
+<strong>SAQ A-EP:</strong> E-commerce with outsourced processing but your website involved<br>
+<strong>SAQ B:</strong> Imprint machines or standalone dial-out terminals only<br>
+<strong>SAQ B-IP:</strong> Standalone, PTS-approved payment terminals with IP connection<br>
+<strong>SAQ C:</strong> Payment application systems connected to the internet<br>
+<strong>SAQ C-VT:</strong> Web-based virtual payment terminals<br>
+<strong>SAQ D (Merchant):</strong> All other merchants (most comprehensive)<br>
 <strong>SAQ D (Service Provider):</strong> All service providers</p>
 <p><strong>Most cloud-hosted applications:</strong> SAQ D-Merchant (all 12 requirements apply)</p>
 <h2>Compliance Timeline</h2>
 <h3>New Merchant Timeline (from zero)</h3>
-<p><strong>Months 1-2:</strong> Scope your CDE, inventory systems
-<strong>Months 3-4:</strong> Implement technical controls (AuditKit helps here)
-<strong>Months 5-6:</strong> Policies, procedures, documentation
-<strong>Month 7:</strong> Remediate gaps from AuditKit scan
-<strong>Month 8:</strong> Internal audit and testing
-<strong>Month 9:</strong> Quarterly ASV scan (first of four)
-<strong>Month 10-11:</strong> Address ASV findings
-<strong>Month 12:</strong> QSA assessment or SAQ validation
+<p><strong>Months 1-2:</strong> Scope your CDE, inventory systems<br>
+<strong>Months 3-4:</strong> Implement technical controls (AuditKit helps here)<br>
+<strong>Months 5-6:</strong> Policies, procedures, documentation<br>
+<strong>Month 7:</strong> Remediate gaps from AuditKit scan<br>
+<strong>Month 8:</strong> Internal audit and testing<br>
+<strong>Month 9:</strong> Quarterly ASV scan (first of four)<br>
+<strong>Month 10-11:</strong> Address ASV findings<br>
+<strong>Month 12:</strong> QSA assessment or SAQ validation<br>
 <strong>Ongoing:</strong> Quarterly ASV scans, annual reassessment</p>
 <h3>Existing Merchant (maintenance)</h3>
-<p><strong>Quarterly:</strong> ASV vulnerability scans
-<strong>Quarterly:</strong> Internal vulnerability scans
-<strong>Annually:</strong> Penetration testing
-<strong>Annually:</strong> QSA assessment or SAQ attestation
+<p><strong>Quarterly:</strong> ASV vulnerability scans<br>
+<strong>Quarterly:</strong> Internal vulnerability scans<br>
+<strong>Annually:</strong> Penetration testing<br>
+<strong>Annually:</strong> QSA assessment or SAQ attestation<br>
 <strong>Continuously:</strong> Log monitoring, change management, access reviews</p>
 <h2>Common PCI-DSS Violations</h2>
 <p>Based on Verizon Payment Security Reports:</p>

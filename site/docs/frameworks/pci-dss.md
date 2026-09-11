@@ -8,9 +8,9 @@ Payment Card Industry Data Security Standard guide.
 
 **PCI-DSS** protects payment card data for businesses that store, process, or transmit cardholder information.
 
-**Who needs it:** Merchants, service providers, payment processors, anyone handling credit/debit card data
-**Status in AuditKit:** Production
-**Coverage:** 69 requirements across all 12 groups (AWS 59, Azure 59, GCP 49)
+**Who needs it:** Merchants, service providers, payment processors, anyone handling credit/debit card data  
+**Status in AuditKit:** Production  
+**Coverage:** 69 requirements across all 12 groups (AWS 59, Azure 59, GCP 49)  
 **What's covered:** Technical controls for network security, encryption, access control, monitoring, testing, and policy
 
 ---
@@ -37,8 +37,8 @@ Payment Card Industry Data Security Standard guide.
 - Formal risk assessments
 - Complete policy and procedure documentation
 
-**Use for:** Technical control assessment and remediation as part of PCI-DSS compliance program
-**Don't use for:** Sole evidence of PCI-DSS compliance
+**Use for:** Technical control assessment and remediation as part of PCI-DSS compliance program  
+**Don't use for:** Sole evidence of PCI-DSS compliance  
 **Hire a QSA for:** Annual assessment and Report on Compliance (ROC) or Self-Assessment Questionnaire (SAQ) validation
 
 ---
@@ -263,25 +263,25 @@ auditkit scan -provider aws -framework pci -format pdf -output pci-report.pdf
 Your validation requirements depend on transaction volume:
 
 ### Level 1 (Highest)
-**Volume:** 6 million+ transactions/year
-**Validation:** Annual Report on Compliance (ROC) by QSA
-**Scans:** Quarterly ASV scans
+**Volume:** 6 million+ transactions/year  
+**Validation:** Annual Report on Compliance (ROC) by QSA  
+**Scans:** Quarterly ASV scans  
 **Cost:** $15,000 - $50,000 for QSA assessment
 
 ### Level 2
-**Volume:** 1-6 million transactions/year
-**Validation:** Annual Self-Assessment Questionnaire (SAQ)
-**Scans:** Quarterly ASV scans
+**Volume:** 1-6 million transactions/year  
+**Validation:** Annual Self-Assessment Questionnaire (SAQ)  
+**Scans:** Quarterly ASV scans  
 **May require:** QSA validation depending on acquiring bank
 
 ### Level 3
-**Volume:** 20,000 - 1 million e-commerce transactions/year
-**Validation:** Annual SAQ
+**Volume:** 20,000 - 1 million e-commerce transactions/year  
+**Validation:** Annual SAQ  
 **Scans:** Quarterly ASV scans
 
 ### Level 4 (Lowest)
-**Volume:** Fewer than 20,000 e-commerce transactions/year or up to 1 million other transactions/year
-**Validation:** Annual SAQ
+**Volume:** Fewer than 20,000 e-commerce transactions/year or up to 1 million other transactions/year  
+**Validation:** Annual SAQ  
 **Scans:** Quarterly ASV scans (recommended, may be required by acquirer)
 
 ---
@@ -290,13 +290,13 @@ Your validation requirements depend on transaction volume:
 
 Different SAQs for different business models:
 
-**SAQ A:** E-commerce with fully outsourced payment processing (no cardholder data touches your systems)
-**SAQ A-EP:** E-commerce with outsourced processing but your website involved
-**SAQ B:** Imprint machines or standalone dial-out terminals only
-**SAQ B-IP:** Standalone, PTS-approved payment terminals with IP connection
-**SAQ C:** Payment application systems connected to the internet
-**SAQ C-VT:** Web-based virtual payment terminals
-**SAQ D (Merchant):** All other merchants (most comprehensive)
+**SAQ A:** E-commerce with fully outsourced payment processing (no cardholder data touches your systems)  
+**SAQ A-EP:** E-commerce with outsourced processing but your website involved  
+**SAQ B:** Imprint machines or standalone dial-out terminals only  
+**SAQ B-IP:** Standalone, PTS-approved payment terminals with IP connection  
+**SAQ C:** Payment application systems connected to the internet  
+**SAQ C-VT:** Web-based virtual payment terminals  
+**SAQ D (Merchant):** All other merchants (most comprehensive)  
 **SAQ D (Service Provider):** All service providers
 
 **Most cloud-hosted applications:** SAQ D-Merchant (all 12 requirements apply)
@@ -306,21 +306,21 @@ Different SAQs for different business models:
 ## Compliance Timeline
 
 ### New Merchant Timeline (from zero)
-**Months 1-2:** Scope your CDE, inventory systems
-**Months 3-4:** Implement technical controls (AuditKit helps here)
-**Months 5-6:** Policies, procedures, documentation
-**Month 7:** Remediate gaps from AuditKit scan
-**Month 8:** Internal audit and testing
-**Month 9:** Quarterly ASV scan (first of four)
-**Month 10-11:** Address ASV findings
-**Month 12:** QSA assessment or SAQ validation
+**Months 1-2:** Scope your CDE, inventory systems  
+**Months 3-4:** Implement technical controls (AuditKit helps here)  
+**Months 5-6:** Policies, procedures, documentation  
+**Month 7:** Remediate gaps from AuditKit scan  
+**Month 8:** Internal audit and testing  
+**Month 9:** Quarterly ASV scan (first of four)  
+**Month 10-11:** Address ASV findings  
+**Month 12:** QSA assessment or SAQ validation  
 **Ongoing:** Quarterly ASV scans, annual reassessment
 
 ### Existing Merchant (maintenance)
-**Quarterly:** ASV vulnerability scans
-**Quarterly:** Internal vulnerability scans
-**Annually:** Penetration testing
-**Annually:** QSA assessment or SAQ attestation
+**Quarterly:** ASV vulnerability scans  
+**Quarterly:** Internal vulnerability scans  
+**Annually:** Penetration testing  
+**Annually:** QSA assessment or SAQ attestation  
 **Continuously:** Log monitoring, change management, access reviews
 
 ---

@@ -8,9 +8,9 @@ The NIST Cybersecurity Framework, version 2.0.
 
 **NIST CSF 2.0** is a voluntary framework for organising and communicating cybersecurity risk, released in February 2024.
 
-**Who needs it:** Anyone who wants a common language for security posture; often asked for by insurers, boards and enterprise customers
-**Status in AuditKit:** Production
-**Coverage:** 63 subcategories on GCP, 65 on AWS and 62 on Azure, out of the 106 subcategories a CSF scan lists (71 are in the crosswalk)
+**Who needs it:** Anyone who wants a common language for security posture; often asked for by insurers, boards and enterprise customers  
+**Status in AuditKit:** Production  
+**Coverage:** 63 subcategories on GCP, 65 on AWS and 62 on Azure, out of the 106 subcategories a CSF scan lists (71 are in the crosswalk)  
 **How it works:** Derived from your SOC2, PCI DSS and CMMC results through NIST 800-53
 
 ---

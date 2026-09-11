@@ -185,7 +185,7 @@
                         <li>PDF, HTML, JSON, CSV output</li>
                         <li>Fix scripts for every finding</li>
                     </ul>
-                    <div class="code-inline">./auditkit-pro scan -framework soc2 -verbose</div>
+                    <div class="card-command">./auditkit-pro scan -framework soc2 -verbose</div>
                 </div>
 
                 <div class="card card-flex card-highlight">
@@ -199,7 +199,7 @@
                         <li>Multi-account scanning across an AWS Organization or OU</li>
                         <li>ScubaGear and Prowler import for Microsoft 365</li>
                     </ul>
-                    <div class="code-inline">./auditkit-pro-desktop --port 1337</div>
+                    <div class="card-command">./auditkit-pro-desktop --port 1337</div>
                 </div>
             </div>
         </div>
@@ -388,19 +388,19 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
                 <div class="card card-flex">
                     <h3>Multi-Account Scanning</h3>
                     <p>Scan entire AWS Organizations, Azure Management Groups, and GCP Folders with one command. Unified compliance reports across all accounts. Perfect for separate dev/staging/prod environments.</p>
-                    <div class="code-inline">./auditkit-pro scan -framework soc2 --scan-all</div>
+                    <div class="card-command">./auditkit-pro scan -framework soc2 --scan-all</div>
                 </div>
 
                 <div class="card card-flex">
                     <h3>Evidence Packages</h3>
                     <p>Generates auditor-ready ZIP files with configuration dumps, logs and documentation in the format auditors expect, with a folder per control holding the finding, a console link and a step-by-step evidence guide.</p>
-                    <div class="code-inline">./auditkit-pro evidence-package -framework soc2</div>
+                    <div class="card-command">./auditkit-pro evidence-package -framework soc2</div>
                 </div>
 
                 <div class="card card-flex">
                     <h3>Custom Controls <span class="badge-new">NEW</span></h3>
                     <p>Define your own security checks in YAML. Create organization-specific controls, tag requirements, naming conventions, and resource count validations. Execute custom checks alongside built-in frameworks.</p>
-                    <div class="code-inline">./auditkit-pro scan --custom-controls my-controls.yaml</div>
+                    <div class="card-command">./auditkit-pro scan --custom-controls my-controls.yaml</div>
                 </div>
             </div>
 
@@ -408,19 +408,19 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
                 <div class="card card-flex">
                     <h3>Continuous Monitoring</h3>
                     <p>Scheduled scans that alert you when a control that was passing starts failing, when your compliance score drops, or when a scan cannot run. Sends to Slack, Microsoft Teams, email, webhook, syslog or a file. Air-gapped friendly.</p>
-                    <div class="code-inline">./auditkit-pro daemon start -schedule "0 2 * * *"</div>
+                    <div class="card-command">./auditkit-pro daemon start -schedule "0 2 * * *"</div>
                 </div>
 
                 <div class="card card-flex">
                     <h3>Drift Detection</h3>
                     <p>Compare dev/staging/prod environments to identify configuration drift. Ensures consistent security posture across all environments before your audit.</p>
-                    <div class="code-inline">./auditkit-pro drift-check --env dev:ACCT1 --env prod:ACCT2</div>
+                    <div class="card-command">./auditkit-pro drift-check --env dev:ACCT1 --env prod:ACCT2</div>
                 </div>
 
                 <div class="card card-flex">
                     <h3>Exceptions &amp; Waivers</h3>
                     <p>Record an approved exception against a control with a reason, an approver and an expiry date, so accepted risks stop appearing as open findings and the waiver register is ready for your assessor.</p>
-                    <div class="code-inline">./auditkit-pro exception add --control AC.L2-3.1.3 --reason "..." --approved-by "..."</div>
+                    <div class="card-command">./auditkit-pro exception add --control AC.L2-3.1.3 --reason "..." --approved-by "..."</div>
                 </div>
             </div>
         </div>
