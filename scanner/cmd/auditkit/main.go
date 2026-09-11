@@ -1521,6 +1521,39 @@ func performScan(provider, profile, framework string, verbose bool, services str
 			}
 		}
 		missing := mappings.MissingControls(framework, reported)
+
+		// 800-53 and its FedRAMP baselines report the uncovered set as one
+		// count. Listing it adds about a thousand rows to a scan that found
+		// roughly 150 things, and a reader looking for the findings would have
+		// to page past every one. The rule lives in pkg/mappings so both
+		// editions draw the same line.
+		if mappings.ShouldSummariseUncovered(framework) && len(missing) > 0 {
+			assessed := 0
+			for _, c := range controls {
+				if c.Status != "MANUAL" {
+					assessed++
+				}
+			}
+			total := assessed + len(missing)
+			controls = append(controls, ControlResult{
+				ID:       strings.ToUpper(framework) + "-UNCOVERED",
+				Name:     "Controls not assessed by this scan",
+				Category: "Manual Documentation",
+				Severity: "MEDIUM",
+				Status:   "MANUAL",
+				Evidence: fmt.Sprintf(
+					"MANUAL: %d of %d controls were assessed. The remaining %d are largely policy, "+
+						"process and personnel controls that a configuration scan cannot evidence; "+
+						"they are enumerated in the framework catalog rather than listed here.",
+					assessed, total, len(missing)),
+				Remediation: "Collect the policy, procedure and personnel evidence for the controls " +
+					"this scan does not reach, and store it with the audit package.",
+				Priority:   "MEDIUM",
+				Frameworks: map[string]string{strings.ToUpper(framework): "coverage"},
+			})
+			missing = nil
+		}
+
 		missingIDs := make([]string, 0, len(missing))
 		for id := range missing {
 			missingIDs = append(missingIDs, id)

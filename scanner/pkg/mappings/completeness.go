@@ -149,6 +149,29 @@ func MissingControls(framework string, reported []string) map[string]string {
 	return missing
 }
 
+// SummariseUncovered names the frameworks whose uncovered controls are
+// reported as a single count rather than one row each.
+//
+// Listing every control a scan could not evaluate is right for a framework an
+// assessor works through: PCI's 235 and CMMC's manual practices are a
+// worklist. It stops being right at 800-53's scale - 1,045 rows, which buries
+// the 151 real findings under a thousand lines of "document how this is
+// satisfied". The FedRAMP baselines are subsets of 800-53, so they take the
+// same treatment rather than a different one at an arbitrary size.
+var SummariseUncovered = map[string]bool{
+	"800-53":           true,
+	"nist800-53":       true,
+	"nist-800-53":      true,
+	"fedramp-low":      true,
+	"fedramp-moderate": true,
+	"fedramp-high":     true,
+}
+
+// ShouldSummariseUncovered resolves the same framework aliases CatalogFor does.
+func ShouldSummariseUncovered(framework string) bool {
+	return SummariseUncovered[strings.ToLower(strings.TrimSpace(framework))]
+}
+
 // PartialCatalogNote returns the caveat for a framework whose shipped catalog is
 // smaller than the published standard, resolving the same aliases CatalogFor
 // accepts ("pci" and "pci-dss" name one catalog).
