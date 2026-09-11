@@ -40,6 +40,7 @@ type AzureScanner struct {
 	policyClient        *armstorage.ManagementPoliciesClient
 	autoscaleClient     *armmonitor.AutoscaleSettingsClient
 	blobServiceClient   *armstorage.BlobServicesClient
+	fileServiceClient   *armstorage.FileServicesClient
 	roleClient          *armauthorization.RoleAssignmentsClient
 	roleDefClient       *armauthorization.RoleDefinitionsClient
 	securityClient      *armsecurity.PricingsClient // For Defender checks
@@ -151,6 +152,10 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 	if err != nil {
 		blobServiceClient = nil
 	}
+	fileServiceClient, err := armstorage.NewFileServicesClient(subscriptionID, cred, nil)
+	if err != nil {
+		fileServiceClient = nil
+	}
 
 	roleClient, err := armauthorization.NewRoleAssignmentsClient(subscriptionID, cred, nil)
 	if err != nil {
@@ -202,6 +207,7 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		policyClient:        policyClient,
 		autoscaleClient:     autoscaleClient,
 		blobServiceClient:   blobServiceClient,
+		fileServiceClient:   fileServiceClient,
 		roleClient:          roleClient,
 		roleDefClient:       roleDefClient,
 		securityClient:      securityClient,
@@ -269,7 +275,8 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 	soc2Checks := []checks.Check{
 		checks.NewDefenderChecks(s.subscriptionID, s.securityClient, s.autoProvisionClient, s.contactsClient),
 		checks.NewAzureCISManualChecks(s.subscriptionID),
-		checks.NewCISFoundationsManualChecks(), // CIS Azure Foundations v6.0.0, the Manual recommendations
+		checks.NewCISFoundationsManualChecks(),                                                // CIS Azure Foundations v6.0.0, the Manual recommendations
+		checks.NewCISStorageChecks(s.storageClient, s.blobServiceClient, s.fileServiceClient), // CIS Azure v6.0.0 section 9
 		checks.NewAppServiceChecks(s.subscriptionID),
 		checks.NewAzureCC1Checks(s.roleClient, s.roleDefClient),
 		checks.NewAzureCC2Checks(),
