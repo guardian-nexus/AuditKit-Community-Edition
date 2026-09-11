@@ -184,7 +184,7 @@ func (c *SQLChecks) CheckSQLFirewall(ctx context.Context) []CheckResult {
 	if c.serverClient == nil {
 		return append(results, CheckResult{
 			Control:    "AZ-SQL-13",
-			Name:       "SQL Firewall Rules",
+			Name:       "SQL Server Firewall and Public Access",
 			Status:     "INFO",
 			Evidence:   "Server client not available - manual check required",
 			Priority:   PriorityCritical,
@@ -234,7 +234,7 @@ func (c *SQLChecks) CheckSQLFirewall(ctx context.Context) []CheckResult {
 
 		results = append(results, CheckResult{
 			Control:     "AZ-SQL-13",
-			Name:        "SQL Server Firewall & Public Access",
+			Name:        "SQL Server Firewall and Public Access",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("%d SQL servers allow public network access: %s", len(serversWithOpenFirewall), strings.Join(displayServers, ", ")),
@@ -265,7 +265,7 @@ If public access is required, ensure NO firewall rules allow:
 	} else if totalServers > 0 {
 		results = append(results, CheckResult{
 			Control:    "AZ-SQL-13",
-			Name:       "SQL Server Public Access",
+			Name:       "SQL Server Firewall and Public Access",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("All %d SQL servers have public network access disabled", totalServers),
 			Priority:   PriorityInfo,
