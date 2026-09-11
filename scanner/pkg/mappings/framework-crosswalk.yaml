@@ -75,6 +75,16 @@ pci_to_800_53:
   PCI-1.3.2: [AC-4, SC-7(5)]            # Outbound traffic from CDE restricted
   PCI-1.4.1: [SC-7, SC-7(3)]            # NSCs between trusted and untrusted networks
   PCI-3.2.1: [SI-12, MP-6]              # Account data storage minimised
+  # Ported from Pro, which had these and Community did not. The AKS port made
+  # Community emit 1.4.4 and 3.5.1.2 for the first time, and without an entry
+  # they derived no 800-53 controls at all.
+  PCI-1.4.4: [SC-7, SC-7(3)]            # CHD components not reachable from untrusted networks
+  PCI-11.4.1: [CA-8]                    # Penetration testing methodology
+  PCI-3.5.1.2: [SC-28, SC-28(1)]        # Disk-level encryption
+  PCI-6.5.1: [CM-3, CM-4]               # Change control procedures
+  PCI-6.5.2: [CM-3(2), CM-4]            # Requirements confirmed after significant change
+  PCI-8.3.1: [IA-2]                     # All users authenticated
+  PCI-9.3.1: [PE-2, PE-3]               # Physical access authorisation to the CDE
   PCI-3.7.4: [SC-12, SC-12(1)]          # Key changes at end of cryptoperiod
   PCI-2.2.7: [AC-17(2), SC-8, SC-8(1)]  # Non-console admin access encrypted
   PCI-8.2.4: [AC-2, IA-4, IA-5]         # Identifier and authenticator lifecycle

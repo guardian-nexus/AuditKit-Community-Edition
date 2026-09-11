@@ -11,6 +11,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/applicationinsights/armapplicationinsights"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/databricks/armdatabricks"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/keyvault/armkeyvault"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
@@ -32,6 +33,7 @@ type AzureScanner struct {
 	cred                *azidentity.DefaultAzureCredential
 	graphClient         *msgraphsdk.GraphServiceClient
 	storageClient       *armstorage.AccountsClient
+	aksClient           *armcontainerservice.ManagedClustersClient
 	computeClient       *armcompute.VirtualMachinesClient
 	disksClient         *armcompute.DisksClient
 	networkClient       *armnetwork.VirtualNetworksClient
@@ -96,6 +98,14 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 	storageClient, err := armstorage.NewAccountsClient(subscriptionID, cred, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create storage client: %v", err)
+	}
+
+	// CIS AKS coverage is free in both editions: the benchmark is published
+	// free, so the paid tier differs by capability - evidence packages,
+	// multi-account, monitoring - not by which requirements you may see.
+	aksClient, err := armcontainerservice.NewManagedClustersClient(subscriptionID, cred, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create AKS client: %v", err)
 	}
 
 	computeClient, err := armcompute.NewVirtualMachinesClient(subscriptionID, cred, nil)
@@ -277,6 +287,7 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		cred:                cred,
 		graphClient:         graphClient,
 		storageClient:       storageClient,
+		aksClient:           aksClient,
 		computeClient:       computeClient,
 		disksClient:         disksClient,
 		networkClient:       networkClient,
@@ -377,6 +388,7 @@ func (s *AzureScanner) ScanServices(ctx context.Context, services []string, verb
 func (s *AzureScanner) allSuites() []checks.Check {
 	return []checks.Check{
 		checks.NewDefenderChecks(s.subscriptionID, s.securityClient, s.autoProvisionClient, s.contactsClient),
+		checks.NewAKSChecks(s.aksClient, s.subscriptionID), // CIS AKS v1.8.0
 		checks.NewAzureCISManualChecks(s.subscriptionID),
 		checks.NewCISFoundationsManualChecks(),                                                // CIS Azure Foundations v6.0.0, the Manual recommendations
 		checks.NewCISStorageChecks(s.storageClient, s.blobServiceClient, s.fileServiceClient), // CIS Azure v6.0.0 section 9
