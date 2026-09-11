@@ -74,13 +74,9 @@ func (c *MonitoringChecks) CheckActivityLogDiagnostics(ctx context.Context) []Ch
 			Control:     "CIS-6.1.1.2",
 			Name:        "Activity Log Export and Retention",
 			Status:      "INFO",
-			Evidence:    fmt.Sprintf("CIS 5.1.2-5.1.4: Activity logs are being collected (%d recent events found). VERIFY diagnostic settings are configured with proper retention and destinations.", logsFound),
+			Evidence:    fmt.Sprintf("CIS 6.1.1.1, 6.1.1.2: Activity logs are being collected (%d recent events found). VERIFY diagnostic settings are configured with proper retention and destinations.", logsFound),
 			Remediation: "Verify Activity Log diagnostic settings meet CIS requirements",
-			RemediationDetail: `CIS Azure 5.1.2: Ensure that Activity Log Alert exists for Create or Update Network Security Group Rule
-CIS Azure 5.1.3: Ensure that Activity Log Alert exists for Delete Network Security Group Rule
-CIS Azure 5.1.4: Ensure that Activity Log Alert exists for Create or Update Security Solution
-
-VERIFICATION STEPS:
+			RemediationDetail: `VERIFICATION STEPS:
 1. Azure Portal → Monitor → Activity log → Diagnostic settings
 2. Confirm diagnostic setting exists at SUBSCRIPTION level
 3. Verify ALL log categories are enabled:
@@ -93,8 +89,8 @@ VERIFICATION STEPS:
    - Recommendation
 4. Confirm destinations configured:
    - Log Analytics workspace (for real-time querying/alerting)
-   - Storage account (for 365+ day retention per CIS 5.2)
-5. Storage account must use Customer-managed key (CMK) encryption (CIS 5.3)
+   - Storage account (for 365+ day retention)
+5. Storage account must use Customer-managed key (CMK) encryption (CIS 6.1.1.3)
 
 Azure CLI verification:
 az monitor diagnostic-settings list --resource /subscriptions/{subscription-id}
@@ -132,9 +128,9 @@ CRITICAL: This is a foundational control. Without proper Activity Log export:
 			Name:        "Activity Log Export and Retention",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    "CIS 5.1.2-5.1.4: Unable to retrieve activity logs. This indicates either: (1) Diagnostic settings are NOT configured, or (2) Insufficient permissions to read logs. This is a CRITICAL security gap.",
+			Evidence:    "CIS 6.1.1.1, 6.1.1.2: Unable to retrieve activity logs. This indicates either: (1) Diagnostic settings are NOT configured, or (2) Insufficient permissions to read logs. This is a CRITICAL security gap.",
 			Remediation: "IMMEDIATE ACTION REQUIRED: Configure Activity Log diagnostic settings",
-			RemediationDetail: `CIS Azure 5.1.2-5.1.4: Activity Log export is either missing or inaccessible
+			RemediationDetail: `CIS Azure 6.1.1.1, 6.1.1.2: Activity Log export is either missing or inaccessible
 
 TROUBLESHOOTING:
 1. Check if diagnostic settings exist:
@@ -181,7 +177,7 @@ FIX THIS IMMEDIATELY before proceeding with other checks.`,
 func (c *MonitoringChecks) CheckResourceDiagnostics(ctx context.Context) []CheckResult {
 	results := []CheckResult{}
 
-	// CIS 5.1.5, 5.1.6: Diagnostic settings for specific resources
+	// CIS 6.1.1.4, 6.1.1.5: Diagnostic settings for specific resources
 	// These require checking individual resources (Key Vaults, NSGs, etc.)
 	// This is handled by the respective resource check files (keyvault.go, network.go)
 	// Here we provide overall guidance
@@ -190,12 +186,12 @@ func (c *MonitoringChecks) CheckResourceDiagnostics(ctx context.Context) []Check
 		Control:     "CIS-6.1.1.4",
 		Name:        "Key Vault and NSG Diagnostic Logging",
 		Status:      "INFO",
-		Evidence:    "CIS 5.1.5, 5.1.6: VERIFY diagnostic logging is enabled for all Key Vaults and NSG flow logs are configured",
+		Evidence:    "CIS 6.1.1.4, 6.1.1.5: VERIFY diagnostic logging is enabled for all Key Vaults and NSG flow logs are configured",
 		Remediation: "Enable diagnostic settings on all Key Vaults and configure NSG flow logging",
-		RemediationDetail: `CIS Azure 5.1.5: Ensure Diagnostic Setting captures appropriate categories for Key Vault
-CIS Azure 5.1.6: Ensure that Network Security Group Flow Logging is enabled
+		RemediationDetail: `CIS Azure 6.1.1.4: Key Vault logging enabled
+CIS Azure 6.1.1.5: Network security group flow logs sent to Log Analytics
 
-KEY VAULT LOGGING (CIS 5.1.5):
+KEY VAULT LOGGING (CIS 6.1.1.4):
 Requirement: Enable 'AuditEvent' category for ALL Key Vaults
 
 Verify compliance:
@@ -213,7 +209,7 @@ Verify compliance:
      --logs '[{"category": "AuditEvent", "enabled": true}]' \
      --workspace {log-analytics-workspace-id}
 
-NSG FLOW LOGS (CIS 5.1.6):
+NSG FLOW LOGS (CIS 6.1.1.5):
 Requirement: Enable flow logging for ALL Network Security Groups
 
 Verify compliance:

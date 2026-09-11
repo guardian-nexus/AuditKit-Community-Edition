@@ -100,7 +100,7 @@ func (c *Route53Checks) CheckDNSSEC(ctx context.Context) (CheckResult, error) {
 			Name:        "Route53 DNSSEC Enabled",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("%d/%d Route53 public hosted zones lack DNSSEC: %s | Violates CIS AWS 5.19 (DNS spoofing protection)", len(nonDNSSECZones), checkedCount, zoneList),
+			Evidence:    fmt.Sprintf("%d/%d Route53 public hosted zones lack DNSSEC: %s (DNS spoofing protection)", len(nonDNSSECZones), checkedCount, zoneList),
 			Remediation: fmt.Sprintf("Enable DNSSEC on: %s", nonDNSSECZones[0]),
 			RemediationDetail: fmt.Sprintf(`# Enable DNSSEC for hosted zone
 aws route53 enable-hosted-zone-dnssec --hosted-zone-id $(aws route53 list-hosted-zones-by-name --dns-name %s --query 'HostedZones[0].Id' --output text)
@@ -131,7 +131,7 @@ aws route53 enable-hosted-zone-dnssec --hosted-zone-id $(aws route53 list-hosted
 		Control:    "AWS-ROUTE53-01",
 		Name:       "Route53 DNSSEC Enabled",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("All %d Route53 public hosted zones have DNSSEC enabled | Meets CIS AWS 5.19 (DNS integrity protection)", checkedCount),
+		Evidence:   fmt.Sprintf("All %d Route53 public hosted zones have DNSSEC enabled (DNS integrity protection)", checkedCount),
 		Severity:   "INFO",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),

@@ -59,7 +59,7 @@ func (c *AccessAnalyzerChecks) CheckAccessAnalyzerEnabled(ctx context.Context) (
 			Name:        "IAM Access Analyzer Enabled",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("No IAM Access Analyzer found in region %s | Violates CIS AWS 1.8 (external access detection)", c.region),
+			Evidence:    fmt.Sprintf("No IAM Access Analyzer found in region %s | Violates CIS AWS 2.18 (external access detection)", c.region),
 			Remediation: "Enable IAM Access Analyzer in this region",
 			RemediationDetail: fmt.Sprintf(`# Create IAM Access Analyzer
 aws accessanalyzer create-analyzer \
@@ -110,7 +110,7 @@ aws accessanalyzer create-analyzer \
 			Name:        "IAM Access Analyzer Enabled",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("Found %d analyzer(s) but none are active in region %s | Violates CIS AWS 1.8", len(resp.Analyzers), c.region),
+			Evidence:    fmt.Sprintf("Found %d analyzer(s) but none are active in region %s | Violates CIS AWS 2.18", len(resp.Analyzers), c.region),
 			Remediation: "Activate IAM Access Analyzer or create a new one",
 			RemediationDetail: fmt.Sprintf(`# Check analyzer status
 aws accessanalyzer list-analyzers --region %s
@@ -132,7 +132,7 @@ aws accessanalyzer create-analyzer \
 		Control:    "CIS-2.18",
 		Name:       "IAM Access Analyzer Enabled",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("IAM Access Analyzer is active in region %s (%d active analyzer(s): %v) | Meets CIS AWS 1.8 (external access monitoring)", c.region, activeAnalyzers, analyzerNames),
+		Evidence:   fmt.Sprintf("IAM Access Analyzer is active in region %s (%d active analyzer(s): %v) | Meets CIS AWS 2.18 (external access monitoring)", c.region, activeAnalyzers, analyzerNames),
 		Severity:   "INFO",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),

@@ -140,7 +140,7 @@ func contains(str, substr string) bool {
 	return len(str) > 0 && len(substr) > 0 && (str == substr || len(str) > len(substr))
 }
 
-// CheckSecurityHubEnabled verifies AWS Security Hub is enabled (CIS 4.16)
+// CheckSecurityHubEnabled verifies AWS Security Hub is enabled (CIS 5.16)
 func (c *MonitoringChecks) CheckSecurityHubEnabled(ctx context.Context) (CheckResult, error) {
 	// Try to get the Security Hub status
 	hub, err := c.shClient.DescribeHub(ctx, &securityhub.DescribeHubInput{})
@@ -176,7 +176,7 @@ done
 
 IMPORTANT: Security Hub requires AWS Config to be enabled first.
 Also consider enabling:
-- AWS Config (CIS 3.3)
+- AWS Config (CIS 5.16)
 - Amazon GuardDuty
 - AWS Inspector
 - Amazon Macie`,

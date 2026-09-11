@@ -45,9 +45,9 @@ func (c *AppServiceChecks) checkAuthentication() CheckResult {
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
-		Evidence:    "CIS 9.1: MANUAL CHECK - Verify App Service Authentication is enabled for all apps",
-		Remediation: "Enable authentication for App Service apps per CIS 9.1",
-		RemediationDetail: `CIS Azure 9.1: Ensure App Service Authentication is set up for apps in Azure App Service
+		Evidence:    "MANUAL CHECK - Verify App Service Authentication is enabled for all apps",
+		Remediation: "Enable authentication for App Service apps",
+		RemediationDetail: `Ensure App Service Authentication is set up for apps in Azure App Service
 
 Configure authentication via:
 1. App Service → Settings → Authentication
@@ -83,9 +83,9 @@ func (c *AppServiceChecks) checkHTTPSRedirect() CheckResult {
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
-		Evidence:    "CIS 9.2: MANUAL CHECK - Verify all App Service apps redirect HTTP to HTTPS",
-		Remediation: "Enable HTTPS-only mode per CIS 9.2",
-		RemediationDetail: `CIS Azure 9.2: Ensure Web App Redirects All HTTP traffic to HTTPS in Azure App Service
+		Evidence:    "MANUAL CHECK - Verify all App Service apps redirect HTTP to HTTPS",
+		Remediation: "Enable HTTPS-only mode",
+		RemediationDetail: `Ensure Web App Redirects All HTTP traffic to HTTPS in Azure App Service
 
 Azure CLI:
 az webapp update \
@@ -114,9 +114,9 @@ func (c *AppServiceChecks) checkTLSVersion() CheckResult {
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
-		Evidence:    "CIS 9.3: MANUAL CHECK - Verify App Service is using TLS 1.2 or higher",
-		Remediation: "Set minimum TLS version to 1.2 per CIS 9.3",
-		RemediationDetail: `CIS Azure 9.3: Ensure Web App is using the latest version of TLS encryption
+		Evidence:    "MANUAL CHECK - Verify App Service is using TLS 1.2 or higher",
+		Remediation: "Set minimum TLS version to 1.2",
+		RemediationDetail: `Ensure Web App is using the latest version of TLS encryption
 
 Configure minimum TLS version:
 App Service → Configuration → General settings → Minimum TLS version = 1.2 (or 1.3)
@@ -144,9 +144,9 @@ func (c *AppServiceChecks) checkClientCertificates() CheckResult {
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
-		Evidence:    "CIS 9.4: MANUAL CHECK - Verify client certificates are enabled where appropriate",
+		Evidence:    "MANUAL CHECK - Verify client certificates are enabled where appropriate",
 		Remediation: "Enable client certificates for mutual TLS authentication",
-		RemediationDetail: `CIS Azure 9.4: Ensure the web app has 'Client Certificates (Incoming client certificates)' set to 'On'
+		RemediationDetail: `Ensure the web app has 'Client Certificates (Incoming client certificates)' set to 'On'
 
 Client certificates provide mutual TLS authentication - both client and server verify each other's identity.
 
@@ -168,9 +168,9 @@ func (c *AppServiceChecks) checkManagedIdentity() CheckResult {
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
-		Evidence:    "CIS 9.5: MANUAL CHECK - Verify App Service apps use managed identities",
-		Remediation: "Enable managed identity per CIS 9.5",
-		RemediationDetail: `CIS Azure 9.5: Ensure that 'Register with Azure Active Directory' is enabled on App Service
+		Evidence:    "MANUAL CHECK - Verify App Service apps use managed identities",
+		Remediation: "Enable managed identity",
+		RemediationDetail: `Ensure that 'Register with Azure Active Directory' is enabled on App Service
 
 Managed identities eliminate the need for credentials in code:
 - System-assigned: Tied to app lifecycle
@@ -204,11 +204,11 @@ func (c *AppServiceChecks) checkRuntimeVersions() CheckResult {
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
-		Evidence:    "CIS 9.6-9.8: MANUAL CHECK - Verify PHP, Python, and Java versions are current",
+		Evidence:    "MANUAL CHECK - Verify PHP, Python, and Java versions are current",
 		Remediation: "Use latest stable runtime versions",
-		RemediationDetail: `CIS Azure 9.6: Ensure 'PHP version' is the latest, if used
-CIS Azure 9.7: Ensure 'Python version' is the latest stable version, if used
-CIS Azure 9.8: Ensure 'Java version' is the latest, if used
+		RemediationDetail: `Ensure 'PHP version' is the latest, if used
+Ensure 'Python version' is the latest stable version, if used
+Ensure 'Java version' is the latest, if used
 
 Check current runtime versions:
 App Service → Configuration → General settings → Stack settings
@@ -235,9 +235,9 @@ func (c *AppServiceChecks) checkFTPDeployment() CheckResult {
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
-		Evidence:    "CIS 9.10: MANUAL CHECK - Verify FTP deployments are disabled",
-		Remediation: "Disable FTP and require FTPS per CIS 9.10",
-		RemediationDetail: `CIS Azure 9.10: Ensure FTP deployments are Disabled
+		Evidence:    "MANUAL CHECK - Verify FTP deployments are disabled",
+		Remediation: "Disable FTP and require FTPS",
+		RemediationDetail: `Ensure FTP deployments are Disabled
 
 FTP transmits credentials and data in plaintext.
 

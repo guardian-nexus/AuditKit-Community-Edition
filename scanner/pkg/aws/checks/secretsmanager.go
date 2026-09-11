@@ -23,17 +23,17 @@ func (c *SecretsManagerChecks) Name() string {
 func (c *SecretsManagerChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	// CIS 12.1 - Secret rotation enabled
+	// Secret rotation enabled
 	if result, err := c.CheckSecretRotation(ctx); err == nil {
 		results = append(results, result)
 	}
 
-	// CIS 12.2 - Secrets encrypted with KMS
+	// Secrets encrypted with KMS
 	if result, err := c.CheckSecretEncryption(ctx); err == nil {
 		results = append(results, result)
 	}
 
-	// CIS 12.3 - Unused secrets removed
+	// Unused secrets removed
 	if result, err := c.CheckUnusedSecrets(ctx); err == nil {
 		results = append(results, result)
 	}

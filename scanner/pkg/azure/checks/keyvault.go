@@ -41,9 +41,9 @@ func (c *KeyVaultChecks) Run(ctx context.Context) ([]CheckResult, error) {
 			Control:     "AZ-KEYVAULT-01",
 			Name:        "Key Vault Recovery Settings",
 			Status:      "INFO",
-			Evidence:    fmt.Sprintf("CIS 3.3.5: MANUAL CHECK - Verify purge protection and soft delete (90+ days) for %d Key Vaults", totalVaults),
+			Evidence:    fmt.Sprintf("CIS 8.3.5: MANUAL CHECK - Verify purge protection and soft delete (90+ days) for %d Key Vaults", totalVaults),
 			Remediation: "Enable purge protection and soft delete for all Key Vaults",
-			RemediationDetail: `CIS Azure 3.3.5: Ensure the Key Vault is Recoverable
+			RemediationDetail: `CIS Azure 8.3.5: Ensure the Key Vault is Recoverable
 
 Verify each Key Vault has:
 - Soft delete enabled with 90+ day retention
@@ -63,9 +63,9 @@ az keyvault update --name <vault> --enable-purge-protection true`,
 			Control:     "AZ-KEYVAULT-02",
 			Name:        "Key Vault RBAC Authorization",
 			Status:      "INFO",
-			Evidence:    fmt.Sprintf("CIS 3.3.6: MANUAL CHECK - Verify RBAC is enabled for %d Key Vaults", totalVaults),
+			Evidence:    fmt.Sprintf("CIS 8.3.6: MANUAL CHECK - Verify RBAC is enabled for %d Key Vaults", totalVaults),
 			Remediation: "Enable Azure RBAC for Key Vault authorization",
-			RemediationDetail: `CIS Azure 3.3.6: Enable Role Based Access Control
+			RemediationDetail: `CIS Azure 8.3.6: Enable Role Based Access Control
 
 Azure CLI:
 az keyvault update --name <vault> --enable-rbac-authorization true`,
@@ -79,7 +79,7 @@ az keyvault update --name <vault> --enable-rbac-authorization true`,
 			Control:         "CIS-8.3.8",
 			Name:            "Key Vault Private Endpoints",
 			Status:          "INFO",
-			Evidence:        fmt.Sprintf("CIS 3.3.7: MANUAL CHECK - Verify private endpoints for %d Key Vaults", totalVaults),
+			Evidence:        fmt.Sprintf("CIS 8.3.8: MANUAL CHECK - Verify private endpoints for %d Key Vaults", totalVaults),
 			Remediation:     "Configure private endpoints for secure VNet access",
 			ScreenshotGuide: "Key Vault → Networking → Private endpoint connections configured",
 			Priority:        PriorityMedium,
@@ -91,7 +91,7 @@ az keyvault update --name <vault> --enable-rbac-authorization true`,
 			Control:         "CIS-8.3.7",
 			Name:            "Key Vault Network Access",
 			Status:          "INFO",
-			Evidence:        fmt.Sprintf("CIS 8.3: MANUAL CHECK - Verify network restrictions for %d Key Vaults", totalVaults),
+			Evidence:        fmt.Sprintf("CIS 8.3.7: MANUAL CHECK - Verify network restrictions for %d Key Vaults", totalVaults),
 			Remediation:     "Configure network rules to restrict access",
 			ScreenshotGuide: "Key Vault → Networking → Selected networks only",
 			Priority:        PriorityMedium,
@@ -103,7 +103,7 @@ az keyvault update --name <vault> --enable-rbac-authorization true`,
 			Control:         "CIS-6.1.1.4",
 			Name:            "Key Vault Logging",
 			Status:          "INFO",
-			Evidence:        "CIS 6.1.4: MANUAL CHECK - Verify diagnostic logging with 180+ day retention",
+			Evidence:        "CIS 6.1.1.4: MANUAL CHECK - Verify diagnostic logging with 180+ day retention",
 			Remediation:     "Enable diagnostic logging for all Key Vaults",
 			ScreenshotGuide: "Key Vault → Diagnostic settings → AuditEvent logs enabled",
 			Priority:        PriorityHigh,

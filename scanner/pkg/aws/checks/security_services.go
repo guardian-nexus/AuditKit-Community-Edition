@@ -57,7 +57,7 @@ func (c *SecurityServicesChecks) Run(ctx context.Context) ([]CheckResult, error)
 	return results, nil
 }
 
-// CIS 9.1 - Ensure GuardDuty is enabled
+// Ensure GuardDuty is enabled
 func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (CheckResult, error) {
 	detectors, err := c.guarddutyClient.ListDetectors(ctx, &guardduty.ListDetectorsInput{})
 	if err != nil {
@@ -66,7 +66,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 			Name:              "GuardDuty Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("Unable to check GuardDuty status: %v | CIS 9.1", err),
+			Evidence:          fmt.Sprintf("Unable to check GuardDuty status: %v", err),
 			Remediation:       "Enable GuardDuty",
 			RemediationDetail: "aws guardduty create-detector --enable",
 			ScreenshotGuide:   "GuardDuty Console → Getting started → Screenshot showing detector enabled",
@@ -83,7 +83,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 			Name:              "GuardDuty Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          "GuardDuty is not enabled in this region | CIS 9.1 | Intelligent threat detection not active",
+			Evidence:          "GuardDuty is not enabled in this region | Intelligent threat detection not active",
 			Remediation:       "Enable GuardDuty to detect threats",
 			RemediationDetail: `aws guardduty create-detector --enable --finding-publishing-frequency FIFTEEN_MINUTES`,
 			ScreenshotGuide:   "GuardDuty Console → Dashboard → Screenshot showing detector enabled with findings",
@@ -109,7 +109,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 			Name:              "GuardDuty Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("GuardDuty detector exists but is %s | CIS 9.1", detector.Status),
+			Evidence:          fmt.Sprintf("GuardDuty detector exists but is %s", detector.Status),
 			Remediation:       "Enable GuardDuty detector",
 			RemediationDetail: fmt.Sprintf("aws guardduty update-detector --detector-id %s --enable", detectorId),
 			ScreenshotGuide:   "GuardDuty Console → Settings → Screenshot showing detector enabled",
@@ -124,14 +124,14 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 		Control:    "AWS-SECSVC-01",
 		Name:       "GuardDuty Enabled",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("GuardDuty is enabled (Detector: %s) | Meets CIS 9.1", detectorId),
+		Evidence:   fmt.Sprintf("GuardDuty is enabled (Detector: %s)", detectorId),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC7.2"},
 	}, nil
 }
 
-// CIS 9.2 - Ensure Amazon Macie is enabled
+// Ensure Amazon Macie is enabled
 func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckResult, error) {
 	session, err := c.macieClient.GetMacieSession(ctx, &macie2.GetMacieSessionInput{})
 	if err != nil {
@@ -140,7 +140,7 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 			Name:              "Macie Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          "Macie is not enabled in this region | CIS 9.2 | Sensitive data discovery not active",
+			Evidence:          "Macie is not enabled in this region | Sensitive data discovery not active",
 			Remediation:       "Enable Amazon Macie",
 			RemediationDetail: `aws macie2 enable-macie`,
 			ScreenshotGuide:   "Macie Console → Dashboard → Screenshot showing Macie enabled",
@@ -157,7 +157,7 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 			Name:              "Macie Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("Macie exists but is %s | CIS 9.2", session.Status),
+			Evidence:          fmt.Sprintf("Macie exists but is %s", session.Status),
 			Remediation:       "Enable Amazon Macie",
 			RemediationDetail: "aws macie2 enable-macie",
 			ScreenshotGuide:   "Macie Console → Settings → Screenshot showing Macie status enabled",
@@ -172,14 +172,14 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 		Control:    "AWS-SECSVC-03",
 		Name:       "Macie Enabled",
 		Status:     "PASS",
-		Evidence:   "Amazon Macie is enabled for sensitive data discovery | Meets CIS 9.2",
+		Evidence:   "Amazon Macie is enabled for sensitive data discovery",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "C1.1"},
 	}, nil
 }
 
-// CIS 9.3 - Ensure Security Hub is enabled
+// CIS 5.16 - Ensure Security Hub is enabled
 func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (CheckResult, error) {
 	hub, err := c.securityHubClient.DescribeHub(ctx, &securityhub.DescribeHubInput{})
 	if err != nil {
@@ -188,7 +188,7 @@ func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (C
 			Name:              "Security Hub Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          "AWS Security Hub is not enabled | CIS 9.3 | Centralized security findings not available",
+			Evidence:          "AWS Security Hub is not enabled | CIS 5.16 | Centralized security findings not available",
 			Remediation:       "Enable AWS Security Hub",
 			RemediationDetail: `aws securityhub enable-security-hub --enable-default-standards`,
 			ScreenshotGuide:   "Security Hub Console → Summary → Screenshot showing Security Hub enabled with standards",
@@ -205,7 +205,7 @@ func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (C
 			Name:              "Security Hub Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          "Security Hub exists but is not properly configured | CIS 9.3",
+			Evidence:          "Security Hub exists but is not properly configured | CIS 5.16",
 			Remediation:       "Enable Security Hub",
 			RemediationDetail: "aws securityhub enable-security-hub",
 			ScreenshotGuide:   "Security Hub Console → Screenshot showing enabled",
@@ -220,14 +220,14 @@ func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (C
 		Control:    "CIS-5.16",
 		Name:       "Security Hub Enabled",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("AWS Security Hub is enabled | Meets CIS 9.3"),
+		Evidence:   fmt.Sprintf("AWS Security Hub is enabled | Meets CIS 5.16"),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"CIS-AWS": "5.16"},
 	}, nil
 }
 
-// CIS 9.4 - Ensure Amazon Inspector is enabled
+// Ensure Amazon Inspector is enabled
 func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (CheckResult, error) {
 	status, err := c.inspectorClient.BatchGetAccountStatus(ctx, &inspector2.BatchGetAccountStatusInput{})
 	if err != nil {
@@ -236,7 +236,7 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 			Name:              "Inspector Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          "Amazon Inspector is not enabled | CIS 9.4 | Vulnerability scanning not active",
+			Evidence:          "Amazon Inspector is not enabled | Vulnerability scanning not active",
 			Remediation:       "Enable Amazon Inspector",
 			RemediationDetail: `aws inspector2 enable --resource-types EC2 ECR LAMBDA`,
 			ScreenshotGuide:   "Inspector Console → Dashboard → Screenshot showing Inspector enabled",
@@ -253,7 +253,7 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 			Name:              "Inspector Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          "Amazon Inspector has no enabled accounts | CIS 9.4",
+			Evidence:          "Amazon Inspector has no enabled accounts",
 			Remediation:       "Enable Amazon Inspector for vulnerability scanning",
 			RemediationDetail: "aws inspector2 enable --resource-types EC2 ECR LAMBDA",
 			ScreenshotGuide:   "Inspector Console → Account management → Screenshot showing account enabled",
@@ -271,7 +271,7 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 			Name:              "Inspector Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("Amazon Inspector status is %s | CIS 9.4", account.State.Status),
+			Evidence:          fmt.Sprintf("Amazon Inspector status is %s", account.State.Status),
 			Remediation:       "Enable Amazon Inspector",
 			RemediationDetail: "aws inspector2 enable --resource-types EC2 ECR LAMBDA",
 			ScreenshotGuide:   "Inspector Console → Settings → Screenshot showing status enabled",
@@ -286,7 +286,7 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 		Control:    "AWS-SECSVC-02",
 		Name:       "Inspector Enabled",
 		Status:     "PASS",
-		Evidence:   "Amazon Inspector is enabled for vulnerability scanning | Meets CIS 9.4",
+		Evidence:   "Amazon Inspector is enabled for vulnerability scanning",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC8.1"},

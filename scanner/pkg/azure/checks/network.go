@@ -24,25 +24,25 @@ func (c *NetworkChecks) Name() string {
 func (c *NetworkChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	// CIS 7.1: RDP access from internet
+	// RDP access from internet
 	results = append(results, c.CheckRDPAccess(ctx)...)
 
-	// CIS 7.2: SSH access from internet
+	// SSH access from internet
 	results = append(results, c.CheckSSHAccess(ctx)...)
 
-	// CIS 7.3: UDP access from internet
+	// UDP access from internet
 	results = append(results, c.CheckUDPAccess(ctx)...)
 
-	// CIS 7.4: HTTP(S) access evaluation
+	// HTTP(S) access evaluation
 	results = append(results, c.CheckHTTPAccess(ctx)...)
 
-	// CIS 7.5: NSG Flow Log retention
+	// NSG Flow Log retention
 	results = append(results, c.CheckFlowLogRetention(ctx)...)
 
-	// CIS 7.6: Network Watcher enabled
+	// Network Watcher enabled
 	results = append(results, c.CheckNetworkWatcher(ctx)...)
 
-	// CIS 7.7: Public IP evaluation
+	// Public IP evaluation
 	results = append(results, c.CheckPublicIPs(ctx)...)
 
 	// Legacy comprehensive check (covers multiple)
@@ -615,7 +615,7 @@ func (c *NetworkChecks) CheckOpenPorts(ctx context.Context) []CheckResult {
 			Name:        "Dangerous Open Ports",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("CIS 6.1-6.3: %d NSG rules expose dangerous ports to internet: %s", len(openToInternet), strings.Join(displayNSGs, ", ")),
+			Evidence:    fmt.Sprintf("CIS 7.1-7.3: %d NSG rules expose dangerous ports to internet: %s", len(openToInternet), strings.Join(displayNSGs, ", ")),
 			Remediation: "Remove internet access to management and database ports",
 			RemediationDetail: `Multiple CIS Azure 6.x controls violated - dangerous ports exposed to internet.
 

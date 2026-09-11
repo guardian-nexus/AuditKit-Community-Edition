@@ -95,9 +95,9 @@ func (c *AADChecks) CheckPrivilegedRoles(ctx context.Context) []CheckResult {
 			Name:              "Excessive Owner Assignments",
 			Status:            "FAIL",
 			Severity:          "HIGH",
-			Evidence:          fmt.Sprintf("CIS 1.4: %d Owner role assignments found - excessive privileged access. CIS recommends max 3 subscription owners.", ownerCount),
-			Remediation:       "Reduce to minimum required owners (2-3 max per CIS Azure 1.5)",
-			RemediationDetail: "Azure Portal → Subscriptions → Access control (IAM) → Review Owner assignments\n\nPer CIS Azure 1.4-1.6:\n- Minimize privileged role assignments\n- Use Azure AD PIM for just-in-time access\n- Regularly review privileged accounts",
+			Evidence:          fmt.Sprintf("CIS 5.7: %d Owner role assignments found - excessive privileged access. CIS recommends max 3 subscription owners.", ownerCount),
+			Remediation:       "Reduce to minimum required owners (2-3 max per CIS Azure 5.7)",
+			RemediationDetail: "Azure Portal → Subscriptions → Access control (IAM) → Review Owner assignments\n\nPer CIS Azure 5.7:\n- Minimize privileged role assignments\n- Use Azure AD PIM for just-in-time access\n- Regularly review privileged accounts",
 			ScreenshotGuide:   "1. Go to Subscription → Access control (IAM)\n2. Filter by 'Owner' role\n3. Screenshot showing ≤3 owners\n4. Document justification for each owner\n5. Show PIM configuration if using just-in-time access",
 			ConsoleURL:        "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
 			Priority:          PriorityHigh,
@@ -109,7 +109,7 @@ func (c *AADChecks) CheckPrivilegedRoles(ctx context.Context) []CheckResult {
 			Control:    "CIS-5.7",
 			Name:       "Owner Role Assignments",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 1.4: %d Owner assignments (acceptable, within CIS recommended limit)", ownerCount),
+			Evidence:   fmt.Sprintf("CIS 5.7: %d Owner assignments (acceptable, within CIS recommended limit)", ownerCount),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("AAD_PRIVILEGED_ROLES"),
@@ -123,9 +123,9 @@ func (c *AADChecks) CheckPrivilegedRoles(ctx context.Context) []CheckResult {
 			Name:              "Contributor Role Assignments",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("CIS 1.6: %d Contributor assignments - review for least privilege principle", contributorCount),
+			Evidence:          fmt.Sprintf("CIS 5.3.7: %d Contributor assignments - review for least privilege principle", contributorCount),
 			Remediation:       "Use more specific roles instead of broad Contributor access",
-			RemediationDetail: "Replace Contributor with specific roles like:\n- Virtual Machine Contributor\n- Storage Account Contributor\n- Network Contributor\n\nPer CIS 1.6: Use custom RBAC roles for granular permissions",
+			RemediationDetail: "Replace Contributor with specific roles like:\n- Virtual Machine Contributor\n- Storage Account Contributor\n- Network Contributor\n\nPer CIS 5.3.7: Use custom RBAC roles for granular permissions",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks:        GetFrameworkMappings("AAD_PRIVILEGED_ROLES"),
@@ -144,9 +144,9 @@ func (c *AADChecks) CheckMFAConfiguration(ctx context.Context) []CheckResult {
 			Control:     "CIS-5.1.3",
 			Name:        "MFA for All Users",
 			Status:      "INFO",
-			Evidence:    "CIS 1.1: MANUAL CHECK REQUIRED - Verify MFA is enabled for all users (Graph API not available)",
-			Remediation: "Enable MFA for all user accounts per CIS Azure 1.1",
-			RemediationDetail: `CIS Azure 1.1: Multi-factor authentication should be enabled for all users
+			Evidence:    "CIS 5.1.3: MANUAL CHECK REQUIRED - Verify MFA is enabled for all users (Graph API not available)",
+			Remediation: "Enable MFA for all user accounts per CIS Azure 5.1.3",
+			RemediationDetail: `CIS Azure 5.1.3: Multi-factor authentication should be enabled for all users
 
 Configure via Conditional Access or Security Defaults`,
 			ScreenshotGuide: "Azure AD → Security → Conditional Access → Show MFA policy enabled",
@@ -160,7 +160,7 @@ Configure via Conditional Access or Security Defaults`,
 			Control:     "AZ-ENTRA-90",
 			Name:        "MFA for Privileged Users",
 			Status:      "INFO",
-			Evidence:    "CIS 1.2: MANUAL CHECK - Verify MFA for privileged users (Graph API not available)",
+			Evidence:    "CIS 5.1.3: MANUAL CHECK - Verify MFA for privileged users (Graph API not available)",
 			Remediation: "Enforce MFA for all privileged accounts",
 			Priority:    PriorityCritical,
 			Timestamp:   time.Now(),
@@ -225,16 +225,16 @@ Configure via Conditional Access or Security Defaults`,
 		}
 	}
 
-	// CIS 1.1: MFA for all users
+	// CIS 5.1.3: MFA for all users
 	if usersWithoutMFA > 0 {
 		results = append(results, CheckResult{
 			Control:     "CIS-5.1.3",
 			Name:        "MFA for All Users",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("CIS 1.1: %d/%d users do not have MFA enabled", usersWithoutMFA, totalUsers),
-			Remediation: "Enable MFA for all user accounts per CIS Azure 1.1",
-			RemediationDetail: `CIS Azure 1.1: Multi-factor authentication should be enabled for all users
+			Evidence:    fmt.Sprintf("CIS 5.1.3: %d/%d users do not have MFA enabled", usersWithoutMFA, totalUsers),
+			Remediation: "Enable MFA for all user accounts per CIS Azure 5.1.3",
+			RemediationDetail: `CIS Azure 5.1.3: Multi-factor authentication should be enabled for all users
 
 Implementation options:
 1. Security Defaults (simplest)
@@ -254,23 +254,23 @@ Azure AD → Security → Conditional Access → Create policy requiring MFA for
 			Control:    "CIS-5.1.3",
 			Name:       "MFA for All Users",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 1.1: All %d users have MFA enabled", totalUsers),
+			Evidence:   fmt.Sprintf("CIS 5.1.3: All %d users have MFA enabled", totalUsers),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("AAD_MFA"),
 		})
 	}
 
-	// CIS 1.2: MFA for privileged users
+	// CIS 5.1.3: MFA for privileged users
 	if adminUsersWithoutMFA > 0 {
 		results = append(results, CheckResult{
 			Control:     "AZ-ENTRA-90",
 			Name:        "MFA for Privileged Users",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("CIS 1.2: %d administrative users do not have MFA enabled", adminUsersWithoutMFA),
+			Evidence:    fmt.Sprintf("CIS 5.1.3: %d administrative users do not have MFA enabled", adminUsersWithoutMFA),
 			Remediation: "Enforce MFA for all privileged accounts immediately",
-			RemediationDetail: `CIS Azure 1.2: Ensure that multi-factor authentication is enabled for all privileged users
+			RemediationDetail: `CIS Azure 5.1.3: Ensure that multi-factor authentication is enabled for all privileged users
 
 Create Conditional Access policy targeting directory roles requiring MFA`,
 			ScreenshotGuide: "Azure AD → Security → Conditional Access → Show policy targeting privileged roles with MFA",
@@ -284,7 +284,7 @@ Create Conditional Access policy targeting directory roles requiring MFA`,
 			Control:    "AZ-ENTRA-90",
 			Name:       "MFA for Privileged Users",
 			Status:     "PASS",
-			Evidence:   "CIS 1.2: All privileged users have MFA enabled",
+			Evidence:   "CIS 5.1.3: All privileged users have MFA enabled",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("AAD_MFA"),
@@ -302,9 +302,9 @@ func (c *AADChecks) CheckPasswordPolicy(ctx context.Context) []CheckResult {
 			Control:           "AZ-ENTRA-01",
 			Name:              "Password Policy Configuration",
 			Status:            "INFO",
-			Evidence:          "CIS 1.3: MANUAL CHECK - Verify password policy meets complexity requirements",
-			Remediation:       "Configure password policy per CIS Azure 1.3",
-			RemediationDetail: `CIS Azure 1.3: Ensure password policy meets requirements (14+ chars, complexity enabled)`,
+			Evidence:          "MANUAL CHECK - Verify password policy meets complexity requirements",
+			Remediation:       "Configure password policy",
+			RemediationDetail: `Ensure password policy meets requirements (14+ chars, complexity enabled)`,
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
 			Frameworks:        GetFrameworkMappings("AAD_PASSWORD_POLICY"),
@@ -335,7 +335,7 @@ func (c *AADChecks) CheckPasswordPolicy(ctx context.Context) []CheckResult {
 			Control:    "AZ-ENTRA-01",
 			Name:       "Password Policy Configuration",
 			Status:     "PASS",
-			Evidence:   "CIS 1.3: Azure AD password protection policies are configured",
+			Evidence:   "Azure AD password protection policies are configured",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("AAD_PASSWORD_POLICY"),
@@ -345,9 +345,9 @@ func (c *AADChecks) CheckPasswordPolicy(ctx context.Context) []CheckResult {
 			Control:     "AZ-ENTRA-01",
 			Name:        "Password Policy Configuration",
 			Status:      "INFO",
-			Evidence:    "CIS 1.3: Unable to fully verify password policy configuration - manual review recommended",
+			Evidence:    "Unable to fully verify password policy configuration - manual review recommended",
 			Remediation: "Review Azure AD password protection settings",
-			RemediationDetail: `CIS Azure 1.3: Ensure password policy meets requirements
+			RemediationDetail: `Ensure password policy meets requirements
 
 Configure:
 - Custom banned password list
@@ -373,7 +373,7 @@ func (c *AADChecks) CheckConditionalAccess(ctx context.Context) []CheckResult {
 			Control:     "AZ-ENTRA-91",
 			Name:        "Conditional Access - Untrusted Locations",
 			Status:      "INFO",
-			Evidence:    "CIS 1.9: MANUAL CHECK - Verify Conditional Access policies block untrusted locations",
+			Evidence:    "MANUAL CHECK - Verify Conditional Access policies block untrusted locations",
 			Remediation: "Configure Conditional Access to restrict untrusted locations",
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),
@@ -384,7 +384,7 @@ func (c *AADChecks) CheckConditionalAccess(ctx context.Context) []CheckResult {
 			Control:     "CIS-5.1.1",
 			Name:        "Block Legacy Authentication",
 			Status:      "INFO",
-			Evidence:    "CIS 1.10: MANUAL CHECK - Verify legacy authentication is blocked",
+			Evidence:    "CIS 5.1.1: MANUAL CHECK - Verify legacy authentication is blocked",
 			Remediation: "Block legacy authentication protocols via Conditional Access",
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),
@@ -423,12 +423,12 @@ func (c *AADChecks) CheckConditionalAccess(ctx context.Context) []CheckResult {
 				if strings.Contains(strings.ToLower(stateStr), "enabled") {
 					enabledPolicies++
 
-					// Check for location-based policies (CIS 1.9)
+					// Check for location-based policies (CIS 5.1.1)
 					if policy.GetConditions() != nil && policy.GetConditions().GetLocations() != nil {
 						hasLocationPolicy = true
 					}
 
-					// Check for legacy authentication blocking (CIS 1.10)
+					// Check for legacy authentication blocking (CIS 5.1.1)
 					if policy.GetConditions() != nil && policy.GetConditions().GetClientAppTypes() != nil {
 						clientApps := policy.GetConditions().GetClientAppTypes()
 						if len(clientApps) > 0 {
@@ -440,16 +440,16 @@ func (c *AADChecks) CheckConditionalAccess(ctx context.Context) []CheckResult {
 		}
 	}
 
-	// CIS 1.9: Location-based Conditional Access
+	// CIS 5.1.1: Location-based Conditional Access
 	if !hasLocationPolicy {
 		results = append(results, CheckResult{
 			Control:     "AZ-ENTRA-91",
 			Name:        "Conditional Access - Untrusted Locations",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 1.9: No location-based Conditional Access policies found (%d total policies)", enabledPolicies),
+			Evidence:    fmt.Sprintf("No location-based Conditional Access policies found (%d total policies)", enabledPolicies),
 			Remediation: "Create Conditional Access policy restricting access from untrusted locations",
-			RemediationDetail: `CIS Azure 1.9: Ensure Conditional Access policies restrict untrusted locations
+			RemediationDetail: `Ensure Conditional Access policies restrict untrusted locations
 
 Create policy:
 - Define trusted locations (corporate IPs)
@@ -465,23 +465,23 @@ Create policy:
 			Control:    "AZ-ENTRA-91",
 			Name:       "Conditional Access - Untrusted Locations",
 			Status:     "PASS",
-			Evidence:   "CIS 1.9: Location-based Conditional Access policy is configured",
+			Evidence:   "Location-based Conditional Access policy is configured",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("AAD_CONDITIONAL_ACCESS"),
 		})
 	}
 
-	// CIS 1.10: Block Legacy Authentication
+	// CIS 5.1.1: Block Legacy Authentication
 	if !hasLegacyAuthBlock {
 		results = append(results, CheckResult{
 			Control:     "CIS-5.1.1",
 			Name:        "Block Legacy Authentication",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 1.10: No policies blocking legacy authentication found (%d total policies)", enabledPolicies),
+			Evidence:    fmt.Sprintf("CIS 5.1.1: No policies blocking legacy authentication found (%d total policies)", enabledPolicies),
 			Remediation: "Create Conditional Access policy to block legacy authentication",
-			RemediationDetail: `CIS Azure 1.10: Ensure legacy authentication protocols are blocked
+			RemediationDetail: `CIS Azure 5.1.1: Ensure legacy authentication protocols are blocked
 
 Block protocols: IMAP, POP3, SMTP, Exchange ActiveSync, EWS
 
@@ -497,7 +497,7 @@ Create Conditional Access policy targeting Exchange ActiveSync and Other clients
 			Control:    "CIS-5.1.1",
 			Name:       "Block Legacy Authentication",
 			Status:     "PASS",
-			Evidence:   "CIS 1.10: Legacy authentication blocking is configured",
+			Evidence:   "CIS 5.1.1: Legacy authentication blocking is configured",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("AAD_CONDITIONAL_ACCESS"),
@@ -540,9 +540,9 @@ func (c *AADChecks) CheckGuestAccess(ctx context.Context) []CheckResult {
 			Control:     "CIS-5.3.2",
 			Name:        "Guest User Access Review",
 			Status:      "INFO",
-			Evidence:    fmt.Sprintf("CIS 1.7: Found %d potential guest user role assignments - verify these are authorized and reviewed regularly", guestAssignments),
-			Remediation: "Review and restrict guest access per CIS 1.7",
-			RemediationDetail: `CIS Azure 1.7: Ensure guest users are reviewed regularly
+			Evidence:    fmt.Sprintf("CIS 5.3.2: Found %d potential guest user role assignments - verify these are authorized and reviewed regularly", guestAssignments),
+			Remediation: "Review and restrict guest access per CIS 5.3.2",
+			RemediationDetail: `CIS Azure 5.3.2: Ensure guest users are reviewed regularly
 
 Requirements:
 - Quarterly access reviews
@@ -558,7 +558,7 @@ Requirements:
 			Control:    "CIS-5.3.2",
 			Name:       "Guest User Access",
 			Status:     "PASS",
-			Evidence:   "CIS 1.7: No guest user role assignments detected",
+			Evidence:   "CIS 5.3.2: No guest user role assignments detected",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("AAD_GUEST_USERS"),
@@ -569,9 +569,9 @@ Requirements:
 		Control:     "AZ-ENTRA-92",
 		Name:        "Guest Invite Restrictions",
 		Status:      "INFO",
-		Evidence:    "CIS 1.8: MANUAL CHECK - Verify guest invite settings restrict who can invite external users",
-		Remediation: "Configure guest invite settings per CIS 1.8",
-		RemediationDetail: `CIS Azure 1.8: Ensure guest users are reviewed monthly and access removed if unneeded
+		Evidence:    "MANUAL CHECK - Verify guest invite settings restrict who can invite external users",
+		Remediation: "Configure guest invite settings",
+		RemediationDetail: `Ensure guest users are reviewed monthly and access removed if unneeded
 
 Configure:
 Azure AD → External Identities → External collaboration settings → Restrict guest invites to admins only`,

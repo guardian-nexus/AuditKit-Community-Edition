@@ -45,7 +45,7 @@ func (c *ECSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	return results, nil
 }
 
-// CIS 7.1 - Ensure ECS task definitions have logging enabled
+// Ensure ECS task definitions have logging enabled
 func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckResult, error) {
 	// List task definition families
 	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
@@ -100,7 +100,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 			Name:        "ECS Task Definition Logging",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("%d/%d ECS task definitions without logging: %v | CIS 7.1", len(tasksWithoutLogging), totalTasks, displayTasks),
+			Evidence:    fmt.Sprintf("%d/%d ECS task definitions without logging: %v", len(tasksWithoutLogging), totalTasks, displayTasks),
 			Remediation: "Configure logging for ECS task definitions",
 			RemediationDetail: `# Add to task definition JSON:
 {
@@ -126,7 +126,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 			Control:    "AWS-ECS-03",
 			Name:       "ECS Task Definition Logging",
 			Status:     StatusInfo,
-			Evidence:   "No ECS task definitions found | CIS 7.1 N/A",
+			Evidence:   "No ECS task definitions found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "CC7.2"},
@@ -137,14 +137,14 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 		Control:    "AWS-ECS-03",
 		Name:       "ECS Task Definition Logging",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("All %d ECS task definitions have logging enabled | Meets CIS 7.1", totalTasks),
+		Evidence:   fmt.Sprintf("All %d ECS task definitions have logging enabled", totalTasks),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC7.2"},
 	}, nil
 }
 
-// CIS 7.2 - Ensure ECS uses Secrets Manager for sensitive data
+// Ensure ECS uses Secrets Manager for sensitive data
 func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult, error) {
 	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
 	if err != nil {
@@ -201,7 +201,7 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 			Name:        "ECS Secrets Management",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("%d ECS tasks with plaintext sensitive environment variables: %v | CIS 7.2", len(tasksWithPlaintextSecrets), displayTasks),
+			Evidence:    fmt.Sprintf("%d ECS tasks with plaintext sensitive environment variables: %v", len(tasksWithPlaintextSecrets), displayTasks),
 			Remediation: "Use AWS Secrets Manager or Parameter Store for sensitive data",
 			RemediationDetail: `# Instead of:
 "environment": [{"name": "DB_PASSWORD", "value": "plaintext"}]
@@ -224,7 +224,7 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 			Control:    "AWS-ECS-02",
 			Name:       "ECS Secrets Management",
 			Status:     StatusInfo,
-			Evidence:   "No ECS task definitions found | CIS 7.2 N/A",
+			Evidence:   "No ECS task definitions found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "CC6.1"},
@@ -235,14 +235,14 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 		Control:    "AWS-ECS-02",
 		Name:       "ECS Secrets Management",
 		Status:     "PASS",
-		Evidence:   "ECS tasks use Secrets Manager for sensitive data | Meets CIS 7.2",
+		Evidence:   "ECS tasks use Secrets Manager for sensitive data",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC6.1"},
 	}, nil
 }
 
-// CIS 7.3 - Ensure ECS Container Insights is enabled
+// Ensure ECS Container Insights is enabled
 func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.ListClusters(ctx, &ecs.ListClustersInput{})
 	if err != nil {
@@ -254,7 +254,7 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 			Control:    "AWS-ECS-01",
 			Name:       "ECS Container Insights",
 			Status:     StatusInfo,
-			Evidence:   "No ECS clusters found | CIS 7.3 N/A",
+			Evidence:   "No ECS clusters found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "CC7.2"},
@@ -293,7 +293,7 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 			Name:        "ECS Container Insights",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("%d/%d ECS clusters without Container Insights: %v | CIS 7.3", len(clustersWithoutInsights), len(clustersOutput.Clusters), clustersWithoutInsights),
+			Evidence:    fmt.Sprintf("%d/%d ECS clusters without Container Insights: %v", len(clustersWithoutInsights), len(clustersOutput.Clusters), clustersWithoutInsights),
 			Remediation: "Enable Container Insights for ECS clusters",
 			RemediationDetail: `aws ecs update-cluster-settings \
   --cluster CLUSTER_NAME \
@@ -310,14 +310,14 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 		Control:    "AWS-ECS-01",
 		Name:       "ECS Container Insights",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("All %d ECS clusters have Container Insights enabled | Meets CIS 7.3", len(clustersOutput.Clusters)),
+		Evidence:   fmt.Sprintf("All %d ECS clusters have Container Insights enabled", len(clustersOutput.Clusters)),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC7.2"},
 	}, nil
 }
 
-// CIS 7.4 - Ensure ECS task roles follow least privilege
+// Ensure ECS task roles follow least privilege
 func (c *ECSChecks) CheckECSTaskRolePermissions(ctx context.Context) (CheckResult, error) {
 	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
 	if err != nil {
@@ -366,7 +366,7 @@ func (c *ECSChecks) CheckECSTaskRolePermissions(ctx context.Context) (CheckResul
 			Name:        "ECS Task Role Permissions",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("%d ECS tasks with overly permissive roles: %v | CIS 7.4", len(tasksWithBroadRoles), displayTasks),
+			Evidence:    fmt.Sprintf("%d ECS tasks with overly permissive roles: %v", len(tasksWithBroadRoles), displayTasks),
 			Remediation: "Use least privilege IAM roles for ECS tasks",
 			RemediationDetail: `# Create custom role with only required permissions
 aws iam create-role --role-name ECSTaskRole --assume-role-policy-document file://ecs-trust-policy.json
@@ -384,7 +384,7 @@ aws iam put-role-policy --role-name ECSTaskRole --policy-name TaskPolicy --polic
 			Control:    "AWS-ECS-04",
 			Name:       "ECS Task Role Permissions",
 			Status:     StatusInfo,
-			Evidence:   "No ECS task definitions found | CIS 7.4 N/A",
+			Evidence:   "No ECS task definitions found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "CC6.3"},
@@ -395,7 +395,7 @@ aws iam put-role-policy --role-name ECSTaskRole --policy-name TaskPolicy --polic
 		Control:    "AWS-ECS-04",
 		Name:       "ECS Task Role Permissions",
 		Status:     "PASS",
-		Evidence:   "ECS tasks use least-privilege roles | Meets CIS 7.4",
+		Evidence:   "ECS tasks use least-privilege roles",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC6.3"},

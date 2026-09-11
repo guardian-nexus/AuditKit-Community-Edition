@@ -371,7 +371,7 @@ func (c *EC2Checks) CheckOldAMIs(ctx context.Context) (CheckResult, error) {
 
 // NEW CIS-SPECIFIC CHECKS
 
-// CIS 5.2 - Ensure no security groups allow ingress from 0.0.0.0/0 to port 22
+// CIS 6.3 - Ensure no security groups allow ingress from 0.0.0.0/0 to port 22
 func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, error) {
 	sgs, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
@@ -422,7 +422,7 @@ func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, err
 	}, nil
 }
 
-// CIS 5.3 - Ensure no security groups allow ingress from 0.0.0.0/0 to port 3389
+// CIS 6.3 - Ensure no security groups allow ingress from 0.0.0.0/0 to port 3389
 func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, error) {
 	sgs, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
@@ -473,7 +473,7 @@ func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, err
 	}, nil
 }
 
-// CIS 5.4 - Ensure default security group restricts all traffic
+// CIS 6.5 - Ensure default security group restricts all traffic
 func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult, error) {
 	vpcs, err := c.client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
 	if err != nil {
@@ -533,7 +533,7 @@ func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult,
 	}, nil
 }
 
-// CIS 5.6 - Ensure EC2 instances use IMDSv2
+// CIS 6.7 - Ensure EC2 instances use IMDSv2
 func (c *EC2Checks) CheckIMDSv2(ctx context.Context) (CheckResult, error) {
 	instances, err := c.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{})
 	if err != nil {
@@ -585,7 +585,7 @@ func (c *EC2Checks) CheckIMDSv2(ctx context.Context) (CheckResult, error) {
 	}, nil
 }
 
-// CIS 2.2.2 - Ensure EBS volume snapshots are not publicly accessible
+// Ensure EBS volume snapshots are not publicly accessible
 func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, error) {
 	snapshots, err := c.client.DescribeSnapshots(ctx, &ec2.DescribeSnapshotsInput{
 		OwnerIds: []string{"self"},
@@ -640,7 +640,7 @@ func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, e
 	}, nil
 }
 
-// CheckInstanceIAMRoles verifies EC2 instances use IAM roles (CIS 1.18)
+// CheckInstanceIAMRoles verifies EC2 instances use IAM roles (CIS 2.16)
 func (c *EC2Checks) CheckInstanceIAMRoles(ctx context.Context) (CheckResult, error) {
 	result, err := c.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{})
 	if err != nil {
@@ -687,7 +687,7 @@ func (c *EC2Checks) CheckInstanceIAMRoles(ctx context.Context) (CheckResult, err
 			Name:        "EC2 Instance IAM Roles",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("%d/%d running EC2 instances do not use IAM roles: %s | Violates CIS 1.18 (may use embedded credentials)", len(instancesWithoutRoles), totalRunningInstances, strings.Join(displayInstances, ", ")),
+			Evidence:    fmt.Sprintf("%d/%d running EC2 instances do not use IAM roles: %s | Violates CIS 2.16 (may use embedded credentials)", len(instancesWithoutRoles), totalRunningInstances, strings.Join(displayInstances, ", ")),
 			Remediation: "Attach IAM instance profiles to EC2 instances",
 			RemediationDetail: fmt.Sprintf(`# Create IAM role for EC2
 aws iam create-role --role-name EC2-App-Role --assume-role-policy-document '{
@@ -736,7 +736,7 @@ aws ec2 associate-iam-instance-profile --instance-id %s --iam-instance-profile N
 		Control:    "CIS-2.16",
 		Name:       "EC2 Instance IAM Roles",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("All %d running EC2 instances use IAM roles | Meets CIS 1.18", totalRunningInstances),
+		Evidence:   fmt.Sprintf("All %d running EC2 instances use IAM roles | Meets CIS 2.16", totalRunningInstances),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"CIS-AWS": "2.16", "SOC2": "CC6.1", "PCI-DSS": "7.2.1"},

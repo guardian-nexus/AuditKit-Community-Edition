@@ -151,7 +151,7 @@ func (c *AzureCISManualChecks) checkAppRegistrationOwnership() CheckResult {
 		Priority:    PriorityMedium,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify all App Registrations have at least one owner assigned",
 		Remediation: "Ensure every App Registration has assigned owners",
-		RemediationDetail: `CIS Azure 1.5: Ensure that 'Owners' are defined for each registered application
+		RemediationDetail: `Ensure that 'Owners' are defined for each registered application
 
 App Registrations without owners cannot be managed if the creator leaves.
 
@@ -183,7 +183,7 @@ func (c *AzureCISManualChecks) checkGuestInviteSettings() CheckResult {
 		Priority:    PriorityMedium,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify guest invite settings are restricted per CIS requirements",
 		Remediation: "Configure guest user access and invitation settings",
-		RemediationDetail: `CIS Azure 1.11: Ensure that 'Guest invite restrictions' is set to 'Only users assigned to specific admin roles can invite guest users'
+		RemediationDetail: `Ensure that 'Guest invite restrictions' is set to 'Only users assigned to specific admin roles can invite guest users'
 
 Verification:
 1. Azure Portal → Azure AD → External identities → External collaboration settings
@@ -208,7 +208,7 @@ func (c *AzureCISManualChecks) checkSecurityDefaults() CheckResult {
 		Priority:    PriorityCritical,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify Security Defaults OR Conditional Access policies are enabled",
 		Remediation: "Enable Security Defaults or implement Conditional Access policies",
-		RemediationDetail: `CIS Azure 1.12: Ensure Either Security Defaults is Enabled OR Conditional Access Policies are Configured
+		RemediationDetail: `CIS Azure 5.1.1: Ensure Either Security Defaults is Enabled OR Conditional Access Policies are Configured
 
 You must have ONE of these enabled:
 1. Security Defaults (simple, automatic protection)
@@ -246,7 +246,7 @@ func (c *AzureCISManualChecks) checkRDPRestricted() CheckResult {
 		Priority:    PriorityCritical,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify NO Network Security Groups allow RDP (port 3389) from Internet (0.0.0.0/0)",
 		Remediation: "Remove any NSG rules allowing RDP from 0.0.0.0/0",
-		RemediationDetail: `CIS Azure 6.2: Ensure that RDP access from the Internet is evaluated and restricted
+		RemediationDetail: `CIS Azure 7.1: Ensure that RDP access from the Internet is evaluated and restricted
 
 Check all NSGs for rules allowing:
 - Source: Any/Internet/0.0.0.0/0
@@ -279,7 +279,7 @@ func (c *AzureCISManualChecks) checkSSHRestricted() CheckResult {
 		Priority:    PriorityCritical,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify NO Network Security Groups allow SSH (port 22) from Internet",
 		Remediation: "Remove any NSG rules allowing SSH from 0.0.0.0/0",
-		RemediationDetail: `CIS Azure 6.3: Ensure that SSH access from the Internet is evaluated and restricted
+		RemediationDetail: `CIS Azure 7.2: Ensure that SSH access from the Internet is evaluated and restricted
 
 Check all NSGs for rules allowing:
 - Source: Any/Internet/0.0.0.0/0
@@ -307,7 +307,7 @@ func (c *AzureCISManualChecks) checkSQLPortRestricted() CheckResult {
 		Priority:    PriorityCritical,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify NO NSGs allow SQL Server port (1433) from Internet",
 		Remediation: "Remove any NSG rules allowing port 1433 from 0.0.0.0/0",
-		RemediationDetail: `CIS Azure 6.4: Ensure that SQL Server port (1433) access from the Internet is restricted
+		RemediationDetail: `Ensure that SQL Server port (1433) access from the Internet is restricted
 
 Check all NSGs for rules allowing:
 - Source: Any/Internet/0.0.0.0/0
@@ -331,7 +331,7 @@ func (c *AzureCISManualChecks) checkPostgreSQLPortRestricted() CheckResult {
 		Priority:          PriorityHigh,
 		Evidence:          "MANUAL CHECK REQUIRED: Verify NO NSGs allow PostgreSQL port (5432) from Internet",
 		Remediation:       "Remove any NSG rules allowing port 5432 from 0.0.0.0/0",
-		RemediationDetail: `CIS Azure 6.5: Ensure that PostgreSQL port (5432) access from the Internet is restricted`,
+		RemediationDetail: `Ensure that PostgreSQL port (5432) access from the Internet is restricted`,
 		ScreenshotGuide:   "Network security groups → Inbound rules → NO rules allowing 5432 from Internet",
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
@@ -350,7 +350,7 @@ func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 		Priority:          PriorityHigh,
 		Evidence:          "MANUAL CHECK REQUIRED: Verify NO NSGs allow MySQL port (3306) from Internet",
 		Remediation:       "Remove any NSG rules allowing port 3306 from 0.0.0.0/0",
-		RemediationDetail: `CIS Azure 6.6: Ensure that MySQL port (3306) access from the Internet is restricted`,
+		RemediationDetail: `Ensure that MySQL port (3306) access from the Internet is restricted`,
 		ScreenshotGuide:   "Network security groups → Inbound rules → NO rules allowing 3306 from Internet",
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
@@ -371,7 +371,7 @@ func (c *AzureCISManualChecks) checkKeyVaultRecoveryLevel() CheckResult {
 		Priority:    PriorityHigh,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify all Key Vaults have soft-delete and purge protection enabled",
 		Remediation: "Enable soft-delete and purge protection for all Key Vaults",
-		RemediationDetail: `CIS Azure 8.1: Ensure that the key vault is recoverable
+		RemediationDetail: `Ensure that the key vault is recoverable
 
 All Key Vaults must have:
 1. Soft Delete enabled (90+ day retention)
@@ -402,7 +402,7 @@ func (c *AzureCISManualChecks) checkKeyVaultKeyExpiration() CheckResult {
 		Priority:    PriorityMedium,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify all cryptographic keys have expiration dates set",
 		Remediation: "Set expiration dates for all keys in Key Vaults",
-		RemediationDetail: `CIS Azure 8.2: Ensure that key vault keys have an expiration date set
+		RemediationDetail: `CIS Azure 8.3.1: Ensure that key vault keys have an expiration date set
 
 Azure CLI:
 az keyvault key list --vault-name <vault-name> --query "[?attributes.expires == null].{Name:name, Enabled:attributes.enabled}" -o table
@@ -428,7 +428,7 @@ func (c *AzureCISManualChecks) checkKeyVaultSecretExpiration() CheckResult {
 		Priority:    PriorityMedium,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify all secrets have expiration dates set",
 		Remediation: "Set expiration dates for all secrets in Key Vaults",
-		RemediationDetail: `CIS Azure 8.4: Ensure that secrets in Azure Key Vault have an expiration date set
+		RemediationDetail: `CIS Azure 8.3.3: Ensure that secrets in Azure Key Vault have an expiration date set
 
 Azure CLI:
 az keyvault secret list --vault-name <vault-name> --query "[?attributes.expires == null].{Name:name, Enabled:attributes.enabled}" -o table
@@ -454,7 +454,7 @@ func (c *AzureCISManualChecks) checkKeyVaultCertificateExpiration() CheckResult 
 		Priority:    PriorityMedium,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify certificates have auto-renewal configured",
 		Remediation: "Configure auto-renewal for certificates in Key Vaults",
-		RemediationDetail: `CIS Azure 8.6: Ensure that certificate auto-renewal is enabled for certificates stored in Azure Key Vault
+		RemediationDetail: `Ensure that certificate auto-renewal is enabled for certificates stored in Azure Key Vault
 
 Azure CLI:
 az keyvault certificate list --vault-name <vault-name> --query "[].{Name:name, AutoRenew:policy.lifetimeActions}" -o table

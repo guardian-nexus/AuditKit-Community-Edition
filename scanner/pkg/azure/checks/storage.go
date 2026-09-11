@@ -90,10 +90,10 @@ func (c *StorageChecks) CheckPublicAccess(ctx context.Context) []CheckResult {
 			Name:        "Storage Account Public Access",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("CIS 3.1: %d/%d storage accounts allow public blob access: %s", len(publicAccounts), totalAccounts, strings.Join(displayAccounts, ", ")),
-			Remediation: "Disable public blob access per CIS Azure 3.1",
-			RemediationDetail: fmt.Sprintf(`CIS Azure 3.1: Ensure that 'Public access level' is disabled for storage blobs
-CIS Azure 3.2: Ensure default network access rule for Storage Accounts is set to deny
+			Evidence:    fmt.Sprintf("CIS 9.3.8: %d/%d storage accounts allow public blob access: %s", len(publicAccounts), totalAccounts, strings.Join(displayAccounts, ", ")),
+			Remediation: "Disable public blob access ",
+			RemediationDetail: fmt.Sprintf(`CIS Azure 9.3.8: Ensure that 'Public access level' is disabled for storage blobs
+CIS Azure 9.3.2.3: Default network access rule set to deny
 
 Azure CLI:
 az storage account update \
@@ -112,7 +112,7 @@ az storage account update \
 			Control:    "CIS-9.3.8",
 			Name:       "Storage Account Public Access",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 3.1, 3.2: All %d storage accounts block public access", totalAccounts),
+			Evidence:   fmt.Sprintf("CIS 9.3.8, 9.3.2.3: All %d storage accounts block public access", totalAccounts),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("STORAGE_PUBLIC_ACCESS"),
@@ -169,13 +169,13 @@ func (c *StorageChecks) CheckEncryption(ctx context.Context) []CheckResult {
 			Name:        "Storage Encryption at Rest",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("CIS 3.3: %d storage accounts lack encryption", len(unencryptedAccounts)),
+			Evidence:    fmt.Sprintf("%d storage accounts lack encryption", len(unencryptedAccounts)),
 			Remediation: "Enable encryption (automatic for new accounts)",
-			RemediationDetail: `CIS Azure 3.3: Ensure storage for critical data is encrypted with Customer Managed Key
-CIS Azure 3.4: Ensure that storage account encryption is enabled
+			RemediationDetail: `Ensure storage for critical data is encrypted with Customer Managed Key
+Ensure that storage account encryption is enabled
 
 Storage encryption is enabled by default for all new accounts using Microsoft-managed keys.
-For enhanced security (CIS 3.3), use customer-managed keys in Azure Key Vault.`,
+For enhanced security, use customer-managed keys in Azure Key Vault.`,
 			Priority:   PriorityCritical,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("STORAGE_ENCRYPTION"),
@@ -186,7 +186,7 @@ For enhanced security (CIS 3.3), use customer-managed keys in Azure Key Vault.`,
 			Name:        "Storage Service Encryption",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 3.4: %d storage services have encryption disabled: %s", len(weakEncryption), strings.Join(weakEncryption[:min(3, len(weakEncryption))], ", ")),
+			Evidence:    fmt.Sprintf("%d storage services have encryption disabled: %s", len(weakEncryption), strings.Join(weakEncryption[:min(3, len(weakEncryption))], ", ")),
 			Remediation: "Enable encryption for all storage services",
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),
@@ -197,7 +197,7 @@ For enhanced security (CIS 3.3), use customer-managed keys in Azure Key Vault.`,
 			Control:    "AZ-STORAGE-93",
 			Name:       "Storage Encryption at Rest",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 3.3, 3.4: All %d storage accounts encrypted", totalAccounts),
+			Evidence:   fmt.Sprintf("All %d storage accounts encrypted", totalAccounts),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("STORAGE_ENCRYPTION"),
@@ -245,9 +245,9 @@ func (c *StorageChecks) CheckSecureTransfer(ctx context.Context) []CheckResult {
 			Name:        "Secure Transfer Required",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 4.1: %d storage accounts allow unencrypted transfers: %s", len(insecureAccounts), strings.Join(displayAccounts, ", ")),
-			Remediation: "Enable secure transfer (HTTPS only) per CIS Azure 4.1",
-			RemediationDetail: fmt.Sprintf(`CIS Azure 4.1: Ensure that 'Secure transfer required' is set to 'Enabled'
+			Evidence:    fmt.Sprintf("CIS 9.3.4: %d storage accounts allow unencrypted transfers: %s", len(insecureAccounts), strings.Join(displayAccounts, ", ")),
+			Remediation: "Enable secure transfer (HTTPS only) per CIS Azure 9.3.4",
+			RemediationDetail: fmt.Sprintf(`CIS Azure 9.3.4: Ensure that 'Secure transfer required' is set to 'Enabled'
 
 Azure CLI:
 az storage account update \
@@ -263,7 +263,7 @@ az storage account update \
 			Control:    "CIS-9.3.4",
 			Name:       "Secure Transfer Required",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 4.1: All %d storage accounts require HTTPS", totalAccounts),
+			Evidence:   fmt.Sprintf("CIS 9.3.4: All %d storage accounts require HTTPS", totalAccounts),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("STORAGE_SECURE_TRANSFER"),
@@ -317,9 +317,9 @@ func (c *StorageChecks) CheckInfrastructureEncryption(ctx context.Context) []Che
 			Name:        "Infrastructure Encryption",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("CIS 4.2: %d storage accounts lack infrastructure encryption: %s", len(noInfraEncryption), strings.Join(displayAccounts, ", ")),
+			Evidence:    fmt.Sprintf("%d storage accounts lack infrastructure encryption: %s", len(noInfraEncryption), strings.Join(displayAccounts, ", ")),
 			Remediation: "Enable infrastructure encryption (must be set at creation)",
-			RemediationDetail: `CIS Azure 4.2: Ensure that 'Enable Infrastructure Encryption' is Set to 'Enabled'
+			RemediationDetail: `Ensure that 'Enable Infrastructure Encryption' is Set to 'Enabled'
 
 IMPORTANT: Infrastructure encryption can only be enabled when creating a storage account.
 For existing accounts, you must:
@@ -343,7 +343,7 @@ az storage account create \
 			Control:    "AZ-STORAGE-03",
 			Name:       "Infrastructure Encryption",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 4.2: All %d storage accounts have infrastructure encryption", totalAccounts),
+			Evidence:   fmt.Sprintf("All %d storage accounts have infrastructure encryption", totalAccounts),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("STORAGE_ENCRYPTION"),
@@ -393,9 +393,9 @@ func (c *StorageChecks) CheckPublicNetworkAccess(ctx context.Context) []CheckRes
 			Name:        "Public Network Access Disabled",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 4.6: %d storage accounts allow public network access: %s", len(publicAccessAccounts), strings.Join(displayAccounts, ", ")),
+			Evidence:    fmt.Sprintf("CIS 9.3.2.2: %d storage accounts allow public network access: %s", len(publicAccessAccounts), strings.Join(displayAccounts, ", ")),
 			Remediation: "Disable public network access, use private endpoints",
-			RemediationDetail: fmt.Sprintf(`CIS Azure 4.6: Ensure that Public Network Access is Disabled for storage accounts
+			RemediationDetail: fmt.Sprintf(`CIS Azure 9.3.2.2: Ensure that Public Network Access is Disabled for storage accounts
 
 Azure CLI:
 az storage account update \
@@ -414,7 +414,7 @@ Then configure Private Endpoints for access from VNets.`, publicAccessAccounts[0
 			Control:    "CIS-9.3.2.2",
 			Name:       "Public Network Access Disabled",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 4.6: All %d storage accounts disable public network access", totalAccounts),
+			Evidence:   fmt.Sprintf("CIS 9.3.2.2: All %d storage accounts disable public network access", totalAccounts),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("STORAGE_NETWORK_RULES"),
@@ -466,9 +466,9 @@ func (c *StorageChecks) CheckMinimumTLS(ctx context.Context) []CheckResult {
 			Name:        "Minimum TLS Version",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 4.15: %d storage accounts allow TLS < 1.2: %s", len(weakTLS), strings.Join(displayAccounts, ", ")),
+			Evidence:    fmt.Sprintf("CIS 9.3.6: %d storage accounts allow TLS < 1.2: %s", len(weakTLS), strings.Join(displayAccounts, ", ")),
 			Remediation: "Set minimum TLS version to 1.2",
-			RemediationDetail: fmt.Sprintf(`CIS Azure 4.15: Ensure the 'Minimum TLS version' is set to 'Version 1.2'
+			RemediationDetail: fmt.Sprintf(`CIS Azure 9.3.6: Ensure the 'Minimum TLS version' is set to 'Version 1.2'
 
 Azure CLI:
 az storage account update \
@@ -485,7 +485,7 @@ az storage account update \
 			Control:    "CIS-9.3.6",
 			Name:       "Minimum TLS Version",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 4.15: All %d storage accounts require TLS 1.2+", totalAccounts),
+			Evidence:   fmt.Sprintf("CIS 9.3.6: All %d storage accounts require TLS 1.2+", totalAccounts),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("STORAGE_SECURE_TRANSFER"),
@@ -512,7 +512,7 @@ func (c *StorageChecks) CheckBlobAnonymousAccess(ctx context.Context) []CheckRes
 		for _, account := range page.Value {
 			totalAccounts++
 
-			// This is similar to AllowBlobPublicAccess but explicitly for CIS 4.17
+			// This is similar to AllowBlobPublicAccess but explicitly for CIS 9.3.8
 			if account.Properties != nil && account.Properties.AllowBlobPublicAccess != nil {
 				if *account.Properties.AllowBlobPublicAccess {
 					anonymousAccess = append(anonymousAccess, *account.Name)
@@ -532,9 +532,9 @@ func (c *StorageChecks) CheckBlobAnonymousAccess(ctx context.Context) []CheckRes
 			Name:        "Blob Anonymous Access",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("CIS 4.17: %d storage accounts allow blob anonymous access: %s", len(anonymousAccess), strings.Join(displayAccounts, ", ")),
+			Evidence:    fmt.Sprintf("CIS 9.3.8: %d storage accounts allow blob anonymous access: %s", len(anonymousAccess), strings.Join(displayAccounts, ", ")),
 			Remediation: "Disable anonymous blob access at storage account level",
-			RemediationDetail: fmt.Sprintf(`CIS Azure 4.17: Ensure that 'Allow Blob Anonymous Access' is set to 'Disabled'
+			RemediationDetail: fmt.Sprintf(`CIS Azure 9.3.8: Ensure that 'Allow Blob Anonymous Access' is set to 'Disabled'
 
 Azure CLI:
 az storage account update \
@@ -551,7 +551,7 @@ az storage account update \
 			Control:    "AZ-STORAGE-02",
 			Name:       "Blob Anonymous Access",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 4.17: All %d storage accounts block anonymous blob access", totalAccounts),
+			Evidence:   fmt.Sprintf("CIS 9.3.8: All %d storage accounts block anonymous blob access", totalAccounts),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("STORAGE_PUBLIC_ACCESS"),
@@ -598,9 +598,9 @@ func (c *StorageChecks) CheckCrosstenantReplication(ctx context.Context) []Check
 			Name:        "Cross-Tenant Replication",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("CIS 4.16: %d storage accounts allow cross-tenant replication: %s", len(crossTenantEnabled), strings.Join(displayAccounts, ", ")),
+			Evidence:    fmt.Sprintf("CIS 9.3.7: %d storage accounts allow cross-tenant replication: %s", len(crossTenantEnabled), strings.Join(displayAccounts, ", ")),
 			Remediation: "Disable cross-tenant replication unless required",
-			RemediationDetail: fmt.Sprintf(`CIS Azure 4.16: Ensure Cross Tenant Replication is not enabled
+			RemediationDetail: fmt.Sprintf(`CIS Azure 9.3.7: Ensure Cross Tenant Replication is not enabled
 
 Azure CLI:
 az storage account update \
@@ -617,7 +617,7 @@ az storage account update \
 			Control:    "CIS-9.3.7",
 			Name:       "Cross-Tenant Replication",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 4.16: All %d storage accounts block cross-tenant replication", totalAccounts),
+			Evidence:   fmt.Sprintf("CIS 9.3.7: All %d storage accounts block cross-tenant replication", totalAccounts),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("STORAGE_NETWORK_RULES"),
@@ -630,16 +630,16 @@ az storage account update \
 func (c *StorageChecks) CheckBlobSoftDelete(ctx context.Context) []CheckResult {
 	results := []CheckResult{}
 
-	// CIS 4.10 - Soft delete requires checking blob service properties
+	// CIS 9.2.1, 9.2.2 - Soft delete requires checking blob service properties
 	// This requires additional API calls per storage account
 
 	results = append(results, CheckResult{
 		Control:     "AZ-STORAGE-95",
 		Name:        "Blob Soft Delete",
 		Status:      "INFO",
-		Evidence:    "CIS 4.10: MANUAL CHECK - Verify soft delete is enabled for blobs with 7-365 day retention",
+		Evidence:    "CIS 9.2.1, 9.2.2: MANUAL CHECK - Verify soft delete is enabled for blobs with 7-365 day retention",
 		Remediation: "Enable soft delete with appropriate retention",
-		RemediationDetail: `CIS Azure 4.10: Ensure Soft Delete is Enabled for Azure Containers and Blob Storage
+		RemediationDetail: `CIS Azure 9.2.1, 9.2.2: Ensure Soft Delete is Enabled for Azure Containers and Blob Storage
 
 Requirements:
 - Blob soft delete: Enabled with 7-365 days retention
@@ -679,7 +679,7 @@ func (c *StorageChecks) CheckNetworkRestrictions(ctx context.Context) []CheckRes
 		for _, account := range page.Value {
 			totalAccounts++
 
-			// Check CIS 4.7: Default action should be Deny
+			// Check CIS 9.3.2.3: Default action should be Deny
 			if account.Properties != nil && account.Properties.NetworkRuleSet != nil {
 				acls := account.Properties.NetworkRuleSet
 
@@ -713,9 +713,9 @@ func (c *StorageChecks) CheckNetworkRestrictions(ctx context.Context) []CheckRes
 			Name:        "Default Network Access Rule",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("CIS 4.7: %d storage accounts have default action 'Allow': %s", len(openAccounts), strings.Join(displayAccounts, ", ")),
+			Evidence:    fmt.Sprintf("CIS 9.3.2.3: %d storage accounts have default action 'Allow': %s", len(openAccounts), strings.Join(displayAccounts, ", ")),
 			Remediation: "Set default network action to Deny",
-			RemediationDetail: fmt.Sprintf(`CIS Azure 4.7: Ensure Default Network Access Rule for Storage Accounts is Set to Deny
+			RemediationDetail: fmt.Sprintf(`CIS Azure 9.3.2.3: Ensure Default Network Access Rule for Storage Accounts is Set to Deny
 
 Azure CLI:
 az storage account update \
@@ -734,7 +734,7 @@ Then whitelist specific VNets or IP ranges.`, openAccounts[0]),
 			Control:    "CIS-9.3.2.3",
 			Name:       "Default Network Access Rule",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 4.7: All %d storage accounts default to Deny", totalAccounts),
+			Evidence:   fmt.Sprintf("CIS 9.3.2.3: All %d storage accounts default to Deny", totalAccounts),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("STORAGE_NETWORK_RULES"),
@@ -747,17 +747,17 @@ Then whitelist specific VNets or IP ranges.`, openAccounts[0]),
 func (c *StorageChecks) CheckKeyRotation(ctx context.Context) []CheckResult {
 	results := []CheckResult{}
 
-	// CIS 4.3, 4.4: Key rotation requires tracking last rotation date
+	// CIS 9.3.1.1: Key rotation requires tracking last rotation date
 	// This would need additional tracking/database
 
 	results = append(results, CheckResult{
 		Control:     "CIS-9.3.1.1",
 		Name:        "Storage Key Rotation",
 		Status:      "INFO",
-		Evidence:    "CIS 4.3, 4.4: MANUAL CHECK - Verify storage account keys are rotated periodically",
+		Evidence:    "CIS 9.3.1.1: MANUAL CHECK - Verify storage account keys are rotated periodically",
 		Remediation: "Implement 90-day key rotation policy",
-		RemediationDetail: `CIS Azure 4.3: Ensure that 'Enable key rotation reminders' is enabled
-CIS Azure 4.4: Ensure that Storage Account Access Keys are Periodically Regenerated
+		RemediationDetail: `CIS Azure 9.3.1.1: Ensure that 'Enable key rotation reminders' is enabled
+CIS Azure 9.3.1.1: Ensure that Storage Account Access Keys are Periodically Regenerated
 
 Best practices:
 - Rotate keys every 90 days
@@ -782,16 +782,14 @@ az storage account keys renew \
 func (c *StorageChecks) CheckStorageLogging(ctx context.Context) []CheckResult {
 	results := []CheckResult{}
 
-	// CIS 4.12, 4.13, 4.14: Storage logging
+	// Storage logging
 	results = append(results, CheckResult{
 		Control:     "AZ-STORAGE-01",
 		Name:        "Storage Logging",
 		Status:      "INFO",
-		Evidence:    "CIS 4.12-4.14: MANUAL CHECK - Verify storage logging enabled for Queue, Blob, and Table services",
+		Evidence:    "MANUAL CHECK - Verify storage logging enabled for Queue, Blob, and Table services",
 		Remediation: "Enable logging for Read, Write, Delete requests",
-		RemediationDetail: `CIS Azure 4.12: Ensure Storage Logging is Enabled for Queue Service for Read, Write, and Delete requests
-CIS Azure 4.13: Ensure Storage logging is Enabled for Blob Service for Read, Write, and Delete requests
-CIS Azure 4.14: Ensure Storage Logging is Enabled for Table Service for Read, Write, and Delete Requests
+		RemediationDetail: `Enable storage logging for the queue, blob and table services, for read, write and delete requests
 
 Azure CLI (example for blob):
 az storage logging update \

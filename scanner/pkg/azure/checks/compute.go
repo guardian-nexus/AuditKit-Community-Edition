@@ -37,7 +37,7 @@ func (c *ComputeChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results = append(results, c.CheckVMExtensions(ctx)...)
 	results = append(results, c.CheckPublicIPs(ctx)...)
 	results = append(results, c.CheckManagedDisks(ctx)...)
-	results = append(results, c.CheckDiskNetworkAccess(ctx)...) // NEW: CIS 8.5
+	results = append(results, c.CheckDiskNetworkAccess(ctx)...)
 
 	return results, nil
 }
@@ -82,10 +82,10 @@ func (c *ComputeChecks) CheckDiskEncryption(ctx context.Context) []CheckResult {
 			Name:        "Disk Encryption at Rest",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 7.1, 7.2: %d/%d disks not encrypted | Violates CIS Azure requirements", len(unencryptedDisks), totalDisks),
-			Remediation: "Enable disk encryption per CIS Azure 7.1, 7.2",
-			RemediationDetail: `CIS Azure 7.1: Ensure Virtual Machines are utilizing Managed Disks
-CIS Azure 7.2: Ensure that 'OS and Data' disks are encrypted with Customer Managed Key (CMK)
+			Evidence:    fmt.Sprintf("%d/%d disks not encrypted | Violates CIS Azure requirements", len(unencryptedDisks), totalDisks),
+			Remediation: "Enable disk encryption",
+			RemediationDetail: `Ensure Virtual Machines are utilizing Managed Disks
+Ensure that 'OS and Data' disks are encrypted with Customer Managed Key (CMK)
 
 Enable Azure Disk Encryption:
 1. Create Key Vault with purge protection and soft delete
@@ -111,7 +111,7 @@ az vm encryption enable \
 			Control:    "CC6.3",
 			Name:       "Disk Encryption at Rest",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 7.1, 7.2: All %d disks encrypted | Meets CIS Azure requirements", totalDisks),
+			Evidence:   fmt.Sprintf("All %d disks encrypted | Meets CIS Azure requirements", totalDisks),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DISK_ENCRYPTION"),
@@ -167,9 +167,9 @@ func (c *ComputeChecks) CheckManagedDisks(ctx context.Context) []CheckResult {
 			Name:        "Managed Disks",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("CIS 7.3: %d VMs using unmanaged disks", len(unmanagedDisks)),
-			Remediation: "Migrate to managed disks per CIS Azure 7.3",
-			RemediationDetail: `CIS Azure 7.3: Ensure that 'Unattached disks' are encrypted with Customer Managed Key (CMK)
+			Evidence:    fmt.Sprintf("%d VMs using unmanaged disks", len(unmanagedDisks)),
+			Remediation: "Migrate to managed disks",
+			RemediationDetail: `Ensure that 'Unattached disks' are encrypted with Customer Managed Key (CMK)
 
 Managed disks provide:
 - Better reliability (99.999% availability)
@@ -188,7 +188,7 @@ Azure Portal → VM → Disks → Migrate to managed disks`,
 			Control:    "AZ-COMPUTE-01",
 			Name:       "Managed Disks",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 7.3: All %d VMs using managed disks", totalVMs),
+			Evidence:   fmt.Sprintf("All %d VMs using managed disks", totalVMs),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("VM_MANAGED_DISKS"),
@@ -263,17 +263,17 @@ func (c *ComputeChecks) CheckVMExtensions(ctx context.Context) []CheckResult {
 			Name:        "Endpoint Protection",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 7.4, 7.5: %d/%d VMs lack antimalware protection", len(vmsWithoutAntimalware), totalVMs),
-			Remediation: "Install Microsoft Antimalware per CIS Azure 7.4, 7.5",
-			RemediationDetail: `CIS Azure 7.4: Ensure that endpoint protection for all Virtual Machines is installed
-CIS Azure 7.5: Ensure that Microsoft Defender for Endpoint (MDE) integration is enabled
+			Evidence:    fmt.Sprintf("CIS 8.1.3.3: %d/%d VMs lack antimalware protection", len(vmsWithoutAntimalware), totalVMs),
+			Remediation: "Install Microsoft Antimalware per CIS Azure 8.1.3.3",
+			RemediationDetail: `CIS Azure 8.1.3.3: Ensure that endpoint protection for all Virtual Machines is installed
+CIS Azure 8.1.3.3: Ensure that Microsoft Defender for Endpoint (MDE) integration is enabled
 
 Install endpoint protection:
 1. VM → Extensions → Add Microsoft Antimalware
 2. Or enable Microsoft Defender for Cloud
 3. Configure real-time protection and scanning
 
-For CIS 7.5: Enable MDE integration via Defender for Cloud`,
+For CIS 8.1.3.3: Enable MDE integration via Defender for Cloud`,
 			ScreenshotGuide: "1. VM → Extensions → Show Microsoft Antimalware installed\n2. Defender for Cloud → VMs → Show endpoint protection status = Healthy\n3. Show MDE integration enabled",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
@@ -286,9 +286,9 @@ For CIS 7.5: Enable MDE integration via Defender for Cloud`,
 		Control:     "AZ-COMPUTE-05",
 		Name:        "VM Backup",
 		Status:      "INFO",
-		Evidence:    "CIS 7.6: MANUAL CHECK - Verify Azure Backup is enabled for all production VMs",
-		Remediation: "Enable Azure Backup per CIS Azure 7.6",
-		RemediationDetail: `CIS Azure 7.6: Ensure that Virtual Machine backup is enabled
+		Evidence:    "MANUAL CHECK - Verify Azure Backup is enabled for all production VMs",
+		Remediation: "Enable Azure Backup",
+		RemediationDetail: `Ensure that Virtual Machine backup is enabled
 
 Requirements:
 1. Create Recovery Services vault
@@ -310,7 +310,7 @@ VM → Backup → Enable and configure policy`,
 	return results
 }
 
-// NEW: CIS 8.5 - Disk network access restriction
+// Disk network access restriction
 func (c *ComputeChecks) CheckDiskNetworkAccess(ctx context.Context) []CheckResult {
 	results := []CheckResult{}
 
@@ -359,9 +359,9 @@ func (c *ComputeChecks) CheckDiskNetworkAccess(ctx context.Context) []CheckResul
 			Name:        "Disk Network Access Restriction",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 8.5: %d/%d managed disks allow public network access | Violates CIS Azure requirements", len(disksWithPublicAccess), totalDisks),
-			Remediation: "Restrict disk network access per CIS Azure 8.5",
-			RemediationDetail: `CIS Azure 8.5: Ensure that 'Public access level' is set to Private for Azure managed disks
+			Evidence:    fmt.Sprintf("%d/%d managed disks allow public network access | Violates CIS Azure requirements", len(disksWithPublicAccess), totalDisks),
+			Remediation: "Restrict disk network access",
+			RemediationDetail: `Ensure that 'Public access level' is set to Private for Azure managed disks
 
 Managed disks should restrict network access to prevent unauthorized data exfiltration.
 
@@ -399,7 +399,7 @@ Security impact:
 			Control:    "AZ-COMPUTE-02",
 			Name:       "Disk Network Access Restriction",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 8.5: All %d managed disks have restricted network access | Meets CIS Azure requirements", totalDisks),
+			Evidence:   fmt.Sprintf("All %d managed disks have restricted network access | Meets CIS Azure requirements", totalDisks),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DISK_NETWORK_ACCESS"),

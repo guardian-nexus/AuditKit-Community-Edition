@@ -38,25 +38,25 @@ func (c *VPCChecks) Run(ctx context.Context) ([]CheckResult, error) {
 		results = append(results, result)
 	}
 
-	// CIS 5.7-5.8: VPC Endpoints
+	// VPC Endpoints
 	if result, err := c.CheckVPCEndpoints(ctx); err == nil {
 		results = append(results, result)
 	}
 
-	// CIS 5.9-5.12: NACL restrictions
+	// NACL restrictions
 	results = append(results, c.CheckNACLRestrictions(ctx)...)
 
-	// CIS 5.13: Admin port security
+	// Admin port security
 	if result, err := c.CheckAdminPortSecurity(ctx); err == nil {
 		results = append(results, result)
 	}
 
-	// CIS 5.14: EC2 subnet placement
+	// EC2 subnet placement
 	if result, err := c.CheckEC2SubnetPlacement(ctx); err == nil {
 		results = append(results, result)
 	}
 
-	// CIS 5.18: Unused security groups
+	// Unused security groups
 	if result, err := c.CheckUnusedSecurityGroups(ctx); err == nil {
 		results = append(results, result)
 	}
@@ -125,7 +125,7 @@ func (c *VPCChecks) CheckVPCFlowLogs(ctx context.Context) (CheckResult, error) {
 	}, nil
 }
 
-// CIS 5.1 - Ensure no default VPC is in use
+// Ensure no default VPC is in use
 func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
 	vpcs, err := c.client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{
 		Filters: []types.Filter{
@@ -195,7 +195,7 @@ func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
 	}, nil
 }
 
-// CIS 5.5 - Ensure routing tables for VPC peering are least access
+// CIS 6.6 - Ensure routing tables for VPC peering are least access
 func (c *VPCChecks) CheckVPCPeering(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
 		Control:           "CIS-6.6",
@@ -212,7 +212,7 @@ func (c *VPCChecks) CheckVPCPeering(ctx context.Context) (CheckResult, error) {
 	}, nil
 }
 
-// CIS 5.7-5.8 - Ensure VPC endpoints are used for AWS services
+// CIS 6.8 - Ensure VPC endpoints are used for AWS services
 func (c *VPCChecks) CheckVPCEndpoints(ctx context.Context) (CheckResult, error) {
 	vpcs, err := c.client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
 	if err != nil {
@@ -262,7 +262,7 @@ func (c *VPCChecks) CheckVPCEndpoints(ctx context.Context) (CheckResult, error) 
 	}
 
 	if len(vpcsWithoutS3) > 0 || len(vpcsWithoutDynamoDB) > 0 {
-		evidence := fmt.Sprintf("VPCs without S3 endpoint: %d | VPCs without DynamoDB endpoint: %d | CIS 5.7-5.8",
+		evidence := fmt.Sprintf("VPCs without S3 endpoint: %d | VPCs without DynamoDB endpoint: %d | CIS 6.8",
 			len(vpcsWithoutS3), len(vpcsWithoutDynamoDB))
 
 		return CheckResult{
@@ -289,14 +289,14 @@ aws ec2 create-vpc-endpoint --vpc-id VPC_ID --service-name com.amazonaws.REGION.
 		Control:    "CIS-6.8",
 		Name:       "VPC Endpoints for AWS Services",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("All %d VPCs have appropriate endpoints | CIS 5.7-5.8", len(vpcs.Vpcs)-countDefaultVPCs(vpcs.Vpcs)),
+		Evidence:   fmt.Sprintf("All %d VPCs have appropriate endpoints | CIS 6.8", len(vpcs.Vpcs)-countDefaultVPCs(vpcs.Vpcs)),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"CIS-AWS": "6.8, 6.6"},
 	}, nil
 }
 
-// CIS 5.9-5.12 - Ensure Network ACLs restrict admin access from internet
+// CIS 6.2 - Ensure Network ACLs restrict admin access from internet
 func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -360,14 +360,14 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 		}
 	}
 
-	// CIS 5.9
+	// CIS 6.2
 	if len(naclsAllowingSSH) > 0 {
 		results = append(results, CheckResult{
 			Control:           "CIS-6.2",
 			Name:              "NACL Restricts SSH from Internet",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("%d NACLs allow SSH (port 22) from 0.0.0.0/0: %v | CIS 5.9", len(naclsAllowingSSH), truncateList(naclsAllowingSSH, 3)),
+			Evidence:          fmt.Sprintf("%d NACLs allow SSH (port 22) from 0.0.0.0/0: %v | CIS 6.2", len(naclsAllowingSSH), truncateList(naclsAllowingSSH, 3)),
 			Remediation:       "Remove NACL rules allowing SSH from 0.0.0.0/0",
 			RemediationDetail: `aws ec2 delete-network-acl-entry --network-acl-id NACL_ID --ingress --rule-number RULE_NUM`,
 			ScreenshotGuide:   "VPC Console → Network ACLs → Inbound Rules → Screenshot showing no rules for port 22 from 0.0.0.0/0",
@@ -381,21 +381,21 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 			Control:    "CIS-6.2",
 			Name:       "NACL Restricts SSH from Internet",
 			Status:     "PASS",
-			Evidence:   "No NACLs allow SSH from internet | CIS 5.9",
+			Evidence:   "No NACLs allow SSH from internet | CIS 6.2",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"CIS-AWS": "6.2"},
 		})
 	}
 
-	// CIS 5.10
+	// CIS 6.2
 	if len(naclsAllowingRDP) > 0 {
 		results = append(results, CheckResult{
 			Control:           "CIS-6.2",
 			Name:              "NACL Restricts RDP from Internet",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("%d NACLs allow RDP (port 3389) from 0.0.0.0/0: %v | CIS 5.10", len(naclsAllowingRDP), truncateList(naclsAllowingRDP, 3)),
+			Evidence:          fmt.Sprintf("%d NACLs allow RDP (port 3389) from 0.0.0.0/0: %v | CIS 6.2", len(naclsAllowingRDP), truncateList(naclsAllowingRDP, 3)),
 			Remediation:       "Remove NACL rules allowing RDP from 0.0.0.0/0",
 			RemediationDetail: `aws ec2 delete-network-acl-entry --network-acl-id NACL_ID --ingress --rule-number RULE_NUM`,
 			ScreenshotGuide:   "VPC Console → Network ACLs → Inbound Rules → Screenshot showing no rules for port 3389 from 0.0.0.0/0",
@@ -409,21 +409,21 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 			Control:    "CIS-6.2",
 			Name:       "NACL Restricts RDP from Internet",
 			Status:     "PASS",
-			Evidence:   "No NACLs allow RDP from internet | CIS 5.10",
+			Evidence:   "No NACLs allow RDP from internet | CIS 6.2",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"CIS-AWS": "6.2"},
 		})
 	}
 
-	// CIS 5.11
+	// CIS 6.2
 	if len(naclsAllowingSSHv6) > 0 {
 		results = append(results, CheckResult{
 			Control:           "AWS-VPC-04",
 			Name:              "NACL Restricts SSH from Internet (IPv6)",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("%d NACLs allow SSH from ::/0: %v | CIS 5.11", len(naclsAllowingSSHv6), truncateList(naclsAllowingSSHv6, 3)),
+			Evidence:          fmt.Sprintf("%d NACLs allow SSH from ::/0: %v", len(naclsAllowingSSHv6), truncateList(naclsAllowingSSHv6, 3)),
 			Remediation:       "Remove NACL rules allowing SSH from ::/0",
 			RemediationDetail: `aws ec2 delete-network-acl-entry --network-acl-id NACL_ID --ingress --rule-number RULE_NUM`,
 			ScreenshotGuide:   "VPC Console → Network ACLs → Inbound Rules → Screenshot showing no IPv6 rules for port 22",
@@ -437,21 +437,21 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 			Control:    "AWS-VPC-04",
 			Name:       "NACL Restricts SSH from Internet (IPv6)",
 			Status:     "PASS",
-			Evidence:   "No NACLs allow SSH from ::/0 | CIS 5.11",
+			Evidence:   "No NACLs allow SSH from ::/0",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "CC6.6"},
 		})
 	}
 
-	// CIS 5.12
+	// CIS 6.2
 	if len(naclsAllowingRDPv6) > 0 {
 		results = append(results, CheckResult{
 			Control:           "AWS-VPC-03",
 			Name:              "NACL Restricts RDP from Internet (IPv6)",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
-			Evidence:          fmt.Sprintf("%d NACLs allow RDP from ::/0: %v | CIS 5.12", len(naclsAllowingRDPv6), truncateList(naclsAllowingRDPv6, 3)),
+			Evidence:          fmt.Sprintf("%d NACLs allow RDP from ::/0: %v", len(naclsAllowingRDPv6), truncateList(naclsAllowingRDPv6, 3)),
 			Remediation:       "Remove NACL rules allowing RDP from ::/0",
 			RemediationDetail: `aws ec2 delete-network-acl-entry --network-acl-id NACL_ID --ingress --rule-number RULE_NUM`,
 			ScreenshotGuide:   "VPC Console → Network ACLs → Inbound Rules → Screenshot showing no IPv6 rules for port 3389",
@@ -465,7 +465,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 			Control:    "AWS-VPC-03",
 			Name:       "NACL Restricts RDP from Internet (IPv6)",
 			Status:     "PASS",
-			Evidence:   "No NACLs allow RDP from ::/0 | CIS 5.12",
+			Evidence:   "No NACLs allow RDP from ::/0",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "CC6.6"},
@@ -475,7 +475,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 	return results
 }
 
-// CIS 5.13 - Security groups restrict admin access
+// CIS 6.3 - Security groups restrict admin access
 func (c *VPCChecks) CheckAdminPortSecurity(ctx context.Context) (CheckResult, error) {
 	secGroups, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
@@ -510,7 +510,7 @@ func (c *VPCChecks) CheckAdminPortSecurity(ctx context.Context) (CheckResult, er
 			Name:        "Security Groups Restrict Admin Ports",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("%d security group rules allow admin ports from internet: %v | CIS 5.13", len(violatingSGs), truncateList(violatingSGs, 5)),
+			Evidence:    fmt.Sprintf("%d security group rules allow admin ports from internet: %v | CIS 6.3", len(violatingSGs), truncateList(violatingSGs, 5)),
 			Remediation: "Restrict admin port access to specific IP ranges",
 			RemediationDetail: `aws ec2 revoke-security-group-ingress --group-id SG_ID --protocol tcp --port 22 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id SG_ID --protocol tcp --port 22 --cidr YOUR_IP/32`,
@@ -526,14 +526,14 @@ aws ec2 authorize-security-group-ingress --group-id SG_ID --protocol tcp --port 
 		Control:    "CIS-6.3",
 		Name:       "Security Groups Restrict Admin Ports",
 		Status:     "PASS",
-		Evidence:   "Security groups properly restrict admin port access | CIS 5.13",
+		Evidence:   "Security groups properly restrict admin port access | CIS 6.3",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"CIS-AWS": "6.3"},
 	}, nil
 }
 
-// CIS 5.14 - Ensure EC2 instances are in custom VPC subnets
+// Ensure EC2 instances are in custom VPC subnets
 func (c *VPCChecks) CheckEC2SubnetPlacement(ctx context.Context) (CheckResult, error) {
 	// Get default VPCs
 	defaultVPCs, err := c.client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{
@@ -569,7 +569,7 @@ func (c *VPCChecks) CheckEC2SubnetPlacement(ctx context.Context) (CheckResult, e
 			Name:              "EC2 Instances in Custom VPC",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("%d instances in default VPC: %v | CIS 5.14", len(instancesInDefault), truncateList(instancesInDefault, 3)),
+			Evidence:          fmt.Sprintf("%d instances in default VPC: %v", len(instancesInDefault), truncateList(instancesInDefault, 3)),
 			Remediation:       "Launch instances in custom VPCs with proper network controls",
 			RemediationDetail: "1. Create custom VPC\n2. Migrate instances to custom VPC\n3. Terminate instances in default VPC",
 			ScreenshotGuide:   "EC2 Console → Instances → VPC column → Screenshot showing all instances in custom VPCs",
@@ -584,14 +584,14 @@ func (c *VPCChecks) CheckEC2SubnetPlacement(ctx context.Context) (CheckResult, e
 		Control:    "AWS-VPC-02",
 		Name:       "EC2 Instances in Custom VPC",
 		Status:     "PASS",
-		Evidence:   "All instances in custom VPCs | CIS 5.14",
+		Evidence:   "All instances in custom VPCs",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC6.6"},
 	}, nil
 }
 
-// CIS 5.18 - Ensure unused security groups are removed
+// Ensure unused security groups are removed
 func (c *VPCChecks) CheckUnusedSecurityGroups(ctx context.Context) (CheckResult, error) {
 	secGroups, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
@@ -629,7 +629,7 @@ func (c *VPCChecks) CheckUnusedSecurityGroups(ctx context.Context) (CheckResult,
 			Name:              "Unused Security Groups Removed",
 			Status:            "FAIL",
 			Severity:          "LOW",
-			Evidence:          fmt.Sprintf("%d unused security groups found: %v | CIS 5.18", len(unusedSGs), truncateList(unusedSGs, 5)),
+			Evidence:          fmt.Sprintf("%d unused security groups found: %v", len(unusedSGs), truncateList(unusedSGs, 5)),
 			Remediation:       "Remove unused security groups to reduce attack surface",
 			RemediationDetail: `aws ec2 delete-security-group --group-id SG_ID`,
 			ScreenshotGuide:   "EC2 Console → Security Groups → Screenshot showing only security groups in use",
@@ -644,7 +644,7 @@ func (c *VPCChecks) CheckUnusedSecurityGroups(ctx context.Context) (CheckResult,
 		Control:    "AWS-VPC-05",
 		Name:       "Unused Security Groups Removed",
 		Status:     "PASS",
-		Evidence:   "No unused security groups | CIS 5.18",
+		Evidence:   "No unused security groups",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC6.6"},

@@ -196,7 +196,7 @@ func (c *RDSChecks) CheckRDSBackups(ctx context.Context) (CheckResult, error) {
 
 // NEW CIS-SPECIFIC CHECKS
 
-// CIS 2.3.2 - Ensure RDS instances have automatic minor version upgrade enabled
+// CIS 3.2.2 - Ensure RDS instances have automatic minor version upgrade enabled
 func (c *RDSChecks) CheckRDSMinorVersionUpgrade(ctx context.Context) (CheckResult, error) {
 	instances, err := c.client.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
 	if err != nil {
@@ -239,7 +239,7 @@ func (c *RDSChecks) CheckRDSMinorVersionUpgrade(ctx context.Context) (CheckResul
 	}, nil
 }
 
-// CIS 2.3.4 - Ensure RDS instances are configured with multiple Availability Zones
+// CIS 3.2.4 - Ensure RDS instances are configured with multiple Availability Zones
 func (c *RDSChecks) CheckRDSMultiAZ(ctx context.Context) (CheckResult, error) {
 	instances, err := c.client.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
 	if err != nil {
@@ -282,7 +282,7 @@ func (c *RDSChecks) CheckRDSMultiAZ(ctx context.Context) (CheckResult, error) {
 	}, nil
 }
 
-// CIS 2.3.5 - Ensure RDS instances have deletion protection enabled
+// Ensure RDS instances have deletion protection enabled
 func (c *RDSChecks) CheckRDSDeletionProtection(ctx context.Context) (CheckResult, error) {
 	instances, err := c.client.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
 	if err != nil {

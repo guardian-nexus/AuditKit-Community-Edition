@@ -28,22 +28,22 @@ func (c *OrganizationsAdvancedChecks) Name() string {
 func (c *OrganizationsAdvancedChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	// CIS 11.1 - SCPs enabled
+	// SCPs enabled
 	if result, err := c.CheckSCPsEnabled(ctx); err == nil {
 		results = append(results, result)
 	}
 
-	// CIS 11.2 - Multi-account structure
+	// Multi-account structure
 	if result, err := c.CheckMultiAccountStructure(ctx); err == nil {
 		results = append(results, result)
 	}
 
-	// CIS 11.3 - Organization CloudTrail
+	// Organization CloudTrail
 	if result, err := c.CheckOrganizationTrail(ctx); err == nil {
 		results = append(results, result)
 	}
 
-	// CIS 11.4 - Service Control Policies configured
+	// Service Control Policies configured
 	if result, err := c.CheckSCPsConfigured(ctx); err == nil {
 		results = append(results, result)
 	}
