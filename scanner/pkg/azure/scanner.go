@@ -269,6 +269,7 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 	soc2Checks := []checks.Check{
 		checks.NewDefenderChecks(s.subscriptionID, s.securityClient, s.autoProvisionClient, s.contactsClient),
 		checks.NewAzureCISManualChecks(s.subscriptionID),
+		checks.NewCISFoundationsManualChecks(), // CIS Azure Foundations v6.0.0, the Manual recommendations
 		checks.NewAppServiceChecks(s.subscriptionID),
 		checks.NewAzureCC1Checks(s.roleClient, s.roleDefClient),
 		checks.NewAzureCC2Checks(),
