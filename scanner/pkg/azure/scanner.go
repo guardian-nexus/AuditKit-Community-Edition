@@ -33,6 +33,14 @@ type AzureScanner struct {
 	nsgClient           *armnetwork.SecurityGroupsClient
 	nicClient           *armnetwork.InterfacesClient
 	publicIPClient      *armnetwork.PublicIPAddressesClient
+	appGatewayClient    *armnetwork.ApplicationGatewaysClient
+	wafPolicyClient     *armnetwork.WebApplicationFirewallPoliciesClient
+	watcherClient       *armnetwork.WatchersClient
+	flowLogClient       *armnetwork.FlowLogsClient
+	vpnGatewayClient    *armnetwork.VirtualNetworkGatewaysClient
+	bastionClient       *armnetwork.BastionHostsClient
+	kvKeysClient        *armkeyvault.KeysClient
+	kvSecretsClient     *armkeyvault.SecretsClient
 	sqlClient           *armsql.ServersClient
 	sqlDBClient         *armsql.DatabasesClient
 	keyVaultClient      *armkeyvault.VaultsClient
@@ -50,6 +58,7 @@ type AzureScanner struct {
 	subAssessClient     *armsecurity.SubAssessmentsClient
 	autoProvisionClient *armsecurity.AutoProvisioningSettingsClient // For auto-provisioning
 	contactsClient      *armsecurity.ContactsClient                 // For security contacts
+	assessmentsClient   *armsecurity.AssessmentsClient              // Defender's own recommendation results
 }
 
 type ScanResult struct {
@@ -111,6 +120,47 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 	publicIPClient, err := armnetwork.NewPublicIPAddressesClient(subscriptionID, cred, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create public IP client: %v", err)
+	}
+
+	// The section 7 networking recommendations read five different resources.
+	// networkClient is already the virtual networks client, so it serves the
+	// subnet and resource-group enumeration. The rest are optional: each check
+	// reports ERROR when its own client is absent rather than passing on data
+	// it never saw.
+	appGatewayClient, err := armnetwork.NewApplicationGatewaysClient(subscriptionID, cred, nil)
+	if err != nil {
+		appGatewayClient = nil
+	}
+	wafPolicyClient, err := armnetwork.NewWebApplicationFirewallPoliciesClient(subscriptionID, cred, nil)
+	if err != nil {
+		wafPolicyClient = nil
+	}
+	watcherClient, err := armnetwork.NewWatchersClient(subscriptionID, cred, nil)
+	if err != nil {
+		watcherClient = nil
+	}
+	flowLogClient, err := armnetwork.NewFlowLogsClient(subscriptionID, cred, nil)
+	if err != nil {
+		flowLogClient = nil
+	}
+	vpnGatewayClient, err := armnetwork.NewVirtualNetworkGatewaysClient(subscriptionID, cred, nil)
+	if err != nil {
+		vpnGatewayClient = nil
+	}
+	bastionClient, err := armnetwork.NewBastionHostsClient(subscriptionID, cred, nil)
+	if err != nil {
+		bastionClient = nil
+	}
+
+	// The key and secret objects, for the section 8.3 expiry and rotation
+	// recommendations. The vault client alone cannot see them.
+	kvKeysClient, err := armkeyvault.NewKeysClient(subscriptionID, cred, nil)
+	if err != nil {
+		kvKeysClient = nil
+	}
+	kvSecretsClient, err := armkeyvault.NewSecretsClient(subscriptionID, cred, nil)
+	if err != nil {
+		kvSecretsClient = nil
 	}
 
 	sqlClient, err := armsql.NewServersClient(subscriptionID, cred, nil)
@@ -204,6 +254,14 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		return nil, fmt.Errorf("failed to create security contacts client: %v", err)
 	}
 
+	// Defender's own recommendation results, which is where the operating
+	// system update assessment surfaces. Constructed with its field, not
+	// declared and left nil.
+	assessmentsClient, err := armsecurity.NewAssessmentsClient(cred, nil)
+	if err != nil {
+		assessmentsClient = nil
+	}
+
 	return &AzureScanner{
 		subscriptionID:      subscriptionID,
 		cred:                cred,
@@ -215,6 +273,14 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		nsgClient:           nsgClient,
 		nicClient:           nicClient,
 		publicIPClient:      publicIPClient,
+		appGatewayClient:    appGatewayClient,
+		wafPolicyClient:     wafPolicyClient,
+		watcherClient:       watcherClient,
+		flowLogClient:       flowLogClient,
+		vpnGatewayClient:    vpnGatewayClient,
+		bastionClient:       bastionClient,
+		kvKeysClient:        kvKeysClient,
+		kvSecretsClient:     kvSecretsClient,
 		sqlClient:           sqlClient,
 		sqlDBClient:         sqlDBClient,
 		keyVaultClient:      keyVaultClient,
@@ -232,6 +298,7 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		subAssessClient:     subAssessClient,
 		autoProvisionClient: autoProvisionClient,
 		contactsClient:      contactsClient,
+		assessmentsClient:   assessmentsClient,
 	}, nil
 }
 
@@ -296,6 +363,11 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 		checks.NewCISFoundationsManualChecks(),                                                // CIS Azure Foundations v6.0.0, the Manual recommendations
 		checks.NewCISStorageChecks(s.storageClient, s.blobServiceClient, s.fileServiceClient), // CIS Azure v6.0.0 section 9
 		checks.NewCISActivityAlertChecks(s.alertClient, s.insightsClient, s.subscriptionID),   // CIS Azure v6.0.0 sections 6.1.2 and 6.1.3
+		checks.NewCISIdentityDefenderChecks(s.roleClient, s.roleDefClient, s.securityClient, // CIS Azure v6.0.0 sections 5.3.3, 5.4 and 8.1
+			s.contactsClient, s.assessmentsClient, s.subscriptionID),
+		checks.NewCISNetworkChecks(s.appGatewayClient, s.wafPolicyClient, s.networkClient, // CIS Azure v6.0.0 section 7
+			s.watcherClient, s.flowLogClient, s.vpnGatewayClient, s.bastionClient),
+		checks.NewCISKeyVaultChecks(s.keyVaultClient, s.kvKeysClient, s.kvSecretsClient), // CIS Azure v6.0.0 section 8.3
 		checks.NewAppServiceChecks(s.subscriptionID),
 		checks.NewAzureCC1Checks(s.roleClient, s.roleDefClient),
 		checks.NewAzureCC2Checks(),
