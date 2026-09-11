@@ -501,6 +501,8 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 	soc2Checks := []checks.Check{
 		// CC1 & CC2: Control Environment & Communication
 		checks.NewCC1Checks(s.iamClient, s.orgClient, s.ssmClient),
+		checks.NewKMSChecks(s.kmsClient), // claims SOC2 and PCI; must run in those scans
+		checks.NewEFSChecks(s.efsClient), // claims SOC2 and PCI; must run in those scans
 		checks.NewCC2Checks(s.snsClient, s.ssmClient, s.iamClient),
 
 		// CC3, CC4, CC5: Risk Assessment, Monitoring, Control Activities
@@ -624,6 +626,8 @@ func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 	// Also run basic checks but filter for PCI relevance
 	basicChecks := []checks.Check{
 		checks.NewIAMChecks(s.iamClient),                               // For password policy, MFA, key rotation
+		checks.NewKMSChecks(s.kmsClient),                               // claims SOC2 and PCI; must run in those scans
+		checks.NewEFSChecks(s.efsClient),                               // claims SOC2 and PCI; must run in those scans
 		checks.NewS3Checks(s.s3Client, s.s3controlClient, s.stsClient), // For encryption requirements
 		checks.NewEC2Checks(s.ec2Client),                               // For network segmentation
 		checks.NewCloudTrailChecks(s.ctClient),                         // For logging requirements
