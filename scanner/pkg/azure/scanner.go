@@ -503,7 +503,7 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 	var results []ScanResult
 
 	if verbose {
-		fmt.Println("Running CMMC Level 1 - Open Source (the level defines 17 practices)")
+		fmt.Println("Running CMMC - all 110 practices reported, the technical ones measured")
 		fmt.Println("")
 		fmt.Println("IMPORTANT DISCLAIMER:")
 		fmt.Println("This scanner tests technical controls that can be automated.")
@@ -536,21 +536,61 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 	}
 
 	if verbose {
-		fmt.Printf("\nCMMC Level 1 scan complete: %d controls tested\n", len(results))
+		fmt.Printf("\nCMMC scan complete: %d practices reported\n", len(results))
 		fmt.Println("")
-		fmt.Println("UNLOCK CMMC LEVEL 2:")
-		fmt.Println("  - All 110 CMMC Level 2 practices for CUI")
-		fmt.Println("  - Required for DoW contractors handling CUI")
-		fmt.Println("  - Complete evidence collection guides")
-		fmt.Println("  - November 10, 2025 deadline compliance")
+		fmt.Println("WHAT AUDITKIT PRO ADDS:")
+		fmt.Println("  - More of the 110 practices measured rather than asked for")
+		fmt.Println("  - Evidence packages an assessor can read directly")
+		fmt.Println("  - Multi-account scanning and continuous monitoring")
 		fmt.Println("")
-		fmt.Println("Visit https://auditkit.io/pro for full CMMC Level 2")
+		fmt.Println("Visit https://auditkit.io/pro")
 	}
 
 	// Vulnerability scan coverage, read from Defender rather than asked for as a document.
 	results = append(results, s.runVulnCoverage(ctx, checks.EmitCMMC)...)
 
+	// Every practice nothing above reported, reported as a manual requirement.
+	// A CMMC report's denominator is the benchmark's 110, not the subset this
+	// provider can automate, or a reader cannot tell an absent practice from a
+	// satisfied one.
+	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
+
 	return results
+}
+
+// reportRemainingCMMCPractices fills in the practices the suites above did not
+// name. The covered set is computed from the results just produced rather than
+// kept by hand, so adding an automated check for a practice removes it from
+// here automatically instead of leaving it reported twice.
+func (s *AzureScanner) reportRemainingCMMCPractices(ctx context.Context, reported []ScanResult) []ScanResult {
+	covered := map[string]bool{}
+	for _, r := range reported {
+		covered[r.Control] = true
+		// A tag may name more than one practice. None do today, but a
+		// single-key read would silently report both of them again.
+		for _, id := range strings.Split(r.Frameworks["CMMC"], ",") {
+			if id = strings.TrimSpace(id); id != "" {
+				covered[id] = true
+			}
+		}
+	}
+	var out []ScanResult
+	rows, _ := checks.NewCMMCPracticeReport(covered).Run(ctx)
+	for _, cr := range rows {
+		out = append(out, ScanResult{
+			Control:           cr.Control,
+			Name:              cr.Name,
+			Status:            cr.Status,
+			Evidence:          cr.Evidence,
+			Remediation:       cr.Remediation,
+			RemediationDetail: cr.RemediationDetail,
+			Severity:          cr.Severity,
+			ScreenshotGuide:   cr.ScreenshotGuide,
+			ConsoleURL:        cr.ConsoleURL,
+			Frameworks:        cr.Frameworks,
+		})
+	}
+	return out
 }
 
 func (s *AzureScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResult {
