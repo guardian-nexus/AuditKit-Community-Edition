@@ -92,7 +92,7 @@ func (c *ConfigChecks) CheckConfigRecording(ctx context.Context) (CheckResult, e
 	recorders, err := c.client.DescribeConfigurationRecorders(ctx, &configservice.DescribeConfigurationRecordersInput{})
 	if err != nil || len(recorders.ConfigurationRecorders) == 0 {
 		return CheckResult{
-			Control:           "CIS-3.5",
+			Control:           "CIS-4.3",
 			Name:              "AWS Config Recording Status",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -122,7 +122,7 @@ func (c *ConfigChecks) CheckConfigRecording(ctx context.Context) (CheckResult, e
 
 	if len(notRecording) > 0 {
 		return CheckResult{
-			Control:           "CIS-3.5",
+			Control:           "CIS-4.3",
 			Name:              "AWS Config Recording Status",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -138,7 +138,7 @@ func (c *ConfigChecks) CheckConfigRecording(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "CIS-3.5",
+		Control:    "CIS-4.3",
 		Name:       "AWS Config Recording Status",
 		Status:     "PASS",
 		Evidence:   "AWS Config is actively recording configuration changes",

@@ -151,7 +151,7 @@ func (c *MonitoringChecks) CheckSecurityHubEnabled(ctx context.Context) (CheckRe
 			strings.Contains(err.Error(), "InvalidAccessException") ||
 			strings.Contains(err.Error(), "ResourceNotFoundException") {
 			return CheckResult{
-				Control:     "CIS-4.16",
+				Control:     "CIS-5.16",
 				Name:        "AWS Security Hub Enabled",
 				Status:      "FAIL",
 				Severity:    "MEDIUM",
@@ -195,7 +195,7 @@ Also consider enabling:
 
 		// Other errors (permission issues, etc.)
 		return CheckResult{
-			Control:           "CIS-4.16",
+			Control:           "CIS-5.16",
 			Name:              "AWS Security Hub Enabled",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -211,7 +211,7 @@ Also consider enabling:
 	// Security Hub is enabled - check if it's active
 	if hub.HubArn == nil || *hub.HubArn == "" {
 		return CheckResult{
-			Control:     "CIS-4.16",
+			Control:     "CIS-5.16",
 			Name:        "AWS Security Hub Enabled",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
@@ -230,7 +230,7 @@ Also consider enabling:
 	}
 
 	return CheckResult{
-		Control:    "CIS-4.16",
+		Control:    "CIS-5.16",
 		Name:       "AWS Security Hub Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("AWS Security Hub is enabled | Hub ARN: %s | Subscribed: %s", *hub.HubArn, subscriptionDate),

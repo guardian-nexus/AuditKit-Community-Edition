@@ -68,13 +68,13 @@ func (c *EKSChecks) CheckEKSEndpointAccess(ctx context.Context) (CheckResult, er
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CIS-8.1",
+			Control:    "CC6.6",
 			Name:       "EKS Cluster Endpoint Access",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.1 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "8.1"},
+			Frameworks: map[string]string{"SOC2": "CC6.6"},
 		}, nil
 	}
 
@@ -108,7 +108,7 @@ func (c *EKSChecks) CheckEKSEndpointAccess(ctx context.Context) (CheckResult, er
 		}
 
 		return CheckResult{
-			Control:     "CIS-8.1",
+			Control:     "CC6.6",
 			Name:        "EKS Cluster Endpoint Access",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -127,18 +127,18 @@ aws eks update-cluster-config \
 			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "8.1", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
+			Frameworks:      map[string]string{"SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-8.1",
+		Control:    "CC6.6",
 		Name:       "EKS Cluster Endpoint Access",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d EKS clusters have restricted endpoint access | Meets CIS 8.1", len(clusters.Clusters)),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "8.1"},
+		Frameworks: map[string]string{"SOC2": "CC6.6"},
 	}, nil
 }
 
@@ -151,13 +151,13 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CIS-8.2",
+			Control:    "CC7.2",
 			Name:       "EKS Cluster Logging",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.2 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "8.2"},
+			Frameworks: map[string]string{"SOC2": "CC7.2"},
 		}, nil
 	}
 
@@ -205,7 +205,7 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 		}
 
 		return CheckResult{
-			Control:     "CIS-8.2",
+			Control:     "CC7.2",
 			Name:        "EKS Cluster Logging",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -218,18 +218,18 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "8.2", "SOC2": "CC7.2", "PCI-DSS": "10.2.1.2"},
+			Frameworks:      map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1.2"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-8.2",
+		Control:    "CC7.2",
 		Name:       "EKS Cluster Logging",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d EKS clusters have complete logging enabled | Meets CIS 8.2", len(clusters.Clusters)),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "8.2"},
+		Frameworks: map[string]string{"SOC2": "CC7.2"},
 	}, nil
 }
 
@@ -242,13 +242,13 @@ func (c *EKSChecks) CheckEKSEncryption(ctx context.Context) (CheckResult, error)
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CIS-8.3",
+			Control:    "CC6.7",
 			Name:       "EKS Cluster Encryption",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.3 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "8.3"},
+			Frameworks: map[string]string{"SOC2": "CC6.7"},
 		}, nil
 	}
 
@@ -279,7 +279,7 @@ func (c *EKSChecks) CheckEKSEncryption(ctx context.Context) (CheckResult, error)
 		}
 
 		return CheckResult{
-			Control:     "CIS-8.3",
+			Control:     "CC6.7",
 			Name:        "EKS Cluster Encryption",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
@@ -296,18 +296,18 @@ aws eks create-cluster \
 			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "8.3", "SOC2": "CC6.7", "PCI-DSS": "3.5.1"},
+			Frameworks:      map[string]string{"SOC2": "CC6.7", "PCI-DSS": "3.5.1"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-8.3",
+		Control:    "CC6.7",
 		Name:       "EKS Cluster Encryption",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d EKS clusters have encryption enabled | Meets CIS 8.3", len(clusters.Clusters)),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "8.3"},
+		Frameworks: map[string]string{"SOC2": "CC6.7"},
 	}, nil
 }
 
@@ -320,20 +320,20 @@ func (c *EKSChecks) CheckEKSNetworkPolicy(ctx context.Context) (CheckResult, err
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CIS-8.4",
+			Control:    "CC6.6",
 			Name:       "EKS Network Policy",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.4 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "8.4"},
+			Frameworks: map[string]string{"SOC2": "CC6.6"},
 		}, nil
 	}
 
 	// Network policy enforcement requires manual verification or add-on checks
 	// This is a manual check as network policy is typically implemented via Calico or other CNI plugins
 	return CheckResult{
-		Control:     "CIS-8.4",
+		Control:     "CC6.6",
 		Name:        "EKS Network Policy",
 		Status:      "MANUAL",
 		Severity:    "MEDIUM",
@@ -348,7 +348,7 @@ kubectl apply -f https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/master
 		ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 		Priority:        PriorityMedium,
 		Timestamp:       time.Now(),
-		Frameworks:      map[string]string{"CIS-AWS": "8.4", "SOC2": "CC6.6"},
+		Frameworks:      map[string]string{"SOC2": "CC6.6"},
 	}, nil
 }
 
@@ -361,20 +361,20 @@ func (c *EKSChecks) CheckEKSPodSecurityPolicy(ctx context.Context) (CheckResult,
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CIS-8.5",
+			Control:    "CC8.1",
 			Name:       "EKS Pod Security Policy",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.5 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "8.5"},
+			Frameworks: map[string]string{"SOC2": "CC8.1"},
 		}, nil
 	}
 
 	// Pod Security Policy is deprecated in K8s 1.25+, replaced by Pod Security Standards
 	// This requires manual verification of PSP or PSS implementation
 	return CheckResult{
-		Control:     "CIS-8.5",
+		Control:     "CC8.1",
 		Name:        "EKS Pod Security Policy",
 		Status:      "MANUAL",
 		Severity:    "HIGH",
@@ -392,7 +392,7 @@ kubectl get namespace default -o yaml | grep pod-security`,
 		ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 		Priority:        PriorityHigh,
 		Timestamp:       time.Now(),
-		Frameworks:      map[string]string{"CIS-AWS": "8.5", "SOC2": "CC8.1", "PCI-DSS": "2.2.1"},
+		Frameworks:      map[string]string{"SOC2": "CC8.1", "PCI-DSS": "2.2.1"},
 	}, nil
 }
 
@@ -405,20 +405,20 @@ func (c *EKSChecks) CheckEKSRBAC(ctx context.Context) (CheckResult, error) {
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CIS-8.6",
+			Control:    "CC6.3",
 			Name:       "EKS RBAC Configuration",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.6 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "8.6"},
+			Frameworks: map[string]string{"SOC2": "CC6.3"},
 		}, nil
 	}
 
 	// RBAC configuration requires kubectl access to verify
 	// This is a manual check
 	return CheckResult{
-		Control:     "CIS-8.6",
+		Control:     "CC6.3",
 		Name:        "EKS RBAC Configuration",
 		Status:      "MANUAL",
 		Severity:    "HIGH",
@@ -437,7 +437,7 @@ kubectl delete clusterrolebinding NAME`,
 		ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 		Priority:        PriorityHigh,
 		Timestamp:       time.Now(),
-		Frameworks:      map[string]string{"CIS-AWS": "8.6", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
+		Frameworks:      map[string]string{"SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
 	}, nil
 }
 
@@ -457,13 +457,13 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CIS-8.8",
+			Control:    "CC7.2",
 			Name:       "EKS Audit Logging",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.8 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "8.8"},
+			Frameworks: map[string]string{"SOC2": "CC7.2"},
 		}, nil
 	}
 
@@ -506,7 +506,7 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 		}
 
 		return CheckResult{
-			Control:     "CIS-8.8",
+			Control:     "CC7.2",
 			Name:        "EKS Audit Logging",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -519,17 +519,17 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 			ConsoleURL:      "https://console.aws.amazon.com/eks/home#/clusters",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "8.8", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
+			Frameworks:      map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-8.8",
+		Control:    "CC7.2",
 		Name:       "EKS Audit Logging",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d EKS clusters have audit logging enabled | Meets CIS 8.8", len(clusters.Clusters)),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "8.8"},
+		Frameworks: map[string]string{"SOC2": "CC7.2"},
 	}, nil
 }

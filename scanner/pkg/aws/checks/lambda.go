@@ -70,7 +70,7 @@ func (c *LambdaChecks) CheckLambdaInVPC(ctx context.Context) (CheckResult, error
 		}
 
 		return CheckResult{
-			Control:     "CIS-6.1",
+			Control:     "CC6.6",
 			Name:        "Lambda Functions in VPC",
 			Status:      "INFO",
 			Severity:    "MEDIUM",
@@ -83,18 +83,18 @@ func (c *LambdaChecks) CheckLambdaInVPC(ctx context.Context) (CheckResult, error
 			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
 			Priority:        PriorityMedium,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "6.1", "SOC2": "CC6.6"},
+			Frameworks:      map[string]string{"SOC2": "CC6.6"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-6.1",
+		Control:    "CC6.6",
 		Name:       "Lambda Functions in VPC",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Lambda functions are in VPC | Meets CIS 6.1", totalFunctions),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "6.1"},
+		Frameworks: map[string]string{"SOC2": "CC6.6"},
 	}, nil
 }
 
@@ -124,7 +124,7 @@ func (c *LambdaChecks) CheckLambdaEnvironmentEncryption(ctx context.Context) (Ch
 		}
 
 		return CheckResult{
-			Control:     "CIS-6.2",
+			Control:     "CC6.7",
 			Name:        "Lambda Environment Encryption",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -141,30 +141,30 @@ aws lambda update-function-configuration \
 			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "6.2", "SOC2": "CC6.7", "PCI-DSS": "3.5.1"},
+			Frameworks:      map[string]string{"SOC2": "CC6.7", "PCI-DSS": "3.5.1"},
 		}, nil
 	}
 
 	if totalWithEnvVars == 0 {
 		return CheckResult{
-			Control:    "CIS-6.2",
+			Control:    "CC6.7",
 			Name:       "Lambda Environment Encryption",
 			Status:     "PASS",
 			Evidence:   "No Lambda functions with environment variables | CIS 6.2 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "6.2"},
+			Frameworks: map[string]string{"SOC2": "CC6.7"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-6.2",
+		Control:    "CC6.7",
 		Name:       "Lambda Environment Encryption",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d functions with environment variables use KMS encryption | Meets CIS 6.2", totalWithEnvVars),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "6.2"},
+		Frameworks: map[string]string{"SOC2": "CC6.7"},
 	}, nil
 }
 
@@ -194,7 +194,7 @@ func (c *LambdaChecks) CheckLambdaExecutionRole(ctx context.Context) (CheckResul
 		}
 
 		return CheckResult{
-			Control:     "CIS-6.3",
+			Control:     "CC6.3",
 			Name:        "Lambda Execution Role Permissions",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -212,18 +212,18 @@ aws lambda update-function-configuration \
 			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "6.3", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
+			Frameworks:      map[string]string{"SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-6.3",
+		Control:    "CC6.3",
 		Name:       "Lambda Execution Role Permissions",
 		Status:     "PASS",
 		Evidence:   "Lambda functions use least-privilege execution roles | Meets CIS 6.3",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "6.3"},
+		Frameworks: map[string]string{"SOC2": "CC6.3"},
 	}, nil
 }
 
@@ -262,7 +262,7 @@ func (c *LambdaChecks) CheckLambdaPublicAccess(ctx context.Context) (CheckResult
 		}
 
 		return CheckResult{
-			Control:     "CIS-6.4",
+			Control:     "CC6.1",
 			Name:        "Lambda Functions Not Public",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
@@ -275,18 +275,18 @@ func (c *LambdaChecks) CheckLambdaPublicAccess(ctx context.Context) (CheckResult
 			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "6.4", "SOC2": "CC6.1", "PCI-DSS": "1.4.2"},
+			Frameworks:      map[string]string{"SOC2": "CC6.1", "PCI-DSS": "1.4.2"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-6.4",
+		Control:    "CC6.1",
 		Name:       "Lambda Functions Not Public",
 		Status:     "PASS",
 		Evidence:   "No Lambda functions are publicly accessible | Meets CIS 6.4",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "6.4"},
+		Frameworks: map[string]string{"SOC2": "CC6.1"},
 	}, nil
 }
 
@@ -313,7 +313,7 @@ func (c *LambdaChecks) CheckLambdaTracing(ctx context.Context) (CheckResult, err
 		}
 
 		return CheckResult{
-			Control:     "CIS-6.5",
+			Control:     "CC7.2",
 			Name:        "Lambda X-Ray Tracing Enabled",
 			Status:      "FAIL",
 			Severity:    "LOW",
@@ -326,17 +326,17 @@ func (c *LambdaChecks) CheckLambdaTracing(ctx context.Context) (CheckResult, err
 			ConsoleURL:      "https://console.aws.amazon.com/lambda/home#/functions",
 			Priority:        PriorityLow,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "6.5", "SOC2": "CC7.2"},
+			Frameworks:      map[string]string{"SOC2": "CC7.2"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-6.5",
+		Control:    "CC7.2",
 		Name:       "Lambda X-Ray Tracing Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Lambda functions have X-Ray tracing enabled | Meets CIS 6.5", totalFunctions),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "6.5"},
+		Frameworks: map[string]string{"SOC2": "CC7.2"},
 	}, nil
 }

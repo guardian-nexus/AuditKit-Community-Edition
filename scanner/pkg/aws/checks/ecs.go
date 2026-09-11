@@ -96,7 +96,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 		}
 
 		return CheckResult{
-			Control:     "CIS-7.1",
+			Control:     "CC7.2",
 			Name:        "ECS Task Definition Logging",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -117,30 +117,30 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 			ConsoleURL:      "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "7.1", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
+			Frameworks:      map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 		}, nil
 	}
 
 	if totalTasks == 0 {
 		return CheckResult{
-			Control:    "CIS-7.1",
+			Control:    "CC7.2",
 			Name:       "ECS Task Definition Logging",
 			Status:     StatusInfo,
 			Evidence:   "No ECS task definitions found | CIS 7.1 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "7.1"},
+			Frameworks: map[string]string{"SOC2": "CC7.2"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-7.1",
+		Control:    "CC7.2",
 		Name:       "ECS Task Definition Logging",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d ECS task definitions have logging enabled | Meets CIS 7.1", totalTasks),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "7.1"},
+		Frameworks: map[string]string{"SOC2": "CC7.2"},
 	}, nil
 }
 
@@ -197,7 +197,7 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 		}
 
 		return CheckResult{
-			Control:     "CIS-7.2",
+			Control:     "CC6.1",
 			Name:        "ECS Secrets Management",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
@@ -215,30 +215,30 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 			ConsoleURL:      "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "7.2", "SOC2": "CC6.1", "PCI-DSS": "3.5.1"},
+			Frameworks:      map[string]string{"SOC2": "CC6.1", "PCI-DSS": "3.5.1"},
 		}, nil
 	}
 
 	if totalTasks == 0 {
 		return CheckResult{
-			Control:    "CIS-7.2",
+			Control:    "CC6.1",
 			Name:       "ECS Secrets Management",
 			Status:     StatusInfo,
 			Evidence:   "No ECS task definitions found | CIS 7.2 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "7.2"},
+			Frameworks: map[string]string{"SOC2": "CC6.1"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-7.2",
+		Control:    "CC6.1",
 		Name:       "ECS Secrets Management",
 		Status:     "PASS",
 		Evidence:   "ECS tasks use Secrets Manager for sensitive data | Meets CIS 7.2",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "7.2"},
+		Frameworks: map[string]string{"SOC2": "CC6.1"},
 	}, nil
 }
 
@@ -251,13 +251,13 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 
 	if len(clusters.ClusterArns) == 0 {
 		return CheckResult{
-			Control:    "CIS-7.3",
+			Control:    "CC7.2",
 			Name:       "ECS Container Insights",
 			Status:     StatusInfo,
 			Evidence:   "No ECS clusters found | CIS 7.3 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "7.3"},
+			Frameworks: map[string]string{"SOC2": "CC7.2"},
 		}, nil
 	}
 
@@ -289,7 +289,7 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 
 	if len(clustersWithoutInsights) > 0 {
 		return CheckResult{
-			Control:     "CIS-7.3",
+			Control:     "CC7.2",
 			Name:        "ECS Container Insights",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
@@ -302,18 +302,18 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 			ConsoleURL:      "https://console.aws.amazon.com/ecs/home#/clusters",
 			Priority:        PriorityMedium,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "7.3", "SOC2": "CC7.2"},
+			Frameworks:      map[string]string{"SOC2": "CC7.2"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-7.3",
+		Control:    "CC7.2",
 		Name:       "ECS Container Insights",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d ECS clusters have Container Insights enabled | Meets CIS 7.3", len(clustersOutput.Clusters)),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "7.3"},
+		Frameworks: map[string]string{"SOC2": "CC7.2"},
 	}, nil
 }
 
@@ -362,7 +362,7 @@ func (c *ECSChecks) CheckECSTaskRolePermissions(ctx context.Context) (CheckResul
 		}
 
 		return CheckResult{
-			Control:     "CIS-7.4",
+			Control:     "CC6.3",
 			Name:        "ECS Task Role Permissions",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -375,29 +375,29 @@ aws iam put-role-policy --role-name ECSTaskRole --policy-name TaskPolicy --polic
 			ConsoleURL:      "https://console.aws.amazon.com/ecs/home#/taskDefinitions",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "7.4", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
+			Frameworks:      map[string]string{"SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
 		}, nil
 	}
 
 	if totalTasks == 0 {
 		return CheckResult{
-			Control:    "CIS-7.4",
+			Control:    "CC6.3",
 			Name:       "ECS Task Role Permissions",
 			Status:     StatusInfo,
 			Evidence:   "No ECS task definitions found | CIS 7.4 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "7.4"},
+			Frameworks: map[string]string{"SOC2": "CC6.3"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-7.4",
+		Control:    "CC6.3",
 		Name:       "ECS Task Role Permissions",
 		Status:     "PASS",
 		Evidence:   "ECS tasks use least-privilege roles | Meets CIS 7.4",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "7.4"},
+		Frameworks: map[string]string{"SOC2": "CC6.3"},
 	}, nil
 }

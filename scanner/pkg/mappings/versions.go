@@ -49,11 +49,14 @@ var editions = map[string]Edition{
 	"CIS-AWS": {
 		Framework: "CIS-AWS",
 		Name:      "CIS Amazon Web Services Foundations Benchmark",
+		Version:   "v7.0.0",
 		Document:  "CIS Amazon Web Services Foundations Benchmark v7.0.0, 03-25-2026",
 		Verified:  "2026-09-10",
-		Note: "v7.0.0 renumbered every section - Identity and Access Management moved from " +
-			"section 1 to section 2 - and our control identifiers still use the older layout, " +
-			"so no version is claimed until they are reconciled.",
+		Note: "Reconciled identifier by identifier against the benchmark. v7.0.0 renumbered " +
+			"every section, moving Identity and Access Management from 1 to 2. Checks whose " +
+			"subject the Foundations benchmark does not cover - Lambda, ECS, EKS, DynamoDB, " +
+			"Redshift, ElastiCache, OpenSearch and others - keep running under their other " +
+			"frameworks and no longer claim a CIS number.",
 	},
 	"CIS-Azure": {
 		Framework: "CIS-Azure",

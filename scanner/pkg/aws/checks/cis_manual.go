@@ -23,7 +23,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	// These require manual configuration and cannot be fully automated
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.1",
+		Control:     "CIS-5.1",
 		Name:        "Metric Filter - Unauthorized API Calls",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for unauthorized API calls",
@@ -42,7 +42,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.2",
+		Control:     "CIS-5.2",
 		Name:        "Metric Filter - Console Sign-in Without MFA",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for console sign-in without MFA",
@@ -59,7 +59,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.3",
+		Control:     "CIS-5.3",
 		Name:        "Metric Filter - Root Account Usage",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for root account usage",
@@ -76,7 +76,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.4",
+		Control:     "CIS-5.4",
 		Name:        "Metric Filter - IAM Policy Changes",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for IAM policy changes",
@@ -93,7 +93,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.5",
+		Control:     "CIS-5.5",
 		Name:        "Metric Filter - CloudTrail Configuration Changes",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for CloudTrail configuration changes",
@@ -110,7 +110,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.6",
+		Control:     "CIS-5.6",
 		Name:        "Metric Filter - Console Authentication Failures",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for console authentication failures",
@@ -127,7 +127,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.7",
+		Control:     "CIS-5.7",
 		Name:        "Metric Filter - KMS Key Disable/Delete",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for disabling or scheduled deletion of KMS keys",
@@ -144,7 +144,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.8",
+		Control:     "CIS-5.8",
 		Name:        "Metric Filter - S3 Bucket Policy Changes",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for S3 bucket policy changes",
@@ -161,7 +161,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.9",
+		Control:     "CIS-5.9",
 		Name:        "Metric Filter - AWS Config Changes",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for AWS Config configuration changes",
@@ -178,7 +178,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.10",
+		Control:     "CIS-5.10",
 		Name:        "Metric Filter - Security Group Changes",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for security group changes",
@@ -195,7 +195,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.11",
+		Control:     "CIS-5.11",
 		Name:        "Metric Filter - NACL Changes",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for Network ACL changes",
@@ -212,7 +212,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.12",
+		Control:     "CIS-5.12",
 		Name:        "Metric Filter - Network Gateway Changes",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for network gateway changes",
@@ -229,7 +229,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.13",
+		Control:     "CIS-5.13",
 		Name:        "Metric Filter - Route Table Changes",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for route table changes",
@@ -246,7 +246,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.14",
+		Control:     "CIS-5.14",
 		Name:        "Metric Filter - VPC Changes",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for VPC changes",
@@ -263,7 +263,7 @@ func (c *CISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	})
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.15",
+		Control:     "CIS-5.15",
 		Name:        "Metric Filter - AWS Organizations Changes",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Ensure metric filter and alarm exist for AWS Organizations changes",

@@ -42,7 +42,7 @@ func (c *DynamoDBChecks) CheckPointInTimeRecovery(ctx context.Context) (CheckRes
 	tables, err := c.client.ListTables(ctx, &dynamodb.ListTablesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-14.1",
+			Control:    "A1.2",
 			Name:       "DynamoDB Point-in-Time Recovery",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Failed to list DynamoDB tables: %v", err),
@@ -54,7 +54,7 @@ func (c *DynamoDBChecks) CheckPointInTimeRecovery(ctx context.Context) (CheckRes
 
 	if len(tables.TableNames) == 0 {
 		return CheckResult{
-			Control:    "CIS-14.1",
+			Control:    "A1.2",
 			Name:       "DynamoDB Point-in-Time Recovery",
 			Status:     "INFO",
 			Evidence:   "No DynamoDB tables found",
@@ -86,7 +86,7 @@ func (c *DynamoDBChecks) CheckPointInTimeRecovery(ctx context.Context) (CheckRes
 
 	if len(without) > 0 {
 		return CheckResult{
-			Control:     "CIS-14.1",
+			Control:     "A1.2",
 			Name:        "DynamoDB Point-in-Time Recovery",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d tables lack PITR: %v", len(without), len(tables.TableNames), without),
@@ -100,7 +100,7 @@ func (c *DynamoDBChecks) CheckPointInTimeRecovery(ctx context.Context) (CheckRes
 	}
 
 	return CheckResult{
-		Control:    "CIS-14.1",
+		Control:    "A1.2",
 		Name:       "DynamoDB Point-in-Time Recovery",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d tables have PITR enabled", with),
@@ -115,7 +115,7 @@ func (c *DynamoDBChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult
 	tables, err := c.client.ListTables(ctx, &dynamodb.ListTablesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-14.2",
+			Control:    "CC6.3",
 			Name:       "DynamoDB Encryption at Rest",
 			Status:     "ERROR",
 			Evidence:   "Failed to list tables",
@@ -127,7 +127,7 @@ func (c *DynamoDBChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult
 
 	if len(tables.TableNames) == 0 {
 		return CheckResult{
-			Control:    "CIS-14.2",
+			Control:    "CC6.3",
 			Name:       "DynamoDB Encryption at Rest",
 			Status:     "INFO",
 			Evidence:   "No DynamoDB tables found",
@@ -162,7 +162,7 @@ func (c *DynamoDBChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult
 
 	if len(unencrypted) > 0 {
 		return CheckResult{
-			Control:     "CIS-14.2",
+			Control:     "CC6.3",
 			Name:        "DynamoDB Encryption at Rest",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d tables not encrypted: %v", len(unencrypted), unencrypted),
@@ -176,7 +176,7 @@ func (c *DynamoDBChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult
 	}
 
 	return CheckResult{
-		Control:    "CIS-14.2",
+		Control:    "CC6.3",
 		Name:       "DynamoDB Encryption at Rest",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All tables encrypted. %d custom KMS, %d AWS managed", customKMS, awsManaged),
@@ -191,7 +191,7 @@ func (c *DynamoDBChecks) CheckAutoScaling(ctx context.Context) (CheckResult, err
 	tables, err := c.client.ListTables(ctx, &dynamodb.ListTablesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-14.3",
+			Control:    "A1.2",
 			Name:       "DynamoDB Auto Scaling Enabled",
 			Status:     "ERROR",
 			Evidence:   "Failed to list tables",
@@ -203,7 +203,7 @@ func (c *DynamoDBChecks) CheckAutoScaling(ctx context.Context) (CheckResult, err
 
 	if len(tables.TableNames) == 0 {
 		return CheckResult{
-			Control:    "CIS-14.3",
+			Control:    "A1.2",
 			Name:       "DynamoDB Auto Scaling Enabled",
 			Status:     "INFO",
 			Evidence:   "No DynamoDB tables found",
@@ -233,7 +233,7 @@ func (c *DynamoDBChecks) CheckAutoScaling(ctx context.Context) (CheckResult, err
 	}
 
 	return CheckResult{
-		Control:    "CIS-14.3",
+		Control:    "A1.2",
 		Name:       "DynamoDB Auto Scaling Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("%d tables on-demand (auto-scales), %d provisioned", onDemand, provisioned),

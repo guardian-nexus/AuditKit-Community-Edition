@@ -48,7 +48,7 @@ func (c *SSMChecks) CheckParameterEncryption(ctx context.Context) (CheckResult, 
 	params, err := c.client.DescribeParameters(ctx, &ssm.DescribeParametersInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "CIS-10.1",
+			Control:           "CC6.3",
 			Name:              "SSM Parameter Store Encryption",
 			Status:            "ERROR",
 			Evidence:          fmt.Sprintf("Failed to list SSM parameters: %v", err),
@@ -62,7 +62,7 @@ func (c *SSMChecks) CheckParameterEncryption(ctx context.Context) (CheckResult, 
 
 	if len(params.Parameters) == 0 {
 		return CheckResult{
-			Control:     "CIS-10.1",
+			Control:     "CC6.3",
 			Name:        "SSM Parameter Store Encryption",
 			Status:      "INFO",
 			Evidence:    "No SSM parameters found",
@@ -92,7 +92,7 @@ func (c *SSMChecks) CheckParameterEncryption(ctx context.Context) (CheckResult, 
 
 	if len(unencryptedParams) > 0 {
 		return CheckResult{
-			Control:     "CIS-10.1",
+			Control:     "CC6.3",
 			Name:        "SSM Parameter Store Encryption",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d parameters not encrypted (using String/StringList instead of SecureString): %v", len(unencryptedParams), len(params.Parameters), unencryptedParams),
@@ -114,7 +114,7 @@ func (c *SSMChecks) CheckParameterEncryption(ctx context.Context) (CheckResult, 
 	}
 
 	return CheckResult{
-		Control:     "CIS-10.1",
+		Control:     "CC6.3",
 		Name:        "SSM Parameter Store Encryption",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d SSM parameters use encryption (SecureString type)", encryptedCount),
@@ -141,7 +141,7 @@ func (c *SSMChecks) CheckSessionManagerLogging(ctx context.Context) (CheckResult
 	if err != nil {
 		// Document might not exist or access denied
 		return CheckResult{
-			Control:     "CIS-10.2",
+			Control:     "CC7.1",
 			Name:        "SSM Session Manager Logging",
 			Status:      "FAIL",
 			Evidence:    "Session Manager logging configuration not found or not accessible",
@@ -165,7 +165,7 @@ func (c *SSMChecks) CheckSessionManagerLogging(ctx context.Context) (CheckResult
 
 	// For now, return INFO status since we can't easily determine logging config via API
 	return CheckResult{
-		Control:     "CIS-10.2",
+		Control:     "CC7.1",
 		Name:        "SSM Session Manager Logging",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Verify Session Manager logging is configured",
@@ -190,7 +190,7 @@ func (c *SSMChecks) CheckPatchCompliance(ctx context.Context) (CheckResult, erro
 	instances, err := c.client.DescribeInstanceInformation(ctx, &ssm.DescribeInstanceInformationInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-10.3",
+			Control:     "CC7.2",
 			Name:        "SSM Patch Compliance",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list managed instances: %v", err),
@@ -207,7 +207,7 @@ Required permissions:
 
 	if len(instances.InstanceInformationList) == 0 {
 		return CheckResult{
-			Control:     "CIS-10.3",
+			Control:     "CC7.2",
 			Name:        "SSM Patch Compliance",
 			Status:      "INFO",
 			Evidence:    "No EC2 instances managed by Systems Manager",
@@ -232,7 +232,7 @@ Required permissions:
 
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-10.3",
+			Control:     "CC7.2",
 			Name:        "SSM Patch Compliance",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to get patch compliance status: %v", err),
@@ -256,7 +256,7 @@ Required permissions:
 
 	if len(nonCompliantInstances) > 0 {
 		return CheckResult{
-			Control:     "CIS-10.3",
+			Control:     "CC7.2",
 			Name:        "SSM Patch Compliance",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d instances are not patch compliant: %v", len(nonCompliantInstances), len(patchStates.InstancePatchStates), nonCompliantInstances),
@@ -277,7 +277,7 @@ Required permissions:
 	}
 
 	return CheckResult{
-		Control:     "CIS-10.3",
+		Control:     "CC7.2",
 		Name:        "SSM Patch Compliance",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d managed instances are patch compliant", compliantInstances),

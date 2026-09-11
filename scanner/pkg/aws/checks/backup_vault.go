@@ -46,7 +46,7 @@ func (c *BackupVaultChecks) CheckBackupVaultEncryption(ctx context.Context) (Che
 	vaults, err := c.client.ListBackupVaults(ctx, &backup.ListBackupVaultsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-10.10",
+			Control:     "CC6.3",
 			Name:        "AWS Backup Vault Encryption",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list backup vaults: %v", err),
@@ -59,7 +59,7 @@ func (c *BackupVaultChecks) CheckBackupVaultEncryption(ctx context.Context) (Che
 
 	if len(vaults.BackupVaultList) == 0 {
 		return CheckResult{
-			Control:     "CIS-10.10",
+			Control:     "CC6.3",
 			Name:        "AWS Backup Vault Encryption",
 			Status:      "INFO",
 			Evidence:    "No AWS Backup vaults found",
@@ -90,7 +90,7 @@ func (c *BackupVaultChecks) CheckBackupVaultEncryption(ctx context.Context) (Che
 
 	if len(unencryptedVaults) > 0 {
 		return CheckResult{
-			Control:     "CIS-10.10",
+			Control:     "CC6.3",
 			Name:        "AWS Backup Vault Encryption",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d backup vaults lack encryption: %v", len(unencryptedVaults), len(vaults.BackupVaultList), unencryptedVaults),
@@ -112,7 +112,7 @@ func (c *BackupVaultChecks) CheckBackupVaultEncryption(ctx context.Context) (Che
 	}
 
 	return CheckResult{
-		Control:     "CIS-10.10",
+		Control:     "CC6.3",
 		Name:        "AWS Backup Vault Encryption",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d backup vaults use KMS encryption", encryptedVaults),
@@ -133,7 +133,7 @@ func (c *BackupVaultChecks) CheckBackupPlanExists(ctx context.Context) (CheckRes
 	plans, err := c.client.ListBackupPlans(ctx, &backup.ListBackupPlansInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-10.11",
+			Control:     "A1.2",
 			Name:        "AWS Backup Plan Configured",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list backup plans: %v", err),
@@ -146,7 +146,7 @@ func (c *BackupVaultChecks) CheckBackupPlanExists(ctx context.Context) (CheckRes
 
 	if len(plans.BackupPlansList) == 0 {
 		return CheckResult{
-			Control:     "CIS-10.11",
+			Control:     "A1.2",
 			Name:        "AWS Backup Plan Configured",
 			Status:      "FAIL",
 			Evidence:    "No backup plans configured - data loss risk if resources fail",
@@ -180,7 +180,7 @@ func (c *BackupVaultChecks) CheckBackupPlanExists(ctx context.Context) (CheckRes
 	}
 
 	return CheckResult{
-		Control:     "CIS-10.11",
+		Control:     "A1.2",
 		Name:        "AWS Backup Plan Configured",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("%d backup plan(s) configured for automated backups", activePlans),
@@ -204,7 +204,7 @@ func (c *BackupVaultChecks) CheckBackupVaultLock(ctx context.Context) (CheckResu
 	vaults, err := c.client.ListBackupVaults(ctx, &backup.ListBackupVaultsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-10.12",
+			Control:     "CC6.5",
 			Name:        "AWS Backup Vault Lock Enabled",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list vaults: %v", err),
@@ -217,7 +217,7 @@ func (c *BackupVaultChecks) CheckBackupVaultLock(ctx context.Context) (CheckResu
 
 	if len(vaults.BackupVaultList) == 0 {
 		return CheckResult{
-			Control:     "CIS-10.12",
+			Control:     "CC6.5",
 			Name:        "AWS Backup Vault Lock Enabled",
 			Status:      "INFO",
 			Evidence:    "No backup vaults found",
@@ -252,7 +252,7 @@ func (c *BackupVaultChecks) CheckBackupVaultLock(ctx context.Context) (CheckResu
 
 	if len(vaultsWithoutLock) > 0 {
 		return CheckResult{
-			Control:     "CIS-10.12",
+			Control:     "CC6.5",
 			Name:        "AWS Backup Vault Lock Enabled",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d vaults lack vault lock (WORM protection): %v", len(vaultsWithoutLock), len(vaults.BackupVaultList), vaultsWithoutLock),
@@ -278,7 +278,7 @@ Ensure retention policies are correct before enabling.`, vaultsWithoutLock),
 	}
 
 	return CheckResult{
-		Control:     "CIS-10.12",
+		Control:     "CC6.5",
 		Name:        "AWS Backup Vault Lock Enabled",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d backup vaults have vault lock enabled (WORM protection)", vaultsWithLock),

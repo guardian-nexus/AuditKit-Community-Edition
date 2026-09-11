@@ -55,7 +55,7 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsEnabled(ctx context.Context) (Che
 	org, err := c.orgClient.DescribeOrganization(ctx, &organizations.DescribeOrganizationInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-11.1",
+			Control:     "CIS-2.1.2",
 			Name:        "AWS Organizations SCPs Enabled",
 			Status:      "INFO",
 			Evidence:    "Not using AWS Organizations (single account) or no permissions",
@@ -72,7 +72,7 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsEnabled(ctx context.Context) (Che
 
 	if len(org.Organization.AvailablePolicyTypes) == 0 {
 		return CheckResult{
-			Control:     "CIS-11.1",
+			Control:     "CIS-2.1.2",
 			Name:        "AWS Organizations SCPs Enabled",
 			Status:      "FAIL",
 			Evidence:    "Organization exists but Service Control Policies (SCPs) are not enabled",
@@ -100,7 +100,7 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsEnabled(ctx context.Context) (Che
 
 	if !scpEnabled {
 		return CheckResult{
-			Control:     "CIS-11.1",
+			Control:     "CIS-2.1.2",
 			Name:        "AWS Organizations SCPs Enabled",
 			Status:      "FAIL",
 			Evidence:    "AWS Organizations enabled but SCPs are not available",
@@ -113,7 +113,7 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsEnabled(ctx context.Context) (Che
 	}
 
 	return CheckResult{
-		Control:     "CIS-11.1",
+		Control:     "CIS-2.1.2",
 		Name:        "AWS Organizations SCPs Enabled",
 		Status:      "PASS",
 		Evidence:    "AWS Organizations is enabled with Service Control Policies (SCPs) available",
@@ -129,7 +129,7 @@ func (c *OrganizationsAdvancedChecks) CheckMultiAccountStructure(ctx context.Con
 	accounts, err := c.orgClient.ListAccounts(ctx, &organizations.ListAccountsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-11.2",
+			Control:     "CIS-2.1.4",
 			Name:        "Multi-Account Structure",
 			Status:      "INFO",
 			Evidence:    "Not using AWS Organizations or no permissions",
@@ -144,7 +144,7 @@ func (c *OrganizationsAdvancedChecks) CheckMultiAccountStructure(ctx context.Con
 
 	if accountCount <= 1 {
 		return CheckResult{
-			Control:     "CIS-11.2",
+			Control:     "CIS-2.1.4",
 			Name:        "Multi-Account Structure",
 			Status:      "FAIL",
 			Evidence:    "Using single AWS account - no workload isolation",
@@ -172,7 +172,7 @@ Benefits:
 	}
 
 	return CheckResult{
-		Control:     "CIS-11.2",
+		Control:     "CIS-2.1.4",
 		Name:        "Multi-Account Structure",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("Using multi-account structure with %d accounts for workload isolation", accountCount),
@@ -188,7 +188,7 @@ func (c *OrganizationsAdvancedChecks) CheckOrganizationTrail(ctx context.Context
 	trails, err := c.ctClient.DescribeTrails(ctx, &cloudtrail.DescribeTrailsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-11.3",
+			Control:     "CIS-4.1",
 			Name:        "Organization-wide CloudTrail",
 			Status:      "ERROR",
 			Evidence:    "Cannot check CloudTrail configuration",
@@ -209,7 +209,7 @@ func (c *OrganizationsAdvancedChecks) CheckOrganizationTrail(ctx context.Context
 
 	if !hasOrgTrail {
 		return CheckResult{
-			Control:     "CIS-11.3",
+			Control:     "CIS-4.1",
 			Name:        "Organization-wide CloudTrail",
 			Status:      "FAIL",
 			Evidence:    "No organization-wide CloudTrail configured - member accounts may not be logged",
@@ -230,7 +230,7 @@ func (c *OrganizationsAdvancedChecks) CheckOrganizationTrail(ctx context.Context
 	}
 
 	return CheckResult{
-		Control:     "CIS-11.3",
+		Control:     "CIS-4.1",
 		Name:        "Organization-wide CloudTrail",
 		Status:      "PASS",
 		Evidence:    "Organization-wide CloudTrail is configured - all accounts are logged",
@@ -248,7 +248,7 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsConfigured(ctx context.Context) (
 	})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-11.4",
+			Control:     "CIS-2.1.2",
 			Name:        "Service Control Policies Configured",
 			Status:      "INFO",
 			Evidence:    "Cannot list SCPs - not using Organizations or no permissions",
@@ -269,7 +269,7 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsConfigured(ctx context.Context) (
 
 	if customPolicies == 0 {
 		return CheckResult{
-			Control:     "CIS-11.4",
+			Control:     "CIS-2.1.2",
 			Name:        "Service Control Policies Configured",
 			Status:      "FAIL",
 			Evidence:    "No custom SCPs configured - using default FullAWSAccess only",
@@ -301,7 +301,7 @@ Example deny policy:
 	}
 
 	return CheckResult{
-		Control:     "CIS-11.4",
+		Control:     "CIS-2.1.2",
 		Name:        "Service Control Policies Configured",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("%d custom SCPs configured for security boundaries", customPolicies),

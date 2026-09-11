@@ -42,7 +42,7 @@ func (c *ECRChecks) CheckImageScanning(ctx context.Context) (CheckResult, error)
 	repos, err := c.client.DescribeRepositories(ctx, &ecr.DescribeRepositoriesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-13.1",
+			Control:    "CC7.2",
 			Name:       "ECR Image Scanning Enabled",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Failed to list ECR repositories: %v", err),
@@ -54,7 +54,7 @@ func (c *ECRChecks) CheckImageScanning(ctx context.Context) (CheckResult, error)
 
 	if len(repos.Repositories) == 0 {
 		return CheckResult{
-			Control:    "CIS-13.1",
+			Control:    "CC7.2",
 			Name:       "ECR Image Scanning Enabled",
 			Status:     "INFO",
 			Evidence:   "No ECR repositories found",
@@ -77,7 +77,7 @@ func (c *ECRChecks) CheckImageScanning(ctx context.Context) (CheckResult, error)
 
 	if len(without) > 0 {
 		return CheckResult{
-			Control:     "CIS-13.1",
+			Control:     "CC7.2",
 			Name:        "ECR Image Scanning Enabled",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d repositories lack image scanning: %v", len(without), len(repos.Repositories), without),
@@ -91,7 +91,7 @@ func (c *ECRChecks) CheckImageScanning(ctx context.Context) (CheckResult, error)
 	}
 
 	return CheckResult{
-		Control:    "CIS-13.1",
+		Control:    "CC7.2",
 		Name:       "ECR Image Scanning Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d repositories have image scanning enabled", with),
@@ -106,7 +106,7 @@ func (c *ECRChecks) CheckImmutableTags(ctx context.Context) (CheckResult, error)
 	repos, err := c.client.DescribeRepositories(ctx, &ecr.DescribeRepositoriesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-13.2",
+			Control:    "CC8.1",
 			Name:       "ECR Immutable Tags",
 			Status:     "ERROR",
 			Evidence:   "Failed to list repositories",
@@ -118,7 +118,7 @@ func (c *ECRChecks) CheckImmutableTags(ctx context.Context) (CheckResult, error)
 
 	if len(repos.Repositories) == 0 {
 		return CheckResult{
-			Control:    "CIS-13.2",
+			Control:    "CC8.1",
 			Name:       "ECR Immutable Tags",
 			Status:     "INFO",
 			Evidence:   "No ECR repositories found",
@@ -141,7 +141,7 @@ func (c *ECRChecks) CheckImmutableTags(ctx context.Context) (CheckResult, error)
 
 	if len(without) > 0 {
 		return CheckResult{
-			Control:     "CIS-13.2",
+			Control:     "CC8.1",
 			Name:        "ECR Immutable Tags",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d repositories allow mutable tags: %v", len(without), len(repos.Repositories), without),
@@ -155,7 +155,7 @@ func (c *ECRChecks) CheckImmutableTags(ctx context.Context) (CheckResult, error)
 	}
 
 	return CheckResult{
-		Control:    "CIS-13.2",
+		Control:    "CC8.1",
 		Name:       "ECR Immutable Tags",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d repositories have immutable tags enabled", with),
@@ -170,7 +170,7 @@ func (c *ECRChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult, err
 	repos, err := c.client.DescribeRepositories(ctx, &ecr.DescribeRepositoriesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-13.3",
+			Control:    "CC6.3",
 			Name:       "ECR Encryption at Rest",
 			Status:     "ERROR",
 			Evidence:   "Failed to list repositories",
@@ -182,7 +182,7 @@ func (c *ECRChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult, err
 
 	if len(repos.Repositories) == 0 {
 		return CheckResult{
-			Control:    "CIS-13.3",
+			Control:    "CC6.3",
 			Name:       "ECR Encryption at Rest",
 			Status:     "INFO",
 			Evidence:   "No ECR repositories found",
@@ -205,7 +205,7 @@ func (c *ECRChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult, err
 	}
 
 	return CheckResult{
-		Control:    "CIS-13.3",
+		Control:    "CC6.3",
 		Name:       "ECR Encryption at Rest",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All repositories encrypted. %d with custom KMS, %d with AWS managed", customKMS, awsManaged),

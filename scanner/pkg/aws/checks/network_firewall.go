@@ -51,25 +51,25 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.
 	firewalls, err := c.nfwClient.ListFirewalls(ctx, &networkfirewall.ListFirewallsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-5.15",
+			Control:    "CC6.6",
 			Name:       "Network Firewall AZ Deployment",
 			Status:     "PASS",
 			Evidence:   "No Network Firewalls deployed | CIS 5.15 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "5.15"},
+			Frameworks: map[string]string{"SOC2": "CC6.6"},
 		}, nil
 	}
 
 	if len(firewalls.Firewalls) == 0 {
 		return CheckResult{
-			Control:    "CIS-5.15",
+			Control:    "CC6.6",
 			Name:       "Network Firewall AZ Deployment",
 			Status:     "INFO",
 			Evidence:   "No Network Firewalls deployed | Consider deploying for enhanced network security",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "5.15"},
+			Frameworks: map[string]string{"SOC2": "CC6.6"},
 		}, nil
 	}
 
@@ -134,7 +134,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.
 
 	if len(firewallsWithMissingAZs) > 0 {
 		return CheckResult{
-			Control:     "CIS-5.15",
+			Control:     "CC6.6",
 			Name:        "Network Firewall AZ Deployment",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
@@ -152,18 +152,18 @@ aws network-firewall associate-subnets \
 			ConsoleURL:      "https://console.aws.amazon.com/vpc/home#NetworkFirewalls",
 			Priority:        PriorityMedium,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "5.15", "SOC2": "CC6.6"},
+			Frameworks:      map[string]string{"SOC2": "CC6.6"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-5.15",
+		Control:    "CC6.6",
 		Name:       "Network Firewall AZ Deployment",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Network Firewalls are deployed across all AZs | Meets CIS 5.15", len(firewalls.Firewalls)),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "5.15"},
+		Frameworks: map[string]string{"SOC2": "CC6.6"},
 	}, nil
 }
 
@@ -173,25 +173,25 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallPolicyRules(ctx context.Cont
 	policies, err := c.nfwClient.ListFirewallPolicies(ctx, &networkfirewall.ListFirewallPoliciesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-5.16",
+			Control:    "CC6.1",
 			Name:       "Network Firewall Policy Rules",
 			Status:     StatusInfo,
 			Evidence:   "No Network Firewall policies found | CIS 5.16 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "5.16"},
+			Frameworks: map[string]string{"SOC2": "CC6.1"},
 		}, nil
 	}
 
 	if len(policies.FirewallPolicies) == 0 {
 		return CheckResult{
-			Control:    "CIS-5.16",
+			Control:    "CC6.1",
 			Name:       "Network Firewall Policy Rules",
 			Status:     "INFO",
 			Evidence:   "No Network Firewall policies found | Consider creating firewall policies",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "5.16"},
+			Frameworks: map[string]string{"SOC2": "CC6.1"},
 		}, nil
 	}
 
@@ -229,7 +229,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallPolicyRules(ctx context.Cont
 		}
 
 		return CheckResult{
-			Control:     "CIS-5.16",
+			Control:     "CC6.1",
 			Name:        "Network Firewall Policy Rules",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -249,18 +249,18 @@ aws network-firewall update-firewall-policy \
 			ConsoleURL:      "https://console.aws.amazon.com/vpc/home#FirewallPolicies",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "5.16", "SOC2": "CC6.1", "PCI-DSS": "1.2.1"},
+			Frameworks:      map[string]string{"SOC2": "CC6.1", "PCI-DSS": "1.2.1"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-5.16",
+		Control:    "CC6.1",
 		Name:       "Network Firewall Policy Rules",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Network Firewall policies have stateful rule groups | Meets CIS 5.16", len(policies.FirewallPolicies)),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "5.16"},
+		Frameworks: map[string]string{"SOC2": "CC6.1"},
 	}, nil
 }
 
@@ -270,25 +270,25 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallLogging(ctx context.Context)
 	firewalls, err := c.nfwClient.ListFirewalls(ctx, &networkfirewall.ListFirewallsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-5.17",
+			Control:    "CC7.2",
 			Name:       "Network Firewall Logging",
 			Status:     StatusInfo,
 			Evidence:   "No Network Firewalls found | CIS 5.17 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "5.17"},
+			Frameworks: map[string]string{"SOC2": "CC7.2"},
 		}, nil
 	}
 
 	if len(firewalls.Firewalls) == 0 {
 		return CheckResult{
-			Control:    "CIS-5.17",
+			Control:    "CC7.2",
 			Name:       "Network Firewall Logging",
 			Status:     "INFO",
 			Evidence:   "No Network Firewalls deployed | CIS 5.17 N/A",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "5.17"},
+			Frameworks: map[string]string{"SOC2": "CC7.2"},
 		}, nil
 	}
 
@@ -324,7 +324,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallLogging(ctx context.Context)
 		}
 
 		return CheckResult{
-			Control:     "CIS-5.17",
+			Control:     "CC7.2",
 			Name:        "Network Firewall Logging",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -349,18 +349,18 @@ aws network-firewall update-logging-configuration \
 			ConsoleURL:      "https://console.aws.amazon.com/vpc/home#NetworkFirewalls",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "5.17", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
+			Frameworks:      map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-5.17",
+		Control:    "CC7.2",
 		Name:       "Network Firewall Logging",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Network Firewalls have logging enabled | Meets CIS 5.17", len(firewalls.Firewalls)),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "5.17"},
+		Frameworks: map[string]string{"SOC2": "CC7.2"},
 	}, nil
 }
 

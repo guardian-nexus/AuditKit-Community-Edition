@@ -38,7 +38,7 @@ func (c *CloudFormationChecks) CheckStackPolicy(ctx context.Context) (CheckResul
 	stacks, err := c.client.DescribeStacks(ctx, &cloudformation.DescribeStacksInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-15.1",
+			Control:    "CC5.2",
 			Name:       "CloudFormation Stack Policy Configured",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Failed to list stacks: %v", err),
@@ -50,7 +50,7 @@ func (c *CloudFormationChecks) CheckStackPolicy(ctx context.Context) (CheckResul
 
 	if len(stacks.Stacks) == 0 {
 		return CheckResult{
-			Control:    "CIS-15.1",
+			Control:    "CC5.2",
 			Name:       "CloudFormation Stack Policy Configured",
 			Status:     "INFO",
 			Evidence:   "No CloudFormation stacks found",
@@ -76,7 +76,7 @@ func (c *CloudFormationChecks) CheckStackPolicy(ctx context.Context) (CheckResul
 
 	if len(without) > 0 {
 		return CheckResult{
-			Control:     "CIS-15.1",
+			Control:     "CC5.2",
 			Name:        "CloudFormation Stack Policy Configured",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d stacks lack stack policies: %v", len(without), len(stacks.Stacks), without),
@@ -90,7 +90,7 @@ func (c *CloudFormationChecks) CheckStackPolicy(ctx context.Context) (CheckResul
 	}
 
 	return CheckResult{
-		Control:    "CIS-15.1",
+		Control:    "CC5.2",
 		Name:       "CloudFormation Stack Policy Configured",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d stacks have stack policies configured", with),
@@ -105,7 +105,7 @@ func (c *CloudFormationChecks) CheckDriftDetection(ctx context.Context) (CheckRe
 	stacks, err := c.client.DescribeStacks(ctx, &cloudformation.DescribeStacksInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-15.2",
+			Control:    "CC7.2",
 			Name:       "CloudFormation Drift Detection",
 			Status:     "ERROR",
 			Evidence:   "Failed to list stacks",
@@ -117,7 +117,7 @@ func (c *CloudFormationChecks) CheckDriftDetection(ctx context.Context) (CheckRe
 
 	if len(stacks.Stacks) == 0 {
 		return CheckResult{
-			Control:    "CIS-15.2",
+			Control:    "CC7.2",
 			Name:       "CloudFormation Drift Detection",
 			Status:     "INFO",
 			Evidence:   "No CloudFormation stacks found",
@@ -128,7 +128,7 @@ func (c *CloudFormationChecks) CheckDriftDetection(ctx context.Context) (CheckRe
 	}
 
 	return CheckResult{
-		Control:     "CIS-15.2",
+		Control:     "CC7.2",
 		Name:        "CloudFormation Drift Detection",
 		Status:      "MANUAL",
 		Evidence:    fmt.Sprintf("MANUAL CHECK: Run drift detection on %d stacks regularly", len(stacks.Stacks)),

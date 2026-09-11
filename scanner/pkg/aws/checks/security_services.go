@@ -62,7 +62,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 	detectors, err := c.guarddutyClient.ListDetectors(ctx, &guardduty.ListDetectorsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "CIS-9.1",
+			Control:           "CC7.2",
 			Name:              "GuardDuty Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -73,13 +73,13 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 			ConsoleURL:        "https://console.aws.amazon.com/guardduty/home",
 			Priority:          PriorityCritical,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.1", "SOC2": "CC7.2"},
+			Frameworks:        map[string]string{"SOC2": "CC7.2"},
 		}, nil
 	}
 
 	if len(detectors.DetectorIds) == 0 {
 		return CheckResult{
-			Control:           "CIS-9.1",
+			Control:           "CC7.2",
 			Name:              "GuardDuty Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -90,7 +90,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 			ConsoleURL:        "https://console.aws.amazon.com/guardduty/home",
 			Priority:          PriorityCritical,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.1", "SOC2": "CC7.2", "PCI-DSS": "11.5.1"},
+			Frameworks:        map[string]string{"SOC2": "CC7.2", "PCI-DSS": "11.5.1"},
 		}, nil
 	}
 
@@ -105,7 +105,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 
 	if detector.Status != "ENABLED" {
 		return CheckResult{
-			Control:           "CIS-9.1",
+			Control:           "CC7.2",
 			Name:              "GuardDuty Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -116,18 +116,18 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 			ConsoleURL:        "https://console.aws.amazon.com/guardduty/home",
 			Priority:          PriorityCritical,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.1"},
+			Frameworks:        map[string]string{"SOC2": "CC7.2"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-9.1",
+		Control:    "CC7.2",
 		Name:       "GuardDuty Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("GuardDuty is enabled (Detector: %s) | Meets CIS 9.1", detectorId),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "9.1"},
+		Frameworks: map[string]string{"SOC2": "CC7.2"},
 	}, nil
 }
 
@@ -136,7 +136,7 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 	session, err := c.macieClient.GetMacieSession(ctx, &macie2.GetMacieSessionInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "CIS-9.2",
+			Control:           "C1.1",
 			Name:              "Macie Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -147,13 +147,13 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 			ConsoleURL:        "https://console.aws.amazon.com/macie/home",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.2", "SOC2": "C1.1", "PCI-DSS": "3.2.1, 12.5.2"},
+			Frameworks:        map[string]string{"SOC2": "C1.1", "PCI-DSS": "3.2.1, 12.5.2"},
 		}, nil
 	}
 
 	if session.Status != "ENABLED" {
 		return CheckResult{
-			Control:           "CIS-9.2",
+			Control:           "C1.1",
 			Name:              "Macie Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -164,18 +164,18 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 			ConsoleURL:        "https://console.aws.amazon.com/macie/home",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.2"},
+			Frameworks:        map[string]string{"SOC2": "C1.1"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-9.2",
+		Control:    "C1.1",
 		Name:       "Macie Enabled",
 		Status:     "PASS",
 		Evidence:   "Amazon Macie is enabled for sensitive data discovery | Meets CIS 9.2",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "9.2"},
+		Frameworks: map[string]string{"SOC2": "C1.1"},
 	}, nil
 }
 
@@ -184,7 +184,7 @@ func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (C
 	hub, err := c.securityHubClient.DescribeHub(ctx, &securityhub.DescribeHubInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "CIS-9.3",
+			Control:           "CIS-5.16",
 			Name:              "Security Hub Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -195,13 +195,13 @@ func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (C
 			ConsoleURL:        "https://console.aws.amazon.com/securityhub/home",
 			Priority:          PriorityCritical,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.3", "SOC2": "CC7.1, CC7.2", "PCI-DSS": "10.7.2"},
+			Frameworks:        map[string]string{"CIS-AWS": "5.16", "SOC2": "CC7.1, CC7.2", "PCI-DSS": "10.7.2"},
 		}, nil
 	}
 
 	if hub.HubArn == nil {
 		return CheckResult{
-			Control:           "CIS-9.3",
+			Control:           "CIS-5.16",
 			Name:              "Security Hub Enabled",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -212,18 +212,18 @@ func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (C
 			ConsoleURL:        "https://console.aws.amazon.com/securityhub/home",
 			Priority:          PriorityCritical,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.3"},
+			Frameworks:        map[string]string{"CIS-AWS": "5.16"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-9.3",
+		Control:    "CIS-5.16",
 		Name:       "Security Hub Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("AWS Security Hub is enabled | Meets CIS 9.3"),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "9.3"},
+		Frameworks: map[string]string{"CIS-AWS": "5.16"},
 	}, nil
 }
 
@@ -232,7 +232,7 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 	status, err := c.inspectorClient.BatchGetAccountStatus(ctx, &inspector2.BatchGetAccountStatusInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "CIS-9.4",
+			Control:           "CC8.1",
 			Name:              "Inspector Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -243,13 +243,13 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 			ConsoleURL:        "https://console.aws.amazon.com/inspector/v2/home",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.4", "SOC2": "CC8.1"},
+			Frameworks:        map[string]string{"SOC2": "CC8.1"},
 		}, nil
 	}
 
 	if len(status.Accounts) == 0 {
 		return CheckResult{
-			Control:           "CIS-9.4",
+			Control:           "CC8.1",
 			Name:              "Inspector Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -260,14 +260,14 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 			ConsoleURL:        "https://console.aws.amazon.com/inspector/v2/home",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.4"},
+			Frameworks:        map[string]string{"SOC2": "CC8.1"},
 		}, nil
 	}
 
 	account := status.Accounts[0]
 	if account.State.Status != "ENABLED" {
 		return CheckResult{
-			Control:           "CIS-9.4",
+			Control:           "CC8.1",
 			Name:              "Inspector Enabled",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -278,17 +278,17 @@ func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (Che
 			ConsoleURL:        "https://console.aws.amazon.com/inspector/v2/home",
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "9.4"},
+			Frameworks:        map[string]string{"SOC2": "CC8.1"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-9.4",
+		Control:    "CC8.1",
 		Name:       "Inspector Enabled",
 		Status:     "PASS",
 		Evidence:   "Amazon Inspector is enabled for vulnerability scanning | Meets CIS 9.4",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "9.4"},
+		Frameworks: map[string]string{"SOC2": "CC8.1"},
 	}, nil
 }

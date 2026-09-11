@@ -44,7 +44,9 @@ func TestEveryRowSaysSomethingUsable(t *testing.T) {
 // mistake this registry is here to prevent, so it is pinned: the reconciliation
 // has to happen first, and doing it means editing this test deliberately.
 func TestTheCISRowsStayUnreconciledUntilTheWorkIsDone(t *testing.T) {
-	for _, key := range []string{"CIS-AWS", "CIS-Azure", "CIS-GCP"} {
+	// AWS was reconciled against v7.0.0 and now carries a version. Azure and GCP
+	// have not been, and must not acquire one until they are.
+	for _, key := range []string{"CIS-Azure", "CIS-GCP"} {
 		e, ok := EditionFor(key)
 		if !ok {
 			t.Fatalf("%s has no row", key)
@@ -63,9 +65,9 @@ func TestTheCISRowsStayUnreconciledUntilTheWorkIsDone(t *testing.T) {
 }
 
 func TestDescribeNeverInventsAVersion(t *testing.T) {
-	unreconciled, _ := EditionFor("CIS-AWS")
+	unreconciled, _ := EditionFor("CIS-Azure")
 	got := unreconciled.Describe()
-	if strings.Contains(got, "v7") || strings.Contains(got, "7.0.0") {
+	if strings.Contains(got, "v6") || strings.Contains(got, "6.0.0") {
 		t.Errorf("Describe must not print the benchmark version we have not reconciled to: %q", got)
 	}
 	if !strings.Contains(got, "not yet reconciled") {
@@ -115,7 +117,7 @@ func TestEditionsAreOrderedAndLookupWorks(t *testing.T) {
 // Collapsing them is how "we read v7.0.0" would become "we implement v7.0.0".
 func TestProvenanceDoesNotClaimAReconciliationThatDidNotHappen(t *testing.T) {
 	now := time.Date(2026, 9, 11, 0, 0, 0, 0, time.UTC)
-	e, _ := EditionFor("CIS-AWS")
+	e, _ := EditionFor("CIS-Azure")
 	got := e.Provenance(now)
 	if strings.Contains(got, "verified against") {
 		t.Errorf("the document was read, not conformed to: %q", got)

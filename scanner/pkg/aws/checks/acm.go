@@ -38,7 +38,7 @@ func (c *ACMChecks) CheckCertificateRenewal(ctx context.Context) (CheckResult, e
 	certs, err := c.client.ListCertificates(ctx, &acm.ListCertificatesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-16.1",
+			Control:    "CC6.3",
 			Name:       "ACM Certificate Auto-Renewal",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Failed to list certificates: %v", err),
@@ -50,7 +50,7 @@ func (c *ACMChecks) CheckCertificateRenewal(ctx context.Context) (CheckResult, e
 
 	if len(certs.CertificateSummaryList) == 0 {
 		return CheckResult{
-			Control:    "CIS-16.1",
+			Control:    "CC6.3",
 			Name:       "ACM Certificate Auto-Renewal",
 			Status:     "INFO",
 			Evidence:   "No ACM certificates found",
@@ -86,7 +86,7 @@ func (c *ACMChecks) CheckCertificateRenewal(ctx context.Context) (CheckResult, e
 
 	if len(expired) > 0 {
 		return CheckResult{
-			Control:     "CIS-16.1",
+			Control:     "CC6.3",
 			Name:        "ACM Certificate Auto-Renewal",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d certificates EXPIRED: %v", len(expired), expired),
@@ -101,7 +101,7 @@ func (c *ACMChecks) CheckCertificateRenewal(ctx context.Context) (CheckResult, e
 
 	if len(expiringSoon) > 0 {
 		return CheckResult{
-			Control:     "CIS-16.1",
+			Control:     "CC6.3",
 			Name:        "ACM Certificate Auto-Renewal",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d certificates expiring within 30 days: %v", len(expiringSoon), expiringSoon),
@@ -115,7 +115,7 @@ func (c *ACMChecks) CheckCertificateRenewal(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "CIS-16.1",
+		Control:    "CC6.3",
 		Name:       "ACM Certificate Auto-Renewal",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d certificates valid and not expiring soon", valid),
@@ -130,7 +130,7 @@ func (c *ACMChecks) CheckCertificateInUse(ctx context.Context) (CheckResult, err
 	certs, err := c.client.ListCertificates(ctx, &acm.ListCertificatesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-16.2",
+			Control:    "CC6.1",
 			Name:       "ACM Certificate In Use",
 			Status:     "ERROR",
 			Evidence:   "Failed to list certificates",
@@ -142,7 +142,7 @@ func (c *ACMChecks) CheckCertificateInUse(ctx context.Context) (CheckResult, err
 
 	if len(certs.CertificateSummaryList) == 0 {
 		return CheckResult{
-			Control:    "CIS-16.2",
+			Control:    "CC6.1",
 			Name:       "ACM Certificate In Use",
 			Status:     "INFO",
 			Evidence:   "No ACM certificates found",
@@ -172,7 +172,7 @@ func (c *ACMChecks) CheckCertificateInUse(ctx context.Context) (CheckResult, err
 
 	if len(unused) > 0 {
 		return CheckResult{
-			Control:     "CIS-16.2",
+			Control:     "CC6.1",
 			Name:        "ACM Certificate In Use",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d certificates not in use: %v", len(unused), len(certs.CertificateSummaryList), unused),
@@ -186,7 +186,7 @@ func (c *ACMChecks) CheckCertificateInUse(ctx context.Context) (CheckResult, err
 	}
 
 	return CheckResult{
-		Control:    "CIS-16.2",
+		Control:    "CC6.1",
 		Name:       "ACM Certificate In Use",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d certificates are in use", inUse),

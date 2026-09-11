@@ -52,7 +52,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayLogging(ctx context.Context) (CheckRes
 	restAPIs, err := c.clientV1.GetRestApis(ctx, &apigateway.GetRestApisInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-10.7",
+			Control:     "CC7.1",
 			Name:        "API Gateway Logging Enabled",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list API Gateway REST APIs: %v", err),
@@ -67,7 +67,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayLogging(ctx context.Context) (CheckRes
 	httpAPIs, err := c.clientV2.GetApis(ctx, &apigatewayv2.GetApisInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-10.7",
+			Control:     "CC7.1",
 			Name:        "API Gateway Logging Enabled",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list API Gateway HTTP APIs: %v", err),
@@ -82,7 +82,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayLogging(ctx context.Context) (CheckRes
 
 	if totalAPIs == 0 {
 		return CheckResult{
-			Control:     "CIS-10.7",
+			Control:     "CC7.1",
 			Name:        "API Gateway Logging Enabled",
 			Status:      "INFO",
 			Evidence:    "No API Gateway APIs found",
@@ -136,7 +136,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayLogging(ctx context.Context) (CheckRes
 
 	if len(stagesWithoutLogging) > 0 {
 		return CheckResult{
-			Control:     "CIS-10.7",
+			Control:     "CC7.1",
 			Name:        "API Gateway Logging Enabled",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d stages lack CloudWatch logging: %v", len(stagesWithoutLogging), stagesWithoutLogging),
@@ -159,7 +159,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayLogging(ctx context.Context) (CheckRes
 	}
 
 	return CheckResult{
-		Control:     "CIS-10.7",
+		Control:     "CC7.1",
 		Name:        "API Gateway Logging Enabled",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d API Gateway stages have CloudWatch logging enabled", stagesWithLogging),
@@ -180,7 +180,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayAuth(ctx context.Context) (CheckResult
 	restAPIs, err := c.clientV1.GetRestApis(ctx, &apigateway.GetRestApisInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-10.8",
+			Control:     "CC6.1",
 			Name:        "API Gateway Authorization Enabled",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list APIs: %v", err),
@@ -193,7 +193,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayAuth(ctx context.Context) (CheckResult
 
 	if len(restAPIs.Items) == 0 {
 		return CheckResult{
-			Control:     "CIS-10.8",
+			Control:     "CC6.1",
 			Name:        "API Gateway Authorization Enabled",
 			Status:      "INFO",
 			Evidence:    "No API Gateway APIs found",
@@ -206,7 +206,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayAuth(ctx context.Context) (CheckResult
 
 	// Check for authorizers is complex - require manual verification
 	return CheckResult{
-		Control:     "CIS-10.8",
+		Control:     "CC6.1",
 		Name:        "API Gateway Authorization Enabled",
 		Status:      "MANUAL",
 		Evidence:    fmt.Sprintf("MANUAL CHECK: Verify %d API(s) use authorizers (IAM, Cognito, Lambda, or API keys)", len(restAPIs.Items)),
@@ -234,7 +234,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayTLS(ctx context.Context) (CheckResult,
 	domainNames, err := c.clientV1.GetDomainNames(ctx, &apigateway.GetDomainNamesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CIS-10.9",
+			Control:     "CC6.3",
 			Name:        "API Gateway TLS 1.2+",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list custom domains: %v", err),
@@ -247,7 +247,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayTLS(ctx context.Context) (CheckResult,
 
 	if len(domainNames.Items) == 0 {
 		return CheckResult{
-			Control:     "CIS-10.9",
+			Control:     "CC6.3",
 			Name:        "API Gateway TLS 1.2+",
 			Status:      "INFO",
 			Evidence:    "No custom domains configured - API Gateway default endpoints use TLS 1.2+",
@@ -284,7 +284,7 @@ When configuring custom domains, ensure:
 
 	if len(weakTLSDomains) > 0 {
 		return CheckResult{
-			Control:     "CIS-10.9",
+			Control:     "CC6.3",
 			Name:        "API Gateway TLS 1.2+",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d custom domains use weak TLS (1.0/1.1): %v", len(weakTLSDomains), weakTLSDomains),
@@ -306,7 +306,7 @@ When configuring custom domains, ensure:
 	}
 
 	return CheckResult{
-		Control:     "CIS-10.9",
+		Control:     "CC6.3",
 		Name:        "API Gateway TLS 1.2+",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d custom domains use TLS 1.2 security policy", secureDomains),
