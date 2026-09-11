@@ -145,7 +145,7 @@ func (c *CISGCPManualReport) Run(ctx context.Context) ([]CheckResult, error) {
 			ScreenshotGuide: "Attach the configuration or record showing " + r.evidence,
 			ConsoleURL:      r.console,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-GCP": strings.TrimPrefix(r.id, "CIS-GCP-"), "SOC2": "CC6.1"},
+			Frameworks:      map[string]string{"CIS-GCP": strings.TrimPrefix(r.id, "CIS-GCP-")},
 		})
 	}
 	return out, nil

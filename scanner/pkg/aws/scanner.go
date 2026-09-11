@@ -52,6 +52,10 @@ import (
 )
 
 type AWSScanner struct {
+	// Cached result of runSuites, so the shared suite list runs once per scan.
+	suiteCache  []ScanResult
+	suiteCached bool
+
 	cfg             aws.Config
 	s3Client        *s3.Client
 	s3controlClient *s3control.Client
@@ -399,6 +403,8 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 		fmt.Println("  • Documentation of operational procedures")
 	}
 
+	results = append(results, s.runSuites(ctx, verbose)...)
+
 	return results
 }
 
@@ -464,6 +470,8 @@ func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 	// provider can automate, or a reader cannot tell an absent practice from a
 	// satisfied one.
 	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
+
+	results = append(results, s.runSuites(ctx, verbose)...)
 
 	return results
 }
@@ -536,11 +544,20 @@ func (s *AWSScanner) runVulnCoverage(ctx context.Context, emit checks.Emit) []Sc
 	return out
 }
 
-func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
-	// Initialize SOC2 checks
-	soc2Checks := []checks.Check{
+// allSuites is every check suite this provider has, constructed once.
+//
+// Each framework path used to hand-pick its own subset, so a suite claiming a
+// framework ran only if somebody had remembered to add it to that path. The PCI
+// suite answers CIS 3.1.1 - S3 buckets denying HTTP - and never ran on a CIS
+// scan; the CC8 and CC9 suites answer four CA.L2 practices and never ran on a
+// CMMC scan. Neither omission was visible in the output.
+//
+// The framework filter belongs at the report layer, where
+// controlMatchesFramework already applies it - including to the results that
+// carry no Frameworks field and match through their control id in the
+// framework's catalog, which an in-scan filter on tag presence drops.
+func (s *AWSScanner) allSuites(ctx context.Context) []checks.Check {
+	return []checks.Check{
 		// CC1 & CC2: Control Environment & Communication
 		checks.NewMonitoringChecks(s.cwClient, s.snsClient, s.shClient),
 		checks.NewCC1Checks(s.iamClient, s.orgClient, s.ssmClient),
@@ -603,19 +620,28 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 		checks.NewRedshiftChecks(s.redshiftClient),       // Redshift data warehouse
 		checks.NewElastiCacheChecks(s.elasticacheClient), // ElastiCache/Redis
 		checks.NewOpenSearchChecks(s.opensearchClient),   // OpenSearch/Elasticsearch
+		checks.NewAWSCMMCLevel1Checks(s.iamClient, s.s3Client, s.ec2Client, s.ctClient),
+		checks.NewPCIDSSChecks(s.iamClient, s.ec2Client, s.s3Client, s.ctClient, s.configClient),
 	}
+}
 
-	for _, check := range soc2Checks {
+// runSuites runs every suite and converts the results. Shared by the framework
+// paths so none of them can quietly run a different set.
+func (s *AWSScanner) runSuites(ctx context.Context, verbose bool) []ScanResult {
+	// Run once per scan. The framework paths share this list, so a scan
+	// that calls several of them would otherwise re-run every suite.
+	if s.suiteCached {
+		return s.suiteCache
+	}
+	var results []ScanResult
+	for _, check := range s.allSuites(ctx) {
 		if verbose {
-			fmt.Printf("  Running %s ...\n", check.Name())
+			fmt.Printf("   Running %s...\n", check.Name())
 		}
-
-		checkResults, err := s.runCheckModule(ctx, check)
+		checkResults, err := check.Run(ctx)
 		if err != nil && verbose {
-			fmt.Printf("    Warning in %s: %v\n", check.Name(), err)
+			fmt.Printf("     Warning in %s: %v\n", check.Name(), err)
 		}
-
-		// Convert CheckResult to ScanResult
 		for _, cr := range checkResults {
 			results = append(results, ScanResult{
 				Control:           cr.Control,
@@ -631,6 +657,15 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 			})
 		}
 	}
+	s.suiteCache, s.suiteCached = results, true
+	return results
+}
+func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
+	var results []ScanResult
+
+	// Initialize SOC2 checks
+
+	results = append(results, s.runSuites(ctx, verbose)...)
 
 	return results
 }
@@ -667,71 +702,15 @@ func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 	}
 
 	// Also run basic checks but filter for PCI relevance
-	basicChecks := []checks.Check{
-		checks.NewVPCChecks(s.ec2Client),
-		checks.NewSecurityServicesChecks(s.gdClient, s.macieClient, s.shClient, s.inspector2Client),
-		checks.NewSecretsManagerChecks(s.secretsManagerClient),
-		checks.NewSageMakerChecks(s.sagemakerClient),
-		checks.NewSSMChecks(s.ssmClient),
-		checks.NewRoute53Checks(s.route53Client),
-		checks.NewRedshiftChecks(s.redshiftClient),
-		checks.NewOrganizationsAdvancedChecks(s.orgClient, s.ctClient),
-		checks.NewOpenSearchChecks(s.opensearchClient),
-		checks.NewNetworkFirewallChecks(s.nfwClient, s.ec2Client),
-		checks.NewMonitoringChecks(s.cwClient, s.snsClient, s.shClient),
-		checks.NewMessagingChecks(s.snsClient, s.sqsClient),
-		checks.NewLambdaChecks(s.lambdaClient),
-		checks.NewIAMExtendedChecks(s.iamClient),
-		checks.NewElastiCacheChecks(s.elasticacheClient),
-		checks.NewEKSChecks(s.eksClient),
-		checks.NewECSChecks(s.ecsClient),
-		checks.NewECRChecks(s.ecrClient),
-		checks.NewDynamoDBChecks(s.dynamodbClient),
-		checks.NewConfigChecks(s.configClient),
-		checks.NewCloudFormationChecks(s.cloudFormationClient),
-		checks.NewCISManualChecks(),
-		checks.NewBeanstalkChecks(s.beanstalkClient),
-		checks.NewBackupVaultChecks(s.backupClient),
-		checks.NewAuroraChecks(s.rdsClient),
-		checks.NewAccessAnalyzerChecks(s.accessAnalyzerClient, s.cfg.Region),
-		checks.NewAPIGatewayChecks(s.apigwClient, s.apigwv2Client),
-		checks.NewACMChecks(s.acmClient),
-		checks.NewIAMChecks(s.iamClient),                               // For password policy, MFA, key rotation
-		checks.NewKMSChecks(s.kmsClient),                               // claims SOC2 and PCI; must run in those scans
-		checks.NewEFSChecks(s.efsClient),                               // claims SOC2 and PCI; must run in those scans
-		checks.NewS3Checks(s.s3Client, s.s3controlClient, s.stsClient), // For encryption requirements
-		checks.NewEC2Checks(s.ec2Client),                               // For network segmentation
-		checks.NewCloudTrailChecks(s.ctClient),                         // For logging requirements
-		// RDS carries PCI 3.5.1 (stored account data encrypted) and 1.4.2 (no
-		// direct public access). Without it a PCI scan reported no RDS evidence
-		// at all, though the mappings for it already existed.
-		checks.NewRDSChecks(s.rdsClient),
-	}
-
-	for _, check := range basicChecks {
-		checkResults, _ := s.runCheckModule(ctx, check)
-		for _, cr := range checkResults {
-			// Only include if it has PCI mapping
-			if cr.Frameworks != nil && cr.Frameworks["PCI-DSS"] != "" {
-				results = append(results, ScanResult{
-					Control:           cr.Control,
-					Name:              cr.Name,
-					Status:            cr.Status,
-					Evidence:          cr.Evidence,
-					Remediation:       cr.Remediation,
-					RemediationDetail: cr.RemediationDetail,
-					Severity:          cr.Severity,
-					ScreenshotGuide:   cr.ScreenshotGuide,
-					ConsoleURL:        cr.ConsoleURL,
-					Frameworks:        cr.Frameworks,
-				})
-			}
-		}
-	}
 
 	// PCI-DSS 11.3.1 wants scans quarterly across every in-scope system, which
 	// "Inspector is enabled" never established.
 	results = append(results, s.runVulnCoverage(ctx, checks.EmitPCI)...)
+
+	// Every suite. This path used to keep its own list and filter each
+	// result for a PCI tag, which is narrower than the report filter and
+	// dropped the results that match through the catalog instead.
+	results = append(results, s.runSuites(ctx, verbose)...)
 
 	return results
 }

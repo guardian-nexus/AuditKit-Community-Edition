@@ -17,6 +17,10 @@ import (
 )
 
 type GCPScanner struct {
+	// Cached result of runSuites, so the shared suite list runs once per scan.
+	suiteCache  []ScanResult
+	suiteCached bool
+
 	projectID      string
 	storageClient  *storage.Client
 	iamClient      *admin.IamClient
@@ -139,6 +143,9 @@ func (s *GCPScanner) ScanServices(ctx context.Context, services []string, verbos
 		results = append(results, s.runPCIChecks(ctx, verbose)...)
 		results = append(results, s.runCMMCChecks(ctx, verbose)...)
 		results = append(results, s.runCISChecks(ctx, verbose)...)
+		// The paths share one suite list, so the same finding arrives once
+		// per path.
+		results = dedupeIdenticalResults(results)
 	default:
 		results = append(results, s.runSOC2Checks(ctx, verbose)...)
 	}
@@ -146,54 +153,63 @@ func (s *GCPScanner) ScanServices(ctx context.Context, services []string, verbos
 	return results, nil
 }
 
-func (s *GCPScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
-	if verbose {
-		fmt.Println("Running SOC2 compliance checks for GCP...")
-	}
-
-	// Run SOC2 CC1-CC9 check modules that exist in GCP
-	soc2Checks := []checks.Check{
-		// CC1 & CC2: Control Environment & Communication
-		// FIXED: Match actual constructor signatures from soc2_cc1_cc2.go
+// allSuites is every check suite this provider has, constructed once.
+//
+// Each framework path used to hand-pick its own subset, so a suite claiming a
+// framework ran only if somebody had remembered to add it to that path. The
+// PCI path constructed one aggregate checker while the suites carrying PCI
+// tags - BigQuery, Compute, GKE, SQL, network, IAM - never ran on a PCI scan,
+// so the report was a fraction of what the mappings already covered and said
+// nothing about the difference.
+//
+// The framework filter belongs at the report layer, where
+// controlMatchesFramework already applies it, including to the results that
+// carry no Frameworks field and match through their control id in the
+// framework's catalog. An in-scan filter on tag presence is narrower than that
+// and silently drops them.
+func (s *GCPScanner) allSuites() []checks.Check {
+	return []checks.Check{
 		checks.NewGCPCC1Checks(s.iamClient, s.projectID),
 		checks.NewGCPCC2Checks(),
-
-		// CC3, CC4, CC5: Risk Assessment, Monitoring, Control Activities
-		// FIXED: Match actual constructor signatures from soc2_cc3_cc5.go
 		checks.NewGCPCC3Checks(s.projectID),
 		checks.NewGCPCC4Checks(s.projectID),
 		checks.NewGCPCC5Checks(s.projectID),
-
-		// CC6, CC7, CC8, CC9: Access Controls, Operations, Change Mgmt, Risk Mitigation
-		// FIXED: Match actual constructor signatures from soc2_cc6_cc9.go
 		checks.NewGCPCC6Checks(s.storageClient, s.iamClient, s.computeService, s.sqlService, s.projectID),
 		checks.NewGCPCC7Checks(s.loggingClient, s.computeService, s.projectID),
 		checks.NewGCPCC8Checks(s.projectID),
 		checks.NewGCPCC9Checks(s.storageClient, s.sqlService, s.projectID),
 		checks.NewGCPAvailabilityConfidentialityChecks(s.storageClient, s.sqlService, s.computeService, s.projectID),
-
-		// Also run traditional checks for backward compatibility
 		checks.NewStorageChecks(s.storageClient, s.projectID),
 		checks.NewIAMChecks(s.iamClient, s.projectID),
 		checks.NewComputeChecks(s.computeService, s.projectID),
 		checks.NewNetworkChecks(s.computeService, s.projectID),
 		checks.NewSQLChecks(s.sqlService, s.projectID),
+		checks.NewKMSChecks(s.kmsClient, s.projectID),
+		checks.NewLoggingChecks(s.loggingClient, s.projectID),
+		checks.NewBigQueryChecks(s.projectID),
+		checks.NewGCPCISManualChecks(s.projectID),
+		checks.NewGKEChecks(s.gkeService, s.projectID),
+		checks.NewGCPCMMCLevel1Checks(s.storageClient, s.iamClient, s.computeService, s.projectID),
 	}
+}
 
-	for _, check := range soc2Checks {
+// runSuites runs every suite and converts the results. Shared by the framework
+// paths so none of them can quietly run a different set.
+func (s *GCPScanner) runSuites(ctx context.Context, verbose bool, label string) []ScanResult {
+	// Run once per scan. The framework paths share this list, so a scan
+	// that calls several of them would otherwise re-run every suite.
+	if s.suiteCached {
+		return s.suiteCache
+	}
+	var results []ScanResult
+	for _, check := range s.allSuites() {
 		if verbose {
-			// GCP checks don't have Name() method, use type assertion or reflection
-			fmt.Printf("  Running SOC2 check module...\n")
+			fmt.Printf("  Running %s check module...\n", label)
 		}
-
 		checkResults, err := check.Run(ctx)
 		if err != nil && verbose {
-			fmt.Printf("    Warning: %v\n", err)
+			fmt.Printf("  Warning: %v\n", err)
 		}
-
-		// Convert CheckResult to ScanResult
 		for _, cr := range checkResults {
 			results = append(results, ScanResult{
 				Control:           cr.Control,
@@ -209,6 +225,20 @@ func (s *GCPScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 			})
 		}
 	}
+	s.suiteCache, s.suiteCached = results, true
+	return results
+}
+
+func (s *GCPScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
+	var results []ScanResult
+
+	if verbose {
+		fmt.Println("Running SOC2 compliance checks for GCP...")
+	}
+
+	// Run SOC2 CC1-CC9 check modules that exist in GCP
+
+	results = append(results, s.runSuites(ctx, verbose, "SOC2")...)
 
 	return results
 }
@@ -278,6 +308,9 @@ func (s *GCPScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResul
 	// PCI-DSS 11.3.1 wants scans quarterly across every in-scope system.
 	results = append(results, s.runVulnCoverage(ctx, checks.EmitPCI)...)
 
+	// Every suite, not the one aggregate checker this path used to build.
+	results = append(results, s.runSuites(ctx, verbose, "PCI-DSS")...)
+
 	return results
 }
 
@@ -337,6 +370,8 @@ func (s *GCPScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 	// provider can automate, or a reader cannot tell an absent practice from a
 	// satisfied one.
 	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
+
+	results = append(results, s.runSuites(ctx, verbose, "CMMC")...)
 
 	return results
 }
@@ -479,6 +514,8 @@ func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 	// recommendation from a satisfied one.
 	results = append(results, s.reportRemainingCISGCP(ctx, results)...)
 
+	results = append(results, s.runSuites(ctx, verbose, "CIS")...)
+
 	return results
 }
 
@@ -513,4 +550,26 @@ func (s *GCPScanner) reportRemainingCISGCP(ctx context.Context, reported []ScanR
 		})
 	}
 	return out
+}
+
+// dedupeIdenticalResults removes results that are the same finding reported by
+// more than one framework path. It keys on control, status and evidence, so
+// genuinely distinct findings that share a control id - several resources
+// failing the same criterion - are preserved.
+//
+// Needed since the framework paths share one suite list: a scan that runs
+// several of them, which is what the derived frameworks do, would otherwise
+// report every finding once per path.
+func dedupeIdenticalResults(results []ScanResult) []ScanResult {
+	seen := make(map[string]bool, len(results))
+	deduped := make([]ScanResult, 0, len(results))
+	for _, result := range results {
+		key := result.Control + "\x00" + result.Status + "\x00" + result.Evidence
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		deduped = append(deduped, result)
+	}
+	return deduped
 }

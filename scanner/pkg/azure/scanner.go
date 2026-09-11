@@ -24,6 +24,10 @@ import (
 )
 
 type AzureScanner struct {
+	// Cached result of runSuites, so the shared suite list runs once per scan.
+	suiteCache  []ScanResult
+	suiteCached bool
+
 	subscriptionID      string
 	cred                *azidentity.DefaultAzureCredential
 	graphClient         *msgraphsdk.GraphServiceClient
@@ -349,6 +353,9 @@ func (s *AzureScanner) ScanServices(ctx context.Context, services []string, verb
 		results = append(results, s.runPCIChecks(ctx, verbose)...)
 		results = append(results, s.runCMMCChecks(ctx, verbose)...)
 		results = append(results, s.runCISChecks(ctx, verbose)...)
+		// The paths share one suite list, so the same finding arrives once
+		// per path.
+		results = dedupeIdenticalResults(results)
 	default:
 		results = append(results, s.runSOC2Checks(ctx, verbose)...)
 	}
@@ -356,15 +363,19 @@ func (s *AzureScanner) ScanServices(ctx context.Context, services []string, verb
 	return results, nil
 }
 
-func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
-	if verbose {
-		fmt.Println("Running SOC2 compliance checks for Azure...")
-	}
-
-	// Run SOC2 CC1-CC9 check modules
-	soc2Checks := []checks.Check{
+// allSuites is every check suite this provider has, constructed once.
+//
+// Each framework path used to hand-pick its own subset, so a suite claiming a
+// framework ran only if somebody had remembered to add it to that path. The PCI
+// path built four suites while more than thirty carried PCI tags, so a PCI scan
+// reported a fraction of what the mappings already covered.
+//
+// The framework filter belongs at the report layer, where
+// controlMatchesFramework already applies it - including to the results that
+// carry no Frameworks field and match through their control id in the
+// framework's catalog, which an in-scan filter on tag presence drops.
+func (s *AzureScanner) allSuites() []checks.Check {
+	return []checks.Check{
 		checks.NewDefenderChecks(s.subscriptionID, s.securityClient, s.autoProvisionClient, s.contactsClient),
 		checks.NewAzureCISManualChecks(s.subscriptionID),
 		checks.NewCISFoundationsManualChecks(),                                                // CIS Azure Foundations v6.0.0, the Manual recommendations
@@ -395,18 +406,27 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 		checks.NewKeyVaultChecks(s.keyVaultClient),
 		checks.NewMonitoringChecks(s.monitorClient, s.subscriptionID),
 		checks.NewIdentityChecks(s.subscriptionID),
+		checks.NewAzureCMMCLevel1Checks(s.roleClient, s.storageClient, s.nsgClient, s.graphClient, s.subscriptionID),
 	}
+}
 
-	for _, check := range soc2Checks {
+// runSuites runs every suite and converts the results. Shared by the framework
+// paths so none of them can quietly run a different set.
+func (s *AzureScanner) runSuites(ctx context.Context, verbose bool) []ScanResult {
+	// Run once per scan. The framework paths share this list, so a scan
+	// that calls several of them would otherwise re-run every suite.
+	if s.suiteCached {
+		return s.suiteCache
+	}
+	var results []ScanResult
+	for _, check := range s.allSuites() {
 		if verbose {
-			fmt.Printf("  Running %s...\n", check.Name())
+			fmt.Printf("   Running %s...\n", check.Name())
 		}
-
 		checkResults, err := check.Run(ctx)
 		if err != nil && verbose {
-			fmt.Printf("    Warning in %s: %v\n", check.Name(), err)
+			fmt.Printf("     Warning in %s: %v\n", check.Name(), err)
 		}
-
 		for _, cr := range checkResults {
 			results = append(results, ScanResult{
 				Control:           cr.Control,
@@ -415,13 +435,26 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 				Evidence:          cr.Evidence,
 				Remediation:       cr.Remediation,
 				RemediationDetail: cr.RemediationDetail,
-				Severity:          cr.Priority.Level,
+				Severity:          cr.Severity,
 				ScreenshotGuide:   cr.ScreenshotGuide,
 				ConsoleURL:        cr.ConsoleURL,
 				Frameworks:        cr.Frameworks,
 			})
 		}
 	}
+	s.suiteCache, s.suiteCached = results, true
+	return results
+}
+func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
+	var results []ScanResult
+
+	if verbose {
+		fmt.Println("Running SOC2 compliance checks for Azure...")
+	}
+
+	// Run SOC2 CC1-CC9 check modules
+
+	results = append(results, s.runSuites(ctx, verbose)...)
 
 	return results
 }
@@ -496,6 +529,9 @@ func (s *AzureScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanRes
 	// PCI-DSS 11.3.1 wants scans quarterly across every in-scope system.
 	results = append(results, s.runVulnCoverage(ctx, checks.EmitPCI)...)
 
+	// Every suite, not the four this path used to build.
+	results = append(results, s.runSuites(ctx, verbose)...)
+
 	return results
 }
 
@@ -554,6 +590,8 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 	// provider can automate, or a reader cannot tell an absent practice from a
 	// satisfied one.
 	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
+
+	results = append(results, s.runSuites(ctx, verbose)...)
 
 	return results
 }
@@ -706,4 +744,26 @@ func (s *AzureScanner) runCISChecks(ctx context.Context, verbose bool) []ScanRes
 	}
 
 	return results
+}
+
+// dedupeIdenticalResults removes results that are the same finding reported by
+// more than one framework path. It keys on control, status and evidence, so
+// genuinely distinct findings that share a control id - several resources
+// failing the same criterion - are preserved.
+//
+// Needed since the framework paths share one suite list: a scan that runs
+// several of them, which is what the derived frameworks do, would otherwise
+// report every finding once per path.
+func dedupeIdenticalResults(results []ScanResult) []ScanResult {
+	seen := make(map[string]bool, len(results))
+	deduped := make([]ScanResult, 0, len(results))
+	for _, result := range results {
+		key := result.Control + "\x00" + result.Status + "\x00" + result.Evidence
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		deduped = append(deduped, result)
+	}
+	return deduped
 }
