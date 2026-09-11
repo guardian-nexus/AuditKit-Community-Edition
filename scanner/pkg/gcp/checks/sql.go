@@ -34,6 +34,23 @@ func (c *SQLChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results = append(results, c.CheckMySQLSkipShowDatabase(ctx)...)
 	results = append(results, c.CheckSQLServerTraceFlag(ctx)...)
 
+	// Database flags. Ported from Pro: these eight were reported by neither
+	// edition under an identifier that exists in v5.0.0.
+	results = append(results, c.CheckPostgreSQLLogErrorVerbosity(ctx)...)
+	results = append(results, c.CheckPostgreSQLLogStatement(ctx)...)
+	results = append(results, c.CheckPostgreSQLLogMinErrorStatement(ctx)...)
+	results = append(results, c.CheckSQLServerCrossDBOwnership(ctx)...)
+	results = append(results, c.CheckSQLServerContainedDBAuth(ctx)...)
+	results = append(results, c.CheckMySQLLocalInfile(ctx)...)
+	results = append(results, c.CheckSQLServerRemoteAccess(ctx)...)
+	results = append(results, c.CheckPostgreSQLLogLockWaits(ctx)...)
+	// The flag recommendations the original checks did not cover, plus 6.5.
+	results = append(results, c.CheckPostgreSQLLogMinMessages(ctx)...)
+	results = append(results, c.CheckPostgreSQLPgAudit(ctx)...)
+	results = append(results, c.CheckSQLServerExternalScripts(ctx)...)
+	results = append(results, c.CheckSQLServerUserConnections(ctx)...)
+	results = append(results, c.CheckSQLServerUserOptions(ctx)...)
+	results = append(results, c.CheckSQLAuthorizedNetworks(ctx)...)
 	return results, nil
 }
 
@@ -756,6 +773,152 @@ gcloud sql instances patch %s \
 				Frameworks: map[string]string{"CIS-GCP": "6.3.6", "SOC2": "CC6.1"},
 			})
 		}
+	}
+
+	return results
+}
+
+// Ported from Pro. Eight database-flag recommendations that Community was not
+// reporting at all, plus the generic helper they share: the flag name and the
+// expected value are the only things that differ between them, so a check
+// apiece would be eight copies of one API walk.
+// CheckPostgreSQLLogErrorVerbosity verifies log_error_verbosity is set appropriately
+func (c *SQLChecks) CheckPostgreSQLLogErrorVerbosity(ctx context.Context) []CheckResult {
+	return c.checkDatabaseFlag(ctx, "POSTGRES", "log_error_verbosity", "DEFAULT", "CIS-GCP-6.2.1",
+		"PostgreSQL Log Error Verbosity",
+		"Set log_error_verbosity to DEFAULT or stricter for adequate error logging")
+}
+
+// CheckPostgreSQLLogStatement verifies log_statement is set appropriately
+func (c *SQLChecks) CheckPostgreSQLLogStatement(ctx context.Context) []CheckResult {
+	return c.checkDatabaseFlag(ctx, "POSTGRES", "log_statement", "ddl", "CIS-GCP-6.2.4",
+		"PostgreSQL Log Statement",
+		"Set log_statement to 'ddl' or 'all' to log DDL statements for audit trail")
+}
+
+// CheckPostgreSQLLogMinErrorStatement verifies log_min_error_statement is set
+func (c *SQLChecks) CheckPostgreSQLLogMinErrorStatement(ctx context.Context) []CheckResult {
+	return c.checkDatabaseFlag(ctx, "POSTGRES", "log_min_error_statement", "error", "CIS-GCP-6.2.6",
+		"PostgreSQL Log Min Error Statement",
+		"Set log_min_error_statement to 'error' or stricter for comprehensive error logging")
+}
+
+// CheckSQLServerCrossDBOwnership verifies cross db ownership chaining is off
+func (c *SQLChecks) CheckSQLServerCrossDBOwnership(ctx context.Context) []CheckResult {
+	return c.checkDatabaseFlag(ctx, "SQLSERVER", "cross db ownership chaining", "off", "CIS-GCP-6.3.2",
+		"SQL Server Cross DB Ownership Chaining",
+		"Disable cross db ownership chaining to prevent unauthorized data access")
+}
+
+// CheckSQLServerContainedDBAuth verifies contained database authentication is off
+func (c *SQLChecks) CheckSQLServerContainedDBAuth(ctx context.Context) []CheckResult {
+	return c.checkFlagIfPresent(ctx, "SQLSERVER", "contained database authentication", "off", "CIS-GCP-6.3.7",
+		"SQL Server Contained Database Authentication",
+		"Disable contained database authentication for centralized authentication management")
+}
+
+// CheckMySQLLocalInfile verifies local_infile is set to off
+func (c *SQLChecks) CheckMySQLLocalInfile(ctx context.Context) []CheckResult {
+	return c.checkDatabaseFlag(ctx, "MYSQL", "local_infile", "off", "CIS-GCP-6.1.3",
+		"MySQL Local Infile",
+		"Disable local_infile to prevent unauthorized file access from client machines")
+}
+
+// CheckSQLServerRemoteAccess verifies remote access is set to off
+func (c *SQLChecks) CheckSQLServerRemoteAccess(ctx context.Context) []CheckResult {
+	return c.checkDatabaseFlag(ctx, "SQLSERVER", "remote access", "off", "CIS-GCP-6.3.5",
+		"SQL Server Remote Access",
+		"Disable remote access unless specifically required for distributed queries")
+}
+
+// CheckPostgreSQLLogLockWaits verifies log_lock_waits is enabled
+func (c *SQLChecks) CheckPostgreSQLLogLockWaits(ctx context.Context) []CheckResult {
+	return c.checkDatabaseFlag(ctx, "POSTGRES", "log_lock_waits", "on", "GCP-SQL-02",
+		"PostgreSQL Log Lock Waits",
+		"Enable log_lock_waits to identify performance issues and potential deadlocks")
+}
+
+// Helper function to check database flags
+func (c *SQLChecks) checkDatabaseFlag(ctx context.Context, dbType, flagName, expectedValue, cisControl, checkName, remediation string) []CheckResult {
+	var results []CheckResult
+
+	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
+	if err != nil {
+		return results
+	}
+
+	violatingInstances := []string{}
+	relevantInstanceCount := 0
+
+	for _, instance := range instanceList.Items {
+		if instance.DatabaseVersion == "" {
+			continue
+		}
+
+		// Check if this instance matches the database type
+		if !strings.HasPrefix(instance.DatabaseVersion, dbType) {
+			continue
+		}
+
+		relevantInstanceCount++
+		flagValue := ""
+		hasFlag := false
+
+		if instance.Settings != nil && instance.Settings.DatabaseFlags != nil {
+			for _, flag := range instance.Settings.DatabaseFlags {
+				if flag.Name == flagName {
+					hasFlag = true
+					if flag.Value != "" {
+						flagValue = flag.Value
+					}
+					break
+				}
+			}
+		}
+
+		// Check if flag is missing or has wrong value
+		if !hasFlag || (flagValue != expectedValue && !strings.EqualFold(flagValue, expectedValue)) {
+			violatingInstances = append(violatingInstances,
+				fmt.Sprintf("%s (%s=%s)", instance.Name, flagName, flagValue))
+		}
+	}
+
+	if len(violatingInstances) > 0 {
+		displayInstances := violatingInstances
+		if len(violatingInstances) > 5 {
+			displayInstances = violatingInstances[:5]
+		}
+
+		results = append(results, CheckResult{
+			Control:  cisControl,
+			Name:     fmt.Sprintf("[%s] %s", cisControl, checkName),
+			Status:   "FAIL",
+			Severity: "MEDIUM",
+			Evidence: fmt.Sprintf("%s: %d/%d %s instances have incorrect '%s' flag: %v",
+				cisControl, len(violatingInstances), relevantInstanceCount, dbType, flagName, displayInstances),
+			Remediation: remediation,
+			RemediationDetail: fmt.Sprintf(`# Set database flag for Cloud SQL instance
+gcloud sql instances patch INSTANCE_NAME \
+  --database-flags %s=%s
+
+# Or via Console: Cloud SQL → Instance → Edit → Flags → Add %s=%s`,
+				flagName, expectedValue, flagName, expectedValue),
+			Priority:        PriorityMedium,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: fmt.Sprintf("Cloud SQL → Instance → Edit → Flags → Screenshot showing %s=%s", flagName, expectedValue),
+			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/sql/instances?project=%s", c.projectID),
+			Frameworks:      map[string]string{"CIS-GCP": strings.TrimPrefix(strings.TrimPrefix(cisControl, "CIS-GCP-"), "CIS GCP "), "SOC2": "CC6.1"},
+		})
+	} else if relevantInstanceCount > 0 {
+		results = append(results, CheckResult{
+			Control:    cisControl,
+			Name:       fmt.Sprintf("[%s] %s", cisControl, checkName),
+			Status:     "PASS",
+			Evidence:   fmt.Sprintf("All %d %s instances have '%s' set to '%s' | Meets %s", relevantInstanceCount, dbType, flagName, expectedValue, cisControl),
+			Priority:   PriorityInfo,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"CIS-GCP": strings.TrimPrefix(strings.TrimPrefix(cisControl, "CIS-GCP-"), "CIS GCP "), "SOC2": "CC6.1"},
+		})
 	}
 
 	return results

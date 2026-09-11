@@ -42,6 +42,7 @@ func (c *NetworkChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results = append(results, c.CheckHTTPSForwarding(ctx)...)
 	results = append(results, c.CheckTLSVersions(ctx)...)
 
+	results = append(results, c.CheckDNSSECAlgorithm(ctx)...)
 	return results, nil
 }
 
@@ -882,6 +883,52 @@ gcloud compute ssl-policies update %s \
 			Frameworks: GetFrameworkMappings("TLS_VERSION"),
 		})
 	}
+
+	return results
+}
+
+// Ported from Pro, which answered 3.4 and 3.5, the DNSSEC key-signing and zone-signing algorithms while this edition did not.
+// CheckDNSSECAlgorithm verifies DNSSEC doesn't use weak RSASHA1 algorithm (CIS 3.4, 3.5)
+func (c *NetworkChecks) CheckDNSSECAlgorithm(ctx context.Context) []CheckResult {
+	var results []CheckResult
+
+	// Cloud DNS DNSSEC algorithm check requires DNS API
+	results = append(results, CheckResult{
+		Control:     "CIS-GCP-3.4",
+		Name:        "[CIS-GCP-3.4] DNSSEC Algorithm Not RSASHA1",
+		Status:      "MANUAL",
+		Severity:    "MEDIUM",
+		Evidence:    "MANUAL CHECK: Verify DNSSEC zones do not use deprecated RSASHA1 algorithm",
+		Remediation: "Use RSASHA256 or stronger algorithms for DNSSEC",
+		RemediationDetail: `# Check current DNSSEC algorithm
+gcloud dns managed-zones describe ZONE_NAME | grep algorithm
+
+# If using RSASHA1, update to stronger algorithm
+# Note: Requires DNSSEC key rotation
+gcloud dns managed-zones update ZONE_NAME \
+  --dnssec-state=on
+
+# Recommended: Use default settings which avoid RSASHA1
+# Modern GCP defaults use ECDSAP256SHA256
+
+# List all zones with DNSSEC details
+gcloud dns managed-zones list --format="table(
+  name,
+  dnssecConfig.state,
+  dnssecConfig.defaultKeySpecs[0].algorithm
+)"
+
+# Acceptable algorithms (NOT RSASHA1):
+# - RSASHA256
+# - RSASHA512
+# - ECDSAP256SHA256
+# - ECDSAP384SHA384`,
+		Priority:        PriorityMedium,
+		Timestamp:       time.Now(),
+		ScreenshotGuide: "Cloud DNS → Zone details → DNSSEC → Screenshot showing algorithm is NOT 'RSASHA1'",
+		ConsoleURL:      "https://console.cloud.google.com/net-services/dns/zones",
+		Frameworks:      map[string]string{"CIS-GCP": "3.4, 3.5", "SOC2": "CC6.1"},
+	})
 
 	return results
 }

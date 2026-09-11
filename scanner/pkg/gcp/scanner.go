@@ -473,5 +473,44 @@ func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 		fmt.Println("")
 	}
 
+	// Every recommendation nothing above measured, reported with the evidence
+	// an assessor asks for. A report's denominator is the benchmark's 93, not
+	// the subset this scanner reaches, or a reader cannot tell an absent
+	// recommendation from a satisfied one.
+	results = append(results, s.reportRemainingCISGCP(ctx, results)...)
+
 	return results
+}
+
+// reportRemainingCISGCP fills in the recommendations the checks above did not
+// name. The covered set comes from the results just produced rather than a
+// hand-kept list, so automating one of these removes it from here rather than
+// leaving it reported twice.
+func (s *GCPScanner) reportRemainingCISGCP(ctx context.Context, reported []ScanResult) []ScanResult {
+	covered := map[string]bool{}
+	for _, r := range reported {
+		covered[strings.TrimPrefix(r.Control, "CIS-GCP-")] = true
+		for _, id := range strings.Split(r.Frameworks["CIS-GCP"], ",") {
+			if id = strings.TrimSpace(id); id != "" {
+				covered[id] = true
+			}
+		}
+	}
+	var out []ScanResult
+	rows, _ := checks.NewCISGCPManualReport(covered).Run(ctx)
+	for _, cr := range rows {
+		out = append(out, ScanResult{
+			Control:           cr.Control,
+			Name:              cr.Name,
+			Status:            cr.Status,
+			Evidence:          cr.Evidence,
+			Remediation:       cr.Remediation,
+			RemediationDetail: cr.RemediationDetail,
+			Severity:          cr.Severity,
+			ScreenshotGuide:   cr.ScreenshotGuide,
+			ConsoleURL:        cr.ConsoleURL,
+			Frameworks:        cr.Frameworks,
+		})
+	}
+	return out
 }

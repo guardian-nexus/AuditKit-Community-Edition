@@ -367,6 +367,12 @@ var FrameworkMappings = map[string]map[string]string{
 	},
 
 	// GKE / KUBERNETES CONTROLS
+	"BIGQUERY_TABLE_ENCRYPTION": {
+		FrameworkSOC2:  "CC6.7",
+		FrameworkPCI:   "3.5.1",
+		FrameworkHIPAA: "164.312(a)(2)(iv)",
+		FrameworkCIS:   "7.2",
+	},
 	"CLOUD_AUDIT_LOGS": {
 		FrameworkSOC2:  "CC7.2",
 		FrameworkPCI:   "10.2.1",
