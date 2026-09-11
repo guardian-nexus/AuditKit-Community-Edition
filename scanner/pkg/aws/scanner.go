@@ -255,6 +255,7 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 		checks.NewRDSChecks(s.rdsClient),
 		checks.NewVPCChecks(s.ec2Client),
 		checks.NewEFSChecks(s.efsClient), // CIS AWS Foundations v7.0.0 3.3.1
+		checks.NewKMSChecks(s.kmsClient), // CIS AWS Foundations v7.0.0 4.6
 		checks.NewNetworkFirewallChecks(s.nfwClient, s.ec2Client),
 		checks.NewLambdaChecks(s.lambdaClient),
 		checks.NewECSChecks(s.ecsClient),

@@ -417,7 +417,7 @@ func (c *CloudTrailChecks) CheckCloudTrailS3BucketPolicy(ctx context.Context) (C
 // CIS 3.8 - Ensure KMS key rotation is enabled for CloudTrail encryption keys
 func (c *CloudTrailChecks) CheckCloudTrailKMSKey(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control: "CIS-4.6",
+		Control: "AWS-CLOUDTRAIL-03",
 		Name:    "Customer-Managed KMS Key Rotation",
 		Status:  "INFO",
 		// v7.0.0 4.6 covers every customer-created symmetric CMK, not only the

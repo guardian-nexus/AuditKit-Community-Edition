@@ -259,7 +259,8 @@ var FrameworkMappings = map[string]map[string]string{
 		FrameworkSOC2:  "CC6.3",
 		FrameworkPCI:   "3.6.1",
 		FrameworkHIPAA: "164.312(a)(2)(iv)",
-		FrameworkCIS:   "4.6",
+		// 4.6 is answered by KMSChecks, which covers every customer-managed
+		// symmetric key rather than only CloudTrail's.
 	},
 	"S3_CLOUDTRAIL_BUCKET": {
 		FrameworkSOC2:  "CC7.1",
