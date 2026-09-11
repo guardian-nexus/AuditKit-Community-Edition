@@ -232,8 +232,8 @@ func (c *ComputeChecks) CheckOSLogin(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 4.4",
-			Name:        "[CIS GCP 4.4] OS Login Enabled",
+			Control:     "CIS-GCP-4.4",
+			Name:        "[CIS-GCP-4.4] OS Login Enabled",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("CIS 4.4: %d instances do not have OS Login enabled: %v | OS Login provides centralized SSH key management", len(instancesWithoutOSLogin), displayInstances),
@@ -254,8 +254,8 @@ gcloud compute instances add-metadata INSTANCE_NAME \
 		})
 	} else if totalInstances > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 4.4",
-			Name:       "[CIS GCP 4.4] OS Login Enabled",
+			Control:    "CIS-GCP-4.4",
+			Name:       "[CIS-GCP-4.4] OS Login Enabled",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("All %d instances have OS Login enabled | Meets CIS 4.4", totalInstances),
 			Priority:   PriorityInfo,
@@ -305,8 +305,8 @@ func (c *ComputeChecks) CheckShieldedVM(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 4.8",
-			Name:        "[CIS GCP 4.8] Shielded VM Features",
+			Control:     "CIS-GCP-4.8",
+			Name:        "[CIS-GCP-4.8] Shielded VM Features",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Evidence:    fmt.Sprintf("CIS 4.8: %d instances lack full Shielded VM protection: %v | Should enable vTPM, Secure Boot, and Integrity Monitoring", len(instancesWithoutShieldedVM), displayInstances),
@@ -325,8 +325,8 @@ gcloud compute instances update INSTANCE_NAME \
 		})
 	} else if totalInstances > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 4.8",
-			Name:       "[CIS GCP 4.8] Shielded VM Features",
+			Control:    "CIS-GCP-4.8",
+			Name:       "[CIS-GCP-4.8] Shielded VM Features",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("All %d instances have full Shielded VM protection | Meets CIS 4.8", totalInstances),
 			Priority:   PriorityInfo,
@@ -378,8 +378,8 @@ func (c *ComputeChecks) CheckSerialPortAccess(ctx context.Context) []CheckResult
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 4.5",
-			Name:        "[CIS GCP 4.5] Serial Port Access Disabled",
+			Control:     "CIS-GCP-4.5",
+			Name:        "[CIS-GCP-4.5] Serial Port Access Disabled",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Evidence:    fmt.Sprintf("CIS 4.5: %d instances have serial port access enabled: %v | Serial console access should be disabled for security", len(instancesWithSerialPort), displayInstances),
@@ -395,8 +395,8 @@ func (c *ComputeChecks) CheckSerialPortAccess(ctx context.Context) []CheckResult
 		})
 	} else if totalInstances > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 4.5",
-			Name:       "[CIS GCP 4.5] Serial Port Access Disabled",
+			Control:    "CIS-GCP-4.5",
+			Name:       "[CIS-GCP-4.5] Serial Port Access Disabled",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("All %d instances have serial port access disabled | Meets CIS 4.5", totalInstances),
 			Priority:   PriorityInfo,
@@ -442,8 +442,8 @@ func (c *ComputeChecks) CheckIPForwarding(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 4.6",
-			Name:        "[CIS GCP 4.6] IP Forwarding Disabled",
+			Control:     "CIS-GCP-4.6",
+			Name:        "[CIS-GCP-4.6] IP Forwarding Disabled",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Evidence:    fmt.Sprintf("CIS 4.6: %d instances have IP forwarding enabled: %v | Should only be enabled for routers/VPN gateways", len(instancesWithIPForwarding), displayInstances),
@@ -461,8 +461,8 @@ gcloud compute instances create INSTANCE_NAME \
 		})
 	} else if totalInstances > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 4.6",
-			Name:       "[CIS GCP 4.6] IP Forwarding Disabled",
+			Control:    "CIS-GCP-4.6",
+			Name:       "[CIS-GCP-4.6] IP Forwarding Disabled",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("All %d instances have IP forwarding disabled | Meets CIS 4.6", totalInstances),
 			Priority:   PriorityInfo,
@@ -481,8 +481,8 @@ func (c *ComputeChecks) CheckProjectSSHKeys(ctx context.Context) []CheckResult {
 	project, err := c.service.Projects.Get(c.projectID).Context(ctx).Do()
 	if err != nil {
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 4.3",
-			Name:        "[CIS GCP 4.3] Project-Wide SSH Keys",
+			Control:     "CIS-GCP-4.3",
+			Name:        "[CIS-GCP-4.3] Project-Wide SSH Keys",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("Unable to check project SSH keys: %v", err),
 			Remediation: "Verify compute.projects.get permission",
@@ -509,8 +509,8 @@ func (c *ComputeChecks) CheckProjectSSHKeys(ctx context.Context) []CheckResult {
 
 	if hasProjectSSHKeys {
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 4.3",
-			Name:        "[CIS GCP 4.3] Project-Wide SSH Keys",
+			Control:     "CIS-GCP-4.3",
+			Name:        "[CIS-GCP-4.3] Project-Wide SSH Keys",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("CIS 4.3: Project has %d project-wide SSH keys configured | Project-wide keys grant access to all instances", sshKeyCount),
@@ -530,8 +530,8 @@ gcloud compute project-info add-metadata \
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 4.3",
-			Name:       "[CIS GCP 4.3] Project-Wide SSH Keys",
+			Control:    "CIS-GCP-4.3",
+			Name:       "[CIS-GCP-4.3] Project-Wide SSH Keys",
 			Status:     "PASS",
 			Evidence:   "No project-wide SSH keys configured | Meets CIS 4.3",
 			Priority:   PriorityInfo,
@@ -589,8 +589,8 @@ func (c *ComputeChecks) CheckDefaultServiceAccountFullAccess(ctx context.Context
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 4.2",
-			Name:        "[CIS GCP 4.2] Default SA Full Access",
+			Control:     "CIS-GCP-4.2",
+			Name:        "[CIS-GCP-4.2] Default SA Full Access",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("CRITICAL: %d instances use default service account with full API access: %v | Violates CIS 4.2 (excessive permissions)", len(instancesWithFullAccess), displayInstances),
@@ -617,8 +617,8 @@ gcloud compute instances set-service-account %s \
 		})
 	} else if totalInstances > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 4.2",
-			Name:       "[CIS GCP 4.2] Default SA Full Access",
+			Control:    "CIS-GCP-4.2",
+			Name:       "[CIS-GCP-4.2] Default SA Full Access",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("All %d instances use custom service accounts or limited scopes | Meets CIS 4.2", totalInstances),
 			Priority:   PriorityInfo,
@@ -630,7 +630,7 @@ gcloud compute instances set-service-account %s \
 	return results
 }
 
-// CheckConfidentialComputing verifies Confidential Computing is enabled for sensitive workloads (CIS 4.10)
+// CheckConfidentialComputing verifies Confidential Computing is enabled for sensitive workloads (CIS 4.11)
 func (c *ComputeChecks) CheckConfidentialComputing(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -673,11 +673,11 @@ func (c *ComputeChecks) CheckConfidentialComputing(ctx context.Context) []CheckR
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 4.10",
-			Name:        "[CIS GCP 4.10] Confidential Computing",
+			Control:     "CIS-GCP-4.11",
+			Name:        "[CIS-GCP-4.11] Confidential Computing",
 			Status:      "INFO",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("INFO: %d/%d instances do not have Confidential Computing enabled: %v | CIS 4.10 recommends for sensitive workloads", len(instancesWithoutConfidential), totalInstances, displayInstances),
+			Evidence:    fmt.Sprintf("INFO: %d/%d instances do not have Confidential Computing enabled: %v | CIS 4.11 recommends for sensitive workloads", len(instancesWithoutConfidential), totalInstances, displayInstances),
 			Remediation: "Enable Confidential Computing for VMs processing sensitive data",
 			RemediationDetail: fmt.Sprintf(`# Confidential Computing requires N2D machine type
 # Create new instance with Confidential Computing
@@ -693,34 +693,34 @@ Confidential Computing encrypts data in use (memory encryption).`),
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Compute Engine → Create Instance → Confidential VM service → Screenshot showing enabled",
 			ConsoleURL:      "https://console.cloud.google.com/compute/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "4.10", "SOC2": "CC6.7"},
+			Frameworks:      map[string]string{"CIS-GCP": "4.11", "SOC2": "CC6.7"},
 		})
 	} else if totalInstances > 0 && confidentialCount > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 4.10",
-			Name:       "[CIS GCP 4.10] Confidential Computing",
+			Control:    "CIS-GCP-4.11",
+			Name:       "[CIS-GCP-4.11] Confidential Computing",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d instances have Confidential Computing enabled | Exceeds CIS 4.10", totalInstances),
+			Evidence:   fmt.Sprintf("All %d instances have Confidential Computing enabled | Exceeds CIS 4.11", totalInstances),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "4.10", "SOC2": "CC6.7"},
+			Frameworks: map[string]string{"CIS-GCP": "4.11", "SOC2": "CC6.7"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 4.10",
-			Name:       "[CIS GCP 4.10] Confidential Computing",
+			Control:    "CIS-GCP-4.11",
+			Name:       "[CIS-GCP-4.11] Confidential Computing",
 			Status:     "INFO",
 			Evidence:   fmt.Sprintf("%d instances found. Confidential Computing recommended for sensitive workloads processing regulated data.", totalInstances),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "4.10", "SOC2": "CC6.7"},
+			Frameworks: map[string]string{"CIS-GCP": "4.11", "SOC2": "CC6.7"},
 		})
 	}
 
 	return results
 }
 
-// CheckShieldedVMEnabled verifies instances use Shielded VM (CIS 4.7)
+// CheckShieldedVMEnabled verifies instances use Shielded VM (CIS 4.8)
 func (c *ComputeChecks) CheckShieldedVMEnabled(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -765,11 +765,11 @@ func (c *ComputeChecks) CheckShieldedVMEnabled(ctx context.Context) []CheckResul
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 4.7",
-			Name:        "[CIS GCP 4.7] Shielded VM Enabled",
+			Control:     "CIS-GCP-4.8",
+			Name:        "[CIS-GCP-4.8] Shielded VM Enabled",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("%d/%d instances do not have full Shielded VM protection: %s | Violates CIS 4.7 (missing boot integrity protection)", len(instancesWithoutShieldedVM), totalInstances, strings.Join(displayInstances, ", ")),
+			Evidence:    fmt.Sprintf("%d/%d instances do not have full Shielded VM protection: %s | Violates CIS 4.8 (missing boot integrity protection)", len(instancesWithoutShieldedVM), totalInstances, strings.Join(displayInstances, ", ")),
 			Remediation: "Enable Shielded VM with all features for new instances",
 			RemediationDetail: fmt.Sprintf(`# Shielded VM cannot be enabled on existing instances
 # Must create new instance with Shielded VM enabled
@@ -792,24 +792,24 @@ gcloud compute instances create new-instance \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Compute Engine → VM instances → Instance details → Screenshot showing Shielded VM with all features enabled",
 			ConsoleURL:      "https://console.cloud.google.com/compute/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "4.7", "SOC2": "CC6.1"},
+			Frameworks:      map[string]string{"CIS-GCP": "4.8", "SOC2": "CC6.1"},
 		})
 	} else if totalInstances > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 4.7",
-			Name:       "[CIS GCP 4.7] Shielded VM Enabled",
+			Control:    "CIS-GCP-4.8",
+			Name:       "[CIS-GCP-4.8] Shielded VM Enabled",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d instances have full Shielded VM protection enabled | Meets CIS 4.7", totalInstances),
+			Evidence:   fmt.Sprintf("All %d instances have full Shielded VM protection enabled | Meets CIS 4.8", totalInstances),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "4.7", "SOC2": "CC6.1"},
+			Frameworks: map[string]string{"CIS-GCP": "4.8", "SOC2": "CC6.1"},
 		})
 	}
 
 	return results
 }
 
-// CheckInstancePublicIPs verifies instances don't have public IPs (CIS 4.11)
+// CheckInstancePublicIPs verifies instances don't have public IPs (CIS 4.9)
 func (c *ComputeChecks) CheckInstancePublicIPs(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -859,11 +859,11 @@ func (c *ComputeChecks) CheckInstancePublicIPs(ctx context.Context) []CheckResul
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 4.11",
-			Name:        "[CIS GCP 4.11] No Public IP Addresses",
+			Control:     "CIS-GCP-4.9",
+			Name:        "[CIS-GCP-4.9] No Public IP Addresses",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("%d/%d instances have external public IP addresses: %s | Violates CIS 4.11 (direct internet exposure)", len(instancesWithPublicIP), totalInstances, strings.Join(displayInstances, ", ")),
+			Evidence:    fmt.Sprintf("%d/%d instances have external public IP addresses: %s | Violates CIS 4.9 (direct internet exposure)", len(instancesWithPublicIP), totalInstances, strings.Join(displayInstances, ", ")),
 			Remediation: "Remove public IPs and use Cloud NAT or Cloud VPN for outbound connectivity",
 			RemediationDetail: fmt.Sprintf(`# Remove external IP from instance
 gcloud compute instances delete-access-config %s \
@@ -889,17 +889,17 @@ gcloud compute routers nats create nat-config \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Compute Engine → VM instances → External IP column showing 'None' for all instances",
 			ConsoleURL:      "https://console.cloud.google.com/compute/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "4.11", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
+			Frameworks:      map[string]string{"CIS-GCP": "4.9", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	} else if totalInstances > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 4.11",
-			Name:       "[CIS GCP 4.11] No Public IP Addresses",
+			Control:    "CIS-GCP-4.9",
+			Name:       "[CIS-GCP-4.9] No Public IP Addresses",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d instances use private IP addresses only | Meets CIS 4.11", totalInstances),
+			Evidence:   fmt.Sprintf("All %d instances use private IP addresses only | Meets CIS 4.9", totalInstances),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "4.11", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
+			Frameworks: map[string]string{"CIS-GCP": "4.9", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	}
 

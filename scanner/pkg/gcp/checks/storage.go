@@ -386,7 +386,7 @@ func (c *StorageChecks) CheckUniformBucketLevelAccess(ctx context.Context) []Che
 		}
 		if err != nil {
 			results = append(results, CheckResult{
-				Control:     "CIS GCP 5.2",
+				Control:     "CIS-GCP-5.2",
 				Name:        "GCS Uniform Bucket-Level Access",
 				Status:      "FAIL",
 				Evidence:    fmt.Sprintf("Unable to check uniform bucket-level access: %v", err),
@@ -418,7 +418,7 @@ func (c *StorageChecks) CheckUniformBucketLevelAccess(ctx context.Context) []Che
 		}
 
 		results = append(results, CheckResult{
-			Control:           "CIS GCP 5.2",
+			Control:           "CIS-GCP-5.2",
 			Name:              "GCS Uniform Bucket-Level Access",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -433,7 +433,7 @@ func (c *StorageChecks) CheckUniformBucketLevelAccess(ctx context.Context) []Che
 		})
 	} else if totalBuckets > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 5.2",
+			Control:    "CIS-GCP-5.2",
 			Name:       "GCS Uniform Bucket-Level Access",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("All %d buckets use uniform bucket-level access | Meets CIS 5.2", totalBuckets),
@@ -446,7 +446,7 @@ func (c *StorageChecks) CheckUniformBucketLevelAccess(ctx context.Context) []Che
 	return results
 }
 
-// CheckBucketRetentionPolicy verifies retention policies are set (CIS 5.1)
+// CheckBucketRetentionPolicy verifies retention policies are set
 func (c *StorageChecks) CheckBucketRetentionPolicy(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -483,11 +483,11 @@ func (c *StorageChecks) CheckBucketRetentionPolicy(ctx context.Context) []CheckR
 		}
 
 		results = append(results, CheckResult{
-			Control:           "CIS GCP 5.1",
+			Control:           "GCP-STOR-01",
 			Name:              "GCS Bucket Retention Policy",
 			Status:            "INFO",
 			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("CIS 5.1: %d buckets do not have retention policies configured: %v", len(bucketsWithoutRetention), displayBuckets),
+			Evidence:          fmt.Sprintf("%d buckets do not have retention policies configured: %v", len(bucketsWithoutRetention), displayBuckets),
 			Remediation:       "Configure retention policies for compliance and data retention requirements",
 			RemediationDetail: fmt.Sprintf(`gcloud storage buckets update gs://%s --retention-period=90d`, bucketsWithoutRetention[0]),
 			Priority:          PriorityMedium,
@@ -498,10 +498,10 @@ func (c *StorageChecks) CheckBucketRetentionPolicy(ctx context.Context) []CheckR
 		})
 	} else if totalBuckets > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 5.1",
+			Control:    "GCP-STOR-01",
 			Name:       "GCS Bucket Retention Policy",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d buckets have retention policies configured | Meets CIS 5.1", totalBuckets),
+			Evidence:   fmt.Sprintf("All %d buckets have retention policies configured", totalBuckets),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("GCS_RETENTION_POLICY"),

@@ -426,15 +426,15 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 
 // NEW CIS CHECKS BELOW
 
-// CheckAPIKeysExist checks if API keys are in use (CIS 1.12-1.14)
+// CheckAPIKeysExist checks if API keys are in use (CIS 1.13)
 func (c *IAMChecks) CheckAPIKeysExist(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
 	// Note: API keys can't be directly listed via IAM client
 	// This requires the API Keys API which isn't in standard Cloud SDK
 	results = append(results, CheckResult{
-		Control:     "CIS GCP 1.12",
-		Name:        "[CIS GCP 1.12-1.14] API Keys Usage",
+		Control:     "CIS-GCP-1.13",
+		Name:        "[CIS-GCP-1.13] API Keys Usage",
 		Status:      "MANUAL",
 		Severity:    "HIGH",
 		Evidence:    "MANUAL CHECK: Verify API keys are not in use, or if required, are properly restricted",
@@ -456,7 +456,7 @@ gcloud services api-keys update KEY_ID \
 	return results
 }
 
-// CheckServiceAccountAdminSeparation checks for separation of duties (CIS 1.4)
+// CheckServiceAccountAdminSeparation checks for separation of duties (CIS 1.9)
 func (c *IAMChecks) CheckServiceAccountAdminSeparation(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -507,11 +507,11 @@ func (c *IAMChecks) CheckServiceAccountAdminSeparation(ctx context.Context) []Ch
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 1.4",
-			Name:        "[CIS GCP 1.4] Service Account Admin Separation",
+			Control:     "CIS-GCP-1.9",
+			Name:        "[CIS-GCP-1.9] Service Account Admin Separation",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 1.4: %d users have both Service Account Admin and User roles (violation of separation of duties): %s", len(conflictingUsers), strings.Join(displayUsers, ", ")),
+			Evidence:    fmt.Sprintf("CIS 1.9: %d users have both Service Account Admin and User roles (violation of separation of duties): %s", len(conflictingUsers), strings.Join(displayUsers, ", ")),
 			Remediation: "Separate service account administration from usage - different users should manage vs use service accounts",
 			RemediationDetail: `# Remove conflicting role
 gcloud projects remove-iam-policy-binding PROJECT_ID \
@@ -527,10 +527,10 @@ gcloud projects remove-iam-policy-binding PROJECT_ID \
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 1.4",
-			Name:       "[CIS GCP 1.4] Service Account Admin Separation",
+			Control:    "CIS-GCP-1.9",
+			Name:       "[CIS-GCP-1.9] Service Account Admin Separation",
 			Status:     "PASS",
-			Evidence:   "Separation of duties enforced: no users have both admin and usage roles | Meets CIS 1.4",
+			Evidence:   "Separation of duties enforced: no users have both admin and usage roles | Meets CIS 1.9",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("IAM_SERVICE_ACCOUNT_ADMIN"),
@@ -540,7 +540,7 @@ gcloud projects remove-iam-policy-binding PROJECT_ID \
 	return results
 }
 
-// CheckCorporateLogin checks for corporate login enforcement (CIS 1.1)
+// CheckCorporateLogin checks for corporate login enforcement (CIS 1.2)
 func (c *IAMChecks) CheckCorporateLogin(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -575,11 +575,11 @@ func (c *IAMChecks) CheckCorporateLogin(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 1.1",
-			Name:        "[CIS GCP 1.1] Corporate Login Enforcement",
+			Control:     "CIS-GCP-1.2",
+			Name:        "[CIS-GCP-1.2] Corporate Login Enforcement",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 1.1: %d non-corporate (gmail.com) user accounts found: %s | Should use Google Workspace or Cloud Identity", len(nonCorporateUsers), strings.Join(displayUsers, ", ")),
+			Evidence:    fmt.Sprintf("CIS 1.2: %d non-corporate (gmail.com) user accounts found: %s | Should use Google Workspace or Cloud Identity", len(nonCorporateUsers), strings.Join(displayUsers, ", ")),
 			Remediation: "Use corporate Google Workspace or Cloud Identity accounts instead of personal Gmail accounts",
 			RemediationDetail: `# Remove personal accounts
 gcloud projects remove-iam-policy-binding PROJECT_ID \
@@ -598,10 +598,10 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 1.1",
-			Name:       "[CIS GCP 1.1] Corporate Login Enforcement",
+			Control:    "CIS-GCP-1.2",
+			Name:       "[CIS-GCP-1.2] Corporate Login Enforcement",
 			Status:     "PASS",
-			Evidence:   "All user accounts use corporate identity (no personal Gmail accounts) | Meets CIS 1.1",
+			Evidence:   "All user accounts use corporate identity (no personal Gmail accounts) | Meets CIS 1.2",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("IAM_CORPORATE_LOGIN"),
@@ -611,13 +611,13 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 	return results
 }
 
-// CheckWorkloadIdentity checks for GKE workload identity (CIS 1.15)
+// CheckWorkloadIdentity checks for GKE workload identity
 func (c *IAMChecks) CheckWorkloadIdentity(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
 	results = append(results, CheckResult{
-		Control:     "CIS GCP 1.15",
-		Name:        "[CIS GCP 1.15] GKE Workload Identity",
+		Control:     "GCP-GKE-01",
+		Name:        "[GCP-GKE-01] GKE Workload Identity",
 		Status:      "MANUAL",
 		Severity:    "MEDIUM",
 		Evidence:    "MANUAL CHECK: If using GKE, verify Workload Identity is enabled instead of Compute Engine default service account",
@@ -659,8 +659,8 @@ func (c *IAMChecks) CheckDefaultServiceAccountDisabled(ctx context.Context) []Ch
 		}
 		if err != nil {
 			return []CheckResult{{
-				Control:    "CIS-1.7",
-				Name:       "[CIS GCP 1.7] Default Service Account Disabled",
+				Control:    "GCP-IAM-03",
+				Name:       "[GCP-IAM-03] Default Service Account Disabled",
 				Status:     "FAIL",
 				Severity:   "CRITICAL",
 				Evidence:   fmt.Sprintf("Unable to list service accounts: %v", err),
@@ -680,11 +680,11 @@ func (c *IAMChecks) CheckDefaultServiceAccountDisabled(ctx context.Context) []Ch
 
 	if !foundDefault {
 		return []CheckResult{{
-			Control:    "CIS-1.7",
-			Name:       "[CIS GCP 1.7] Default Service Account Disabled",
+			Control:    "GCP-IAM-03",
+			Name:       "[GCP-IAM-03] Default Service Account Disabled",
 			Status:     "PASS",
 			Severity:   "INFO",
-			Evidence:   "Default Compute Engine service account has been deleted | Meets CIS GCP 1.7 (prevent over-privileged default access)",
+			Evidence:   "Default Compute Engine service account has been deleted | Meets CIS GCP 4.1 (prevent over-privileged default access)",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("GCP_DEFAULT_SA"),
@@ -693,11 +693,11 @@ func (c *IAMChecks) CheckDefaultServiceAccountDisabled(ctx context.Context) []Ch
 
 	if defaultSA.Disabled {
 		return []CheckResult{{
-			Control:    "CIS-1.7",
-			Name:       "[CIS GCP 1.7] Default Service Account Disabled",
+			Control:    "GCP-IAM-03",
+			Name:       "[GCP-IAM-03] Default Service Account Disabled",
 			Status:     "PASS",
 			Severity:   "INFO",
-			Evidence:   fmt.Sprintf("Default Compute Engine service account (%s) is disabled | Meets CIS GCP 1.7", defaultSA.Email),
+			Evidence:   fmt.Sprintf("Default Compute Engine service account (%s) is disabled | Meets CIS GCP 4.1", defaultSA.Email),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("GCP_DEFAULT_SA"),
@@ -705,11 +705,11 @@ func (c *IAMChecks) CheckDefaultServiceAccountDisabled(ctx context.Context) []Ch
 	}
 
 	return []CheckResult{{
-		Control:     "CIS-1.7",
-		Name:        "[CIS GCP 1.7] Default Service Account Disabled",
+		Control:     "GCP-IAM-03",
+		Name:        "[GCP-IAM-03] Default Service Account Disabled",
 		Status:      "FAIL",
 		Severity:    "CRITICAL",
-		Evidence:    fmt.Sprintf("Default Compute Engine service account (%s) is ENABLED | Violates CIS GCP 1.7 (default service account is overly permissive)", defaultSA.Email),
+		Evidence:    fmt.Sprintf("Default Compute Engine service account (%s) is ENABLED | Violates CIS GCP 4.1 (default service account is overly permissive)", defaultSA.Email),
 		Remediation: "Disable or delete the default Compute Engine service account",
 		RemediationDetail: fmt.Sprintf(`# Option 1: Disable the default service account (recommended)
 gcloud iam service-accounts disable %s --project=%s
@@ -744,13 +744,13 @@ gcloud compute instances set-service-account VM_NAME \
 	}}
 }
 
-// CheckAPIKeyRotation verifies API keys are rotated every 90 days (CIS 1.11)
+// CheckAPIKeyRotation verifies API keys are rotated every 90 days (CIS 1.16)
 func (c *IAMChecks) CheckAPIKeyRotation(ctx context.Context) []CheckResult {
 	// Note: API Keys in GCP are managed through API Keys service, not IAM
 	// This is a manual check as the API Keys service requires separate client
 	return []CheckResult{{
-		Control:     "CIS GCP 1.11",
-		Name:        "[CIS GCP 1.11] API Keys Rotated Every 90 Days",
+		Control:     "CIS-GCP-1.16",
+		Name:        "[CIS-GCP-1.16] API Keys Rotated Every 90 Days",
 		Status:      "MANUAL",
 		Severity:    "MEDIUM",
 		Evidence:    "MANUAL CHECK: Verify API keys are rotated every 90 days",
@@ -773,11 +773,11 @@ gcloud services api-keys update KEY_ID \
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "APIs & Services → Credentials → Screenshot showing API key creation dates within 90 days",
 		ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/apis/credentials?project=%s", c.projectID),
-		Frameworks:      map[string]string{"CIS-GCP": "1.11", "SOC2": "CC6.1"},
+		Frameworks:      map[string]string{"CIS-GCP": "1.16", "SOC2": "CC6.1"},
 	}}
 }
 
-// CheckSeparationOfDuties verifies separation of duties is enforced (CIS 1.3)
+// CheckSeparationOfDuties verifies separation of duties is enforced
 func (c *IAMChecks) CheckSeparationOfDuties(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -785,28 +785,28 @@ func (c *IAMChecks) CheckSeparationOfDuties(ctx context.Context) []CheckResult {
 	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformReadOnlyScope))
 	if err != nil {
 		return []CheckResult{{
-			Control:     "CIS GCP 1.3",
-			Name:        "[CIS GCP 1.3] Separation of Duties",
+			Control:     "GCP-IAM-02",
+			Name:        "[GCP-IAM-02] Separation of Duties",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("Unable to check IAM policies: %v", err),
 			Remediation: "Verify Cloud Resource Manager API is enabled",
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),
-			Frameworks:  map[string]string{"CIS-GCP": "1.3", "SOC2": "CC6.3"},
+			Frameworks:  map[string]string{"SOC2": "CC6.3"},
 		}}
 	}
 
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
 		return []CheckResult{{
-			Control:     "CIS GCP 1.3",
-			Name:        "[CIS GCP 1.3] Separation of Duties",
+			Control:     "GCP-IAM-02",
+			Name:        "[GCP-IAM-02] Separation of Duties",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
 			Remediation: "Ensure proper permissions to read IAM policies",
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),
-			Frameworks:  map[string]string{"CIS-GCP": "1.3", "SOC2": "CC6.3"},
+			Frameworks:  map[string]string{"SOC2": "CC6.3"},
 		}}
 	}
 
@@ -840,11 +840,11 @@ func (c *IAMChecks) CheckSeparationOfDuties(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 1.3",
-			Name:        "[CIS GCP 1.3] Separation of Duties",
+			Control:     "GCP-IAM-02",
+			Name:        "[GCP-IAM-02] Separation of Duties",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("%d members have conflicting roles violating separation of duties: %s | Violates CIS 1.3", len(conflictingMembers), strings.Join(displayMembers, ", ")),
+			Evidence:    fmt.Sprintf("%d members have conflicting roles violating separation of duties: %s", len(conflictingMembers), strings.Join(displayMembers, ", ")),
 			Remediation: "Remove conflicting role assignments and implement least privilege",
 			RemediationDetail: fmt.Sprintf(`# Review member roles
 gcloud projects get-iam-policy %s --flatten="bindings[].members" --format="table(bindings.role)"
@@ -862,30 +862,30 @@ gcloud projects add-iam-policy-binding %s \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "IAM & Admin → IAM → Screenshot showing users with single, specific roles (no Owner+Editor combinations)",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "1.3", "SOC2": "CC6.3", "PCI-DSS": "7.2.1"},
+			Frameworks:      map[string]string{"SOC2": "CC6.3", "PCI-DSS": "7.2.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 1.3",
-			Name:       "[CIS GCP 1.3] Separation of Duties",
+			Control:    "GCP-IAM-02",
+			Name:       "[GCP-IAM-02] Separation of Duties",
 			Status:     "PASS",
-			Evidence:   "No conflicting role assignments detected | Meets CIS 1.3",
+			Evidence:   "No conflicting role assignments detected",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "1.3", "SOC2": "CC6.3", "PCI-DSS": "7.2.1"},
+			Frameworks: map[string]string{"SOC2": "CC6.3", "PCI-DSS": "7.2.1"},
 		})
 	}
 
 	return results
 }
 
-// CheckKMSKeysPublicAccess verifies KMS keys are not publicly accessible (CIS 1.8)
+// CheckKMSKeysPublicAccess verifies KMS keys are not publicly accessible (CIS 1.10)
 func (c *IAMChecks) CheckKMSKeysPublicAccess(ctx context.Context) []CheckResult {
 	// Note: This requires KMS API client to check key policies
 	// Implementing as manual check for now
 	return []CheckResult{{
-		Control:     "CIS GCP 1.8",
-		Name:        "[CIS GCP 1.8] KMS Keys Not Publicly Accessible",
+		Control:     "CIS-GCP-1.10",
+		Name:        "[CIS-GCP-1.10] KMS Keys Not Publicly Accessible",
 		Status:      "MANUAL",
 		Severity:    "CRITICAL",
 		Evidence:    "MANUAL CHECK: Verify KMS cryptokeys are not accessible by allUsers or allAuthenticatedUsers",
@@ -917,11 +917,11 @@ gcloud kms keys remove-iam-policy-binding KEY_NAME \
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "Security → Key Management → Select key → Permissions → Screenshot showing NO allUsers or allAuthenticatedUsers",
 		ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/security/kms?project=%s", c.projectID),
-		Frameworks:      map[string]string{"CIS-GCP": "1.8", "SOC2": "CC6.1", "PCI-DSS": "3.5.1"},
+		Frameworks:      map[string]string{"CIS-GCP": "1.10", "SOC2": "CC6.1", "PCI-DSS": "3.5.1"},
 	}}
 }
 
-// CheckKMSRoleSeparation verifies separation of duties for KMS roles (CIS 1.16)
+// CheckKMSRoleSeparation verifies separation of duties for KMS roles (CIS 1.12)
 func (c *IAMChecks) CheckKMSRoleSeparation(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -929,28 +929,28 @@ func (c *IAMChecks) CheckKMSRoleSeparation(ctx context.Context) []CheckResult {
 	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformReadOnlyScope))
 	if err != nil {
 		return []CheckResult{{
-			Control:     "CIS GCP 1.16",
-			Name:        "[CIS GCP 1.16] KMS Role Separation of Duties",
+			Control:     "CIS-GCP-1.12",
+			Name:        "[CIS-GCP-1.12] KMS Role Separation of Duties",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("Unable to check IAM policies: %v", err),
 			Remediation: "Verify Cloud Resource Manager API is enabled",
 			Priority:    PriorityMedium,
 			Timestamp:   time.Now(),
-			Frameworks:  map[string]string{"CIS-GCP": "1.16", "SOC2": "CC6.3"},
+			Frameworks:  map[string]string{"CIS-GCP": "1.12", "SOC2": "CC6.3"},
 		}}
 	}
 
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
 		return []CheckResult{{
-			Control:     "CIS GCP 1.16",
-			Name:        "[CIS GCP 1.16] KMS Role Separation of Duties",
+			Control:     "CIS-GCP-1.12",
+			Name:        "[CIS-GCP-1.12] KMS Role Separation of Duties",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
 			Remediation: "Ensure proper permissions to read IAM policies",
 			Priority:    PriorityMedium,
 			Timestamp:   time.Now(),
-			Frameworks:  map[string]string{"CIS-GCP": "1.16", "SOC2": "CC6.3"},
+			Frameworks:  map[string]string{"CIS-GCP": "1.12", "SOC2": "CC6.3"},
 		}}
 	}
 
@@ -993,11 +993,11 @@ func (c *IAMChecks) CheckKMSRoleSeparation(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 1.16",
-			Name:        "[CIS GCP 1.16] KMS Role Separation of Duties",
+			Control:     "CIS-GCP-1.12",
+			Name:        "[CIS-GCP-1.12] KMS Role Separation of Duties",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("%d members have both KMS admin and cryptographic roles: %s | Violates CIS 1.16 (no separation)", len(conflictingKMSMembers), strings.Join(displayMembers, ", ")),
+			Evidence:    fmt.Sprintf("%d members have both KMS admin and cryptographic roles: %s | Violates CIS 1.12 (no separation)", len(conflictingKMSMembers), strings.Join(displayMembers, ", ")),
 			Remediation: "Separate KMS administration from cryptographic operations",
 			RemediationDetail: fmt.Sprintf(`# Remove admin role from crypto users
 gcloud projects remove-iam-policy-binding %s \
@@ -1014,24 +1014,24 @@ gcloud projects remove-iam-policy-binding %s \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "IAM & Admin → IAM → Screenshot showing KMS admins and crypto users are different principals",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "1.16", "SOC2": "CC6.3"},
+			Frameworks:      map[string]string{"CIS-GCP": "1.12", "SOC2": "CC6.3"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 1.16",
-			Name:       "[CIS GCP 1.16] KMS Role Separation of Duties",
+			Control:    "CIS-GCP-1.12",
+			Name:       "[CIS-GCP-1.12] KMS Role Separation of Duties",
 			Status:     "PASS",
-			Evidence:   "KMS admin and cryptographic roles are properly separated | Meets CIS 1.16",
+			Evidence:   "KMS admin and cryptographic roles are properly separated | Meets CIS 1.12",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "1.16", "SOC2": "CC6.3"},
+			Frameworks: map[string]string{"CIS-GCP": "1.12", "SOC2": "CC6.3"},
 		})
 	}
 
 	return results
 }
 
-// CheckIAMUserRoles ensures service account roles are not assigned at project level (CIS 1.6)
+// CheckIAMUserRoles ensures service account roles are not assigned at project level (CIS 1.7)
 func (c *IAMChecks) CheckIAMUserRoles(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -1039,30 +1039,30 @@ func (c *IAMChecks) CheckIAMUserRoles(ctx context.Context) []CheckResult {
 	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformReadOnlyScope))
 	if err != nil {
 		return []CheckResult{{
-			Control:     "CIS GCP 1.6",
-			Name:        "[CIS GCP 1.6] Service Account Roles at Project Level",
+			Control:     "CIS-GCP-1.7",
+			Name:        "[CIS-GCP-1.7] Service Account Roles at Project Level",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("Unable to check IAM policies: %v", err),
 			Remediation: "Verify Cloud Resource Manager API is enabled",
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),
-			Frameworks:  map[string]string{"CIS-GCP": "1.6", "SOC2": "CC6.1"},
+			Frameworks:  map[string]string{"CIS-GCP": "1.7", "SOC2": "CC6.1"},
 		}}
 	}
 
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
 		return []CheckResult{{
-			Control:     "CIS GCP 1.6",
-			Name:        "[CIS GCP 1.6] Service Account Roles at Project Level",
+			Control:     "CIS-GCP-1.7",
+			Name:        "[CIS-GCP-1.7] Service Account Roles at Project Level",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
 			Remediation: "Ensure proper permissions to read IAM policies",
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),
-			Frameworks:  map[string]string{"CIS-GCP": "1.6", "SOC2": "CC6.1"},
+			Frameworks:  map[string]string{"CIS-GCP": "1.7", "SOC2": "CC6.1"},
 		}}
 	}
 
@@ -1095,11 +1095,11 @@ func (c *IAMChecks) CheckIAMUserRoles(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 1.6",
-			Name:        "[CIS GCP 1.6] Service Account Roles at Project Level",
+			Control:     "CIS-GCP-1.7",
+			Name:        "[CIS-GCP-1.7] Service Account Roles at Project Level",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 1.6: %d users have Service Account User/Token Creator roles at project level (should be service account-level only): %s", len(violatingBindings), strings.Join(displayBindings, ", ")),
+			Evidence:    fmt.Sprintf("CIS 1.7: %d users have Service Account User/Token Creator roles at project level (should be service account-level only): %s", len(violatingBindings), strings.Join(displayBindings, ", ")),
 			Remediation: "Grant Service Account User and Token Creator roles at the individual service account level, not project level",
 			RemediationDetail: fmt.Sprintf(`# Remove project-level role binding
 gcloud projects remove-iam-policy-binding %s \
@@ -1118,17 +1118,17 @@ gcloud iam service-accounts add-iam-policy-binding SERVICE_ACCOUNT_EMAIL \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "IAM & Admin → IAM → Screenshot showing no project-level serviceAccountUser/TokenCreator roles + Service Accounts → Permissions showing service-account-level grants",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "1.6", "SOC2": "CC6.1", "PCI-DSS": "7.2.2"},
+			Frameworks:      map[string]string{"CIS-GCP": "1.7", "SOC2": "CC6.1", "PCI-DSS": "7.2.2"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 1.6",
-			Name:       "[CIS GCP 1.6] Service Account Roles at Project Level",
+			Control:    "CIS-GCP-1.7",
+			Name:       "[CIS-GCP-1.7] Service Account Roles at Project Level",
 			Status:     "PASS",
-			Evidence:   "Service Account User/Token Creator roles are not assigned at project level | Meets CIS 1.6 (least privilege enforced)",
+			Evidence:   "Service Account User/Token Creator roles are not assigned at project level | Meets CIS 1.7 (least privilege enforced)",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "1.6", "SOC2": "CC6.1", "PCI-DSS": "7.2.2"},
+			Frameworks: map[string]string{"CIS-GCP": "1.7", "SOC2": "CC6.1", "PCI-DSS": "7.2.2"},
 		})
 	}
 

@@ -32,13 +32,13 @@ func (c *BigQueryChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	return results, nil
 }
 
-// CheckPublicDatasets verifies BigQuery datasets are not publicly accessible (CIS 7.1, 7.2)
+// CheckPublicDatasets verifies BigQuery datasets are not publicly accessible (CIS 7.1)
 func (c *BigQueryChecks) CheckPublicDatasets(ctx context.Context, bqService *bigquery.Service) []CheckResult {
 	datasetList, err := bqService.Datasets.List(c.projectID).Context(ctx).Do()
 	if err != nil {
 		return []CheckResult{{
-			Control:     "CIS GCP 7.1",
-			Name:        "[CIS GCP 7.1] BigQuery Datasets Not Public",
+			Control:     "CIS-GCP-7.1",
+			Name:        "[CIS-GCP-7.1] BigQuery Datasets Not Public",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("Unable to check BigQuery datasets: %v", err),
 			Remediation: "Verify BigQuery API is enabled",
@@ -50,8 +50,8 @@ func (c *BigQueryChecks) CheckPublicDatasets(ctx context.Context, bqService *big
 
 	if datasetList.Datasets == nil || len(datasetList.Datasets) == 0 {
 		return []CheckResult{{
-			Control:    "CIS GCP 7.1",
-			Name:       "[CIS GCP 7.1] BigQuery Datasets Not Public",
+			Control:    "CIS-GCP-7.1",
+			Name:       "[CIS-GCP-7.1] BigQuery Datasets Not Public",
 			Status:     "INFO",
 			Evidence:   "No BigQuery datasets found",
 			Priority:   PriorityInfo,
@@ -87,8 +87,8 @@ func (c *BigQueryChecks) CheckPublicDatasets(ctx context.Context, bqService *big
 		}
 
 		return []CheckResult{{
-			Control:     "CIS GCP 7.1",
-			Name:        "[CIS GCP 7.1] BigQuery Datasets Not Public",
+			Control:     "CIS-GCP-7.1",
+			Name:        "[CIS-GCP-7.1] BigQuery Datasets Not Public",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("CRITICAL: %d BigQuery datasets are publicly accessible: %v | Violates CIS GCP 7.1 (data exposure risk)", len(publicDatasets), displayDatasets),
@@ -111,8 +111,8 @@ bq update --remove_all_users %s:%s
 	}
 
 	return []CheckResult{{
-		Control:    "CIS GCP 7.1",
-		Name:       "[CIS GCP 7.1] BigQuery Datasets Not Public",
+		Control:    "CIS-GCP-7.1",
+		Name:       "[CIS-GCP-7.1] BigQuery Datasets Not Public",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d BigQuery datasets are private | Meets CIS GCP 7.1", len(datasetList.Datasets)),
 		Priority:   PriorityInfo,
@@ -126,8 +126,8 @@ func (c *BigQueryChecks) CheckDatasetEncryption(ctx context.Context, bqService *
 	datasetList, err := bqService.Datasets.List(c.projectID).Context(ctx).Do()
 	if err != nil {
 		return []CheckResult{{
-			Control:     "CIS GCP 7.2",
-			Name:        "[CIS GCP 7.2/7.3] BigQuery CMEK Encryption",
+			Control:     "CIS-GCP-7.3",
+			Name:        "[CIS-GCP-7.3] BigQuery CMEK Encryption",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("Unable to check BigQuery encryption: %v", err),
 			Remediation: "Verify BigQuery API is enabled",
@@ -139,8 +139,8 @@ func (c *BigQueryChecks) CheckDatasetEncryption(ctx context.Context, bqService *
 
 	if datasetList.Datasets == nil || len(datasetList.Datasets) == 0 {
 		return []CheckResult{{
-			Control:    "CIS GCP 7.2",
-			Name:       "[CIS GCP 7.2/7.3] BigQuery CMEK Encryption",
+			Control:    "CIS-GCP-7.3",
+			Name:       "[CIS-GCP-7.3] BigQuery CMEK Encryption",
 			Status:     "INFO",
 			Evidence:   "No BigQuery datasets found",
 			Priority:   PriorityInfo,
@@ -170,11 +170,11 @@ func (c *BigQueryChecks) CheckDatasetEncryption(ctx context.Context, bqService *
 		}
 
 		return []CheckResult{{
-			Control:     "CIS GCP 7.2",
-			Name:        "[CIS GCP 7.2/7.3] BigQuery CMEK Encryption",
+			Control:     "CIS-GCP-7.3",
+			Name:        "[CIS-GCP-7.3] BigQuery CMEK Encryption",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("%d BigQuery datasets use Google-managed keys instead of customer-managed keys (CMEK): %v | Violates CIS GCP 7.2", len(datasetsWithoutCMEK), displayDatasets),
+			Evidence:    fmt.Sprintf("%d BigQuery datasets use Google-managed keys instead of customer-managed keys (CMEK): %v | Violates CIS GCP 7.3", len(datasetsWithoutCMEK), displayDatasets),
 			Remediation: "Enable customer-managed encryption keys (CMEK) for sensitive datasets",
 			RemediationDetail: fmt.Sprintf(`# Create KMS key first
 gcloud kms keys create bigquery-key \
@@ -197,8 +197,8 @@ Note: Existing tables must be copied to new tables with CMEK`, c.projectID, c.pr
 	}
 
 	return []CheckResult{{
-		Control:    "CIS GCP 7.2",
-		Name:       "[CIS GCP 7.2/7.3] BigQuery CMEK Encryption",
+		Control:    "CIS-GCP-7.3",
+		Name:       "[CIS-GCP-7.3] BigQuery CMEK Encryption",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d BigQuery datasets use customer-managed encryption (CMEK) | Meets CIS GCP 7.2, 7.3", len(datasetList.Datasets)),
 		Priority:   PriorityInfo,

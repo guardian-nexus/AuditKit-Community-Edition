@@ -131,7 +131,7 @@ func (c *SQLChecks) CheckBackupEnabled(ctx context.Context) []CheckResult {
 	return results
 }
 
-// CheckBackupRetention verifies SQL instances have proper backup retention configured (CIS 6.7)
+// CheckBackupRetention verifies SQL instances have proper backup retention configured (CIS 6.8)
 func (c *SQLChecks) CheckBackupRetention(ctx context.Context) []CheckResult {
 	var results []CheckResult
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
@@ -141,13 +141,13 @@ func (c *SQLChecks) CheckBackupRetention(ctx context.Context) []CheckResult {
 
 	if len(instanceList.Items) == 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 6.7",
-			Name:       "[CIS GCP 6.7] SQL Backup Retention",
+			Control:    "CIS-GCP-6.8",
+			Name:       "[CIS-GCP-6.8] SQL Backup Retention",
 			Status:     "PASS",
 			Evidence:   "No SQL instances configured",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "6.7", "SOC2": "A1.2"},
+			Frameworks: map[string]string{"CIS-GCP": "6.8", "SOC2": "A1.2"},
 		})
 		return results
 	}
@@ -184,11 +184,11 @@ func (c *SQLChecks) CheckBackupRetention(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 6.7",
-			Name:        "[CIS GCP 6.7] SQL Backup Retention",
+			Control:     "CIS-GCP-6.8",
+			Name:        "[CIS-GCP-6.8] SQL Backup Retention",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    strings.Join(evidenceParts, " | ") + " | Violates CIS GCP 6.7 (backup retention and recovery requirements)",
+			Evidence:    strings.Join(evidenceParts, " | ") + " | Violates CIS GCP 6.8 (backup retention and recovery requirements)",
 			Remediation: "Configure backup retention to 7+ days and enable point-in-time recovery",
 			RemediationDetail: `# Set backup retention to 7 days
 gcloud sql instances patch INSTANCE_NAME \
@@ -202,17 +202,17 @@ gcloud sql instances patch INSTANCE_NAME \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Google Cloud Console → SQL → Select instance → Backups → Screenshot showing backup retention ≥7 days and point-in-time recovery enabled",
 			ConsoleURL:      "https://console.cloud.google.com/sql/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "6.7", "SOC2": "A1.2", "PCI-DSS": "3.2.1"},
+			Frameworks:      map[string]string{"CIS-GCP": "6.8", "SOC2": "A1.2", "PCI-DSS": "3.2.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 6.7",
-			Name:       "[CIS GCP 6.7] SQL Backup Retention",
+			Control:    "CIS-GCP-6.8",
+			Name:       "[CIS-GCP-6.8] SQL Backup Retention",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d SQL instances have adequate backup retention (≥7 days) and point-in-time recovery enabled | Meets CIS GCP 6.7", len(instanceList.Items)),
+			Evidence:   fmt.Sprintf("All %d SQL instances have adequate backup retention (≥7 days) and point-in-time recovery enabled | Meets CIS GCP 6.8", len(instanceList.Items)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "6.7", "SOC2": "A1.2", "PCI-DSS": "3.2.1"},
+			Frameworks: map[string]string{"CIS-GCP": "6.8", "SOC2": "A1.2", "PCI-DSS": "3.2.1"},
 		})
 	}
 
@@ -305,11 +305,11 @@ func (c *SQLChecks) CheckPostgreSQLLogCheckpoints(ctx context.Context) []CheckRe
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 6.2.1",
-			Name:        "[CIS GCP 6.2.1] PostgreSQL log_checkpoints Flag",
+			Control:     "GCP-SQL-01",
+			Name:        "[GCP-SQL-01] PostgreSQL log_checkpoints Flag",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("%d PostgreSQL instances do not have log_checkpoints enabled: %s | Violates CIS GCP 6.2.1 (checkpoint logging for recovery)", len(nonCompliantInstances), strings.Join(displayInstances, ", ")),
+			Evidence:    fmt.Sprintf("%d PostgreSQL instances do not have log_checkpoints enabled: %s (checkpoint logging for recovery)", len(nonCompliantInstances), strings.Join(displayInstances, ", ")),
 			Remediation: "Enable log_checkpoints database flag for PostgreSQL instances",
 			RemediationDetail: fmt.Sprintf(`# Enable log_checkpoints for PostgreSQL
 gcloud sql instances patch %s \
@@ -322,7 +322,7 @@ gcloud sql instances patch %s \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Cloud SQL → Instance → Configuration → Flags → Screenshot showing log_checkpoints=on",
 			ConsoleURL:      "https://console.cloud.google.com/sql/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "6.2.1", "SOC2": "CC7.2"},
+			Frameworks:      map[string]string{"SOC2": "CC7.2"},
 		})
 	} else {
 		// Count PostgreSQL instances to provide meaningful pass message
@@ -334,13 +334,13 @@ gcloud sql instances patch %s \
 		}
 		if postgresCount > 0 {
 			results = append(results, CheckResult{
-				Control:    "CIS GCP 6.2.1",
-				Name:       "[CIS GCP 6.2.1] PostgreSQL log_checkpoints Flag",
+				Control:    "GCP-SQL-01",
+				Name:       "[GCP-SQL-01] PostgreSQL log_checkpoints Flag",
 				Status:     "PASS",
-				Evidence:   fmt.Sprintf("All %d PostgreSQL instances have log_checkpoints enabled | Meets CIS GCP 6.2.1", postgresCount),
+				Evidence:   fmt.Sprintf("All %d PostgreSQL instances have log_checkpoints enabled", postgresCount),
 				Priority:   PriorityInfo,
 				Timestamp:  time.Now(),
-				Frameworks: map[string]string{"CIS-GCP": "6.2.1", "SOC2": "CC7.2"},
+				Frameworks: map[string]string{"SOC2": "CC7.2"},
 			})
 		}
 	}
@@ -388,8 +388,8 @@ func (c *SQLChecks) CheckPostgreSQLLogConnections(ctx context.Context) []CheckRe
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 6.2.2",
-			Name:        "[CIS GCP 6.2.2] PostgreSQL log_connections Flag",
+			Control:     "CIS-GCP-6.2.2",
+			Name:        "[CIS-GCP-6.2.2] PostgreSQL log_connections Flag",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("%d PostgreSQL instances do not have log_connections enabled: %s | Violates CIS GCP 6.2.2 (connection audit trail)", len(nonCompliantInstances), strings.Join(displayInstances, ", ")),
@@ -416,8 +416,8 @@ gcloud sql instances patch %s \
 		}
 		if postgresCount > 0 {
 			results = append(results, CheckResult{
-				Control:    "CIS GCP 6.2.2",
-				Name:       "[CIS GCP 6.2.2] PostgreSQL log_connections Flag",
+				Control:    "CIS-GCP-6.2.2",
+				Name:       "[CIS-GCP-6.2.2] PostgreSQL log_connections Flag",
 				Status:     "PASS",
 				Evidence:   fmt.Sprintf("All %d PostgreSQL instances have log_connections enabled | Meets CIS GCP 6.2.2", postgresCount),
 				Priority:   PriorityInfo,
@@ -470,11 +470,11 @@ func (c *SQLChecks) CheckMySQLSkipShowDatabase(ctx context.Context) []CheckResul
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 6.1.1",
-			Name:        "[CIS GCP 6.1.1] MySQL skip_show_database Flag",
+			Control:     "CIS-GCP-6.1.2",
+			Name:        "[CIS-GCP-6.1.2] MySQL skip_show_database Flag",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("%d MySQL instances do not have skip_show_database enabled: %s | Violates CIS GCP 6.1.1 (prevent database enumeration)", len(nonCompliantInstances), strings.Join(displayInstances, ", ")),
+			Evidence:    fmt.Sprintf("%d MySQL instances do not have skip_show_database enabled: %s | Violates CIS GCP 6.1.2 (prevent database enumeration)", len(nonCompliantInstances), strings.Join(displayInstances, ", ")),
 			Remediation: "Enable skip_show_database database flag for MySQL instances",
 			RemediationDetail: fmt.Sprintf(`# Enable skip_show_database for MySQL
 gcloud sql instances patch %s \
@@ -486,7 +486,7 @@ gcloud sql instances patch %s \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Cloud SQL → Instance → Configuration → Flags → Screenshot showing skip_show_database=on",
 			ConsoleURL:      "https://console.cloud.google.com/sql/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "6.1.1", "SOC2": "CC6.1"},
+			Frameworks:      map[string]string{"CIS-GCP": "6.1.2", "SOC2": "CC6.1"},
 		})
 	} else {
 		mysqlCount := 0
@@ -497,13 +497,13 @@ gcloud sql instances patch %s \
 		}
 		if mysqlCount > 0 {
 			results = append(results, CheckResult{
-				Control:    "CIS GCP 6.1.1",
-				Name:       "[CIS GCP 6.1.1] MySQL skip_show_database Flag",
+				Control:    "CIS-GCP-6.1.2",
+				Name:       "[CIS-GCP-6.1.2] MySQL skip_show_database Flag",
 				Status:     "PASS",
-				Evidence:   fmt.Sprintf("All %d MySQL instances have skip_show_database enabled | Meets CIS GCP 6.1.1", mysqlCount),
+				Evidence:   fmt.Sprintf("All %d MySQL instances have skip_show_database enabled | Meets CIS GCP 6.1.2", mysqlCount),
 				Priority:   PriorityInfo,
 				Timestamp:  time.Now(),
-				Frameworks: map[string]string{"CIS-GCP": "6.1.1", "SOC2": "CC6.1"},
+				Frameworks: map[string]string{"CIS-GCP": "6.1.2", "SOC2": "CC6.1"},
 			})
 		}
 	}
@@ -551,8 +551,8 @@ func (c *SQLChecks) CheckPostgreSQLLogDisconnections(ctx context.Context) []Chec
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 6.2.3",
-			Name:        "[CIS GCP 6.2.3] PostgreSQL log_disconnections Flag",
+			Control:     "CIS-GCP-6.2.3",
+			Name:        "[CIS-GCP-6.2.3] PostgreSQL log_disconnections Flag",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Evidence:    fmt.Sprintf("%d PostgreSQL instances do not have log_disconnections enabled: %s | Violates CIS GCP 6.2.3 (incomplete session audit trail)", len(nonCompliantInstances), strings.Join(displayInstances, ", ")),
@@ -579,8 +579,8 @@ gcloud sql instances patch %s \
 		}
 		if postgresCount > 0 {
 			results = append(results, CheckResult{
-				Control:    "CIS GCP 6.2.3",
-				Name:       "[CIS GCP 6.2.3] PostgreSQL log_disconnections Flag",
+				Control:    "CIS-GCP-6.2.3",
+				Name:       "[CIS-GCP-6.2.3] PostgreSQL log_disconnections Flag",
 				Status:     "PASS",
 				Evidence:   fmt.Sprintf("All %d PostgreSQL instances have log_disconnections enabled | Meets CIS GCP 6.2.3", postgresCount),
 				Priority:   PriorityInfo,
@@ -635,11 +635,11 @@ func (c *SQLChecks) CheckPostgreSQLLogDuration(ctx context.Context) []CheckResul
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 6.2.14",
-			Name:        "[CIS GCP 6.2.14] PostgreSQL log_min_duration_statement Flag",
+			Control:     "CIS-GCP-6.2.7",
+			Name:        "[CIS-GCP-6.2.7] PostgreSQL log_min_duration_statement Flag",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("%d PostgreSQL instances do not have log_min_duration_statement configured: %s | Violates CIS GCP 6.2.14 (no slow query logging)", len(nonCompliantInstances), strings.Join(displayInstances, ", ")),
+			Evidence:    fmt.Sprintf("%d PostgreSQL instances do not have log_min_duration_statement configured: %s | Violates CIS GCP 6.2.7 (no slow query logging)", len(nonCompliantInstances), strings.Join(displayInstances, ", ")),
 			Remediation: "Enable log_min_duration_statement to log slow queries for performance monitoring",
 			RemediationDetail: fmt.Sprintf(`# Enable log_min_duration_statement for PostgreSQL
 # Log statements taking longer than 1000ms (1 second)
@@ -655,7 +655,7 @@ gcloud sql instances patch %s \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Cloud SQL → Instance → Configuration → Flags → Screenshot showing log_min_duration_statement set to value >= 0",
 			ConsoleURL:      "https://console.cloud.google.com/sql/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "6.2.14", "SOC2": "CC7.2"},
+			Frameworks:      map[string]string{"CIS-GCP": "6.2.7", "SOC2": "CC7.2"},
 		})
 	} else {
 		postgresCount := 0
@@ -666,13 +666,13 @@ gcloud sql instances patch %s \
 		}
 		if postgresCount > 0 {
 			results = append(results, CheckResult{
-				Control:    "CIS GCP 6.2.14",
-				Name:       "[CIS GCP 6.2.14] PostgreSQL log_min_duration_statement Flag",
+				Control:    "CIS-GCP-6.2.7",
+				Name:       "[CIS-GCP-6.2.7] PostgreSQL log_min_duration_statement Flag",
 				Status:     "PASS",
-				Evidence:   fmt.Sprintf("All %d PostgreSQL instances have log_min_duration_statement configured | Meets CIS GCP 6.2.14", postgresCount),
+				Evidence:   fmt.Sprintf("All %d PostgreSQL instances have log_min_duration_statement configured | Meets CIS GCP 6.2.7", postgresCount),
 				Priority:   PriorityInfo,
 				Timestamp:  time.Now(),
-				Frameworks: map[string]string{"CIS-GCP": "6.2.14", "SOC2": "CC7.2"},
+				Frameworks: map[string]string{"CIS-GCP": "6.2.7", "SOC2": "CC7.2"},
 			})
 		}
 	}
@@ -720,11 +720,11 @@ func (c *SQLChecks) CheckSQLServerTraceFlag(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 6.3.1",
-			Name:        "[CIS GCP 6.3.1] SQL Server Trace Flag 3625",
+			Control:     "CIS-GCP-6.3.6",
+			Name:        "[CIS-GCP-6.3.6] SQL Server Trace Flag 3625",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("%d SQL Server instances do not have trace flag 3625 enabled: %s | Violates CIS GCP 6.3.1 (error message information disclosure)", len(nonCompliantInstances), strings.Join(displayInstances, ", ")),
+			Evidence:    fmt.Sprintf("%d SQL Server instances do not have trace flag 3625 enabled: %s | Violates CIS GCP 6.3.6 (error message information disclosure)", len(nonCompliantInstances), strings.Join(displayInstances, ", ")),
 			Remediation: "Enable trace flag 3625 to mask error messages and prevent information disclosure",
 			RemediationDetail: fmt.Sprintf(`# Enable trace flag 3625 for SQL Server
 gcloud sql instances patch %s \
@@ -736,7 +736,7 @@ gcloud sql instances patch %s \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Cloud SQL → Instance → Configuration → Flags → Screenshot showing trace flag 3625=on",
 			ConsoleURL:      "https://console.cloud.google.com/sql/instances",
-			Frameworks:      map[string]string{"CIS-GCP": "6.3.1", "SOC2": "CC6.1"},
+			Frameworks:      map[string]string{"CIS-GCP": "6.3.6", "SOC2": "CC6.1"},
 		})
 	} else {
 		sqlServerCount := 0
@@ -747,13 +747,13 @@ gcloud sql instances patch %s \
 		}
 		if sqlServerCount > 0 {
 			results = append(results, CheckResult{
-				Control:    "CIS GCP 6.3.1",
-				Name:       "[CIS GCP 6.3.1] SQL Server Trace Flag 3625",
+				Control:    "CIS-GCP-6.3.6",
+				Name:       "[CIS-GCP-6.3.6] SQL Server Trace Flag 3625",
 				Status:     "PASS",
-				Evidence:   fmt.Sprintf("All %d SQL Server instances have trace flag 3625 enabled | Meets CIS GCP 6.3.1", sqlServerCount),
+				Evidence:   fmt.Sprintf("All %d SQL Server instances have trace flag 3625 enabled | Meets CIS GCP 6.3.6", sqlServerCount),
 				Priority:   PriorityInfo,
 				Timestamp:  time.Now(),
-				Frameworks: map[string]string{"CIS-GCP": "6.3.1", "SOC2": "CC6.1"},
+				Frameworks: map[string]string{"CIS-GCP": "6.3.6", "SOC2": "CC6.1"},
 			})
 		}
 	}

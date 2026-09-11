@@ -34,7 +34,7 @@ func (c *KMSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	return results, nil
 }
 
-// CheckKMSKeyRotation verifies automatic key rotation is enabled (CIS 1.10)
+// CheckKMSKeyRotation verifies automatic key rotation is enabled (CIS 1.11)
 func (c *KMSChecks) CheckKMSKeyRotation(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -95,11 +95,11 @@ func (c *KMSChecks) CheckKMSKeyRotation(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 1.10",
-			Name:        "[CIS GCP 1.10] KMS Key Rotation",
+			Control:     "CIS-GCP-1.11",
+			Name:        "[CIS-GCP-1.11] KMS Key Rotation",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("CIS 1.10: %d KMS keys do not have automatic rotation enabled: %v", len(keysWithoutRotation), displayKeys),
+			Evidence:    fmt.Sprintf("CIS 1.11: %d KMS keys do not have automatic rotation enabled: %v", len(keysWithoutRotation), displayKeys),
 			Remediation: "Enable automatic key rotation (recommended: 90 days)",
 			RemediationDetail: `gcloud kms keys update KEY_NAME \
   --location=LOCATION \
@@ -114,18 +114,18 @@ func (c *KMSChecks) CheckKMSKeyRotation(ctx context.Context) []CheckResult {
 		})
 	} else if totalKeys > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 1.10",
-			Name:       "[CIS GCP 1.10] KMS Key Rotation",
+			Control:    "CIS-GCP-1.11",
+			Name:       "[CIS-GCP-1.11] KMS Key Rotation",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d KMS keys have automatic rotation enabled | Meets CIS 1.10", totalKeys),
+			Evidence:   fmt.Sprintf("All %d KMS keys have automatic rotation enabled | Meets CIS 1.11", totalKeys),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("KMS_ROTATION_ENABLED"),
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 1.10",
-			Name:       "[CIS GCP 1.10] KMS Key Rotation",
+			Control:    "CIS-GCP-1.11",
+			Name:       "[CIS-GCP-1.11] KMS Key Rotation",
 			Status:     "INFO",
 			Evidence:   "No KMS keys found in common locations",
 			Priority:   PriorityInfo,
@@ -137,7 +137,7 @@ func (c *KMSChecks) CheckKMSKeyRotation(ctx context.Context) []CheckResult {
 	return results
 }
 
-// CheckKMSSeparationOfDuties verifies separation of duties for KMS (CIS 1.9)
+// CheckKMSSeparationOfDuties verifies separation of duties for KMS (CIS 1.12)
 func (c *KMSChecks) CheckKMSSeparationOfDuties(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -145,8 +145,8 @@ func (c *KMSChecks) CheckKMSSeparationOfDuties(ctx context.Context) []CheckResul
 	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformScope))
 	if err != nil {
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 1.9",
-			Name:        "[CIS GCP 1.9] KMS Separation of Duties",
+			Control:     "CIS-GCP-1.12",
+			Name:        "[CIS-GCP-1.12] KMS Separation of Duties",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("Unable to check KMS separation of duties: %v", err),
 			Remediation: "Verify Cloud Resource Manager API is enabled",
@@ -160,8 +160,8 @@ func (c *KMSChecks) CheckKMSSeparationOfDuties(ctx context.Context) []CheckResul
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 1.9",
-			Name:        "[CIS GCP 1.9] KMS Separation of Duties",
+			Control:     "CIS-GCP-1.12",
+			Name:        "[CIS-GCP-1.12] KMS Separation of Duties",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
 			Remediation: "Verify resourcemanager.projects.getIamPolicy permission",
@@ -211,11 +211,11 @@ func (c *KMSChecks) CheckKMSSeparationOfDuties(ctx context.Context) []CheckResul
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 1.9",
-			Name:        "[CIS GCP 1.9] KMS Separation of Duties",
+			Control:     "CIS-GCP-1.12",
+			Name:        "[CIS-GCP-1.12] KMS Separation of Duties",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 1.9: %d users have both KMS admin and crypto key usage roles: %v | Violates separation of duties", len(conflictingUsers), displayUsers),
+			Evidence:    fmt.Sprintf("CIS 1.12: %d users have both KMS admin and crypto key usage roles: %v | Violates separation of duties", len(conflictingUsers), displayUsers),
 			Remediation: "Separate KMS administration from key usage - different users should manage keys vs use them",
 			RemediationDetail: `# Remove conflicting role
 gcloud projects remove-iam-policy-binding PROJECT_ID \
@@ -231,10 +231,10 @@ gcloud projects remove-iam-policy-binding PROJECT_ID \
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 1.9",
-			Name:       "[CIS GCP 1.9] KMS Separation of Duties",
+			Control:    "CIS-GCP-1.12",
+			Name:       "[CIS-GCP-1.12] KMS Separation of Duties",
 			Status:     "PASS",
-			Evidence:   "KMS separation of duties enforced: no users have both admin and usage roles | Meets CIS 1.9",
+			Evidence:   "KMS separation of duties enforced: no users have both admin and usage roles | Meets CIS 1.12",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("KMS_SEPARATION_OF_DUTIES"),

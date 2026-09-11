@@ -210,8 +210,8 @@ func (c *NetworkChecks) CheckDefaultNetwork(ctx context.Context) []CheckResult {
 
 	if hasDefaultNetwork && instancesInDefault > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-3.1",
-			Name:        "[CIS GCP 3.1] Default VPC Network Deleted",
+			Control:     "CIS-GCP-3.1",
+			Name:        "[CIS-GCP-3.1] Default VPC Network Deleted",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("%d instances using default VPC network | Violates CIS GCP 3.1 (default networks have overly permissive firewall rules)", instancesInDefault),
@@ -250,8 +250,8 @@ gcloud compute networks delete default --quiet --project=%s`, c.projectID, c.pro
 		})
 	} else if hasDefaultNetwork && instancesInDefault == 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-3.1",
-			Name:        "[CIS GCP 3.1] Default VPC Network Deleted",
+			Control:     "CIS-GCP-3.1",
+			Name:        "[CIS-GCP-3.1] Default VPC Network Deleted",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    "Default VPC network still exists (no instances using it) | Violates CIS GCP 3.1",
@@ -272,8 +272,8 @@ gcloud compute networks delete default --quiet --project=%s`, c.projectID, c.pro
 		})
 	} else if !hasDefaultNetwork {
 		results = append(results, CheckResult{
-			Control:    "CIS-3.1",
-			Name:       "[CIS GCP 3.1] Default VPC Network Deleted",
+			Control:    "CIS-GCP-3.1",
+			Name:       "[CIS-GCP-3.1] Default VPC Network Deleted",
 			Status:     "PASS",
 			Evidence:   "Default VPC network has been deleted | Meets CIS GCP 3.1 (network isolation and custom firewall rules)",
 			Priority:   PriorityInfo,
@@ -351,7 +351,7 @@ func (c *NetworkChecks) CheckPrivateGoogleAccess(ctx context.Context) []CheckRes
 
 // NEW CIS CHECKS BELOW
 
-// CheckVPCFlowLogs verifies VPC Flow Logs are enabled (CIS 3.9)
+// CheckVPCFlowLogs verifies VPC Flow Logs are enabled (CIS 3.10)
 func (c *NetworkChecks) CheckVPCFlowLogs(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -386,11 +386,11 @@ func (c *NetworkChecks) CheckVPCFlowLogs(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 3.9",
-			Name:        "[CIS GCP 3.9] VPC Flow Logs",
+			Control:     "CIS-GCP-3.10",
+			Name:        "[CIS-GCP-3.10] VPC Flow Logs",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 3.9: %d subnets do not have VPC Flow Logs enabled: %s | Required for network monitoring and incident response", len(subnetsWithoutFlowLogs), strings.Join(displaySubnets, ", ")),
+			Evidence:    fmt.Sprintf("CIS 3.10: %d subnets do not have VPC Flow Logs enabled: %s | Required for network monitoring and incident response", len(subnetsWithoutFlowLogs), strings.Join(displaySubnets, ", ")),
 			Remediation: "Enable VPC Flow Logs on all subnets for network traffic visibility",
 			RemediationDetail: fmt.Sprintf(`gcloud compute networks subnets update %s \
   --region=REGION \
@@ -406,10 +406,10 @@ func (c *NetworkChecks) CheckVPCFlowLogs(ctx context.Context) []CheckResult {
 		})
 	} else if totalSubnets > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 3.9",
-			Name:       "[CIS GCP 3.9] VPC Flow Logs",
+			Control:    "CIS-GCP-3.10",
+			Name:       "[CIS-GCP-3.10] VPC Flow Logs",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d subnets have VPC Flow Logs enabled | Meets CIS 3.9", totalSubnets),
+			Evidence:   fmt.Sprintf("All %d subnets have VPC Flow Logs enabled | Meets CIS 3.10", totalSubnets),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("VPC_FLOW_LOGS"),
@@ -425,8 +425,8 @@ func (c *NetworkChecks) CheckDNSSEC(ctx context.Context) []CheckResult {
 
 	// Cloud DNS DNSSEC requires DNS API which isn't in compute service
 	results = append(results, CheckResult{
-		Control:           "CIS GCP 3.3",
-		Name:              "[CIS GCP 3.3] DNSSEC on Cloud DNS",
+		Control:           "CIS-GCP-3.3",
+		Name:              "[CIS-GCP-3.3] DNSSEC on Cloud DNS",
 		Status:            "MANUAL",
 		Severity:          "MEDIUM",
 		Evidence:          "MANUAL CHECK: Verify DNSSEC is enabled on Cloud DNS managed zones",
@@ -442,13 +442,13 @@ func (c *NetworkChecks) CheckDNSSEC(ctx context.Context) []CheckResult {
 	return results
 }
 
-// CheckLoadBalancerLogging checks if load balancer logging is enabled (CIS 3.10)
+// CheckLoadBalancerLogging checks if load balancer logging is enabled (CIS 2.17)
 func (c *NetworkChecks) CheckLoadBalancerLogging(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
 	results = append(results, CheckResult{
-		Control:     "CIS GCP 3.10",
-		Name:        "[CIS GCP 3.10] Load Balancer Logging",
+		Control:     "CIS-GCP-2.17",
+		Name:        "[CIS-GCP-2.17] Load Balancer Logging",
 		Status:      "MANUAL",
 		Severity:    "MEDIUM",
 		Evidence:    "MANUAL CHECK: Verify HTTP(S) load balancers have request logging enabled",
@@ -489,8 +489,8 @@ func (c *NetworkChecks) CheckLegacyNetworks(ctx context.Context) []CheckResult {
 
 	if len(legacyNetworks) > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 3.2",
-			Name:        "[CIS GCP 3.2] Legacy Networks",
+			Control:     "CIS-GCP-3.2",
+			Name:        "[CIS-GCP-3.2] Legacy Networks",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("%d legacy networks found: %s | Violates CIS GCP 3.2 (legacy networks lack modern features)", len(legacyNetworks), strings.Join(legacyNetworks, ", ")),
@@ -517,8 +517,8 @@ gcloud compute networks delete %s --project=%s`, c.projectID, c.projectID, legac
 		})
 	} else if len(networkList.Items) > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 3.2",
-			Name:       "[CIS GCP 3.2] Legacy Networks",
+			Control:    "CIS-GCP-3.2",
+			Name:       "[CIS-GCP-3.2] Legacy Networks",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("All %d networks are subnet-mode (no legacy networks) | Meets CIS GCP 3.2", len(networkList.Items)),
 			Priority:   PriorityInfo,
@@ -530,7 +530,7 @@ gcloud compute networks delete %s --project=%s`, c.projectID, c.projectID, legac
 	return results
 }
 
-// CheckSSHFromInternet checks if SSH is restricted from internet (CIS 3.4)
+// CheckSSHFromInternet checks if SSH is restricted from internet (CIS 3.6)
 func (c *NetworkChecks) CheckSSHFromInternet(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -585,11 +585,11 @@ func (c *NetworkChecks) CheckSSHFromInternet(ctx context.Context) []CheckResult 
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 3.4",
-			Name:        "[CIS GCP 3.4] SSH Access from Internet",
+			Control:     "CIS-GCP-3.6",
+			Name:        "[CIS-GCP-3.6] SSH Access from Internet",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("CRITICAL: %d firewall rules allow SSH (port 22) from 0.0.0.0/0: %s | Violates CIS GCP 3.4", len(sshRulesFromInternet), strings.Join(displayRules, ", ")),
+			Evidence:    fmt.Sprintf("CRITICAL: %d firewall rules allow SSH (port 22) from 0.0.0.0/0: %s | Violates CIS GCP 3.6", len(sshRulesFromInternet), strings.Join(displayRules, ", ")),
 			Remediation: fmt.Sprintf("Remove or restrict firewall rule: %s", sshRulesFromInternet[0]),
 			RemediationDetail: fmt.Sprintf(`# Option 1: Delete the overly permissive rule
 gcloud compute firewall-rules delete %s --project=%s
@@ -610,24 +610,24 @@ gcloud compute firewall-rules create allow-ssh-iap \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: fmt.Sprintf("VPC Network → Firewall → Screenshot showing %s with restricted source ranges (NOT 0.0.0.0/0)", sshRulesFromInternet[0]),
 			ConsoleURL:      "https://console.cloud.google.com/net-security/firewall-manager/firewall-policies/list",
-			Frameworks:      map[string]string{"CIS-GCP": "3.4", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
+			Frameworks:      map[string]string{"CIS-GCP": "3.6", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 3.4",
-			Name:       "[CIS GCP 3.4] SSH Access from Internet",
+			Control:    "CIS-GCP-3.6",
+			Name:       "[CIS-GCP-3.6] SSH Access from Internet",
 			Status:     "PASS",
-			Evidence:   "SSH access (port 22) is not allowed from 0.0.0.0/0 | Meets CIS GCP 3.4",
+			Evidence:   "SSH access (port 22) is not allowed from 0.0.0.0/0 | Meets CIS GCP 3.6",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "3.4", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
+			Frameworks: map[string]string{"CIS-GCP": "3.6", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	}
 
 	return results
 }
 
-// CheckRDPFromInternet checks if RDP is restricted from internet (CIS 3.5)
+// CheckRDPFromInternet checks if RDP is restricted from internet (CIS 3.7)
 func (c *NetworkChecks) CheckRDPFromInternet(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -682,11 +682,11 @@ func (c *NetworkChecks) CheckRDPFromInternet(ctx context.Context) []CheckResult 
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 3.5",
-			Name:        "[CIS GCP 3.5] RDP Access from Internet",
+			Control:     "CIS-GCP-3.7",
+			Name:        "[CIS-GCP-3.7] RDP Access from Internet",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("CRITICAL: %d firewall rules allow RDP (port 3389) from 0.0.0.0/0: %s | Violates CIS GCP 3.5", len(rdpRulesFromInternet), strings.Join(displayRules, ", ")),
+			Evidence:    fmt.Sprintf("CRITICAL: %d firewall rules allow RDP (port 3389) from 0.0.0.0/0: %s | Violates CIS GCP 3.7", len(rdpRulesFromInternet), strings.Join(displayRules, ", ")),
 			Remediation: fmt.Sprintf("Remove or restrict firewall rule: %s", rdpRulesFromInternet[0]),
 			RemediationDetail: fmt.Sprintf(`# Option 1: Delete the overly permissive rule
 gcloud compute firewall-rules delete %s --project=%s
@@ -707,24 +707,24 @@ gcloud compute firewall-rules create allow-rdp-iap \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: fmt.Sprintf("VPC Network → Firewall → Screenshot showing %s with restricted source ranges (NOT 0.0.0.0/0)", rdpRulesFromInternet[0]),
 			ConsoleURL:      "https://console.cloud.google.com/net-security/firewall-manager/firewall-policies/list",
-			Frameworks:      map[string]string{"CIS-GCP": "3.5", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
+			Frameworks:      map[string]string{"CIS-GCP": "3.7", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 3.5",
-			Name:       "[CIS GCP 3.5] RDP Access from Internet",
+			Control:    "CIS-GCP-3.7",
+			Name:       "[CIS-GCP-3.7] RDP Access from Internet",
 			Status:     "PASS",
-			Evidence:   "RDP access (port 3389) is not allowed from 0.0.0.0/0 | Meets CIS GCP 3.5",
+			Evidence:   "RDP access (port 3389) is not allowed from 0.0.0.0/0 | Meets CIS GCP 3.7",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "3.5", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
+			Frameworks: map[string]string{"CIS-GCP": "3.7", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	}
 
 	return results
 }
 
-// CheckHTTPSForwarding verifies that load balancers use HTTPS instead of HTTP (CIS 3.6)
+// CheckHTTPSForwarding verifies that load balancers use HTTPS instead of HTTP
 func (c *NetworkChecks) CheckHTTPSForwarding(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -732,8 +732,8 @@ func (c *NetworkChecks) CheckHTTPSForwarding(ctx context.Context) []CheckResult 
 	urlMaps, err := c.service.UrlMaps.List(c.projectID).Context(ctx).Do()
 	if err != nil {
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 3.6",
-			Name:        "[CIS GCP 3.6] HTTPS Load Balancer Configuration",
+			Control:     "GCP-NET-01",
+			Name:        "[GCP-NET-01] HTTPS Load Balancer Configuration",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("Unable to check URL maps: %v", err),
@@ -747,8 +747,8 @@ func (c *NetworkChecks) CheckHTTPSForwarding(ctx context.Context) []CheckResult 
 
 	if len(urlMaps.Items) == 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 3.6",
-			Name:       "[CIS GCP 3.6] HTTPS Load Balancer Configuration",
+			Control:    "GCP-NET-01",
+			Name:       "[GCP-NET-01] HTTPS Load Balancer Configuration",
 			Status:     "PASS",
 			Evidence:   "No URL maps configured (no HTTP load balancers to check)",
 			Priority:   PriorityInfo,
@@ -761,8 +761,8 @@ func (c *NetworkChecks) CheckHTTPSForwarding(ctx context.Context) []CheckResult 
 	// This is a manual check because detailed URL map rules inspection
 	// requires analyzing redirects and backend service configurations
 	results = append(results, CheckResult{
-		Control:     "CIS GCP 3.6",
-		Name:        "[CIS GCP 3.6] HTTPS Load Balancer Configuration",
+		Control:     "GCP-NET-01",
+		Name:        "[GCP-NET-01] HTTPS Load Balancer Configuration",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Evidence:    fmt.Sprintf("%d URL maps found | Requires manual verification that all HTTP traffic is redirected to HTTPS", len(urlMaps.Items)),
@@ -789,7 +789,7 @@ gcloud compute target-http-proxies update HTTP_PROXY_NAME \
 	return results
 }
 
-// CheckTLSVersions verifies that SSL policies enforce modern TLS versions (CIS 3.7)
+// CheckTLSVersions verifies that SSL policies enforce modern TLS versions (CIS 3.11)
 func (c *NetworkChecks) CheckTLSVersions(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -797,8 +797,8 @@ func (c *NetworkChecks) CheckTLSVersions(ctx context.Context) []CheckResult {
 	sslPolicies, err := c.service.SslPolicies.List(c.projectID).Context(ctx).Do()
 	if err != nil {
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 3.7",
-			Name:        "[CIS GCP 3.7] SSL Policy TLS Version",
+			Control:     "CIS-GCP-3.11",
+			Name:        "[CIS-GCP-3.11] SSL Policy TLS Version",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("Unable to check SSL policies: %v", err),
@@ -812,8 +812,8 @@ func (c *NetworkChecks) CheckTLSVersions(ctx context.Context) []CheckResult {
 
 	if len(sslPolicies.Items) == 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 3.7",
-			Name:        "[CIS GCP 3.7] SSL Policy TLS Version",
+			Control:     "CIS-GCP-3.11",
+			Name:        "[CIS-GCP-3.11] SSL Policy TLS Version",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    "No SSL policies configured | Load balancers may be using default TLS settings which could allow older, insecure TLS versions",
@@ -851,11 +851,11 @@ gcloud compute ssl-policies create restricted-tls \
 
 	if len(weakPolicies) > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 3.7",
-			Name:        "[CIS GCP 3.7] SSL Policy TLS Version",
+			Control:     "CIS-GCP-3.11",
+			Name:        "[CIS-GCP-3.11] SSL Policy TLS Version",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("%d SSL policies allow weak TLS versions: %s | Violates CIS GCP 3.7 (TLS 1.0/1.1 have known vulnerabilities)", len(weakPolicies), strings.Join(weakPolicies, ", ")),
+			Evidence:    fmt.Sprintf("%d SSL policies allow weak TLS versions: %s | Violates CIS GCP 3.11 (TLS 1.0/1.1 have known vulnerabilities)", len(weakPolicies), strings.Join(weakPolicies, ", ")),
 			Remediation: "Update SSL policies to enforce TLS 1.2 or higher",
 			RemediationDetail: fmt.Sprintf(`# Update SSL policy to TLS 1.2 minimum
 gcloud compute ssl-policies update %s \
@@ -873,10 +873,10 @@ gcloud compute ssl-policies update %s \
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 3.7",
-			Name:       "[CIS GCP 3.7] SSL Policy TLS Version",
+			Control:    "CIS-GCP-3.11",
+			Name:       "[CIS-GCP-3.11] SSL Policy TLS Version",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d SSL policies enforce TLS 1.2 or higher | Meets CIS GCP 3.7", len(sslPolicies.Items)),
+			Evidence:   fmt.Sprintf("All %d SSL policies enforce TLS 1.2 or higher | Meets CIS GCP 3.11", len(sslPolicies.Items)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("TLS_VERSION"),
