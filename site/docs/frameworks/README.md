@@ -9,16 +9,16 @@ AuditKit supports multiple compliance frameworks for automated technical control
 | Framework | Status | Automated Controls | Cloud Providers |
 |-----------|--------|-------------------|-----------------|
 | **[SOC2 Type II](./soc2.md)** | Production | 38 of 43 criteria | AWS, Azure, GCP |
-| **[PCI-DSS v4.0.1](./pci-dss.md)** | Production | 69 requirements across all 12 groups | AWS, Azure, GCP |
-| **[CMMC Level 1](./cmmc.md)** | Production | 13 of 17 practices | AWS, Azure, GCP |
+| **[PCI-DSS v4.0.1](./pci-dss.md)** | Production | 71 requirements across all 12 groups | AWS, Azure, GCP |
+| **[CMMC Level 1](./cmmc.md)** | Production | 5 of 17 practices | AWS, Azure, GCP |
 | **[CMMC Level 2](./cmmc.md)** | Reported; automated in Pro | 110 practices | AWS, Azure, GCP |
-| **[CIS Benchmarks](./cis-benchmarks.md)** | Production | AWS: 158, Azure: 108, GCP: 71 | AWS, Azure, GCP |
-| **[NIST 800-53 Rev 5](./nist-800-53.md)** | Production | 95 technical controls (covers FedRAMP), derived, of 1,196 in the catalog | AWS, Azure, GCP |
+| **[CIS Benchmarks](./cis-benchmarks.md)** | Production | AWS: 70, Azure: 127, GCP: 93 | AWS, Azure, GCP |
+| **[NIST 800-53 Rev 5](./nist-800-53.md)** | Production | 149 technical controls (covers FedRAMP), derived, of 1,196 in the catalog | AWS, Azure, GCP |
 | **[FedRAMP](./fedramp.md)** | Production | Low 56 of 149, Moderate 77 of 287, High 78 of 370 on AWS | AWS, Azure, GCP |
-| **[ISO 27001:2022](./iso27001.md)** | Production | 46 controls, derived (48 on AWS, of 93 in Annex A) | AWS, Azure, GCP |
-| **[NIST CSF 2.0](./nist-csf.md)** | Production | 63 subcategories, derived (65 AWS, 62 Azure, of 106) | AWS, Azure, GCP |
-| **[GDPR](./gdpr.md)** | Production | 14 articles, derived | AWS, Azure, GCP |
-| **[HIPAA Security Rule](./hipaa.md)** | Production | 18 safeguards, derived | AWS, Azure, GCP |
+| **[ISO 27001:2022](./iso27001.md)** | Production | 53 controls, derived (48 on AWS, of 93 in Annex A) | AWS, Azure, GCP |
+| **[NIST CSF 2.0](./nist-csf.md)** | Production | 65 subcategories, derived (65 AWS, 62 Azure, of 106) | AWS, Azure, GCP |
+| **[GDPR](./gdpr.md)** | Production | 16 articles, derived | AWS, Azure, GCP |
+| **[HIPAA Security Rule](./hipaa.md)** | Production | 30 safeguards, derived | AWS, Azure, GCP |
 
 ---
 
@@ -123,7 +123,7 @@ An AuditKit subscription adds the automated Level 2 checks:
 ### NIST 800-53 Rev 5
 **Purpose:** Security controls for federal information systems  
 **Certification:** Not a certification (used by FedRAMP, FISMA)  
-**Coverage:** 95 automated technical controls  
+**Coverage:** 149 automated technical controls  
 **Timeline:** 6-12 months for full implementation
 
 **[Learn more →](./nist-800-53.md)**

@@ -10,7 +10,7 @@
 **New in v0.8.7:** `auditkit update` and the provider binaries now report the version they were actually built from.
 
 **CMMC Level 2 is reported in the Community Edition** - all 110 practices, with
-Level 1 automated (13 of 17 practices) and the remainder listed with evidence-collection guidance.
+Level 1 automated (5 of 17 practices) and the remainder listed with evidence-collection guidance.
 
 **Need automated Level 2 checks, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
 
@@ -42,7 +42,7 @@ More in [Example Commands](#example-commands).
 
 AuditKit scans your cloud infrastructure for compliance gaps and security misconfigurations:
 
-- **Broad Control Coverage:** 219 AWS, 174 Azure and 133 GCP controls assessed - some return an automated verdict, the rest are reported with evidence-collection guidance
+- **Broad Control Coverage:** 228 AWS, 276 Azure and 167 GCP controls assessed - some return an automated verdict, the rest are reported with evidence-collection guidance
 - **Full CMMC Scope:** all 110 Level 1 + 2 practices reported, so you see the whole assessment surface
 - **Multi-Cloud Support:** AWS, Azure and GCP scanned directly, Microsoft 365 via ScubaGear import
 - **Audit-Ready Reports:** PDF/HTML/JSON output with evidence
@@ -64,12 +64,12 @@ measured from the checks themselves.
 
 | Framework | AWS | Azure | GCP | Purpose |
 |-----------|-----|-------|-----|---------|
-| **SOC2 Type II** | 38 of 43 | 37 of 43 | 32 of 43 | SaaS customer requirements |
-| **PCI DSS v4.0.1** | 59 | 59 | 49 | Payment card processing |
-| **CMMC Level 1** | 13 of 17 | 13 of 17 | 9 of 17 | DoW contractor compliance (FCI) |
-| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; 8 practices automated on GCP, none on AWS/Azure. Automated Level 2 across all providers in [AuditKit Pro](https://auditkit.io/) |
+| **SOC2 Type II** | 38 of 43 | 38 of 43 | 32 of 43 | SaaS customer requirements |
+| **PCI DSS v4.0.1** | 59 | 63 | 50 | Payment card processing |
+| **CMMC Level 1** | 5 of 17 | 4 of 17 | 4 of 17 | DoW contractor compliance (FCI) |
+| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; 6 practices automated on GCP, none on AWS/Azure. Automated Level 2 across all providers in [AuditKit Pro](https://auditkit.io/) |
 
-69 distinct PCI DSS v4.0.1 requirements are assessed across the three providers.
+71 distinct PCI DSS v4.0.1 requirements are assessed across the three providers.
 
 ### Derived Frameworks
 
@@ -79,11 +79,11 @@ assessed.
 
 | Framework | AWS | Azure | GCP | Unit |
 |-----------|-----|-------|-----|------|
-| **NIST 800-53 Rev 5** | 88 | 83 | 84 | controls (95 across all providers) |
-| **ISO 27001:2022** | 48 | 46 | 46 | controls |
-| **NIST CSF 2.0** | 65 | 62 | 63 | subcategories |
-| **HIPAA Security Rule** | 18 | 18 | 18 | safeguards |
-| **GDPR** | 14 | 14 | 14 | articles |
+| **NIST 800-53 Rev 5** | 146 | 144 | 141 | controls (149 across all providers) |
+| **ISO 27001:2022** | 53 | 53 | 53 | controls |
+| **NIST CSF 2.0** | 67 | 65 | 65 | subcategories |
+| **HIPAA Security Rule** | 30 | 30 | 30 | safeguards |
+| **GDPR** | 16 | 16 | 16 | articles |
 
 FedRAMP Low, Moderate and High are filtered views of the NIST 800-53 coverage
 above rather than separate control sets.
@@ -92,7 +92,7 @@ above rather than separate control sets.
 
 | Framework | AWS | Azure | GCP | Purpose |
 |-----------|-----|-------|-----|---------|
-| **CIS Benchmarks** | 158 | 108 | 71 | Industry security best practices |
+| **CIS Benchmarks** | 70 | 127 | 93 | Industry security best practices |
 
 **[Framework Details →](./site/docs/frameworks/)** • **[What's the difference? →](./site/docs/frameworks/#compliance-vs-security-hardening)**
 
@@ -111,15 +111,15 @@ scanning, or a desktop interface.
 | | Community Edition (free) | AuditKit Pro ($297/mo) |
 |---|---|---|
 | **Cloud providers** | AWS, Azure, GCP scanned; M365 via ScubaGear import | Same, plus Azure Arc |
-| **Controls assessed** | 219 AWS, 174 Azure, 133 GCP | 317 AWS, 322 Azure, 259 GCP |
+| **Controls assessed** | 228 AWS, 276 Azure, 167 GCP | 315 AWS, 394 Azure, 284 GCP |
 | **SOC2 Type II** | 38, 37, 32 criteria | 38, 38, 36 criteria |
-| **PCI DSS v4.0.1** | 69 requirements | 76 requirements |
-| **CMMC Level 1** | 13 of 17 practices automated | 17 of 17 practices automated |
-| **CMMC Level 2** | All 110 practices reported for evidence | All 110 covered: 42 query the cloud, 68 are evidence guidance |
-| **CIS Benchmarks** | 158 AWS, 108 Azure, 71 GCP | 158 AWS, 122 Azure, 72 GCP |
+| **PCI DSS v4.0.1** | 71 requirements | 77 requirements |
+| **CMMC Level 1** | 5 of 17 practices automated | 7 of 17 practices automated |
+| **CMMC Level 2** | All 110 practices reported for evidence | All 110 reported: 26 reach a pass or fail, 84 carry evidence guidance |
+| **CIS Benchmarks** | 70 AWS, 127 Azure, 93 GCP | 70 AWS, 127 Azure, 93 GCP |
 | **Derived frameworks** | 800-53, ISO 27001, HIPAA, GDPR, NIST CSF, FedRAMP | Same six, from a larger control set |
-| **NIST 800-53 derived** | 95 controls | 135 controls |
-| **GDPR / NIST CSF derived** | 14 articles, 65 subcategories (AWS) | 16 articles, 67 subcategories (AWS) |
+| **NIST 800-53 derived** | 149 controls | 151 controls |
+| **GDPR / NIST CSF derived** | 16 articles, 67 subcategories (AWS) | 16 articles, 67 subcategories (AWS) |
 | **Reports** | PDF, HTML, CSV, JSON | Same |
 | **Offline / air-gapped scans** | Yes | Yes, plus cache expiry and clearing |
 | **Evidence lifecycle** | Collection tracking | Tracking, plus a packaged audit deliverable |

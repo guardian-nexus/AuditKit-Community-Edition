@@ -6,7 +6,7 @@ What AuditKit scans in Google Cloud Platform.
 
 ## Overview
 
-**Community Edition:** 133 controls across 8 core services  
+**Community Edition:** 167 controls across 8 core services  
 **Pro version:** 259 controls, including 15 GKE and 10 Vertex AI checks
 
 **Supported frameworks:**

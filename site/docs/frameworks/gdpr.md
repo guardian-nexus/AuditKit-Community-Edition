@@ -10,7 +10,7 @@ Technical and organisational measures under the EU General Data Protection Regul
 
 **Who needs it:** Any organisation processing personal data of people in the EU or UK
 **Status in AuditKit:** Production
-**Coverage:** 14 articles (AWS 14, Azure 14, GCP 14)
+**Coverage:** 16 articles (AWS 14, Azure 14, GCP 14)
 **How it works:** Derived from your SOC2, PCI DSS and CMMC results through NIST 800-53
 
 ---

@@ -13,7 +13,7 @@ What AuditKit scans in Microsoft Azure.
 - SOC2 Type II (37 criteria)
 - PCI-DSS v4.0.1 (59 requirements)
 - CMMC Level 1 and Level 2: all 110 practices reported; Level 1 automated, Level 2 automated in Pro
-- NIST 800-53 Rev 5 (83 controls, derived via crosswalk)
+- NIST 800-53 Rev 5 (144 controls, derived via crosswalk)
 - HIPAA (18 safeguards, derived via crosswalk)
 
 ---

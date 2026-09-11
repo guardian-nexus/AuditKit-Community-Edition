@@ -29,10 +29,10 @@ Free to find your gaps. Paid for the evidence package, multi-account scanning, a
 **What's included:**
 - AWS, Azure and GCP scanning; M365 findings via ScubaGear import
 - SOC2 Type II (38 criteria: all 33 Common Criteria, plus Availability and Confidentiality)
-- PCI-DSS v4.0.1 (69 requirements)
-- CMMC Level 1 automated (13 of 17 practices), and all 110 Level 1 + 2 practices reported for evidence tracking
-- NIST 800-53 Rev 5 (95 technical controls)
-- GCP Core Services (133 controls)
+- PCI-DSS v4.0.1 (71 requirements)
+- CMMC Level 1 automated (5 of 17 practices), and all 110 Level 1 + 2 practices reported for evidence tracking
+- NIST 800-53 Rev 5 (149 technical controls)
+- GCP Core Services (167 controls)
 - PDF, HTML, JSON, CSV and terminal reports
 - Evidence collection tracker
 - CLI tool
@@ -114,10 +114,10 @@ Free to find your gaps. Paid for the evidence package, multi-account scanning, a
 | M365 (ScubaGear) | Full support | Full support |
 | **Frameworks** |
 | SOC2 Type II | 38 criteria | 38 criteria |
-| PCI-DSS v4.0.1 | 69 requirements | 76 requirements |
-| CMMC Level 1 | 13 of 17 practices automated | 17 of 17 practices automated |
+| PCI-DSS v4.0.1 | 71 requirements | 77 requirements |
+| CMMC Level 1 | 5 of 17 practices automated | 7 of 17 practices automated |
 | CMMC Level 2 | All 110 L1 + L2 practices reported for evidence tracking | All 110 assessed: automated checks where the cloud configuration can prove it, evidence guidance elsewhere |
-| NIST 800-53 Rev 5 | 95 controls | 135 controls |
+| NIST 800-53 Rev 5 | 149 controls | 151 controls |
 | HIPAA | 18 safeguards, derived | 18 safeguards, derived |
 | **Scanning** |
 | Single account/project | Yes | Yes |
