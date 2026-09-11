@@ -116,11 +116,11 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 	policies, err := c.iamClient.ListPolicies(ctx, &iam.ListPoliciesInput{Scope: "Local"})
 	if err != nil {
 		return CheckResult{
-			Control:         "AC.L1-3.1.1",
-			Name:            "[CMMC L1] Limit System Access to Authorized Users",
+			Control:         "AC.L1-3.1.2",
+			Name:            "[CMMC L1] Limit Access to Permitted Transactions",
 			Status:          "FAIL",
 			Evidence:        fmt.Sprintf("Unable to verify IAM policies: %v", err),
-			Remediation:     "Configure IAM policies to limit access to authorized users",
+			Remediation:     "Configure IAM policies to limit access to permitted functions and transactions",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "AWS Console → IAM → Policies → Screenshot policy list",
@@ -131,8 +131,8 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 
 	if len(policies.Policies) == 0 {
 		return CheckResult{
-			Control:         "AC.L1-3.1.1",
-			Name:            "[CMMC L1] Limit System Access to Authorized Users",
+			Control:         "AC.L1-3.1.2",
+			Name:            "[CMMC L1] Limit Access to Permitted Transactions",
 			Status:          "FAIL",
 			Evidence:        "No custom IAM policies - relying on AWS managed policies only",
 			Remediation:     "Create custom IAM policies to restrict access appropriately",
@@ -145,8 +145,8 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 	}
 
 	return CheckResult{
-		Control:         "AC.L1-3.1.1",
-		Name:            "[CMMC L1] Limit System Access to Authorized Users",
+		Control:         "AC.L1-3.1.2",
+		Name:            "[CMMC L1] Limit Access to Permitted Transactions",
 		Status:          "PASS",
 		Evidence:        fmt.Sprintf("IAM policies configured (%d custom policies)", len(policies.Policies)),
 		Remediation:     "Review policies quarterly for least privilege",
