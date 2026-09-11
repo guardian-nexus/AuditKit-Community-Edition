@@ -3,6 +3,7 @@ package azure
 import (
 	"context"
 	"fmt"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
 	"os"
 	"strings"
 
@@ -446,7 +447,8 @@ func (s *AzureScanner) runCISChecks(ctx context.Context, verbose bool) []ScanRes
 	var results []ScanResult
 
 	if verbose {
-		fmt.Println("Running CIS Microsoft Azure Foundations Benchmark v3.0")
+		cisEd, _ := mappings.EditionFor("CIS-Azure")
+		fmt.Println("Running " + cisEd.Describe())
 		fmt.Println("")
 	}
 
@@ -547,8 +549,9 @@ func (s *AzureScanner) runCISChecks(ctx context.Context, verbose bool) []ScanRes
 				fmt.Printf("  %s: %d controls\n", section, count)
 			}
 		}
-		fmt.Println("\nNote: CIS Azure Benchmark v3.0 has ~100 total controls")
-		fmt.Println("This scan covers controls automatable via Azure API")
+		// The old line quoted a control total for a benchmark version nobody
+		// had read. State what this scan covers; the registry states the edition.
+		fmt.Println("\nThis scan covers the CIS controls automatable via the Azure API")
 		fmt.Println("")
 	}
 

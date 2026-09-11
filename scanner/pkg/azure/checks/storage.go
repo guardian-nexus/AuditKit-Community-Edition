@@ -31,7 +31,7 @@ func (c *StorageChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results = append(results, c.CheckBlobSoftDelete(ctx)...)
 	results = append(results, c.CheckNetworkRestrictions(ctx)...)
 
-	// NEW CIS v3.0 Section 4 checks
+	// CIS storage-section checks. The edition lives in pkg/mappings.
 	results = append(results, c.CheckInfrastructureEncryption(ctx)...)
 	results = append(results, c.CheckPublicNetworkAccess(ctx)...)
 	results = append(results, c.CheckMinimumTLS(ctx)...)

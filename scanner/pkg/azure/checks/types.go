@@ -70,7 +70,8 @@ type Check interface {
 	Name() string
 }
 
-// Azure-specific framework mappings with CIS Azure v3.0
+// Azure-specific framework mappings. The CIS edition is recorded in
+// pkg/mappings, not asserted here.
 var AzureFrameworkMappings = map[string]map[string]string{
 	// Identity and Access Management (Section 1)
 	"AAD_MFA": {

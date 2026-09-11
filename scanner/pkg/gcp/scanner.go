@@ -3,6 +3,7 @@ package gcp
 import (
 	"context"
 	"fmt"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
 	"strings"
 
 	"cloud.google.com/go/iam/admin/apiv1"
@@ -339,7 +340,8 @@ func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 	var results []ScanResult
 
 	if verbose {
-		fmt.Println("Running CIS Google Cloud Platform Foundation Benchmark v4.0")
+		cisEd, _ := mappings.EditionFor("CIS-GCP")
+		fmt.Println("Running " + cisEd.Describe())
 		fmt.Println("Using existing checks with CIS control mappings...")
 		fmt.Println("")
 	}
@@ -425,8 +427,9 @@ func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 				fmt.Printf("  %s: %d controls\n", section, count)
 			}
 		}
-		fmt.Println("\nNote: CIS GCP Benchmark v4.0 has ~70 total controls")
-		fmt.Println("This scan covers controls automatable via GCP API")
+		// The old line quoted a control total for a benchmark version nobody
+		// had read. State what this scan covers; the registry states the edition.
+		fmt.Println("\nThis scan covers the CIS controls automatable via the GCP API")
 		fmt.Println("")
 	}
 

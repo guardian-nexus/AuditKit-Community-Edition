@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
+	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -235,7 +236,8 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 	var results []ScanResult
 
 	if verbose {
-		fmt.Println("Running CIS AWS Foundations Benchmark (v1.4 & 3.0)")
+		cisEd, _ := mappings.EditionFor("CIS-AWS")
+		fmt.Println("Running " + cisEd.Describe())
 		fmt.Println("Using existing checks with CIS control mappings...")
 		fmt.Println("")
 	}
@@ -381,8 +383,9 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 				fmt.Printf("  %s: %d controls\n", section, count)
 			}
 		}
-		fmt.Println("\nNote: CIS Benchmark v1.4 and v3.0 has ~60 combined total controls")
-		fmt.Println("This scan covers controls automatable via AWS API")
+		// The old line quoted a control total for a benchmark version nobody
+		// had read. State what this scan covers; the registry states the edition.
+		fmt.Println("\nThis scan covers the CIS controls automatable via the AWS API")
 		fmt.Println("")
 		fmt.Println("Missing controls require:")
 		fmt.Println("  • Manual review of organizational policies")
@@ -522,7 +525,8 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 		checks.NewRDSChecks(s.rdsClient),
 		checks.NewVPCChecks(s.ec2Client),
 
-		// CIS AWS Benchmark v1.5.0+ comprehensive coverage
+		// CIS AWS Benchmark coverage. The edition lives in pkg/mappings; this
+		// comment claimed v1.5.0+ while the scan banner said something else.
 		checks.NewCISManualChecks(), // CIS 4.1-4.15
 		checks.NewAccessAnalyzerChecks(s.accessAnalyzerClient, s.cfg.Region),                        // CIS 1.8
 		checks.NewRoute53Checks(s.route53Client),                                                    // CIS 5.19
