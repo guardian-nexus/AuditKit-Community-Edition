@@ -183,7 +183,7 @@ func (c *SQLChecks) CheckSQLFirewall(ctx context.Context) []CheckResult {
 
 	if c.serverClient == nil {
 		return append(results, CheckResult{
-			Control:    "CIS-6.1.1.2",
+			Control:    "AZ-SQL-13",
 			Name:       "SQL Firewall Rules",
 			Status:     "INFO",
 			Evidence:   "CIS 5.1.2: Server client not available - manual check required",
@@ -233,7 +233,7 @@ func (c *SQLChecks) CheckSQLFirewall(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-6.1.1.2",
+			Control:     "AZ-SQL-13",
 			Name:        "SQL Server Firewall & Public Access",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
@@ -264,7 +264,7 @@ If public access is required, ensure NO firewall rules allow:
 		})
 	} else if totalServers > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-6.1.1.2",
+			Control:    "AZ-SQL-13",
 			Name:       "SQL Server Public Access",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 5.1.2, 5.1.7: All %d SQL servers have public network access disabled", totalServers),
@@ -454,14 +454,13 @@ Configure via: PostgreSQL flexible server → Server parameters`,
 		Priority:        PriorityMedium,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.1.2.3",
-			"SOC2":      "CC7.1",
+			"SOC2": "CC7.1",
 		},
 	})
 
 	// CIS 5.2.5: PostgreSQL public access
 	results = append(results, CheckResult{
-		Control:     "CIS-6.1.2.5",
+		Control:     "AZ-SQL-14",
 		Name:        "PostgreSQL Public Network Access",
 		Status:      "INFO",
 		Evidence:    "CIS 5.2.5: MANUAL CHECK - Verify 'Allow public access from any Azure service' is disabled for PostgreSQL",
@@ -480,8 +479,7 @@ Use Private Link or VNet integration for secure connectivity.`,
 		Priority:        PriorityHigh,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.1.2.5",
-			"PCI-DSS":   "1.4.2",
+			"PCI-DSS": "1.4.2",
 		},
 	})
 

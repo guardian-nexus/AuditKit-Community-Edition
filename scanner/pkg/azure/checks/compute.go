@@ -78,7 +78,7 @@ func (c *ComputeChecks) CheckDiskEncryption(ctx context.Context) []CheckResult {
 
 	if len(unencryptedDisks) > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-7.1",
+			Control:     "CC6.3",
 			Name:        "Disk Encryption at Rest",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -108,7 +108,7 @@ az vm encryption enable \
 		})
 	} else if totalDisks > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-7.1",
+			Control:    "CC6.3",
 			Name:       "Disk Encryption at Rest",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 7.1, 7.2: All %d disks encrypted | Meets CIS Azure requirements", totalDisks),
@@ -259,7 +259,7 @@ func (c *ComputeChecks) CheckVMExtensions(ctx context.Context) []CheckResult {
 
 	if len(vmsWithoutAntimalware) > 0 && totalVMs > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-7.4",
+			Control:     "PCI-5.2.1",
 			Name:        "Endpoint Protection",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -283,7 +283,7 @@ For CIS 7.5: Enable MDE integration via Defender for Cloud`,
 
 	// VM Backup check
 	results = append(results, CheckResult{
-		Control:     "CIS-7.6",
+		Control:     "AZ-COMPUTE-05",
 		Name:        "VM Backup",
 		Status:      "INFO",
 		Evidence:    "CIS 7.6: MANUAL CHECK - Verify Azure Backup is enabled for all production VMs",

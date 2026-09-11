@@ -783,7 +783,7 @@ func (c *DefenderChecks) checkSecurityContacts(ctx context.Context) []CheckResul
 		if err != nil {
 			return []CheckResult{
 				{
-					Control:    "AZ-DEFENDER-02",
+					Control:    "CIS-8.1.13",
 					Name:       "Security Contact Email",
 					Status:     "ERROR",
 					Evidence:   fmt.Sprintf("Unable to check security contacts: %v", err),
@@ -825,7 +825,7 @@ func (c *DefenderChecks) checkSecurityContacts(ctx context.Context) []CheckResul
 	// CIS 2.1.19: Security Contact Email
 	if len(contactEmails) == 0 {
 		results = append(results, CheckResult{
-			Control:     "AZ-DEFENDER-02",
+			Control:     "CIS-8.1.13",
 			Name:        "Security Contact Email",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
@@ -843,7 +843,7 @@ Defender for Cloud → Environment settings → Email notifications → Add emai
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "AZ-DEFENDER-02",
+			Control:    "CIS-8.1.13",
 			Name:       "Security Contact Email",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 2.1.19: %d security contact email(s) configured", len(contactEmails)),

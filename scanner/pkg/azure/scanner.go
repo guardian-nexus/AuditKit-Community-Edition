@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/applicationinsights/armapplicationinsights"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/keyvault/armkeyvault"
@@ -39,6 +40,8 @@ type AzureScanner struct {
 	diagnosticClient    *armmonitor.DiagnosticSettingsClient
 	policyClient        *armstorage.ManagementPoliciesClient
 	autoscaleClient     *armmonitor.AutoscaleSettingsClient
+	alertClient         *armmonitor.ActivityLogAlertsClient
+	insightsClient      *armapplicationinsights.ComponentsClient
 	blobServiceClient   *armstorage.BlobServicesClient
 	fileServiceClient   *armstorage.FileServicesClient
 	roleClient          *armauthorization.RoleAssignmentsClient
@@ -148,6 +151,19 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 	if err != nil {
 		autoscaleClient = nil
 	}
+
+	// Activity log alert rules and Application Insights answer CIS Azure
+	// section 6.1.2 and 6.1.3. Constructed here, with the field, on purpose:
+	// a field declared without its constructor is a nil client, which fails
+	// every recommendation for want of data instead of reporting a finding.
+	alertClient, err := armmonitor.NewActivityLogAlertsClient(subscriptionID, cred, nil)
+	if err != nil {
+		alertClient = nil
+	}
+	insightsClient, err := armapplicationinsights.NewComponentsClient(subscriptionID, cred, nil)
+	if err != nil {
+		insightsClient = nil
+	}
 	blobServiceClient, err := armstorage.NewBlobServicesClient(subscriptionID, cred, nil)
 	if err != nil {
 		blobServiceClient = nil
@@ -206,6 +222,8 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		diagnosticClient:    diagnosticClient,
 		policyClient:        policyClient,
 		autoscaleClient:     autoscaleClient,
+		alertClient:         alertClient,
+		insightsClient:      insightsClient,
 		blobServiceClient:   blobServiceClient,
 		fileServiceClient:   fileServiceClient,
 		roleClient:          roleClient,
@@ -277,6 +295,7 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 		checks.NewAzureCISManualChecks(s.subscriptionID),
 		checks.NewCISFoundationsManualChecks(),                                                // CIS Azure Foundations v6.0.0, the Manual recommendations
 		checks.NewCISStorageChecks(s.storageClient, s.blobServiceClient, s.fileServiceClient), // CIS Azure v6.0.0 section 9
+		checks.NewCISActivityAlertChecks(s.alertClient, s.insightsClient, s.subscriptionID),   // CIS Azure v6.0.0 sections 6.1.2 and 6.1.3
 		checks.NewAppServiceChecks(s.subscriptionID),
 		checks.NewAzureCC1Checks(s.roleClient, s.roleDefClient),
 		checks.NewAzureCC2Checks(),

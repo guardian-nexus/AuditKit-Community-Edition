@@ -55,7 +55,7 @@ func (c *StorageChecks) CheckPublicAccess(ctx context.Context) []CheckResult {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
 			return append(results, CheckResult{
-				Control:    "CIS-8.3.7",
+				Control:    "CIS-9.3.8",
 				Name:       "Storage Account Public Access",
 				Status:     "ERROR",
 				Evidence:   fmt.Sprintf("Unable to check storage accounts: %v", err),
@@ -86,7 +86,7 @@ func (c *StorageChecks) CheckPublicAccess(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-8.3.7",
+			Control:     "CIS-9.3.8",
 			Name:        "Storage Account Public Access",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
@@ -109,7 +109,7 @@ az storage account update \
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-8.3.7",
+			Control:    "CIS-9.3.8",
 			Name:       "Storage Account Public Access",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 3.1, 3.2: All %d storage accounts block public access", totalAccounts),
@@ -389,7 +389,7 @@ func (c *StorageChecks) CheckPublicNetworkAccess(ctx context.Context) []CheckRes
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-8.3.7",
+			Control:     "CIS-9.3.2.2",
 			Name:        "Public Network Access Disabled",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -411,7 +411,7 @@ Then configure Private Endpoints for access from VNets.`, publicAccessAccounts[0
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-8.3.7",
+			Control:    "CIS-9.3.2.2",
 			Name:       "Public Network Access Disabled",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 4.6: All %d storage accounts disable public network access", totalAccounts),
@@ -709,7 +709,7 @@ func (c *StorageChecks) CheckNetworkRestrictions(ctx context.Context) []CheckRes
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-9.3.5",
+			Control:     "CIS-9.3.2.3",
 			Name:        "Default Network Access Rule",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
@@ -731,7 +731,7 @@ Then whitelist specific VNets or IP ranges.`, openAccounts[0]),
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-9.3.5",
+			Control:    "CIS-9.3.2.3",
 			Name:       "Default Network Access Rule",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 4.7: All %d storage accounts default to Deny", totalAccounts),

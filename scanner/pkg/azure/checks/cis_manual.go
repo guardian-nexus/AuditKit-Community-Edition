@@ -31,11 +31,6 @@ func (c *AzureCISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	// Section 5: Logging and Monitoring - Azure Monitor Alert Configuration
 	// These require manual verification as Azure Monitor alert rules are complex
 	results = append(results, c.checkMonitorAlertAuthChanges())
-	results = append(results, c.checkMonitorAlertPolicyChanges())
-	results = append(results, c.checkMonitorAlertNSGChanges())
-	results = append(results, c.checkMonitorAlertSecurityGroupChanges())
-	results = append(results, c.checkMonitorAlertSecuritySolutions())
-	results = append(results, c.checkMonitorAlertSQLFirewall())
 	results = append(results, c.checkMonitorAlertKeyVaultDeletion())
 	results = append(results, c.checkMonitorAlertStorageAccountDeletion())
 
@@ -87,162 +82,6 @@ az monitor activity-log alert create \
 		Frameworks: map[string]string{
 			"SOC2":    "CC7.2",
 			"PCI-DSS": "10.2.1.2",
-		},
-	}
-}
-
-func (c *AzureCISManualChecks) checkMonitorAlertPolicyChanges() CheckResult {
-	return CheckResult{
-		Control:     "AZ-CIS-03",
-		Name:        "Create Alert for Policy Assignment Changes",
-		Status:      "INFO",
-		Severity:    "MEDIUM",
-		Priority:    PriorityMedium,
-		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for policy assignment changes",
-		Remediation: "Create Azure Monitor alert for policy operations",
-		RemediationDetail: `Create an alert rule for policy changes:
-
-Azure CLI:
-az monitor activity-log alert create \
-  --name "Policy-Changes-Alert" \
-  --resource-group "monitoring-rg" \
-  --scope /subscriptions/<subscription-id> \
-  --condition category=Administrative and operationName=Microsoft.Authorization/policyAssignments/write \
-  --action-group <action-group-id>
-
-Operations to monitor:
-- Microsoft.Authorization/policyAssignments/write
-- Microsoft.Authorization/policyAssignments/delete
-- Microsoft.Authorization/policyDefinitions/write
-- Microsoft.Authorization/policyDefinitions/delete`,
-		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for policy assignment operations",
-		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
-		Frameworks: map[string]string{
-			"SOC2":    "CC7.2",
-			"PCI-DSS": "10.2.1.2",
-		},
-	}
-}
-
-func (c *AzureCISManualChecks) checkMonitorAlertNSGChanges() CheckResult {
-	return CheckResult{
-		Control:     "CIS-6.1.2.3",
-		Name:        "Create Alert for NSG Changes",
-		Status:      "INFO",
-		Severity:    "HIGH",
-		Priority:    PriorityHigh,
-		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for Network Security Group changes",
-		Remediation: "Create Azure Monitor alert for NSG operations",
-		RemediationDetail: `Create an alert rule for NSG changes:
-
-Azure CLI:
-az monitor activity-log alert create \
-  --name "NSG-Changes-Alert" \
-  --resource-group "monitoring-rg" \
-  --scope /subscriptions/<subscription-id> \
-  --condition category=Administrative and operationName=Microsoft.Network/networkSecurityGroups/write \
-  --action-group <action-group-id>
-
-Also monitor:
-- Microsoft.Network/networkSecurityGroups/delete
-- Microsoft.Network/networkSecurityGroups/securityRules/write
-- Microsoft.Network/networkSecurityGroups/securityRules/delete`,
-		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for NSG write/delete operations",
-		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
-		Frameworks: map[string]string{
-			"CIS-Azure": "6.1.2.3",
-			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.1.7",
-		},
-	}
-}
-
-func (c *AzureCISManualChecks) checkMonitorAlertSecurityGroupChanges() CheckResult {
-	return CheckResult{
-		Control:     "CIS-6.1.2.3",
-		Name:        "Create Alert for Security Group Changes",
-		Status:      "INFO",
-		Severity:    "HIGH",
-		Priority:    PriorityHigh,
-		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for security group modifications",
-		Remediation: "Create Azure Monitor alert for security group operations",
-		RemediationDetail: `Create an alert rule for security group changes:
-
-Azure CLI:
-az monitor activity-log alert create \
-  --name "Security-Group-Changes-Alert" \
-  --resource-group "monitoring-rg" \
-  --scope /subscriptions/<subscription-id> \
-  --condition category=Security and operationName=Microsoft.Security/securityGroups/write \
-  --action-group <action-group-id>`,
-		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for security group operations",
-		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
-		Frameworks: map[string]string{
-			"CIS-Azure": "6.1.2.3",
-			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.1.1",
-		},
-	}
-}
-
-func (c *AzureCISManualChecks) checkMonitorAlertSecuritySolutions() CheckResult {
-	return CheckResult{
-		Control:     "CIS-6.1.2.5",
-		Name:        "Create Alert for Security Solutions Changes",
-		Status:      "INFO",
-		Severity:    "MEDIUM",
-		Priority:    PriorityMedium,
-		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for security solution changes",
-		Remediation: "Create Azure Monitor alert for security solution operations",
-		RemediationDetail: `Create an alert rule for security solution changes:
-
-Azure CLI:
-az monitor activity-log alert create \
-  --name "Security-Solutions-Alert" \
-  --resource-group "monitoring-rg" \
-  --scope /subscriptions/<subscription-id> \
-  --condition category=Security and operationName=Microsoft.Security/securitySolutions/write \
-  --action-group <action-group-id>
-
-Monitor operations:
-- Microsoft.Security/securitySolutions/write
-- Microsoft.Security/securitySolutions/delete`,
-		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for security solutions",
-		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
-		Frameworks: map[string]string{
-			"CIS-Azure": "6.1.2.5",
-			"SOC2":      "CC7.2",
-		},
-	}
-}
-
-func (c *AzureCISManualChecks) checkMonitorAlertSQLFirewall() CheckResult {
-	return CheckResult{
-		Control:     "AZ-CIS-04",
-		Name:        "Create Alert for SQL Firewall Changes",
-		Status:      "INFO",
-		Severity:    "HIGH",
-		Priority:    PriorityHigh,
-		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for SQL firewall rule changes",
-		Remediation: "Create Azure Monitor alert for SQL firewall operations",
-		RemediationDetail: `Create an alert rule for SQL firewall changes:
-
-Azure CLI:
-az monitor activity-log alert create \
-  --name "SQL-Firewall-Changes-Alert" \
-  --resource-group "monitoring-rg" \
-  --scope /subscriptions/<subscription-id> \
-  --condition category=Administrative and operationName=Microsoft.Sql/servers/firewallRules/write \
-  --action-group <action-group-id>
-
-Monitor operations:
-- Microsoft.Sql/servers/firewallRules/write
-- Microsoft.Sql/servers/firewallRules/delete`,
-		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for SQL firewall operations",
-		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
-		Frameworks: map[string]string{
-			"SOC2":    "CC7.2",
-			"PCI-DSS": "10.2.1.7",
 		},
 	}
 }
@@ -337,7 +176,7 @@ az ad app list --query "[].{DisplayName:displayName, AppId:appId}" -o table
 
 func (c *AzureCISManualChecks) checkGuestInviteSettings() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.3.2",
+		Control:     "AZ-ENTRA-92",
 		Name:        "Guest Invite Restrictions",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
@@ -354,9 +193,8 @@ This prevents regular users from inviting external guests.`,
 		ScreenshotGuide: "Azure AD → External identities → External collaboration settings → Screenshot showing restricted invite settings",
 		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/CompanyRelationshipsMenuBlade/Settings",
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.3.2",
-			"SOC2":      "CC6.1",
-			"PCI-DSS":   "7.2.1",
+			"SOC2":    "CC6.1",
+			"PCI-DSS": "7.2.1",
 		},
 	}
 }
@@ -478,9 +316,8 @@ Check all NSGs for rules allowing:
 		ScreenshotGuide: "Network security groups → Inbound rules → NO rules allowing 1433 from Internet",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "7.1",
-			"SOC2":      "CC6.1",
-			"PCI-DSS":   "1.2.1, 2.2.2",
+			"SOC2":    "CC6.1",
+			"PCI-DSS": "1.2.1, 2.2.2",
 		},
 	}
 }
@@ -498,9 +335,8 @@ func (c *AzureCISManualChecks) checkPostgreSQLPortRestricted() CheckResult {
 		ScreenshotGuide:   "Network security groups → Inbound rules → NO rules allowing 5432 from Internet",
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "7.2",
-			"SOC2":      "CC6.1",
-			"PCI-DSS":   "1.4.2",
+			"SOC2":    "CC6.1",
+			"PCI-DSS": "1.4.2",
 		},
 	}
 }
@@ -518,9 +354,8 @@ func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 		ScreenshotGuide:   "Network security groups → Inbound rules → NO rules allowing 3306 from Internet",
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "7.3",
-			"SOC2":      "CC6.1",
-			"PCI-DSS":   "1.4.2",
+			"SOC2":    "CC6.1",
+			"PCI-DSS": "1.4.2",
 		},
 	}
 }

@@ -252,6 +252,23 @@ func (c *CISStorageChecks) Run(ctx context.Context) ([]CheckResult, error) {
 		"az storage account update --name <name> --default-action Deny",
 		"Storage account -> Networking -> Screenshot the default rule set to Deny", "CC6.6", bad)
 
+	// The bypass list is what "Allow trusted Microsoft services" writes. An
+	// account with no network rule set has no firewall to bypass, so the
+	// setting does not exist for it and it is not an offender.
+	bad = nil
+	for _, a := range accts {
+		if a.props == nil || a.props.NetworkRuleSet == nil {
+			continue
+		}
+		if !strings.Contains(deref((*string)(a.props.NetworkRuleSet.Bypass)), "AzureServices") {
+			bad = append(bad, a.name)
+		}
+	}
+	collect("CIS-9.3.5", "Trusted Microsoft Services Allowed", "MEDIUM",
+		"Allow trusted Microsoft services through the storage firewall so backup, monitoring and Defender can still reach the account",
+		"az storage account update --name <name> --bypass AzureServices Logging Metrics",
+		"Storage account -> Networking -> Screenshot 'Allow Azure services on the trusted services list to access this storage account' ticked", "CC6.6", bad)
+
 	bad = nil
 	for _, a := range accts {
 		if a.props == nil || len(a.props.PrivateEndpointConnections) == 0 {
