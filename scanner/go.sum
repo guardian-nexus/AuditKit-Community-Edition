@@ -68,6 +68,8 @@ github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapp
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.53.0/go.mod h1:cSgYe11MCNYunTnRXrKiR/tHc0eoKjICUuWpNZoVCOo=
 github.com/aws/aws-sdk-go-v2 v1.46.0 h1:1kt7m/EKcEHt5mlyyxx9cSlMddRPIKbjb6DIQsu4HPk=
 github.com/aws/aws-sdk-go-v2 v1.46.0/go.mod h1:bttEH6JqnUL8LepvDVfdrds/fZ5bCIxzpe3abyUrhDU=
+github.com/aws/aws-sdk-go-v2 v1.47.0 h1:0jsHallhJCeaU0Ko48c/3FK1ctOQ7NpzggxriJOQ8MQ=
+github.com/aws/aws-sdk-go-v2 v1.47.0/go.mod h1:bttEH6JqnUL8LepvDVfdrds/fZ5bCIxzpe3abyUrhDU=
 github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.1 h1:i8p8P4diljCr60PpJp6qZXNlgX4m2yQFpYk+9ZT+J4E=
 github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.1/go.mod h1:ddqbooRZYNoJ2dsTwOty16rM+/Aqmk/GOXrK8cg7V00=
 github.com/aws/aws-sdk-go-v2/config v1.31.8 h1:kQjtOLlTU4m4A64TsRcqwNChhGCwaPBt+zCQt/oWsHU=
@@ -78,8 +80,12 @@ github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.7 h1:Is2tPmieqGS2edBnmOJIbdv
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.7/go.mod h1:F1i5V5421EGci570yABvpIXgRIBPb5JM+lSkHF6Dq5w=
 github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.2 h1:q/PSLGuRWCChWg+dLnb9dWOnrCxJtnboXbBtFoqqRrI=
 github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.2/go.mod h1:TD1jvU2LvXkJexct5vBqcd8QlNXh5EmRUeL/Z32p0n4=
+github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.3 h1:Hp/VgjP0BysR3OgLlR057Vz2LcbbVnoWeJ+3qWiS/fY=
+github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.3/go.mod h1:nwGV5qw7F1IZPgxCvA/ph8N2TAuz+BkRG/bXn808qMA=
 github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.2 h1:6fl86IPqKEXoySqiOWdfgbEp9OVbn44zTfEICNEBDhY=
 github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.2/go.mod h1:63HDfhFkdzBpI8WGXTSKUHPKS6mqldj4u3LJW7RZtSU=
+github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.3 h1:MUaM4f+kj1ZIBPZfUS8cxP1GKXXZtHJjAthy93AN7SM=
+github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.3/go.mod h1:6YmVmEVRI5ZZzRjCSsb9SryKH0hAlMRdgA7kG9aDvBU=
 github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3 h1:bIqFDwgGXXN1Kpp99pDOdKMTTb5d2KyU5X/BZxjOkRo=
 github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3/go.mod h1:H5O/EsxDWyU+LP/V8i5sm8cxoZgc2fdNR9bxlOFrQTo=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.7 h1:BszAktdUo2xlzmYHjWMq70DqJ7cROM8iBd3f6hrpuMQ=
@@ -112,6 +118,8 @@ github.com/aws/aws-sdk-go-v2/service/ecr v1.51.0 h1:X4qnbHjjwzCSB3CnbqCiAp1LPI9o
 github.com/aws/aws-sdk-go-v2/service/ecr v1.51.0/go.mod h1:WPeTdw/R5dXpINO+eOenPdYxyxUkjYqbj50r8uBMLgk=
 github.com/aws/aws-sdk-go-v2/service/ecs v1.65.4 h1:7iBiBkI9o0dpLzhXBA52zHPO1p5ulswKPE5i09fu99o=
 github.com/aws/aws-sdk-go-v2/service/ecs v1.65.4/go.mod h1:E9n0AAMdcWJ66TGaYOb9SeDDQKG8dYuftwJSt+v6cHg=
+github.com/aws/aws-sdk-go-v2/service/efs v1.49.0 h1:C5YKazI/2RBNaC7VjD3d4iyHlPuM+Hc6ALekEj9DnUs=
+github.com/aws/aws-sdk-go-v2/service/efs v1.49.0/go.mod h1:Y1/nJ3u8kA87NuX5bzRVcidansAy04vY7Fr2+4xvtpc=
 github.com/aws/aws-sdk-go-v2/service/eks v1.74.5 h1:a2zDfL3ZJipBG/JkhRSIk8Z+HLNNTDXGdxPFvifGTY8=
 github.com/aws/aws-sdk-go-v2/service/eks v1.74.5/go.mod h1:jKii+y9R4s9ACQEgMZ5QR3L59sMHQ+PmicKtWmBW2pA=
 github.com/aws/aws-sdk-go-v2/service/elasticache v1.51.9 h1:hTgZLyNoDWphZUtTtcvQh0LP6TZO0mtdSfZK/GObDLk=

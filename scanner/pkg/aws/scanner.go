@@ -22,6 +22,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/ecs"
+	"github.com/aws/aws-sdk-go-v2/service/efs"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/aws/aws-sdk-go-v2/service/elasticache"
 	"github.com/aws/aws-sdk-go-v2/service/elasticbeanstalk"
@@ -66,6 +67,7 @@ type AWSScanner struct {
 	gdClient             *guardduty.Client
 	shClient             *securityhub.Client
 	rdsClient            *rds.Client
+	efsClient            *efs.Client
 	cwClient             *cloudwatch.Client
 	snsClient            *sns.Client
 	ssmClient            *ssm.Client
@@ -151,6 +153,7 @@ func NewScannerWithConfig(cfg aws.Config) (*AWSScanner, error) {
 		gdClient:             guardduty.NewFromConfig(cfg),
 		shClient:             securityhub.NewFromConfig(cfg),
 		rdsClient:            rds.NewFromConfig(cfg),
+		efsClient:            efs.NewFromConfig(cfg),
 		cwClient:             cloudwatch.NewFromConfig(cfg),
 		snsClient:            sns.NewFromConfig(cfg),
 		ssmClient:            ssm.NewFromConfig(cfg),
@@ -251,6 +254,7 @@ func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 		checks.NewConfigChecks(s.configClient),
 		checks.NewRDSChecks(s.rdsClient),
 		checks.NewVPCChecks(s.ec2Client),
+		checks.NewEFSChecks(s.efsClient), // CIS AWS Foundations v7.0.0 3.3.1
 		checks.NewNetworkFirewallChecks(s.nfwClient, s.ec2Client),
 		checks.NewLambdaChecks(s.lambdaClient),
 		checks.NewECSChecks(s.ecsClient),

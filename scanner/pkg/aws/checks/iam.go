@@ -3,7 +3,9 @@ package checks
 import (
 	"context"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -103,6 +105,16 @@ func (c *IAMChecks) Run(ctx context.Context) ([]CheckResult, error) {
 		results = append(results, result)
 	}
 	if result, err := c.CheckIAMPoliciesAttachedToUsers(ctx); err == nil {
+		results = append(results, result)
+	}
+
+	// CIS AWS Foundations v7.0.0 2.14
+	if result, err := c.CheckFullAdminPolicies(ctx); err == nil {
+		results = append(results, result)
+	}
+
+	// CIS AWS Foundations v7.0.0 2.17
+	if result, err := c.CheckExpiredServerCertificates(ctx); err == nil {
 		results = append(results, result)
 	}
 
@@ -1307,5 +1319,204 @@ func (c *IAMChecks) CheckIAMPoliciesAttachedToUsers(ctx context.Context) (CheckR
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("IAM_POLICIES_GROUPS_ONLY"),
+	}, nil
+}
+
+// CheckFullAdminPolicies answers CIS AWS Foundations v7.0.0 2.14.
+//
+// Customer-managed policies granting Action "*" on Resource "*" are the
+// broadest grant IAM can express. The benchmark asks that none be attached; an
+// unattached one is a latent risk but not a finding.
+func (c *IAMChecks) CheckFullAdminPolicies(ctx context.Context) (CheckResult, error) {
+	const control, name = "CIS-2.14", "IAM Policies Granting Full Administrative Privileges"
+	frameworks := map[string]string{"CIS-AWS": "2.14", "SOC2": "CC6.3"}
+
+	errResult := func(err error) CheckResult {
+		return CheckResult{
+			Control: control, Name: name, Status: "ERROR",
+			Evidence:   fmt.Sprintf("Unable to read IAM policies: %v", err),
+			Severity:   "HIGH",
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: frameworks,
+		}
+	}
+
+	offenders := []string{}
+	scanned := 0
+	var marker *string
+	for page := 0; page < 20; page++ {
+		// OnlyAttached narrows this to what the benchmark actually asks about,
+		// and keeps the walk small: an account can hold hundreds of unattached
+		// policies.
+		out, err := c.client.ListPolicies(ctx, &iam.ListPoliciesInput{
+			Scope:        types.PolicyScopeTypeLocal,
+			OnlyAttached: true,
+			Marker:       marker,
+		})
+		if err != nil {
+			return errResult(err), nil
+		}
+		for _, p := range out.Policies {
+			scanned++
+			if p.DefaultVersionId == nil || p.Arn == nil {
+				continue
+			}
+			ver, err := c.client.GetPolicyVersion(ctx, &iam.GetPolicyVersionInput{
+				PolicyArn: p.Arn,
+				VersionId: p.DefaultVersionId,
+			})
+			if err != nil || ver.PolicyVersion == nil || ver.PolicyVersion.Document == nil {
+				// One unreadable policy must not decide the control either way.
+				continue
+			}
+			if grantsFullAdmin(aws.ToString(ver.PolicyVersion.Document)) {
+				offenders = append(offenders, aws.ToString(p.PolicyName))
+			}
+		}
+		if !out.IsTruncated || out.Marker == nil {
+			break
+		}
+		marker = out.Marker
+	}
+
+	if len(offenders) > 0 {
+		return CheckResult{
+			Control: control, Name: name, Status: "FAIL",
+			Severity:          "CRITICAL",
+			Evidence:          fmt.Sprintf("%d attached customer-managed policy/policies grant Action \"*\" on Resource \"*\": %v", len(offenders), offenders),
+			Remediation:       "Replace the wildcard grant with the specific actions and resources each principal needs, then detach the policy",
+			RemediationDetail: fmt.Sprintf("aws iam list-entities-for-policy --policy-arn <arn of %s>\n# then detach and replace with a least-privilege policy", offenders[0]),
+			ScreenshotGuide:   "IAM -> Policies -> filter Customer managed -> Screenshot showing no attached policy with Action * on Resource *",
+			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/policies",
+			Priority:          PriorityCritical,
+			Timestamp:         time.Now(),
+			Frameworks:        frameworks,
+		}, nil
+	}
+
+	return CheckResult{
+		Control: control, Name: name, Status: "PASS",
+		Evidence:   fmt.Sprintf("No attached customer-managed policy grants full administrative privileges (%d checked)", scanned),
+		Priority:   PriorityInfo,
+		Timestamp:  time.Now(),
+		Frameworks: frameworks,
+	}, nil
+}
+
+// grantsFullAdmin reports whether a policy document contains an Allow statement
+// with Action "*" and Resource "*".
+//
+// The document arrives URL-encoded. It is decoded and parsed rather than
+// substring-matched: "Action": "*" appears inside a Deny statement too, and
+// treating that as a full-admin grant would fail an account for a guardrail.
+func grantsFullAdmin(document string) bool {
+	decoded, err := url.QueryUnescape(document)
+	if err != nil {
+		decoded = document
+	}
+	var doc struct {
+		Statement json.RawMessage `json:"Statement"`
+	}
+	if err := json.Unmarshal([]byte(decoded), &doc); err != nil {
+		return false
+	}
+	// Statement is an object when there is one, an array when there are several.
+	var list []map[string]any
+	if err := json.Unmarshal(doc.Statement, &list); err != nil {
+		var one map[string]any
+		if err := json.Unmarshal(doc.Statement, &one); err != nil {
+			return false
+		}
+		list = []map[string]any{one}
+	}
+	for _, st := range list {
+		if effect, _ := st["Effect"].(string); !strings.EqualFold(effect, "Allow") {
+			continue
+		}
+		// A statement carrying a Condition is bounded by it, so the wildcard is
+		// not unrestricted.
+		if _, conditional := st["Condition"]; conditional {
+			continue
+		}
+		if hasWildcard(st["Action"]) && hasWildcard(st["Resource"]) {
+			return true
+		}
+	}
+	return false
+}
+
+// hasWildcard reports whether a policy field is "*", or a list containing "*".
+func hasWildcard(field any) bool {
+	switch v := field.(type) {
+	case string:
+		return v == "*"
+	case []any:
+		for _, item := range v {
+			if s, ok := item.(string); ok && s == "*" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// CheckExpiredServerCertificates answers CIS AWS Foundations v7.0.0 2.17.
+//
+// These are the certificates stored in IAM rather than ACM, which is why the
+// ACM checks do not cover it: an expired one left in IAM can still be attached
+// to a classic load balancer.
+func (c *IAMChecks) CheckExpiredServerCertificates(ctx context.Context) (CheckResult, error) {
+	const control, name = "CIS-2.17", "Expired SSL/TLS Certificates Removed from IAM"
+	frameworks := map[string]string{"CIS-AWS": "2.17", "SOC2": "CC6.1"}
+
+	out, err := c.client.ListServerCertificates(ctx, &iam.ListServerCertificatesInput{})
+	if err != nil {
+		return CheckResult{
+			Control: control, Name: name, Status: "ERROR",
+			Evidence:   fmt.Sprintf("Unable to list IAM server certificates: %v", err),
+			Severity:   "MEDIUM",
+			Priority:   PriorityMedium,
+			Timestamp:  time.Now(),
+			Frameworks: frameworks,
+		}, nil
+	}
+
+	now := time.Now()
+	expired := []string{}
+	for _, cert := range out.ServerCertificateMetadataList {
+		if cert.Expiration != nil && cert.Expiration.Before(now) {
+			expired = append(expired, fmt.Sprintf("%s (expired %s)",
+				aws.ToString(cert.ServerCertificateName), cert.Expiration.Format("2006-01-02")))
+		}
+	}
+
+	if len(expired) > 0 {
+		return CheckResult{
+			Control: control, Name: name, Status: "FAIL",
+			Severity:          "MEDIUM",
+			Evidence:          fmt.Sprintf("%d expired certificate(s) are still stored in IAM: %v", len(expired), expired),
+			Remediation:       "Delete the expired certificates from IAM once nothing references them",
+			RemediationDetail: "aws iam delete-server-certificate --server-certificate-name <name>",
+			ScreenshotGuide:   "IAM -> no console list for server certificates; capture `aws iam list-server-certificates` output showing no expired entries",
+			ConsoleURL:        "https://console.aws.amazon.com/iam/home",
+			Priority:          PriorityMedium,
+			Timestamp:         time.Now(),
+			Frameworks:        frameworks,
+		}, nil
+	}
+
+	// No certificates at all satisfies the recommendation, and the evidence
+	// should say which of the two situations it is.
+	evidence := fmt.Sprintf("None of the %d certificate(s) stored in IAM has expired", len(out.ServerCertificateMetadataList))
+	if len(out.ServerCertificateMetadataList) == 0 {
+		evidence = "No server certificates are stored in IAM"
+	}
+	return CheckResult{
+		Control: control, Name: name, Status: "PASS",
+		Evidence:   evidence,
+		Priority:   PriorityInfo,
+		Timestamp:  time.Now(),
+		Frameworks: frameworks,
 	}, nil
 }

@@ -221,5 +221,10 @@ func (c *IAMAdvancedChecks) CheckRootAccountUsage(ctx context.Context) (CheckRes
 		ConsoleURL:      "https://console.aws.amazon.com/cloudtrail/home#/events",
 		Priority:        PriorityHigh,
 		Timestamp:       time.Now(),
+		// CIS AWS Foundations v7.0.0 2.7. This literal carried no Frameworks
+		// field, so it reached the SOC 2 filter only through the catalog
+		// fallback on its CC6.6 control id, and could never reach the CIS
+		// filter at all - CC6.6 is not a CIS identifier.
+		Frameworks: map[string]string{"CIS-AWS": "2.7", "SOC2": "CC6.6"},
 	}, nil
 }
