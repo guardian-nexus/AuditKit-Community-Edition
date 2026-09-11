@@ -177,14 +177,23 @@ func (c *GCPPCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []CheckR
 	}
 
 	// Check KMS key rotation (PCI-DSS 3.7.4)
+	//
+	// The control was labelled PCI-3.6.4, which is a v3.2.1 number that no
+	// longer exists - we declare v4.0.1, where key changes at the end of a
+	// cryptoperiod are 3.7.4, as this block's own comment and evidence always
+	// said. Passing results are reported too: filtering to FAIL meant a
+	// project that rotates its keys properly showed no PCI row at all, so the
+	// requirement could never be satisfied, only violated.
 	kmsChecker := NewKMSChecks(c.kmsClient, c.projectID)
 	keyResults := kmsChecker.CheckKMSKeyRotation(ctx)
 	for _, result := range keyResults {
-		if result.Status == "FAIL" {
-			result.Control = "PCI-3.6.4"
-			result.Evidence = fmt.Sprintf("PCI-DSS 3.7.4: %s", result.Evidence)
-			results = append(results, result)
+		if result.Status != "PASS" && result.Status != "FAIL" {
+			continue
 		}
+		result.Control = "PCI-3.7.4"
+		result.Evidence = fmt.Sprintf("PCI-DSS 3.7.4: %s", result.Evidence)
+		result.Frameworks = map[string]string{"PCI-DSS": "3.7.4"}
+		results = append(results, result)
 	}
 
 	return results

@@ -76,6 +76,14 @@ pci_to_800_53:
   PCI-1.4.1: [SC-7, SC-7(3)]            # NSCs between trusted and untrusted networks
   PCI-3.2.1: [SI-12, MP-6]              # Account data storage minimised
   PCI-3.7.4: [SC-12, SC-12(1)]          # Key changes at end of cryptoperiod
+  PCI-2.2.7: [AC-17(2), SC-8, SC-8(1)]  # Non-console admin access encrypted
+  PCI-8.2.4: [AC-2, IA-4, IA-5]         # Identifier and authenticator lifecycle
+  # 4.1, 7.1 and 10.1 are the section requirements asking for the process to be
+  # defined and documented, so they derive their family policy control rather
+  # than a technical one.
+  PCI-4.1: [SC-1, SC-8]                 # Transmission protection defined
+  PCI-7.1: [AC-1]                       # Access restriction defined
+  PCI-10.1: [AU-1, AU-2]                # Logging and monitoring defined
   PCI-4.2.1.1: [SC-12, SC-17]           # Inventory of trusted keys and certificates
   PCI-7.2.2: [AC-6, AC-2(7)]            # Least privilege by job function
   PCI-8.2.1: [IA-2, IA-4]               # Unique user IDs
@@ -618,6 +626,14 @@ hipaa_to_800_53:
   # "164.308(a)(1)" is the paragraph heading, not a citable requirement, so it
   # matched nothing in the Security Rule catalog.
   "164.308(a)(1)(i)": [RA-1, RA-3]      # Security management process
+  "164.308(a)(1)(ii)(A)": [RA-3]         # Risk analysis
+  "164.308(a)(1)(ii)(D)": [AU-6, AU-6(1)] # Information system activity review
+  "164.308(a)(3)(ii)(A)": [AC-2, PS-7]   # Authorization and/or supervision
+  "164.308(a)(4)(ii)(A)": [SC-7, AC-4]   # Isolating clearinghouse functions
+  "164.308(a)(4)(ii)(B)": [AC-2, AC-3, AC-6] # Access authorization
+  "164.308(a)(5)(ii)(B)": [SI-3]         # Protection from malicious software
+  "164.308(a)(5)(ii)(D)": [IA-5, IA-5(1)] # Password management
+  "164.308(a)(6)(ii)": [IR-4, IR-6]      # Response and reporting
   "164.308(a)(3)(i)": [AC-1, AC-2]      # Workforce security
   "164.308(a)(4)(i)": [AC-3, AC-6]      # Information access management
   "164.308(a)(5)(i)": [AT-2, AT-3]      # Security awareness and training

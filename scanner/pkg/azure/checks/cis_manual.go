@@ -52,7 +52,7 @@ func (c *AzureCISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *AzureCISManualChecks) checkMonitorAlertAuthChanges() CheckResult {
 	return CheckResult{
-		Control:     "AZ-CIS-02",
+		Control:     "AZ-CIS-18",
 		Name:        "Create Alert for Authorization Changes",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
@@ -88,7 +88,7 @@ az monitor activity-log alert create \
 
 func (c *AzureCISManualChecks) checkMonitorAlertKeyVaultDeletion() CheckResult {
 	return CheckResult{
-		Control:     "AZ-CIS-05",
+		Control:     "AZ-CIS-21",
 		Name:        "Create Alert for Key Vault Deletion",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
@@ -115,7 +115,7 @@ az monitor activity-log alert create \
 
 func (c *AzureCISManualChecks) checkMonitorAlertStorageAccountDeletion() CheckResult {
 	return CheckResult{
-		Control:     "AZ-CIS-06",
+		Control:     "AZ-CIS-22",
 		Name:        "Create Alert for Storage Account Deletion",
 		Status:      "INFO",
 		Severity:    "HIGH",
@@ -144,7 +144,7 @@ az monitor activity-log alert create \
 
 func (c *AzureCISManualChecks) checkAppRegistrationOwnership() CheckResult {
 	return CheckResult{
-		Control:     "AZ-CIS-01",
+		Control:     "AZ-CIS-04",
 		Name:        "App Registration Owner Requirements",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
@@ -300,7 +300,7 @@ az network nsg rule list --nsg-name <nsg-name> --resource-group <rg> --query "[?
 
 func (c *AzureCISManualChecks) checkSQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:     "AZ-CIS-07",
+		Control:     "AZ-CIS-26",
 		Name:        "SQL Server Port Access Restricted",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
@@ -324,7 +324,7 @@ Check all NSGs for rules allowing:
 
 func (c *AzureCISManualChecks) checkPostgreSQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:           "AZ-CIS-08",
+		Control:           "AZ-CIS-27",
 		Name:              "PostgreSQL Port Access Restricted",
 		Status:            "INFO",
 		Severity:          "HIGH",
@@ -343,7 +343,7 @@ func (c *AzureCISManualChecks) checkPostgreSQLPortRestricted() CheckResult {
 
 func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:           "AZ-CIS-09",
+		Control:           "AZ-CIS-28",
 		Name:              "MySQL Port Access Restricted",
 		Status:            "INFO",
 		Severity:          "HIGH",
@@ -364,7 +364,7 @@ func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 
 func (c *AzureCISManualChecks) checkKeyVaultRecoveryLevel() CheckResult {
 	return CheckResult{
-		Control:     "AZ-CIS-10",
+		Control:     "AZ-CIS-32",
 		Name:        "Key Vault Recoverable",
 		Status:      "INFO",
 		Severity:    "HIGH",
@@ -447,7 +447,7 @@ az keyvault secret set-attributes --vault-name <vault-name> --name <secret-name>
 
 func (c *AzureCISManualChecks) checkKeyVaultCertificateExpiration() CheckResult {
 	return CheckResult{
-		Control:     "AZ-CIS-11",
+		Control:     "AZ-CIS-36",
 		Name:        "Key Vault Certificates Auto-Renew",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
