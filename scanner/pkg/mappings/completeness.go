@@ -22,7 +22,15 @@ import (
 //	cmmc                   NIST SP 800-171 Rev2, the 110 CMMC Level 2 practices
 //	soc2                   AICPA Trust Services Criteria
 //	iso27001               ISO/IEC 27001:2022 Annex A identifiers
-//	pci-dss                partial - see PartialCatalogs
+//	pci-dss                PCI DSS v4.0.1, 312 requirements across all 12
+//	                       sections. The header said "partial - see
+//	                       PartialCatalogs", but PartialCatalogs has no pci
+//	                       entry, so no caveat was ever printed. The titles are
+//	                       stored truncated to about 45 characters; nothing
+//	                       prints them - every CatalogFor caller tests id
+//	                       membership only - but they cannot be used to
+//	                       classify a requirement. Completeness against the
+//	                       published standard is unverified.
 //
 //go:embed catalogs/*.json
 var catalogFS embed.FS

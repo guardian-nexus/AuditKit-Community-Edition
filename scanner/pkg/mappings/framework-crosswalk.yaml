@@ -593,6 +593,10 @@ nist_csf_to_800_53:
   PR.PS-04:
     - AU-2
     - AU-12
+  # PR.PS-06 derives only SA-3, the secure development lifecycle, and no
+  # check emits SA-3 because a configuration scanner cannot observe how
+  # software was developed. The subcategory therefore never shows as
+  # covered, which is correct rather than a gap to close.
   PR.PS-06:
     - SA-3
   RC.CO-03:
