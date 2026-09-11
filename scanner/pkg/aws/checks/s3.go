@@ -415,7 +415,7 @@ func (c *S3Checks) CheckServerAccessLogging(ctx context.Context) (CheckResult, e
 	if len(bucketsWithoutLogging) > 0 {
 		firstBucket := bucketsWithoutLogging[0]
 		return CheckResult{
-			Control:           "CC7.1",
+			Control:           "AWS-S3-02",
 			Name:              "S3 Server Access Logging",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -431,7 +431,7 @@ func (c *S3Checks) CheckServerAccessLogging(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "CC7.1",
+		Control:    "AWS-S3-02",
 		Name:       "S3 Server Access Logging",
 		Status:     "PASS",
 		Evidence:   "All S3 buckets have server access logging enabled",
@@ -444,7 +444,7 @@ func (c *S3Checks) CheckServerAccessLogging(ctx context.Context) (CheckResult, e
 // CIS 2.1.6 - Ensure S3 bucket has Object Lock enabled (for compliance)
 func (c *S3Checks) CheckObjectLock(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control:           "A1.2",
+		Control:           "AWS-S3-01",
 		Name:              "S3 Object Lock",
 		Status:            "INFO",
 		Evidence:          "MANUAL CHECK: Verify S3 Object Lock is enabled for buckets storing compliance data",

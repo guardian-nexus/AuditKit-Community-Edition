@@ -51,7 +51,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.
 	firewalls, err := c.nfwClient.ListFirewalls(ctx, &networkfirewall.ListFirewallsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CC6.6",
+			Control:    "AWS-NETFW-01",
 			Name:       "Network Firewall AZ Deployment",
 			Status:     "PASS",
 			Evidence:   "No Network Firewalls deployed | CIS 5.15 N/A",
@@ -63,7 +63,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.
 
 	if len(firewalls.Firewalls) == 0 {
 		return CheckResult{
-			Control:    "CC6.6",
+			Control:    "AWS-NETFW-01",
 			Name:       "Network Firewall AZ Deployment",
 			Status:     "INFO",
 			Evidence:   "No Network Firewalls deployed | Consider deploying for enhanced network security",
@@ -134,7 +134,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.
 
 	if len(firewallsWithMissingAZs) > 0 {
 		return CheckResult{
-			Control:     "CC6.6",
+			Control:     "AWS-NETFW-01",
 			Name:        "Network Firewall AZ Deployment",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
@@ -157,7 +157,7 @@ aws network-firewall associate-subnets \
 	}
 
 	return CheckResult{
-		Control:    "CC6.6",
+		Control:    "AWS-NETFW-01",
 		Name:       "Network Firewall AZ Deployment",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Network Firewalls are deployed across all AZs | Meets CIS 5.15", len(firewalls.Firewalls)),
@@ -173,7 +173,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallPolicyRules(ctx context.Cont
 	policies, err := c.nfwClient.ListFirewallPolicies(ctx, &networkfirewall.ListFirewallPoliciesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CC6.1",
+			Control:    "AWS-NETFW-03",
 			Name:       "Network Firewall Policy Rules",
 			Status:     StatusInfo,
 			Evidence:   "No Network Firewall policies found | CIS 5.16 N/A",
@@ -185,7 +185,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallPolicyRules(ctx context.Cont
 
 	if len(policies.FirewallPolicies) == 0 {
 		return CheckResult{
-			Control:    "CC6.1",
+			Control:    "AWS-NETFW-03",
 			Name:       "Network Firewall Policy Rules",
 			Status:     "INFO",
 			Evidence:   "No Network Firewall policies found | Consider creating firewall policies",
@@ -229,7 +229,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallPolicyRules(ctx context.Cont
 		}
 
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-NETFW-03",
 			Name:        "Network Firewall Policy Rules",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -254,7 +254,7 @@ aws network-firewall update-firewall-policy \
 	}
 
 	return CheckResult{
-		Control:    "CC6.1",
+		Control:    "AWS-NETFW-03",
 		Name:       "Network Firewall Policy Rules",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Network Firewall policies have stateful rule groups | Meets CIS 5.16", len(policies.FirewallPolicies)),
@@ -270,7 +270,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallLogging(ctx context.Context)
 	firewalls, err := c.nfwClient.ListFirewalls(ctx, &networkfirewall.ListFirewallsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CC7.2",
+			Control:    "AWS-NETFW-02",
 			Name:       "Network Firewall Logging",
 			Status:     StatusInfo,
 			Evidence:   "No Network Firewalls found | CIS 5.17 N/A",
@@ -282,7 +282,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallLogging(ctx context.Context)
 
 	if len(firewalls.Firewalls) == 0 {
 		return CheckResult{
-			Control:    "CC7.2",
+			Control:    "AWS-NETFW-02",
 			Name:       "Network Firewall Logging",
 			Status:     "INFO",
 			Evidence:   "No Network Firewalls deployed | CIS 5.17 N/A",
@@ -324,7 +324,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallLogging(ctx context.Context)
 		}
 
 		return CheckResult{
-			Control:     "CC7.2",
+			Control:     "AWS-NETFW-02",
 			Name:        "Network Firewall Logging",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -354,7 +354,7 @@ aws network-firewall update-logging-configuration \
 	}
 
 	return CheckResult{
-		Control:    "CC7.2",
+		Control:    "AWS-NETFW-02",
 		Name:       "Network Firewall Logging",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Network Firewalls have logging enabled | Meets CIS 5.17", len(firewalls.Firewalls)),

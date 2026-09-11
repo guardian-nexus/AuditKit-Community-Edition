@@ -96,7 +96,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 		}
 
 		return CheckResult{
-			Control:     "CC7.2",
+			Control:     "AWS-ECS-03",
 			Name:        "ECS Task Definition Logging",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -123,7 +123,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 
 	if totalTasks == 0 {
 		return CheckResult{
-			Control:    "CC7.2",
+			Control:    "AWS-ECS-03",
 			Name:       "ECS Task Definition Logging",
 			Status:     StatusInfo,
 			Evidence:   "No ECS task definitions found | CIS 7.1 N/A",
@@ -134,7 +134,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 	}
 
 	return CheckResult{
-		Control:    "CC7.2",
+		Control:    "AWS-ECS-03",
 		Name:       "ECS Task Definition Logging",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d ECS task definitions have logging enabled | Meets CIS 7.1", totalTasks),
@@ -197,7 +197,7 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 		}
 
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-ECS-02",
 			Name:        "ECS Secrets Management",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
@@ -221,7 +221,7 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 
 	if totalTasks == 0 {
 		return CheckResult{
-			Control:    "CC6.1",
+			Control:    "AWS-ECS-02",
 			Name:       "ECS Secrets Management",
 			Status:     StatusInfo,
 			Evidence:   "No ECS task definitions found | CIS 7.2 N/A",
@@ -232,7 +232,7 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 	}
 
 	return CheckResult{
-		Control:    "CC6.1",
+		Control:    "AWS-ECS-02",
 		Name:       "ECS Secrets Management",
 		Status:     "PASS",
 		Evidence:   "ECS tasks use Secrets Manager for sensitive data | Meets CIS 7.2",
@@ -251,7 +251,7 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 
 	if len(clusters.ClusterArns) == 0 {
 		return CheckResult{
-			Control:    "CC7.2",
+			Control:    "AWS-ECS-01",
 			Name:       "ECS Container Insights",
 			Status:     StatusInfo,
 			Evidence:   "No ECS clusters found | CIS 7.3 N/A",
@@ -289,7 +289,7 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 
 	if len(clustersWithoutInsights) > 0 {
 		return CheckResult{
-			Control:     "CC7.2",
+			Control:     "AWS-ECS-01",
 			Name:        "ECS Container Insights",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
@@ -307,7 +307,7 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 	}
 
 	return CheckResult{
-		Control:    "CC7.2",
+		Control:    "AWS-ECS-01",
 		Name:       "ECS Container Insights",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d ECS clusters have Container Insights enabled | Meets CIS 7.3", len(clustersOutput.Clusters)),
@@ -362,7 +362,7 @@ func (c *ECSChecks) CheckECSTaskRolePermissions(ctx context.Context) (CheckResul
 		}
 
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-ECS-04",
 			Name:        "ECS Task Role Permissions",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -381,7 +381,7 @@ aws iam put-role-policy --role-name ECSTaskRole --policy-name TaskPolicy --polic
 
 	if totalTasks == 0 {
 		return CheckResult{
-			Control:    "CC6.3",
+			Control:    "AWS-ECS-04",
 			Name:       "ECS Task Role Permissions",
 			Status:     StatusInfo,
 			Evidence:   "No ECS task definitions found | CIS 7.4 N/A",
@@ -392,7 +392,7 @@ aws iam put-role-policy --role-name ECSTaskRole --policy-name TaskPolicy --polic
 	}
 
 	return CheckResult{
-		Control:    "CC6.3",
+		Control:    "AWS-ECS-04",
 		Name:       "ECS Task Role Permissions",
 		Status:     "PASS",
 		Evidence:   "ECS tasks use least-privilege roles | Meets CIS 7.4",

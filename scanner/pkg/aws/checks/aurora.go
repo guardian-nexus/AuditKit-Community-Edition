@@ -35,7 +35,7 @@ func (c *AuroraChecks) CheckBacktrackEnabled(ctx context.Context) (CheckResult, 
 	clusters, err := c.client.DescribeDBClusters(ctx, &rds.DescribeDBClustersInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "A1.2",
+			Control:    "AWS-AURORA-01",
 			Name:       "Aurora Backtrack Enabled",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Failed to list DB clusters: %v", err),
@@ -47,7 +47,7 @@ func (c *AuroraChecks) CheckBacktrackEnabled(ctx context.Context) (CheckResult, 
 
 	if len(clusters.DBClusters) == 0 {
 		return CheckResult{
-			Control:    "A1.2",
+			Control:    "AWS-AURORA-01",
 			Name:       "Aurora Backtrack Enabled",
 			Status:     "INFO",
 			Evidence:   "No Aurora DB clusters found",
@@ -76,7 +76,7 @@ func (c *AuroraChecks) CheckBacktrackEnabled(ctx context.Context) (CheckResult, 
 
 	if len(auroraClusters) == 0 {
 		return CheckResult{
-			Control:    "A1.2",
+			Control:    "AWS-AURORA-01",
 			Name:       "Aurora Backtrack Enabled",
 			Status:     "INFO",
 			Evidence:   "No Aurora clusters found (only RDS/other databases)",
@@ -88,7 +88,7 @@ func (c *AuroraChecks) CheckBacktrackEnabled(ctx context.Context) (CheckResult, 
 
 	if len(without) > 0 {
 		return CheckResult{
-			Control:     "A1.2",
+			Control:     "AWS-AURORA-01",
 			Name:        "Aurora Backtrack Enabled",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d Aurora clusters lack backtrack: %v", len(without), len(auroraClusters), without),
@@ -112,7 +112,7 @@ Note: Backtrack only available for Aurora MySQL`, without),
 	}
 
 	return CheckResult{
-		Control:    "A1.2",
+		Control:    "AWS-AURORA-01",
 		Name:       "Aurora Backtrack Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Aurora clusters have backtrack enabled", with),

@@ -614,7 +614,7 @@ func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, e
 
 	if len(publicSnapshots) > 0 {
 		return CheckResult{
-			Control:           "CC6.2",
+			Control:           "AWS-EC2-01",
 			Name:              "EBS Public Snapshots",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -630,7 +630,7 @@ func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "CC6.2",
+		Control:    "AWS-EC2-01",
 		Name:       "EBS Public Snapshots",
 		Status:     "PASS",
 		Evidence:   "No EBS snapshots are publicly accessible",

@@ -169,7 +169,7 @@ func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
 
 	if len(defaultVPCsInUse) > 0 {
 		return CheckResult{
-			Control:           "CC6.1",
+			Control:           "AWS-VPC-01",
 			Name:              "Default VPC in Use",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -185,7 +185,7 @@ func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
 	}
 
 	return CheckResult{
-		Control:    "CC6.1",
+		Control:    "AWS-VPC-01",
 		Name:       "Default VPC in Use",
 		Status:     "PASS",
 		Evidence:   "No resources using default VPC",
@@ -419,7 +419,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 	// CIS 5.11
 	if len(naclsAllowingSSHv6) > 0 {
 		results = append(results, CheckResult{
-			Control:           "CC6.6",
+			Control:           "AWS-VPC-04",
 			Name:              "NACL Restricts SSH from Internet (IPv6)",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -434,7 +434,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CC6.6",
+			Control:    "AWS-VPC-04",
 			Name:       "NACL Restricts SSH from Internet (IPv6)",
 			Status:     "PASS",
 			Evidence:   "No NACLs allow SSH from ::/0 | CIS 5.11",
@@ -447,7 +447,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 	// CIS 5.12
 	if len(naclsAllowingRDPv6) > 0 {
 		results = append(results, CheckResult{
-			Control:           "CC6.6",
+			Control:           "AWS-VPC-03",
 			Name:              "NACL Restricts RDP from Internet (IPv6)",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -462,7 +462,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CC6.6",
+			Control:    "AWS-VPC-03",
 			Name:       "NACL Restricts RDP from Internet (IPv6)",
 			Status:     "PASS",
 			Evidence:   "No NACLs allow RDP from ::/0 | CIS 5.12",
@@ -565,7 +565,7 @@ func (c *VPCChecks) CheckEC2SubnetPlacement(ctx context.Context) (CheckResult, e
 
 	if len(instancesInDefault) > 0 {
 		return CheckResult{
-			Control:           "CC6.6",
+			Control:           "AWS-VPC-02",
 			Name:              "EC2 Instances in Custom VPC",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -581,7 +581,7 @@ func (c *VPCChecks) CheckEC2SubnetPlacement(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "CC6.6",
+		Control:    "AWS-VPC-02",
 		Name:       "EC2 Instances in Custom VPC",
 		Status:     "PASS",
 		Evidence:   "All instances in custom VPCs | CIS 5.14",
@@ -625,7 +625,7 @@ func (c *VPCChecks) CheckUnusedSecurityGroups(ctx context.Context) (CheckResult,
 
 	if len(unusedSGs) > 0 {
 		return CheckResult{
-			Control:           "CC6.6",
+			Control:           "AWS-VPC-05",
 			Name:              "Unused Security Groups Removed",
 			Status:            "FAIL",
 			Severity:          "LOW",
@@ -641,7 +641,7 @@ func (c *VPCChecks) CheckUnusedSecurityGroups(ctx context.Context) (CheckResult,
 	}
 
 	return CheckResult{
-		Control:    "CC6.6",
+		Control:    "AWS-VPC-05",
 		Name:       "Unused Security Groups Removed",
 		Status:     "PASS",
 		Evidence:   "No unused security groups | CIS 5.18",

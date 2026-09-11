@@ -299,7 +299,7 @@ func (c *RDSChecks) CheckRDSDeletionProtection(ctx context.Context) (CheckResult
 
 	if len(noDeletionProtection) > 0 {
 		return CheckResult{
-			Control:           "A1.2",
+			Control:           "AWS-RDS-01",
 			Name:              "RDS Deletion Protection",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -315,7 +315,7 @@ func (c *RDSChecks) CheckRDSDeletionProtection(ctx context.Context) (CheckResult
 	}
 
 	return CheckResult{
-		Control:    "A1.2",
+		Control:    "AWS-RDS-01",
 		Name:       "RDS Deletion Protection",
 		Status:     "PASS",
 		Evidence:   "All RDS instances have deletion protection enabled",

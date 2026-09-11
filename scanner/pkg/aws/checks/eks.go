@@ -68,7 +68,7 @@ func (c *EKSChecks) CheckEKSEndpointAccess(ctx context.Context) (CheckResult, er
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CC6.6",
+			Control:    "AWS-EKS-03",
 			Name:       "EKS Cluster Endpoint Access",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.1 N/A",
@@ -108,7 +108,7 @@ func (c *EKSChecks) CheckEKSEndpointAccess(ctx context.Context) (CheckResult, er
 		}
 
 		return CheckResult{
-			Control:     "CC6.6",
+			Control:     "AWS-EKS-03",
 			Name:        "EKS Cluster Endpoint Access",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -132,7 +132,7 @@ aws eks update-cluster-config \
 	}
 
 	return CheckResult{
-		Control:    "CC6.6",
+		Control:    "AWS-EKS-03",
 		Name:       "EKS Cluster Endpoint Access",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d EKS clusters have restricted endpoint access | Meets CIS 8.1", len(clusters.Clusters)),
@@ -151,7 +151,7 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CC7.2",
+			Control:    "AWS-EKS-04",
 			Name:       "EKS Cluster Logging",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.2 N/A",
@@ -205,7 +205,7 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 		}
 
 		return CheckResult{
-			Control:     "CC7.2",
+			Control:     "AWS-EKS-04",
 			Name:        "EKS Cluster Logging",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -223,7 +223,7 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 	}
 
 	return CheckResult{
-		Control:    "CC7.2",
+		Control:    "AWS-EKS-04",
 		Name:       "EKS Cluster Logging",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d EKS clusters have complete logging enabled | Meets CIS 8.2", len(clusters.Clusters)),
@@ -242,7 +242,7 @@ func (c *EKSChecks) CheckEKSEncryption(ctx context.Context) (CheckResult, error)
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CC6.7",
+			Control:    "AWS-EKS-02",
 			Name:       "EKS Cluster Encryption",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.3 N/A",
@@ -279,7 +279,7 @@ func (c *EKSChecks) CheckEKSEncryption(ctx context.Context) (CheckResult, error)
 		}
 
 		return CheckResult{
-			Control:     "CC6.7",
+			Control:     "AWS-EKS-02",
 			Name:        "EKS Cluster Encryption",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
@@ -301,7 +301,7 @@ aws eks create-cluster \
 	}
 
 	return CheckResult{
-		Control:    "CC6.7",
+		Control:    "AWS-EKS-02",
 		Name:       "EKS Cluster Encryption",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d EKS clusters have encryption enabled | Meets CIS 8.3", len(clusters.Clusters)),
@@ -320,7 +320,7 @@ func (c *EKSChecks) CheckEKSNetworkPolicy(ctx context.Context) (CheckResult, err
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CC6.6",
+			Control:    "AWS-EKS-05",
 			Name:       "EKS Network Policy",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.4 N/A",
@@ -333,7 +333,7 @@ func (c *EKSChecks) CheckEKSNetworkPolicy(ctx context.Context) (CheckResult, err
 	// Network policy enforcement requires manual verification or add-on checks
 	// This is a manual check as network policy is typically implemented via Calico or other CNI plugins
 	return CheckResult{
-		Control:     "CC6.6",
+		Control:     "AWS-EKS-05",
 		Name:        "EKS Network Policy",
 		Status:      "MANUAL",
 		Severity:    "MEDIUM",
@@ -361,7 +361,7 @@ func (c *EKSChecks) CheckEKSPodSecurityPolicy(ctx context.Context) (CheckResult,
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CC8.1",
+			Control:    "AWS-EKS-06",
 			Name:       "EKS Pod Security Policy",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.5 N/A",
@@ -374,7 +374,7 @@ func (c *EKSChecks) CheckEKSPodSecurityPolicy(ctx context.Context) (CheckResult,
 	// Pod Security Policy is deprecated in K8s 1.25+, replaced by Pod Security Standards
 	// This requires manual verification of PSP or PSS implementation
 	return CheckResult{
-		Control:     "CC8.1",
+		Control:     "AWS-EKS-06",
 		Name:        "EKS Pod Security Policy",
 		Status:      "MANUAL",
 		Severity:    "HIGH",
@@ -405,7 +405,7 @@ func (c *EKSChecks) CheckEKSRBAC(ctx context.Context) (CheckResult, error) {
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CC6.3",
+			Control:    "AWS-EKS-07",
 			Name:       "EKS RBAC Configuration",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.6 N/A",
@@ -418,7 +418,7 @@ func (c *EKSChecks) CheckEKSRBAC(ctx context.Context) (CheckResult, error) {
 	// RBAC configuration requires kubectl access to verify
 	// This is a manual check
 	return CheckResult{
-		Control:     "CC6.3",
+		Control:     "AWS-EKS-07",
 		Name:        "EKS RBAC Configuration",
 		Status:      "MANUAL",
 		Severity:    "HIGH",
@@ -457,7 +457,7 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 
 	if len(clusters.Clusters) == 0 {
 		return CheckResult{
-			Control:    "CC7.2",
+			Control:    "AWS-EKS-01",
 			Name:       "EKS Audit Logging",
 			Status:     StatusInfo,
 			Evidence:   "No EKS clusters found | CIS 8.8 N/A",
@@ -506,7 +506,7 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 		}
 
 		return CheckResult{
-			Control:     "CC7.2",
+			Control:     "AWS-EKS-01",
 			Name:        "EKS Audit Logging",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -524,7 +524,7 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 	}
 
 	return CheckResult{
-		Control:    "CC7.2",
+		Control:    "AWS-EKS-01",
 		Name:       "EKS Audit Logging",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d EKS clusters have audit logging enabled | Meets CIS 8.8", len(clusters.Clusters)),

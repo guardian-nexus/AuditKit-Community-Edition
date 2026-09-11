@@ -45,7 +45,7 @@ func (c *SecretsManagerChecks) CheckSecretRotation(ctx context.Context) (CheckRe
 	secrets, err := c.client.ListSecrets(ctx, &secretsmanager.ListSecretsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CC6.7",
+			Control:     "AWS-SECRETS-02",
 			Name:        "Secrets Manager Rotation Enabled",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list secrets: %v", err),
@@ -58,7 +58,7 @@ func (c *SecretsManagerChecks) CheckSecretRotation(ctx context.Context) (CheckRe
 
 	if len(secrets.SecretList) == 0 {
 		return CheckResult{
-			Control:     "CC6.7",
+			Control:     "AWS-SECRETS-02",
 			Name:        "Secrets Manager Rotation Enabled",
 			Status:      "INFO",
 			Evidence:    "No secrets found in Secrets Manager",
@@ -90,7 +90,7 @@ func (c *SecretsManagerChecks) CheckSecretRotation(ctx context.Context) (CheckRe
 
 	if len(withoutRotation) > 0 {
 		return CheckResult{
-			Control:     "CC6.7",
+			Control:     "AWS-SECRETS-02",
 			Name:        "Secrets Manager Rotation Enabled",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d secrets lack automatic rotation: %v", len(withoutRotation), len(secrets.SecretList), withoutRotation),
@@ -113,7 +113,7 @@ func (c *SecretsManagerChecks) CheckSecretRotation(ctx context.Context) (CheckRe
 	}
 
 	return CheckResult{
-		Control:     "CC6.7",
+		Control:     "AWS-SECRETS-02",
 		Name:        "Secrets Manager Rotation Enabled",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d secrets have automatic rotation enabled", withRotation),
@@ -129,7 +129,7 @@ func (c *SecretsManagerChecks) CheckSecretEncryption(ctx context.Context) (Check
 	secrets, err := c.client.ListSecrets(ctx, &secretsmanager.ListSecretsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-SECRETS-01",
 			Name:        "Secrets Manager KMS Encryption",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list secrets: %v", err),
@@ -142,7 +142,7 @@ func (c *SecretsManagerChecks) CheckSecretEncryption(ctx context.Context) (Check
 
 	if len(secrets.SecretList) == 0 {
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-SECRETS-01",
 			Name:        "Secrets Manager KMS Encryption",
 			Status:      "INFO",
 			Evidence:    "No secrets found",
@@ -168,7 +168,7 @@ func (c *SecretsManagerChecks) CheckSecretEncryption(ctx context.Context) (Check
 	// All secrets are encrypted, but check if using custom KMS keys (best practice)
 	if len(withoutCustomKMS) > 0 {
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-SECRETS-01",
 			Name:        "Secrets Manager KMS Encryption",
 			Status:      "PASS",
 			Evidence:    fmt.Sprintf("All secrets encrypted. %d using custom KMS keys, %d using AWS managed key (less control)", withCustomKMS, len(withoutCustomKMS)),
@@ -190,7 +190,7 @@ To use custom KMS keys:
 	}
 
 	return CheckResult{
-		Control:     "CC6.3",
+		Control:     "AWS-SECRETS-01",
 		Name:        "Secrets Manager KMS Encryption",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d secrets encrypted with custom KMS keys", withCustomKMS),
@@ -206,7 +206,7 @@ func (c *SecretsManagerChecks) CheckUnusedSecrets(ctx context.Context) (CheckRes
 	secrets, err := c.client.ListSecrets(ctx, &secretsmanager.ListSecretsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-SECRETS-03",
 			Name:        "Unused Secrets Removed",
 			Status:      "ERROR",
 			Evidence:    "Failed to list secrets",
@@ -219,7 +219,7 @@ func (c *SecretsManagerChecks) CheckUnusedSecrets(ctx context.Context) (CheckRes
 
 	if len(secrets.SecretList) == 0 {
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-SECRETS-03",
 			Name:        "Unused Secrets Removed",
 			Status:      "INFO",
 			Evidence:    "No secrets found",
@@ -246,7 +246,7 @@ func (c *SecretsManagerChecks) CheckUnusedSecrets(ctx context.Context) (CheckRes
 
 	if len(unusedSecrets) > 0 {
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-SECRETS-03",
 			Name:        "Unused Secrets Removed",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d secrets not accessed in 90+ days: %v", len(unusedSecrets), len(secrets.SecretList), unusedSecrets),
@@ -272,7 +272,7 @@ Unused secrets increase:
 	}
 
 	return CheckResult{
-		Control:     "CC6.1",
+		Control:     "AWS-SECRETS-03",
 		Name:        "Unused Secrets Removed",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d secrets accessed within last 90 days", activeSecrets),

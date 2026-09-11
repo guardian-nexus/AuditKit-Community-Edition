@@ -70,7 +70,7 @@ func (c *LambdaChecks) CheckLambdaInVPC(ctx context.Context) (CheckResult, error
 		}
 
 		return CheckResult{
-			Control:     "CC6.6",
+			Control:     "AWS-LAMBDA-04",
 			Name:        "Lambda Functions in VPC",
 			Status:      "INFO",
 			Severity:    "MEDIUM",
@@ -88,7 +88,7 @@ func (c *LambdaChecks) CheckLambdaInVPC(ctx context.Context) (CheckResult, error
 	}
 
 	return CheckResult{
-		Control:    "CC6.6",
+		Control:    "AWS-LAMBDA-04",
 		Name:       "Lambda Functions in VPC",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Lambda functions are in VPC | Meets CIS 6.1", totalFunctions),
@@ -124,7 +124,7 @@ func (c *LambdaChecks) CheckLambdaEnvironmentEncryption(ctx context.Context) (Ch
 		}
 
 		return CheckResult{
-			Control:     "CC6.7",
+			Control:     "AWS-LAMBDA-01",
 			Name:        "Lambda Environment Encryption",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -147,7 +147,7 @@ aws lambda update-function-configuration \
 
 	if totalWithEnvVars == 0 {
 		return CheckResult{
-			Control:    "CC6.7",
+			Control:    "AWS-LAMBDA-01",
 			Name:       "Lambda Environment Encryption",
 			Status:     "PASS",
 			Evidence:   "No Lambda functions with environment variables | CIS 6.2 N/A",
@@ -158,7 +158,7 @@ aws lambda update-function-configuration \
 	}
 
 	return CheckResult{
-		Control:    "CC6.7",
+		Control:    "AWS-LAMBDA-01",
 		Name:       "Lambda Environment Encryption",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d functions with environment variables use KMS encryption | Meets CIS 6.2", totalWithEnvVars),
@@ -194,7 +194,7 @@ func (c *LambdaChecks) CheckLambdaExecutionRole(ctx context.Context) (CheckResul
 		}
 
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-LAMBDA-02",
 			Name:        "Lambda Execution Role Permissions",
 			Status:      "FAIL",
 			Severity:    "HIGH",
@@ -217,7 +217,7 @@ aws lambda update-function-configuration \
 	}
 
 	return CheckResult{
-		Control:    "CC6.3",
+		Control:    "AWS-LAMBDA-02",
 		Name:       "Lambda Execution Role Permissions",
 		Status:     "PASS",
 		Evidence:   "Lambda functions use least-privilege execution roles | Meets CIS 6.3",
@@ -262,7 +262,7 @@ func (c *LambdaChecks) CheckLambdaPublicAccess(ctx context.Context) (CheckResult
 		}
 
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-LAMBDA-03",
 			Name:        "Lambda Functions Not Public",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
@@ -280,7 +280,7 @@ func (c *LambdaChecks) CheckLambdaPublicAccess(ctx context.Context) (CheckResult
 	}
 
 	return CheckResult{
-		Control:    "CC6.1",
+		Control:    "AWS-LAMBDA-03",
 		Name:       "Lambda Functions Not Public",
 		Status:     "PASS",
 		Evidence:   "No Lambda functions are publicly accessible | Meets CIS 6.4",
@@ -313,7 +313,7 @@ func (c *LambdaChecks) CheckLambdaTracing(ctx context.Context) (CheckResult, err
 		}
 
 		return CheckResult{
-			Control:     "CC7.2",
+			Control:     "AWS-LAMBDA-05",
 			Name:        "Lambda X-Ray Tracing Enabled",
 			Status:      "FAIL",
 			Severity:    "LOW",
@@ -331,7 +331,7 @@ func (c *LambdaChecks) CheckLambdaTracing(ctx context.Context) (CheckResult, err
 	}
 
 	return CheckResult{
-		Control:    "CC7.2",
+		Control:    "AWS-LAMBDA-05",
 		Name:       "Lambda X-Ray Tracing Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Lambda functions have X-Ray tracing enabled | Meets CIS 6.5", totalFunctions),

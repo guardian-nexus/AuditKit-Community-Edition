@@ -46,7 +46,7 @@ func (c *BeanstalkChecks) CheckEnhancedHealthReporting(ctx context.Context) (Che
 	environments, err := c.client.DescribeEnvironments(ctx, &elasticbeanstalk.DescribeEnvironmentsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CC7.2",
+			Control:     "AWS-BEANSTALK-01",
 			Name:        "Elastic Beanstalk Enhanced Health Reporting",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list Beanstalk environments: %v", err),
@@ -59,7 +59,7 @@ func (c *BeanstalkChecks) CheckEnhancedHealthReporting(ctx context.Context) (Che
 
 	if len(environments.Environments) == 0 {
 		return CheckResult{
-			Control:     "CC7.2",
+			Control:     "AWS-BEANSTALK-01",
 			Name:        "Elastic Beanstalk Enhanced Health Reporting",
 			Status:      "INFO",
 			Evidence:    "No Elastic Beanstalk environments found",
@@ -90,7 +90,7 @@ func (c *BeanstalkChecks) CheckEnhancedHealthReporting(ctx context.Context) (Che
 
 	if len(withoutEnhancedHealth) > 0 {
 		return CheckResult{
-			Control:     "CC7.2",
+			Control:     "AWS-BEANSTALK-01",
 			Name:        "Elastic Beanstalk Enhanced Health Reporting",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d environments lack enhanced health reporting: %v", len(withoutEnhancedHealth), len(environments.Environments), withoutEnhancedHealth),
@@ -111,7 +111,7 @@ func (c *BeanstalkChecks) CheckEnhancedHealthReporting(ctx context.Context) (Che
 	}
 
 	return CheckResult{
-		Control:     "CC7.2",
+		Control:     "AWS-BEANSTALK-01",
 		Name:        "Elastic Beanstalk Enhanced Health Reporting",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d Beanstalk environments have enhanced health reporting enabled", withEnhancedHealth),
@@ -132,7 +132,7 @@ func (c *BeanstalkChecks) CheckManagedPlatformUpdates(ctx context.Context) (Chec
 	environments, err := c.client.DescribeEnvironments(ctx, &elasticbeanstalk.DescribeEnvironmentsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CC8.1",
+			Control:     "AWS-BEANSTALK-03",
 			Name:        "Elastic Beanstalk Managed Platform Updates",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list environments: %v", err),
@@ -145,7 +145,7 @@ func (c *BeanstalkChecks) CheckManagedPlatformUpdates(ctx context.Context) (Chec
 
 	if len(environments.Environments) == 0 {
 		return CheckResult{
-			Control:     "CC8.1",
+			Control:     "AWS-BEANSTALK-03",
 			Name:        "Elastic Beanstalk Managed Platform Updates",
 			Status:      "INFO",
 			Evidence:    "No Elastic Beanstalk environments found",
@@ -159,7 +159,7 @@ func (c *BeanstalkChecks) CheckManagedPlatformUpdates(ctx context.Context) (Chec
 	// For managed updates, we need to check configuration settings
 	// This is a manual check as the API doesn't directly expose this setting
 	return CheckResult{
-		Control:     "CC8.1",
+		Control:     "AWS-BEANSTALK-03",
 		Name:        "Elastic Beanstalk Managed Platform Updates",
 		Status:      "MANUAL",
 		Evidence:    fmt.Sprintf("MANUAL CHECK: Verify %d environment(s) have managed platform updates enabled", len(environments.Environments)),
@@ -187,7 +187,7 @@ func (c *BeanstalkChecks) CheckLogStreaming(ctx context.Context) (CheckResult, e
 	environments, err := c.client.DescribeEnvironments(ctx, &elasticbeanstalk.DescribeEnvironmentsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CC7.1",
+			Control:     "AWS-BEANSTALK-02",
 			Name:        "Elastic Beanstalk Log Streaming",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list environments: %v", err),
@@ -200,7 +200,7 @@ func (c *BeanstalkChecks) CheckLogStreaming(ctx context.Context) (CheckResult, e
 
 	if len(environments.Environments) == 0 {
 		return CheckResult{
-			Control:     "CC7.1",
+			Control:     "AWS-BEANSTALK-02",
 			Name:        "Elastic Beanstalk Log Streaming",
 			Status:      "INFO",
 			Evidence:    "No Elastic Beanstalk environments found",
@@ -214,7 +214,7 @@ func (c *BeanstalkChecks) CheckLogStreaming(ctx context.Context) (CheckResult, e
 	// Log streaming configuration is not directly available via API
 	// This requires manual verification or config settings check
 	return CheckResult{
-		Control:     "CC7.1",
+		Control:     "AWS-BEANSTALK-02",
 		Name:        "Elastic Beanstalk Log Streaming",
 		Status:      "MANUAL",
 		Evidence:    fmt.Sprintf("MANUAL CHECK: Verify %d environment(s) have CloudWatch log streaming enabled", len(environments.Environments)),

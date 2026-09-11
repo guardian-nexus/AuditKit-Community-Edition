@@ -53,7 +53,7 @@ func (c *MessagingChecks) CheckSNSEncryption(ctx context.Context) (CheckResult, 
 	topics, err := c.snsClient.ListTopics(ctx, &sns.ListTopicsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-MESSAGING-02",
 			Name:        "SNS Topic Encryption",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list SNS topics: %v", err),
@@ -66,7 +66,7 @@ func (c *MessagingChecks) CheckSNSEncryption(ctx context.Context) (CheckResult, 
 
 	if len(topics.Topics) == 0 {
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-MESSAGING-02",
 			Name:        "SNS Topic Encryption",
 			Status:      "INFO",
 			Evidence:    "No SNS topics found",
@@ -111,7 +111,7 @@ func (c *MessagingChecks) CheckSNSEncryption(ctx context.Context) (CheckResult, 
 
 	if len(unencryptedTopics) > 0 {
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-MESSAGING-02",
 			Name:        "SNS Topic Encryption",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d SNS topics lack encryption at rest: %v", len(unencryptedTopics), len(topics.Topics), unencryptedTopics),
@@ -134,7 +134,7 @@ func (c *MessagingChecks) CheckSNSEncryption(ctx context.Context) (CheckResult, 
 	}
 
 	return CheckResult{
-		Control:     "CC6.3",
+		Control:     "AWS-MESSAGING-02",
 		Name:        "SNS Topic Encryption",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d SNS topics use KMS encryption at rest", encryptedTopics),
@@ -155,7 +155,7 @@ func (c *MessagingChecks) CheckSQSEncryption(ctx context.Context) (CheckResult, 
 	queues, err := c.sqsClient.ListQueues(ctx, &sqs.ListQueuesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-MESSAGING-03",
 			Name:        "SQS Queue Encryption",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list SQS queues: %v", err),
@@ -168,7 +168,7 @@ func (c *MessagingChecks) CheckSQSEncryption(ctx context.Context) (CheckResult, 
 
 	if len(queues.QueueUrls) == 0 {
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-MESSAGING-03",
 			Name:        "SQS Queue Encryption",
 			Status:      "INFO",
 			Evidence:    "No SQS queues found",
@@ -214,7 +214,7 @@ func (c *MessagingChecks) CheckSQSEncryption(ctx context.Context) (CheckResult, 
 
 	if len(unencryptedQueues) > 0 {
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-MESSAGING-03",
 			Name:        "SQS Queue Encryption",
 			Status:      "FAIL",
 			Evidence:    fmt.Sprintf("%d/%d SQS queues lack encryption at rest: %v", len(unencryptedQueues), len(queues.QueueUrls), unencryptedQueues),
@@ -237,7 +237,7 @@ func (c *MessagingChecks) CheckSQSEncryption(ctx context.Context) (CheckResult, 
 	}
 
 	return CheckResult{
-		Control:     "CC6.3",
+		Control:     "AWS-MESSAGING-03",
 		Name:        "SQS Queue Encryption",
 		Status:      "PASS",
 		Evidence:    fmt.Sprintf("All %d SQS queues use KMS encryption at rest", encryptedQueues),
@@ -259,7 +259,7 @@ func (c *MessagingChecks) CheckMessagingAccessPolicies(ctx context.Context) (Che
 	topics, err := c.snsClient.ListTopics(ctx, &sns.ListTopicsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-MESSAGING-01",
 			Name:        "Messaging Access Policies",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list topics: %v", err),
@@ -274,7 +274,7 @@ func (c *MessagingChecks) CheckMessagingAccessPolicies(ctx context.Context) (Che
 	queues, err := c.sqsClient.ListQueues(ctx, &sqs.ListQueuesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-MESSAGING-01",
 			Name:        "Messaging Access Policies",
 			Status:      "ERROR",
 			Evidence:    fmt.Sprintf("Failed to list queues: %v", err),
@@ -289,7 +289,7 @@ func (c *MessagingChecks) CheckMessagingAccessPolicies(ctx context.Context) (Che
 
 	if totalResources == 0 {
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-MESSAGING-01",
 			Name:        "Messaging Access Policies",
 			Status:      "INFO",
 			Evidence:    "No SNS topics or SQS queues found",
@@ -303,7 +303,7 @@ func (c *MessagingChecks) CheckMessagingAccessPolicies(ctx context.Context) (Che
 	// Access policy review requires manual verification
 	// We can't easily detect overly permissive policies programmatically
 	return CheckResult{
-		Control:     "CC6.1",
+		Control:     "AWS-MESSAGING-01",
 		Name:        "Messaging Access Policies",
 		Status:      "MANUAL",
 		Evidence:    fmt.Sprintf("MANUAL CHECK: Review access policies for %d SNS topics and %d SQS queues", len(topics.Topics), len(queues.QueueUrls)),

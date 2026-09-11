@@ -38,7 +38,7 @@ func (c *Route53Checks) CheckDNSSEC(ctx context.Context) (CheckResult, error) {
 	resp, err := c.client.ListHostedZones(ctx, &route53.ListHostedZonesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CC6.1",
+			Control:    "AWS-ROUTE53-01",
 			Name:       "Route53 DNSSEC Enabled",
 			Status:     "FAIL",
 			Evidence:   fmt.Sprintf("Unable to check Route53 hosted zones: %v", err),
@@ -51,7 +51,7 @@ func (c *Route53Checks) CheckDNSSEC(ctx context.Context) (CheckResult, error) {
 
 	if len(resp.HostedZones) == 0 {
 		return CheckResult{
-			Control:    "CC6.1",
+			Control:    "AWS-ROUTE53-01",
 			Name:       "Route53 DNSSEC Enabled",
 			Status:     StatusInfo,
 			Evidence:   "No Route53 hosted zones found",
@@ -96,7 +96,7 @@ func (c *Route53Checks) CheckDNSSEC(ctx context.Context) (CheckResult, error) {
 		}
 
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-ROUTE53-01",
 			Name:        "Route53 DNSSEC Enabled",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
@@ -128,7 +128,7 @@ aws route53 enable-hosted-zone-dnssec --hosted-zone-id $(aws route53 list-hosted
 	}
 
 	return CheckResult{
-		Control:    "CC6.1",
+		Control:    "AWS-ROUTE53-01",
 		Name:       "Route53 DNSSEC Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("All %d Route53 public hosted zones have DNSSEC enabled | Meets CIS AWS 5.19 (DNS integrity protection)", checkedCount),

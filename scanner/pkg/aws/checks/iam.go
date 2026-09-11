@@ -668,7 +668,7 @@ func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, e
 
 	if len(usersWithMultipleKeys) > 0 {
 		return CheckResult{
-			Control:           "CC6.7",
+			Control:           "AWS-IAM-05",
 			Name:              "One Active Access Key Per User",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -684,7 +684,7 @@ func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "CC6.7",
+		Control:    "AWS-IAM-05",
 		Name:       "One Active Access Key Per User",
 		Status:     "PASS",
 		Evidence:   "All IAM users have at most one active access key",
@@ -927,7 +927,7 @@ func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, e
 	policy, err := c.client.GetAccountPasswordPolicy(ctx, &iam.GetAccountPasswordPolicyInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "CC6.1",
+			Control:           "AWS-IAM-06",
 			Name:              "Password Expiration Policy",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -946,7 +946,7 @@ func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, e
 
 	if maxAge == 0 {
 		return CheckResult{
-			Control:           "CC6.1",
+			Control:           "AWS-IAM-06",
 			Name:              "Password Expiration Policy",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -963,7 +963,7 @@ func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, e
 
 	if maxAge > 90 {
 		return CheckResult{
-			Control:           "CC6.1",
+			Control:           "AWS-IAM-06",
 			Name:              "Password Expiration Policy",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -979,7 +979,7 @@ func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "CC6.1",
+		Control:    "AWS-IAM-06",
 		Name:       "Password Expiration Policy",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("Password max age is %d days (≤ 90) | Meets CIS 1.20", maxAge),
@@ -1129,7 +1129,7 @@ func (c *IAMChecks) CheckIAMRolesSeparation(ctx context.Context) (CheckResult, e
 
 	if !hasIAMAdminRole || !hasIAMLimitedRole {
 		return CheckResult{
-			Control:     "CC6.3",
+			Control:     "AWS-IAM-01",
 			Name:        "IAM Master and Manager Roles",
 			Status:      "INFO",
 			Severity:    "MEDIUM",
@@ -1156,7 +1156,7 @@ aws iam put-role-policy --role-name IAMManagerRole --policy-name IAMLimitedAcces
 	}
 
 	return CheckResult{
-		Control:    "CC6.3",
+		Control:    "AWS-IAM-01",
 		Name:       "IAM Master and Manager Roles",
 		Status:     "PASS",
 		Evidence:   "IAM management roles detected | Meets CIS 1.18",
@@ -1169,7 +1169,7 @@ aws iam put-role-policy --role-name IAMManagerRole --policy-name IAMLimitedAcces
 // CIS 1.22 - Ensure IAM user access is reviewed periodically
 func (c *IAMChecks) CheckIAMUserAccessReview(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:     "CC6.3",
+		Control:     "AWS-IAM-04",
 		Name:        "IAM User Access Review",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Verify IAM user access is reviewed at least every 90 days",

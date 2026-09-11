@@ -38,7 +38,7 @@ func (c *IAMExtendedChecks) CheckServiceLinkedRoles(ctx context.Context) (CheckR
 	roles, err := c.client.ListRoles(ctx, &iam.ListRolesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CC6.1",
+			Control:    "AWS-IAM-03",
 			Name:       "IAM Service-Linked Roles Configured",
 			Status:     "ERROR",
 			Evidence:   "Failed to list roles",
@@ -57,7 +57,7 @@ func (c *IAMExtendedChecks) CheckServiceLinkedRoles(ctx context.Context) (CheckR
 
 	if serviceLinkedRoles == 0 {
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-IAM-03",
 			Name:        "IAM Service-Linked Roles Configured",
 			Status:      "INFO",
 			Evidence:    "No service-linked roles found - may not be using AWS services that require them",
@@ -70,7 +70,7 @@ func (c *IAMExtendedChecks) CheckServiceLinkedRoles(ctx context.Context) (CheckR
 	}
 
 	return CheckResult{
-		Control:    "CC6.1",
+		Control:    "AWS-IAM-03",
 		Name:       "IAM Service-Linked Roles Configured",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("%d service-linked roles configured for AWS services", serviceLinkedRoles),
@@ -85,7 +85,7 @@ func (c *IAMExtendedChecks) CheckPermissionBoundaries(ctx context.Context) (Chec
 	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CC6.1",
+			Control:    "AWS-IAM-02",
 			Name:       "IAM Permission Boundaries Configured",
 			Status:     "ERROR",
 			Evidence:   "Failed to list users",
@@ -98,7 +98,7 @@ func (c *IAMExtendedChecks) CheckPermissionBoundaries(ctx context.Context) (Chec
 	roles, err := c.client.ListRoles(ctx, &iam.ListRolesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CC6.1",
+			Control:    "AWS-IAM-02",
 			Name:       "IAM Permission Boundaries Configured",
 			Status:     "ERROR",
 			Evidence:   "Failed to list roles",
@@ -125,7 +125,7 @@ func (c *IAMExtendedChecks) CheckPermissionBoundaries(ctx context.Context) (Chec
 
 	if usersWithBoundaries == 0 && rolesWithBoundaries == 0 {
 		return CheckResult{
-			Control:     "CC6.1",
+			Control:     "AWS-IAM-02",
 			Name:        "IAM Permission Boundaries Configured",
 			Status:      "FAIL",
 			Evidence:    "No permission boundaries configured - no delegation safeguards",
@@ -145,7 +145,7 @@ func (c *IAMExtendedChecks) CheckPermissionBoundaries(ctx context.Context) (Chec
 	}
 
 	return CheckResult{
-		Control:    "CC6.1",
+		Control:    "AWS-IAM-02",
 		Name:       "IAM Permission Boundaries Configured",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("Permission boundaries: %d users, %d roles", usersWithBoundaries, rolesWithBoundaries),

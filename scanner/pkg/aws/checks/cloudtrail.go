@@ -307,7 +307,7 @@ func (c *CloudTrailChecks) CheckCloudTrailLogIntegration(ctx context.Context) (C
 
 	if len(trailsWithoutCWL) > 0 {
 		return CheckResult{
-			Control:           "CC6.3",
+			Control:           "AWS-CLOUDTRAIL-01",
 			Name:              "CloudTrail CloudWatch Logs Integration",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -323,7 +323,7 @@ func (c *CloudTrailChecks) CheckCloudTrailLogIntegration(ctx context.Context) (C
 	}
 
 	return CheckResult{
-		Control:    "CC6.3",
+		Control:    "AWS-CLOUDTRAIL-01",
 		Name:       "CloudTrail CloudWatch Logs Integration",
 		Status:     "PASS",
 		Evidence:   "All CloudTrail logs integrated with CloudWatch Logs",
@@ -400,7 +400,7 @@ func (c *CloudTrailChecks) CheckCloudTrailLogValidation(ctx context.Context) (Ch
 // CIS 3.4 - Ensure CloudTrail S3 bucket policy prevents public access
 func (c *CloudTrailChecks) CheckCloudTrailS3BucketPolicy(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control:           "CC7.1",
+		Control:           "AWS-CLOUDTRAIL-02",
 		Name:              "CloudTrail S3 Bucket Policy",
 		Status:            "INFO",
 		Evidence:          "MANUAL CHECK: Verify CloudTrail S3 bucket denies public access and has proper policy",
