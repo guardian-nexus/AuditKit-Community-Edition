@@ -116,7 +116,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 	policies, err := c.iamClient.ListPolicies(ctx, &iam.ListPoliciesInput{Scope: "Local"})
 	if err != nil {
 		return CheckResult{
-			Control:         "AC.L1-3.1.2",
+			Control:         "AC.L1-3.1.1",
 			Name:            "[CMMC L1] Limit System Access to Authorized Users",
 			Status:          "FAIL",
 			Evidence:        fmt.Sprintf("Unable to verify IAM policies: %v", err),
@@ -131,7 +131,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 
 	if len(policies.Policies) == 0 {
 		return CheckResult{
-			Control:         "AC.L1-3.1.2",
+			Control:         "AC.L1-3.1.1",
 			Name:            "[CMMC L1] Limit System Access to Authorized Users",
 			Status:          "FAIL",
 			Evidence:        "No custom IAM policies - relying on AWS managed policies only",
@@ -145,7 +145,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 	}
 
 	return CheckResult{
-		Control:         "AC.L1-3.1.2",
+		Control:         "AC.L1-3.1.1",
 		Name:            "[CMMC L1] Limit System Access to Authorized Users",
 		Status:          "PASS",
 		Evidence:        fmt.Sprintf("IAM policies configured (%d custom policies)", len(policies.Policies)),
