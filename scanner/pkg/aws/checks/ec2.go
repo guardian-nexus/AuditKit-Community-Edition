@@ -382,8 +382,10 @@ func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, err
 
 	for _, sg := range sgs.SecurityGroups {
 		for _, rule := range sg.IpPermissions {
-			// Check for SSH (port 22)
-			if rule.FromPort != nil && *rule.FromPort == 22 {
+			// A port range covering 22 exposes SSH just as much as a rule
+			// naming it. The equality test reported SSH closed on a group
+			// opening 0-65535, because its FromPort is 0.
+			if ruleCovers(rule.FromPort, rule.ToPort, 22) {
 				for _, ipRange := range rule.IpRanges {
 					if aws.ToString(ipRange.CidrIp) == "0.0.0.0/0" {
 						sshOpenGroups = append(sshOpenGroups, aws.ToString(sg.GroupId))
@@ -433,8 +435,8 @@ func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, err
 
 	for _, sg := range sgs.SecurityGroups {
 		for _, rule := range sg.IpPermissions {
-			// Check for RDP (port 3389)
-			if rule.FromPort != nil && *rule.FromPort == 3389 {
+			// As above: a range covering 3389 exposes RDP.
+			if ruleCovers(rule.FromPort, rule.ToPort, 3389) {
 				for _, ipRange := range rule.IpRanges {
 					if aws.ToString(ipRange.CidrIp) == "0.0.0.0/0" {
 						rdpOpenGroups = append(rdpOpenGroups, aws.ToString(sg.GroupId))
