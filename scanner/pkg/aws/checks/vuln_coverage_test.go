@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/inspector2"
 	inspectortypes "github.com/aws/aws-sdk-go-v2/service/inspector2/types"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/awsinspector"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln/awsinspector"
 )
 
 type stubInspector struct {

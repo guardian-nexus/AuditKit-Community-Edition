@@ -9,8 +9,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/azuredefender"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln/azuredefender"
 )
 
 // Emit selects which control this instance answers. A scan of every framework

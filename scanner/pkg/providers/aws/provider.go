@@ -3,9 +3,9 @@ package aws
 import (
 	"context"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/aws"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/core"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/providers"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/aws"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/core"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/providers"
 )
 
 // AWSProvider implements the Provider interface for AWS

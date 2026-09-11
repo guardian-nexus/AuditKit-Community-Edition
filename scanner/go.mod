@@ -1,4 +1,4 @@
-module github.com/guardian-nexus/auditkit/scanner
+module github.com/guardian-nexus/AuditKit-Community-Edition/scanner
 
 go 1.24.0
 

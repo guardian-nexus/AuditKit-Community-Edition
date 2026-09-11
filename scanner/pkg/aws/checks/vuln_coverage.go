@@ -9,8 +9,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/awsinspector"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln/awsinspector"
 )
 
 // VulnCoverageChecks answers the vulnerability-scanning practices from what

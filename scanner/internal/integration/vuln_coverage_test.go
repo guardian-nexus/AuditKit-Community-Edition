@@ -8,10 +8,10 @@ import (
 	"time"
 
 	inspectortypes "github.com/aws/aws-sdk-go-v2/service/inspector2/types"
-	awschecks "github.com/guardian-nexus/auditkit/scanner/pkg/aws/checks"
-	gcpchecks "github.com/guardian-nexus/auditkit/scanner/pkg/gcp/checks"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/awsinspector"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/gcposconfig"
+	awschecks "github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/aws/checks"
+	gcpchecks "github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/gcp/checks"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln/awsinspector"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln/gcposconfig"
 	osconfig "google.golang.org/api/osconfig/v1"
 )
 

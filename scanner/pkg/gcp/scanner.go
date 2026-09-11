@@ -3,14 +3,14 @@ package gcp
 import (
 	"context"
 	"fmt"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/mappings"
 	"strings"
 
 	"cloud.google.com/go/iam/admin/apiv1"
 	"cloud.google.com/go/kms/apiv1"
 	"cloud.google.com/go/logging/apiv2"
 	"cloud.google.com/go/storage"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/gcp/checks"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/gcp/checks"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/container/v1"
 	"google.golang.org/api/sqladmin/v1"

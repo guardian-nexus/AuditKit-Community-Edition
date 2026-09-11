@@ -146,7 +146,7 @@ GOOS=windows GOARCH=amd64 go build -o auditkit.exe ./cmd/auditkit
 
 ```bash
 # Install directly from GitHub
-go install github.com/guardian-nexus/auditkit/scanner/cmd/auditkit@latest
+go install github.com/guardian-nexus/AuditKit-Community-Edition/scanner/cmd/auditkit@latest
 
 # Binary installed to: $GOPATH/bin/auditkit
 
@@ -358,7 +358,7 @@ sudo mv auditkit /usr/local/bin/
 ### Update Go Install
 
 ```bash
-go install github.com/guardian-nexus/auditkit/scanner/cmd/auditkit@latest
+go install github.com/guardian-nexus/AuditKit-Community-Edition/scanner/cmd/auditkit@latest
 ```
 
 ---

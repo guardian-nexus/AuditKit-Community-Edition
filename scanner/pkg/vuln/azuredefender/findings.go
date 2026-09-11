@@ -8,7 +8,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/security/armsecurity"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln"
 )
 
 // nowFunc is a seam for tests.

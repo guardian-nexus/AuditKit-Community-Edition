@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/mappings"
 )
 
 // The hook, not the table. A CMMC scan must end up with all 110 practices

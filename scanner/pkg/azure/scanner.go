@@ -3,7 +3,7 @@ package azure
 import (
 	"context"
 	"fmt"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/mappings"
 	"os"
 	"strings"
 
@@ -19,8 +19,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/security/armsecurity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/sql/armsql"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/azure/checks"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/azuredefender"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/azure/checks"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln/azuredefender"
 	msgraphsdk "github.com/microsoftgraph/msgraph-sdk-go"
 )
 

@@ -22,7 +22,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln"
 )
 
 // Narrow interfaces over the four clients, so the collector can be exercised

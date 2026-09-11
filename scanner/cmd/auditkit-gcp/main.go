@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/core"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/providers/gcp"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/core"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/providers/gcp"
 )
 
 var CurrentVersion = "v0.8.7"

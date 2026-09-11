@@ -14,8 +14,8 @@ import (
 	"google.golang.org/api/option"
 	"google.golang.org/api/osconfig/v1"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/gcposconfig"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln/gcposconfig"
 )
 
 // Emit selects which control this instance answers. A scan of every framework

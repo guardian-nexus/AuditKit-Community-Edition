@@ -3,7 +3,7 @@ package aws
 import (
 	"context"
 	"fmt"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/mappings"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -47,8 +47,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/aws/checks"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/awsinspector"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/aws/checks"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln/awsinspector"
 )
 
 type AWSScanner struct {

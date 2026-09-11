@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/integrations"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/integrations"
 )
 
 // The mappings ship inside the binary. They used to be read from a

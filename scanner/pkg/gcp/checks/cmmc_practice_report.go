@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/mappings"
 )
 
 // CMMCPracticeReport reports the CMMC practices the automated checks did not

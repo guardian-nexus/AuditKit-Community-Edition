@@ -3,9 +3,9 @@ package gcp
 import (
 	"context"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/core"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/gcp"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/providers"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/core"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/gcp"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/providers"
 )
 
 // GCPProvider implements the Provider interface for GCP

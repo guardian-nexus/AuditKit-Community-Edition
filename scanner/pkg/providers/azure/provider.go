@@ -3,9 +3,9 @@ package azure
 import (
 	"context"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/azure"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/core"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/providers"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/azure"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/core"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/providers"
 )
 
 // AzureProvider implements the Provider interface for Azure

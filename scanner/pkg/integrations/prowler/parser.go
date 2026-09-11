@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/integrations"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/integrations"
 )
 
 // ProwlerOutput represents the top-level Prowler JSON output (v3+)

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/mappings"
 )
 
 // A CMMC report must carry all 110 requirements of NIST SP 800-171 Rev 2.

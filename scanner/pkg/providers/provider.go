@@ -3,7 +3,7 @@ package providers
 import (
 	"context"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/core"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/core"
 )
 
 // BaseProvider provides common functionality for all providers

@@ -10,7 +10,7 @@ import (
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/osconfig/v1"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln/gcposconfig"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln/gcposconfig"
 )
 
 type stubReports struct {

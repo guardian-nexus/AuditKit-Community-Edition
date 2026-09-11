@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/inspector2"
 	inspectortypes "github.com/aws/aws-sdk-go-v2/service/inspector2/types"
 
-	"github.com/guardian-nexus/auditkit/scanner/pkg/vuln"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln"
 )
 
 // FindingsAPI is the second half of the Inspector surface: what it found, as
