@@ -57,8 +57,8 @@ func (c *AzureCISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *AzureCISManualChecks) checkMonitorAlertAuthChanges() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.2.1",
-		Name:        "[CIS Azure 5.2.1] Create Alert for Authorization Changes",
+		Control:     "AZ-CIS-02",
+		Name:        "Create Alert for Authorization Changes",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -85,17 +85,16 @@ az monitor activity-log alert create \
 		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Alert Rules → Screenshot showing alert rule for Microsoft.Authorization operations",
 		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.1",
-			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.1.2",
+			"SOC2":    "CC7.2",
+			"PCI-DSS": "10.2.1.2",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkMonitorAlertPolicyChanges() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.2.2",
-		Name:        "[CIS Azure 5.2.2] Create Alert for Policy Assignment Changes",
+		Control:     "AZ-CIS-03",
+		Name:        "Create Alert for Policy Assignment Changes",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -119,17 +118,16 @@ Operations to monitor:
 		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for policy assignment operations",
 		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.2",
-			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.1.2",
+			"SOC2":    "CC7.2",
+			"PCI-DSS": "10.2.1.2",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkMonitorAlertNSGChanges() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.2.3",
-		Name:        "[CIS Azure 5.2.3] Create Alert for NSG Changes",
+		Control:     "CIS-6.1.2.3",
+		Name:        "Create Alert for NSG Changes",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
@@ -152,7 +150,7 @@ Also monitor:
 		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for NSG write/delete operations",
 		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.3",
+			"CIS-Azure": "6.1.2.3",
 			"SOC2":      "CC7.2",
 			"PCI-DSS":   "10.2.1.7",
 		},
@@ -161,8 +159,8 @@ Also monitor:
 
 func (c *AzureCISManualChecks) checkMonitorAlertSecurityGroupChanges() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.2.4",
-		Name:        "[CIS Azure 5.2.4] Create Alert for Security Group Changes",
+		Control:     "CIS-6.1.2.3",
+		Name:        "Create Alert for Security Group Changes",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
@@ -180,7 +178,7 @@ az monitor activity-log alert create \
 		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for security group operations",
 		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.4",
+			"CIS-Azure": "6.1.2.3",
 			"SOC2":      "CC7.2",
 			"PCI-DSS":   "10.2.1.1",
 		},
@@ -189,8 +187,8 @@ az monitor activity-log alert create \
 
 func (c *AzureCISManualChecks) checkMonitorAlertSecuritySolutions() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.2.5",
-		Name:        "[CIS Azure 5.2.5] Create Alert for Security Solutions Changes",
+		Control:     "CIS-6.1.2.5",
+		Name:        "Create Alert for Security Solutions Changes",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -212,7 +210,7 @@ Monitor operations:
 		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for security solutions",
 		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.5",
+			"CIS-Azure": "6.1.2.5",
 			"SOC2":      "CC7.2",
 		},
 	}
@@ -220,8 +218,8 @@ Monitor operations:
 
 func (c *AzureCISManualChecks) checkMonitorAlertSQLFirewall() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.2.6",
-		Name:        "[CIS Azure 5.2.6] Create Alert for SQL Firewall Changes",
+		Control:     "AZ-CIS-04",
+		Name:        "Create Alert for SQL Firewall Changes",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
@@ -243,17 +241,16 @@ Monitor operations:
 		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for SQL firewall operations",
 		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.6",
-			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.1.7",
+			"SOC2":    "CC7.2",
+			"PCI-DSS": "10.2.1.7",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkMonitorAlertKeyVaultDeletion() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.2.7",
-		Name:        "[CIS Azure 5.2.7] Create Alert for Key Vault Deletion",
+		Control:     "AZ-CIS-05",
+		Name:        "Create Alert for Key Vault Deletion",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
 		Priority:    PriorityCritical,
@@ -271,17 +268,16 @@ az monitor activity-log alert create \
 		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for Key Vault deletion",
 		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.7",
-			"SOC2":      "CC6.3",
-			"PCI-DSS":   "10.2.1.7",
+			"SOC2":    "CC6.3",
+			"PCI-DSS": "10.2.1.7",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkMonitorAlertStorageAccountDeletion() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.2.8",
-		Name:        "[CIS Azure 5.2.8] Create Alert for Storage Account Deletion",
+		Control:     "AZ-CIS-06",
+		Name:        "Create Alert for Storage Account Deletion",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
@@ -299,9 +295,8 @@ az monitor activity-log alert create \
 		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for Storage Account deletion",
 		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.8",
-			"SOC2":      "CC9.1",
-			"PCI-DSS":   "10.2.1.7",
+			"SOC2":    "CC9.1",
+			"PCI-DSS": "10.2.1.7",
 		},
 	}
 }
@@ -310,8 +305,8 @@ az monitor activity-log alert create \
 
 func (c *AzureCISManualChecks) checkAppRegistrationOwnership() CheckResult {
 	return CheckResult{
-		Control:     "CIS-1.5",
-		Name:        "[CIS Azure 1.5] App Registration Owner Requirements",
+		Control:     "AZ-CIS-01",
+		Name:        "App Registration Owner Requirements",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -335,16 +330,15 @@ az ad app list --query "[].{DisplayName:displayName, AppId:appId}" -o table
 		ScreenshotGuide: "Azure AD → App registrations → For each app → Owners → Screenshot showing owner assignments",
 		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
 		Frameworks: map[string]string{
-			"CIS-Azure": "1.5",
-			"SOC2":      "CC6.1",
+			"SOC2": "CC6.1",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkGuestInviteSettings() CheckResult {
 	return CheckResult{
-		Control:     "CIS-1.11",
-		Name:        "[CIS Azure 1.11] Guest Invite Restrictions",
+		Control:     "CIS-5.3.2",
+		Name:        "Guest Invite Restrictions",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -360,7 +354,7 @@ This prevents regular users from inviting external guests.`,
 		ScreenshotGuide: "Azure AD → External identities → External collaboration settings → Screenshot showing restricted invite settings",
 		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/CompanyRelationshipsMenuBlade/Settings",
 		Frameworks: map[string]string{
-			"CIS-Azure": "1.11",
+			"CIS-Azure": "5.3.2",
 			"SOC2":      "CC6.1",
 			"PCI-DSS":   "7.2.1",
 		},
@@ -369,8 +363,8 @@ This prevents regular users from inviting external guests.`,
 
 func (c *AzureCISManualChecks) checkSecurityDefaults() CheckResult {
 	return CheckResult{
-		Control:     "CIS-1.12",
-		Name:        "[CIS Azure 1.12] Security Defaults or Conditional Access",
+		Control:     "CIS-5.1.1",
+		Name:        "Security Defaults or Conditional Access",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
 		Priority:    PriorityCritical,
@@ -395,7 +389,7 @@ az rest --method GET --url https://graph.microsoft.com/v1.0/policies/identitySec
 		ScreenshotGuide: "Azure AD → Properties → Security defaults = Enabled, OR Azure AD → Conditional Access → Active policies screenshot",
 		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Properties",
 		Frameworks: map[string]string{
-			"CIS-Azure": "1.12",
+			"CIS-Azure": "5.1.1",
 			"SOC2":      "CC6.6",
 			"PCI-DSS":   "8.4.2",
 			"HIPAA":     "164.312(a)(2)(i)",
@@ -407,8 +401,8 @@ az rest --method GET --url https://graph.microsoft.com/v1.0/policies/identitySec
 
 func (c *AzureCISManualChecks) checkRDPRestricted() CheckResult {
 	return CheckResult{
-		Control:     "CIS-6.2",
-		Name:        "[CIS Azure 6.2] RDP Access from Internet Restricted",
+		Control:     "CIS-7.1",
+		Name:        "RDP Access from Internet Restricted",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
 		Priority:    PriorityCritical,
@@ -430,7 +424,7 @@ az network nsg rule delete --name <rule-name> --nsg-name <nsg-name> --resource-g
 		ScreenshotGuide: "Network security groups → Inbound security rules → Screenshot showing NO rules with 3389 from Internet",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.2",
+			"CIS-Azure": "7.1",
 			"SOC2":      "CC6.1",
 			"PCI-DSS":   "1.4.2",
 			"HIPAA":     "164.312(a)(1)",
@@ -440,8 +434,8 @@ az network nsg rule delete --name <rule-name> --nsg-name <nsg-name> --resource-g
 
 func (c *AzureCISManualChecks) checkSSHRestricted() CheckResult {
 	return CheckResult{
-		Control:     "CIS-6.3",
-		Name:        "[CIS Azure 6.3] SSH Access from Internet Restricted",
+		Control:     "CIS-7.2",
+		Name:        "SSH Access from Internet Restricted",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
 		Priority:    PriorityCritical,
@@ -459,7 +453,7 @@ az network nsg rule list --nsg-name <nsg-name> --resource-group <rg> --query "[?
 		ScreenshotGuide: "Network security groups → Inbound security rules → Screenshot showing NO rules with port 22 from Internet",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.3",
+			"CIS-Azure": "7.2",
 			"SOC2":      "CC6.1",
 			"PCI-DSS":   "1.4.2",
 		},
@@ -468,8 +462,8 @@ az network nsg rule list --nsg-name <nsg-name> --resource-group <rg> --query "[?
 
 func (c *AzureCISManualChecks) checkSQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:     "CIS-6.4",
-		Name:        "[CIS Azure 6.4] SQL Server Port Access Restricted",
+		Control:     "AZ-CIS-07",
+		Name:        "SQL Server Port Access Restricted",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
 		Priority:    PriorityCritical,
@@ -484,7 +478,7 @@ Check all NSGs for rules allowing:
 		ScreenshotGuide: "Network security groups → Inbound rules → NO rules allowing 1433 from Internet",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.4",
+			"CIS-Azure": "7.1",
 			"SOC2":      "CC6.1",
 			"PCI-DSS":   "1.2.1, 2.2.2",
 		},
@@ -493,8 +487,8 @@ Check all NSGs for rules allowing:
 
 func (c *AzureCISManualChecks) checkPostgreSQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:           "CIS-6.5",
-		Name:              "[CIS Azure 6.5] PostgreSQL Port Access Restricted",
+		Control:           "AZ-CIS-08",
+		Name:              "PostgreSQL Port Access Restricted",
 		Status:            "INFO",
 		Severity:          "HIGH",
 		Priority:          PriorityHigh,
@@ -504,7 +498,7 @@ func (c *AzureCISManualChecks) checkPostgreSQLPortRestricted() CheckResult {
 		ScreenshotGuide:   "Network security groups → Inbound rules → NO rules allowing 5432 from Internet",
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.5",
+			"CIS-Azure": "7.2",
 			"SOC2":      "CC6.1",
 			"PCI-DSS":   "1.4.2",
 		},
@@ -513,8 +507,8 @@ func (c *AzureCISManualChecks) checkPostgreSQLPortRestricted() CheckResult {
 
 func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:           "CIS-6.6",
-		Name:              "[CIS Azure 6.6] MySQL Port Access Restricted",
+		Control:           "AZ-CIS-09",
+		Name:              "MySQL Port Access Restricted",
 		Status:            "INFO",
 		Severity:          "HIGH",
 		Priority:          PriorityHigh,
@@ -524,7 +518,7 @@ func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 		ScreenshotGuide:   "Network security groups → Inbound rules → NO rules allowing 3306 from Internet",
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.6",
+			"CIS-Azure": "7.3",
 			"SOC2":      "CC6.1",
 			"PCI-DSS":   "1.4.2",
 		},
@@ -535,8 +529,8 @@ func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 
 func (c *AzureCISManualChecks) checkKeyVaultRecoveryLevel() CheckResult {
 	return CheckResult{
-		Control:     "CIS-8.1",
-		Name:        "[CIS Azure 8.1] Key Vault Recoverable",
+		Control:     "AZ-CIS-10",
+		Name:        "Key Vault Recoverable",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
@@ -558,17 +552,16 @@ az keyvault update --name <vault-name> --enable-purge-protection true`,
 		ScreenshotGuide: "Key Vault → Properties → Screenshot showing Soft-delete (90 days) and Purge protection both enabled",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
 		Frameworks: map[string]string{
-			"CIS-Azure": "8.1",
-			"SOC2":      "CC9.1",
-			"PCI-DSS":   "3.6.1",
+			"SOC2":    "CC9.1",
+			"PCI-DSS": "3.6.1",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkKeyVaultKeyExpiration() CheckResult {
 	return CheckResult{
-		Control:     "CIS-8.2",
-		Name:        "[CIS Azure 8.2] Key Vault Keys Have Expiration Dates",
+		Control:     "CIS-8.3.1",
+		Name:        "Key Vault Keys Have Expiration Dates",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -584,7 +577,7 @@ az keyvault key set-attributes --vault-name <vault-name> --name <key-name> --exp
 		ScreenshotGuide: "Key Vault → Keys → Each key → Properties → Screenshot showing expiration date configured",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
 		Frameworks: map[string]string{
-			"CIS-Azure": "8.2",
+			"CIS-Azure": "8.3.1",
 			"SOC2":      "CC6.8",
 			"PCI-DSS":   "3.7.4",
 		},
@@ -593,8 +586,8 @@ az keyvault key set-attributes --vault-name <vault-name> --name <key-name> --exp
 
 func (c *AzureCISManualChecks) checkKeyVaultSecretExpiration() CheckResult {
 	return CheckResult{
-		Control:     "CIS-8.4",
-		Name:        "[CIS Azure 8.4] Key Vault Secrets Have Expiration Dates",
+		Control:     "CIS-8.3.3",
+		Name:        "Key Vault Secrets Have Expiration Dates",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -610,7 +603,7 @@ az keyvault secret set-attributes --vault-name <vault-name> --name <secret-name>
 		ScreenshotGuide: "Key Vault → Secrets → Each secret → Properties → Screenshot showing expiration date",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
 		Frameworks: map[string]string{
-			"CIS-Azure": "8.4",
+			"CIS-Azure": "8.3.3",
 			"SOC2":      "CC6.7",
 			"PCI-DSS":   "8.3.9",
 		},
@@ -619,8 +612,8 @@ az keyvault secret set-attributes --vault-name <vault-name> --name <secret-name>
 
 func (c *AzureCISManualChecks) checkKeyVaultCertificateExpiration() CheckResult {
 	return CheckResult{
-		Control:     "CIS-8.6",
-		Name:        "[CIS Azure 8.6] Key Vault Certificates Auto-Renew",
+		Control:     "AZ-CIS-11",
+		Name:        "Key Vault Certificates Auto-Renew",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -637,8 +630,7 @@ Verify each certificate has:
 		ScreenshotGuide: "Key Vault → Certificates → Each cert → Policy → Screenshot showing auto-renewal enabled",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
 		Frameworks: map[string]string{
-			"CIS-Azure": "8.6",
-			"SOC2":      "CC6.7",
+			"SOC2": "CC6.7",
 		},
 	}
 }

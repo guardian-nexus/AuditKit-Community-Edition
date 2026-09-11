@@ -40,8 +40,8 @@ func (c *AppServiceChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *AppServiceChecks) checkAuthentication() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.1",
-		Name:        "[CIS Azure 9.1] App Service Authentication",
+		Control:     "AZ-APPSVC-02",
+		Name:        "App Service Authentication",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
@@ -70,17 +70,16 @@ This ensures only authenticated users can access the application.`,
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "9.1",
-			"SOC2":      "CC6.1",
-			"PCI-DSS":   "8.2.1",
+			"SOC2":    "CC6.1",
+			"PCI-DSS": "8.2.1",
 		},
 	}
 }
 
 func (c *AppServiceChecks) checkHTTPSRedirect() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.2",
-		Name:        "[CIS Azure 9.2] HTTPS Only Redirect",
+		Control:     "AZ-APPSVC-03",
+		Name:        "HTTPS Only Redirect",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
@@ -102,17 +101,16 @@ This forces all traffic to use encrypted connections.`,
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "9.2",
-			"PCI-DSS":   "4.2.1",
-			"HIPAA":     "164.312(e)(1)",
+			"PCI-DSS": "4.2.1",
+			"HIPAA":   "164.312(e)(1)",
 		},
 	}
 }
 
 func (c *AppServiceChecks) checkTLSVersion() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.3",
-		Name:        "[CIS Azure 9.3] TLS Version",
+		Control:     "AZ-APPSVC-04",
+		Name:        "TLS Version",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
@@ -134,16 +132,15 @@ az webapp config set \
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "9.3",
-			"PCI-DSS":   "4.2.1",
+			"PCI-DSS": "4.2.1",
 		},
 	}
 }
 
 func (c *AppServiceChecks) checkClientCertificates() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.4",
-		Name:        "[CIS Azure 9.4] Client Certificates",
+		Control:     "AZ-APPSVC-05",
+		Name:        "Client Certificates",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -160,16 +157,14 @@ Note: Only enable if your application is designed to validate client certificate
 		ScreenshotGuide: "App Service → Configuration → General settings → Screenshot 'Incoming client certificates' setting",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
-		Frameworks: map[string]string{
-			"CIS-Azure": "9.4",
-		},
+		Frameworks:      map[string]string{"SOC2": "CC6.1"},
 	}
 }
 
 func (c *AppServiceChecks) checkManagedIdentity() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.5",
-		Name:        "[CIS Azure 9.5] Managed Identity",
+		Control:     "AZ-APPSVC-06",
+		Name:        "Managed Identity",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -197,16 +192,15 @@ az webapp identity assign \
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "9.5",
-			"SOC2":      "CC6.1",
+			"SOC2": "CC6.1",
 		},
 	}
 }
 
 func (c *AppServiceChecks) checkRuntimeVersions() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.6",
-		Name:        "[CIS Azure 9.6, 9.7, 9.8] Runtime Versions",
+		Control:     "AZ-APPSVC-07",
+		Name:        "Runtime Versions",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -230,16 +224,14 @@ Older versions may have unpatched security vulnerabilities.`,
 		ScreenshotGuide: "App Service → Configuration → General settings → Stack settings → Screenshot showing current runtime version",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
-		Frameworks: map[string]string{
-			"CIS-Azure": "9.6, 9.7, 9.8",
-		},
+		Frameworks:      map[string]string{"SOC2": "CC6.1"},
 	}
 }
 
 func (c *AppServiceChecks) checkFTPDeployment() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.10",
-		Name:        "[CIS Azure 9.10] FTP Deployment Disabled",
+		Control:     "AZ-APPSVC-01",
+		Name:        "FTP Deployment Disabled",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
@@ -265,8 +257,7 @@ Use modern deployment methods instead:
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "9.10",
-			"PCI-DSS":   "4.2.1",
+			"PCI-DSS": "4.2.1",
 		},
 	}
 }

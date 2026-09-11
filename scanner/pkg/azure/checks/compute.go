@@ -79,7 +79,7 @@ func (c *ComputeChecks) CheckDiskEncryption(ctx context.Context) []CheckResult {
 	if len(unencryptedDisks) > 0 {
 		results = append(results, CheckResult{
 			Control:     "CIS-7.1",
-			Name:        "[CIS Azure 7.1, 7.2] Disk Encryption at Rest",
+			Name:        "Disk Encryption at Rest",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("CIS 7.1, 7.2: %d/%d disks not encrypted | Violates CIS Azure requirements", len(unencryptedDisks), totalDisks),
@@ -109,7 +109,7 @@ az vm encryption enable \
 	} else if totalDisks > 0 {
 		results = append(results, CheckResult{
 			Control:    "CIS-7.1",
-			Name:       "[CIS Azure 7.1, 7.2] Disk Encryption at Rest",
+			Name:       "Disk Encryption at Rest",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 7.1, 7.2: All %d disks encrypted | Meets CIS Azure requirements", totalDisks),
 			Priority:   PriorityInfo,
@@ -163,8 +163,8 @@ func (c *ComputeChecks) CheckManagedDisks(ctx context.Context) []CheckResult {
 
 	if len(unmanagedDisks) > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-7.3",
-			Name:        "[CIS Azure 7.3] Managed Disks",
+			Control:     "AZ-COMPUTE-01",
+			Name:        "Managed Disks",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Evidence:    fmt.Sprintf("CIS 7.3: %d VMs using unmanaged disks", len(unmanagedDisks)),
@@ -185,8 +185,8 @@ Azure Portal → VM → Disks → Migrate to managed disks`,
 		})
 	} else if totalVMs > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-7.3",
-			Name:       "[CIS Azure 7.3] Managed Disks",
+			Control:    "AZ-COMPUTE-01",
+			Name:       "Managed Disks",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 7.3: All %d VMs using managed disks", totalVMs),
 			Priority:   PriorityInfo,
@@ -260,7 +260,7 @@ func (c *ComputeChecks) CheckVMExtensions(ctx context.Context) []CheckResult {
 	if len(vmsWithoutAntimalware) > 0 && totalVMs > 0 {
 		results = append(results, CheckResult{
 			Control:     "CIS-7.4",
-			Name:        "[CIS Azure 7.4, 7.5] Endpoint Protection",
+			Name:        "Endpoint Protection",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("CIS 7.4, 7.5: %d/%d VMs lack antimalware protection", len(vmsWithoutAntimalware), totalVMs),
@@ -284,7 +284,7 @@ For CIS 7.5: Enable MDE integration via Defender for Cloud`,
 	// VM Backup check
 	results = append(results, CheckResult{
 		Control:     "CIS-7.6",
-		Name:        "[CIS Azure 7.6] VM Backup",
+		Name:        "VM Backup",
 		Status:      "INFO",
 		Evidence:    "CIS 7.6: MANUAL CHECK - Verify Azure Backup is enabled for all production VMs",
 		Remediation: "Enable Azure Backup per CIS Azure 7.6",
@@ -355,8 +355,8 @@ func (c *ComputeChecks) CheckDiskNetworkAccess(ctx context.Context) []CheckResul
 
 	if len(disksWithPublicAccess) > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-8.5",
-			Name:        "[CIS Azure 8.5] Disk Network Access Restriction",
+			Control:     "AZ-COMPUTE-02",
+			Name:        "Disk Network Access Restriction",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("CIS 8.5: %d/%d managed disks allow public network access | Violates CIS Azure requirements", len(disksWithPublicAccess), totalDisks),
@@ -396,8 +396,8 @@ Security impact:
 		})
 	} else if totalDisks > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-8.5",
-			Name:       "[CIS Azure 8.5] Disk Network Access Restriction",
+			Control:    "AZ-COMPUTE-02",
+			Name:       "Disk Network Access Restriction",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 8.5: All %d managed disks have restricted network access | Meets CIS Azure requirements", totalDisks),
 			Priority:   PriorityInfo,

@@ -75,8 +75,8 @@ func (c *DefenderChecks) checkDefenderForServers(ctx context.Context) []CheckRes
 
 	if err != nil {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.1",
-			Name:        "[CIS Azure 2.1.1] Microsoft Defender for Servers",
+			Control:     "CIS-8.1.3.1",
+			Name:        "Microsoft Defender for Servers",
 			Status:      "ERROR",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
@@ -106,8 +106,8 @@ az security pricing create --name VirtualMachines --tier Standard`,
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.1",
-			Name:        "[CIS Azure 2.1.1] Microsoft Defender for Servers",
+			Control:     "CIS-8.1.3.1",
+			Name:        "Microsoft Defender for Servers",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
@@ -127,8 +127,8 @@ Cost: Per server/month - provides threat detection, vulnerability scanning, and 
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.1",
-			Name:       "[CIS Azure 2.1.1] Microsoft Defender for Servers",
+			Control:    "CIS-8.1.3.1",
+			Name:       "Microsoft Defender for Servers",
 			Status:     "PASS",
 			Priority:   PriorityInfo,
 			Evidence:   "CIS 2.1.1: Microsoft Defender for Servers is enabled (tier = Standard)",
@@ -147,8 +147,8 @@ func (c *DefenderChecks) checkDefenderForAppService(ctx context.Context) []Check
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.2",
-			Name:       "[CIS Azure 2.1.2] Microsoft Defender for App Service",
+			Control:    "CIS-8.1.6.1",
+			Name:       "Microsoft Defender for App Service",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for App Service: %v", err),
 			Priority:   PriorityHigh,
@@ -159,8 +159,8 @@ func (c *DefenderChecks) checkDefenderForAppService(ctx context.Context) []Check
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.2",
-			Name:        "[CIS Azure 2.1.2] Microsoft Defender for App Service",
+			Control:     "CIS-8.1.6.1",
+			Name:        "Microsoft Defender for App Service",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
@@ -177,8 +177,8 @@ az security pricing create --name AppServices --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.2",
-			Name:       "[CIS Azure 2.1.2] Microsoft Defender for App Service",
+			Control:    "CIS-8.1.6.1",
+			Name:       "Microsoft Defender for App Service",
 			Status:     "PASS",
 			Evidence:   "CIS 2.1.2: Microsoft Defender for App Service is enabled",
 			Priority:   PriorityInfo,
@@ -207,8 +207,8 @@ func (c *DefenderChecks) checkDefenderForSQLServers(ctx context.Context) []Check
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.3",
-			Name:       "[CIS Azure 2.1.3] Microsoft Defender for Azure SQL Databases",
+			Control:    "CIS-8.1.7.3",
+			Name:       "Microsoft Defender for Azure SQL Databases",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for SQL Servers: %v", err),
 			Priority:   PriorityHigh,
@@ -219,8 +219,8 @@ func (c *DefenderChecks) checkDefenderForSQLServers(ctx context.Context) []Check
 
 	if !enabled {
 		return []CheckResult{{
-			Control:     "CIS-2.1.3",
-			Name:        "[CIS Azure 2.1.3] Microsoft Defender for Azure SQL Databases",
+			Control:     "CIS-8.1.7.3",
+			Name:        "Microsoft Defender for Azure SQL Databases",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
@@ -238,8 +238,8 @@ az security pricing create --name SqlServers --tier Standard`,
 	}
 
 	return []CheckResult{{
-		Control:    "CIS-2.1.3",
-		Name:       "[CIS Azure 2.1.3] Microsoft Defender for Azure SQL Databases",
+		Control:    "CIS-8.1.7.3",
+		Name:       "Microsoft Defender for Azure SQL Databases",
 		Status:     "PASS",
 		Evidence:   "CIS 2.1.3: Microsoft Defender for Azure SQL Database servers is enabled",
 		Priority:   PriorityInfo,
@@ -253,8 +253,8 @@ func (c *DefenderChecks) checkDefenderForSQLVMs(ctx context.Context) []CheckResu
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.4",
-			Name:       "[CIS Azure 2.1.4] Microsoft Defender for SQL Servers on Machines",
+			Control:    "CIS-8.1.7.4",
+			Name:       "Microsoft Defender for SQL Servers on Machines",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for SQL VMs: %v", err),
 			Priority:   PriorityHigh,
@@ -265,8 +265,8 @@ func (c *DefenderChecks) checkDefenderForSQLVMs(ctx context.Context) []CheckResu
 
 	if !enabled {
 		return []CheckResult{{
-			Control:     "CIS-2.1.4",
-			Name:        "[CIS Azure 2.1.4] Microsoft Defender for SQL Servers on Machines",
+			Control:     "CIS-8.1.7.4",
+			Name:        "Microsoft Defender for SQL Servers on Machines",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
@@ -284,8 +284,8 @@ az security pricing create --name SqlServerVirtualMachines --tier Standard`,
 	}
 
 	return []CheckResult{{
-		Control:    "CIS-2.1.4",
-		Name:       "[CIS Azure 2.1.4] Microsoft Defender for SQL Servers on Machines",
+		Control:    "CIS-8.1.7.4",
+		Name:       "Microsoft Defender for SQL Servers on Machines",
 		Status:     "PASS",
 		Evidence:   "CIS 2.1.4: Microsoft Defender for SQL servers on machines is enabled",
 		Priority:   PriorityInfo,
@@ -299,8 +299,8 @@ func (c *DefenderChecks) checkDefenderForOpenSourceDB(ctx context.Context) []Che
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.5",
-			Name:       "[CIS Azure 2.1.5] Microsoft Defender for Open-Source Relational Databases",
+			Control:    "CIS-8.1.7.2",
+			Name:       "Microsoft Defender for Open-Source Relational Databases",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Open-Source DBs: %v", err),
 			Priority:   PriorityHigh,
@@ -311,8 +311,8 @@ func (c *DefenderChecks) checkDefenderForOpenSourceDB(ctx context.Context) []Che
 
 	if !enabled {
 		return []CheckResult{{
-			Control:     "CIS-2.1.5",
-			Name:        "[CIS Azure 2.1.5] Microsoft Defender for Open-Source Relational Databases",
+			Control:     "CIS-8.1.7.2",
+			Name:        "Microsoft Defender for Open-Source Relational Databases",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
@@ -332,8 +332,8 @@ az security pricing create --name OpenSourceRelationalDatabases --tier Standard`
 	}
 
 	return []CheckResult{{
-		Control:    "CIS-2.1.5",
-		Name:       "[CIS Azure 2.1.5] Microsoft Defender for Open-Source Relational Databases",
+		Control:    "CIS-8.1.7.2",
+		Name:       "Microsoft Defender for Open-Source Relational Databases",
 		Status:     "PASS",
 		Evidence:   "CIS 2.1.5: Microsoft Defender for open-source relational databases is enabled",
 		Priority:   PriorityInfo,
@@ -347,8 +347,8 @@ func (c *DefenderChecks) checkDefenderForCosmosDB(ctx context.Context) []CheckRe
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.6",
-			Name:       "[CIS Azure 2.1.6] Microsoft Defender for Azure Cosmos DB",
+			Control:    "CIS-8.1.7.1",
+			Name:       "Microsoft Defender for Azure Cosmos DB",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Cosmos DB: %v", err),
 			Priority:   PriorityHigh,
@@ -359,8 +359,8 @@ func (c *DefenderChecks) checkDefenderForCosmosDB(ctx context.Context) []CheckRe
 
 	if !enabled {
 		return []CheckResult{{
-			Control:     "CIS-2.1.6",
-			Name:        "[CIS Azure 2.1.6] Microsoft Defender for Azure Cosmos DB",
+			Control:     "CIS-8.1.7.1",
+			Name:        "Microsoft Defender for Azure Cosmos DB",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
@@ -378,8 +378,8 @@ az security pricing create --name CosmosDbs --tier Standard`,
 	}
 
 	return []CheckResult{{
-		Control:    "CIS-2.1.6",
-		Name:       "[CIS Azure 2.1.6] Microsoft Defender for Azure Cosmos DB",
+		Control:    "CIS-8.1.7.1",
+		Name:       "Microsoft Defender for Azure Cosmos DB",
 		Status:     "PASS",
 		Evidence:   "CIS 2.1.6: Microsoft Defender for Azure Cosmos DB is enabled",
 		Priority:   PriorityInfo,
@@ -395,8 +395,8 @@ func (c *DefenderChecks) checkDefenderForStorage(ctx context.Context) []CheckRes
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.7",
-			Name:       "[CIS Azure 2.1.7] Microsoft Defender for Storage",
+			Control:    "CIS-8.1.5.1",
+			Name:       "Microsoft Defender for Storage",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Storage: %v", err),
 			Priority:   PriorityHigh,
@@ -407,8 +407,8 @@ func (c *DefenderChecks) checkDefenderForStorage(ctx context.Context) []CheckRes
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.7",
-			Name:        "[CIS Azure 2.1.7] Microsoft Defender for Storage",
+			Control:     "CIS-8.1.5.1",
+			Name:        "Microsoft Defender for Storage",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
@@ -425,8 +425,8 @@ az security pricing create --name StorageAccounts --tier Standard --subplan Defe
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.7",
-			Name:       "[CIS Azure 2.1.7] Microsoft Defender for Storage",
+			Control:    "CIS-8.1.5.1",
+			Name:       "Microsoft Defender for Storage",
 			Status:     "PASS",
 			Evidence:   "CIS 2.1.7: Microsoft Defender for Storage is enabled",
 			Priority:   PriorityInfo,
@@ -445,8 +445,8 @@ func (c *DefenderChecks) checkDefenderForContainers(ctx context.Context) []Check
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.8",
-			Name:       "[CIS Azure 2.1.8] Microsoft Defender for Containers",
+			Control:    "CIS-8.1.4.1",
+			Name:       "Microsoft Defender for Containers",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Containers: %v", err),
 			Priority:   PriorityHigh,
@@ -457,8 +457,8 @@ func (c *DefenderChecks) checkDefenderForContainers(ctx context.Context) []Check
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.8",
-			Name:        "[CIS Azure 2.1.8] Microsoft Defender for Containers",
+			Control:     "CIS-8.1.4.1",
+			Name:        "Microsoft Defender for Containers",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
@@ -475,8 +475,8 @@ az security pricing create --name Containers --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.8",
-			Name:       "[CIS Azure 2.1.8] Microsoft Defender for Containers",
+			Control:    "CIS-8.1.4.1",
+			Name:       "Microsoft Defender for Containers",
 			Status:     "PASS",
 			Evidence:   "CIS 2.1.8: Microsoft Defender for Containers is enabled",
 			Priority:   PriorityInfo,
@@ -495,8 +495,8 @@ func (c *DefenderChecks) checkDefenderForDNS(ctx context.Context) []CheckResult 
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.9",
-			Name:       "[CIS Azure 2.1.9] Microsoft Defender for DNS",
+			Control:    "AZ-DEFENDER-03",
+			Name:       "Microsoft Defender for DNS",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for DNS: %v", err),
 			Priority:   PriorityMedium,
@@ -507,8 +507,8 @@ func (c *DefenderChecks) checkDefenderForDNS(ctx context.Context) []CheckResult 
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.9",
-			Name:        "[CIS Azure 2.1.9] Microsoft Defender for DNS",
+			Control:     "AZ-DEFENDER-03",
+			Name:        "Microsoft Defender for DNS",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Priority:    PriorityMedium,
@@ -531,8 +531,8 @@ az security pricing create --name Dns --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.9",
-			Name:       "[CIS Azure 2.1.9] Microsoft Defender for DNS",
+			Control:    "AZ-DEFENDER-03",
+			Name:       "Microsoft Defender for DNS",
 			Status:     "PASS",
 			Evidence:   "CIS 2.1.9: Microsoft Defender for DNS is enabled",
 			Priority:   PriorityInfo,
@@ -551,8 +551,8 @@ func (c *DefenderChecks) checkDefenderForKeyVault(ctx context.Context) []CheckRe
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.10",
-			Name:       "[CIS Azure 2.1.10] Microsoft Defender for Key Vault",
+			Control:    "CIS-8.1.8.1",
+			Name:       "Microsoft Defender for Key Vault",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Key Vault: %v", err),
 			Priority:   PriorityMedium,
@@ -563,8 +563,8 @@ func (c *DefenderChecks) checkDefenderForKeyVault(ctx context.Context) []CheckRe
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.10",
-			Name:        "[CIS Azure 2.1.10] Microsoft Defender for Key Vault",
+			Control:     "CIS-8.1.8.1",
+			Name:        "Microsoft Defender for Key Vault",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Priority:    PriorityMedium,
@@ -581,8 +581,8 @@ az security pricing create --name KeyVaults --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.10",
-			Name:       "[CIS Azure 2.1.10] Microsoft Defender for Key Vault",
+			Control:    "CIS-8.1.8.1",
+			Name:       "Microsoft Defender for Key Vault",
 			Status:     "PASS",
 			Evidence:   "CIS 2.1.10: Microsoft Defender for Key Vault is enabled",
 			Priority:   PriorityInfo,
@@ -601,8 +601,8 @@ func (c *DefenderChecks) checkDefenderForAPIs(ctx context.Context) []CheckResult
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.11",
-			Name:       "[CIS Azure 2.1.11] Microsoft Defender for APIs",
+			Control:    "CIS-8.1.2.1",
+			Name:       "Microsoft Defender for APIs",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for APIs: %v", err),
 			Priority:   PriorityMedium,
@@ -613,8 +613,8 @@ func (c *DefenderChecks) checkDefenderForAPIs(ctx context.Context) []CheckResult
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.11",
-			Name:        "[CIS Azure 2.1.11] Microsoft Defender for APIs",
+			Control:     "CIS-8.1.2.1",
+			Name:        "Microsoft Defender for APIs",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Priority:    PriorityMedium,
@@ -637,8 +637,8 @@ az security pricing create --name Api --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.11",
-			Name:       "[CIS Azure 2.1.11] Microsoft Defender for APIs",
+			Control:    "CIS-8.1.2.1",
+			Name:       "Microsoft Defender for APIs",
 			Status:     "PASS",
 			Evidence:   "CIS 2.1.11: Microsoft Defender for APIs is enabled",
 			Priority:   PriorityInfo,
@@ -657,8 +657,8 @@ func (c *DefenderChecks) checkDefenderForResourceManager(ctx context.Context) []
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.12",
-			Name:       "[CIS Azure 2.1.12] Microsoft Defender for Resource Manager",
+			Control:    "CIS-8.1.9.1",
+			Name:       "Microsoft Defender for Resource Manager",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Resource Manager: %v", err),
 			Priority:   PriorityHigh,
@@ -669,8 +669,8 @@ func (c *DefenderChecks) checkDefenderForResourceManager(ctx context.Context) []
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.12",
-			Name:        "[CIS Azure 2.1.12] Microsoft Defender for Resource Manager",
+			Control:     "CIS-8.1.9.1",
+			Name:        "Microsoft Defender for Resource Manager",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
@@ -687,8 +687,8 @@ az security pricing create --name Arm --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.12",
-			Name:       "[CIS Azure 2.1.12] Microsoft Defender for Resource Manager",
+			Control:    "CIS-8.1.9.1",
+			Name:       "Microsoft Defender for Resource Manager",
 			Status:     "PASS",
 			Evidence:   "CIS 2.1.12: Microsoft Defender for Resource Manager is enabled",
 			Priority:   PriorityInfo,
@@ -713,8 +713,8 @@ func (c *DefenderChecks) checkDefenderAutoProvisioning(ctx context.Context) []Ch
 		page, err := pager.NextPage(ctx)
 		if err != nil {
 			return []CheckResult{{
-				Control:    "CIS-2.1.17",
-				Name:       "[CIS Azure 2.1.17] Auto-Provisioning of Defender Components",
+				Control:    "AZ-DEFENDER-01",
+				Name:       "Auto-Provisioning of Defender Components",
 				Status:     "ERROR",
 				Evidence:   fmt.Sprintf("Unable to check auto-provisioning: %v", err),
 				Priority:   PriorityMedium,
@@ -737,8 +737,8 @@ func (c *DefenderChecks) checkDefenderAutoProvisioning(ctx context.Context) []Ch
 
 	if len(disabledSettings) > 0 {
 		results = append(results, CheckResult{
-			Control:  "CIS-2.1.17",
-			Name:     "[CIS Azure 2.1.17] Auto-Provisioning of Defender Components",
+			Control:  "AZ-DEFENDER-01",
+			Name:     "Auto-Provisioning of Defender Components",
 			Status:   "FAIL",
 			Severity: "MEDIUM",
 			Priority: PriorityMedium,
@@ -756,8 +756,8 @@ Defender for Cloud → Environment settings → Auto provisioning → Enable all
 		})
 	} else if totalSettings > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.17",
-			Name:       "[CIS Azure 2.1.17] Auto-Provisioning of Defender Components",
+			Control:    "AZ-DEFENDER-01",
+			Name:       "Auto-Provisioning of Defender Components",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 2.1.17: All %d auto-provisioning settings are enabled", totalSettings),
 			Priority:   PriorityInfo,
@@ -783,8 +783,8 @@ func (c *DefenderChecks) checkSecurityContacts(ctx context.Context) []CheckResul
 		if err != nil {
 			return []CheckResult{
 				{
-					Control:    "CIS-2.1.19",
-					Name:       "[CIS Azure 2.1.19] Security Contact Email",
+					Control:    "AZ-DEFENDER-02",
+					Name:       "Security Contact Email",
 					Status:     "ERROR",
 					Evidence:   fmt.Sprintf("Unable to check security contacts: %v", err),
 					Priority:   PriorityMedium,
@@ -792,8 +792,8 @@ func (c *DefenderChecks) checkSecurityContacts(ctx context.Context) []CheckResul
 					Frameworks: GetFrameworkMappings("DEFENDER_CONTACTS"),
 				},
 				{
-					Control:    "CIS-2.1.20",
-					Name:       "[CIS Azure 2.1.20] Security Alert Notifications",
+					Control:    "CIS-8.1.14",
+					Name:       "Security Alert Notifications",
 					Status:     "ERROR",
 					Evidence:   fmt.Sprintf("Unable to check alert notifications: %v", err),
 					Priority:   PriorityHigh,
@@ -825,8 +825,8 @@ func (c *DefenderChecks) checkSecurityContacts(ctx context.Context) []CheckResul
 	// CIS 2.1.19: Security Contact Email
 	if len(contactEmails) == 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.19",
-			Name:        "[CIS Azure 2.1.19] Security Contact Email",
+			Control:     "AZ-DEFENDER-02",
+			Name:        "Security Contact Email",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Priority:    PriorityMedium,
@@ -843,8 +843,8 @@ Defender for Cloud → Environment settings → Email notifications → Add emai
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.19",
-			Name:       "[CIS Azure 2.1.19] Security Contact Email",
+			Control:    "AZ-DEFENDER-02",
+			Name:       "Security Contact Email",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 2.1.19: %d security contact email(s) configured", len(contactEmails)),
 			Priority:   PriorityInfo,
@@ -857,8 +857,8 @@ Defender for Cloud → Environment settings → Email notifications → Add emai
 	// FIXED: Simplified check - just verify contacts are configured with notifications
 	if !hasAlertNotifications {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.20",
-			Name:        "[CIS Azure 2.1.20] Security Alert Notifications",
+			Control:     "CIS-8.1.14",
+			Name:        "Security Alert Notifications",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
@@ -875,8 +875,8 @@ Defender for Cloud → Environment settings → Email notifications → Alert no
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.20",
-			Name:       "[CIS Azure 2.1.20] Security Alert Notifications",
+			Control:    "CIS-8.1.14",
+			Name:       "Security Alert Notifications",
 			Status:     "PASS",
 			Evidence:   "CIS 2.1.20: Security alert notifications are configured",
 			Priority:   PriorityInfo,

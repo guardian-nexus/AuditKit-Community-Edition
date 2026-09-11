@@ -38,8 +38,8 @@ func (c *KeyVaultChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	// without full vault properties. Mark these for manual verification.
 	if totalVaults > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-3.3.5",
-			Name:        "[CIS Azure 3.3.5, 8.1, 8.2] Key Vault Recovery Settings",
+			Control:     "AZ-KEYVAULT-01",
+			Name:        "Key Vault Recovery Settings",
 			Status:      "INFO",
 			Evidence:    fmt.Sprintf("CIS 3.3.5: MANUAL CHECK - Verify purge protection and soft delete (90+ days) for %d Key Vaults", totalVaults),
 			Remediation: "Enable purge protection and soft delete for all Key Vaults",
@@ -60,8 +60,8 @@ az keyvault update --name <vault> --enable-purge-protection true`,
 		})
 
 		results = append(results, CheckResult{
-			Control:     "CIS-3.3.6",
-			Name:        "[CIS Azure 3.3.6] Key Vault RBAC Authorization",
+			Control:     "AZ-KEYVAULT-02",
+			Name:        "Key Vault RBAC Authorization",
 			Status:      "INFO",
 			Evidence:    fmt.Sprintf("CIS 3.3.6: MANUAL CHECK - Verify RBAC is enabled for %d Key Vaults", totalVaults),
 			Remediation: "Enable Azure RBAC for Key Vault authorization",
@@ -76,8 +76,8 @@ az keyvault update --name <vault> --enable-rbac-authorization true`,
 		})
 
 		results = append(results, CheckResult{
-			Control:         "CIS-3.3.7",
-			Name:            "[CIS Azure 3.3.7] Key Vault Private Endpoints",
+			Control:         "CIS-8.3.8",
+			Name:            "Key Vault Private Endpoints",
 			Status:          "INFO",
 			Evidence:        fmt.Sprintf("CIS 3.3.7: MANUAL CHECK - Verify private endpoints for %d Key Vaults", totalVaults),
 			Remediation:     "Configure private endpoints for secure VNet access",
@@ -88,8 +88,8 @@ az keyvault update --name <vault> --enable-rbac-authorization true`,
 		})
 
 		results = append(results, CheckResult{
-			Control:         "CIS-8.3",
-			Name:            "[CIS Azure 8.3] Key Vault Network Access",
+			Control:         "CIS-8.3.7",
+			Name:            "Key Vault Network Access",
 			Status:          "INFO",
 			Evidence:        fmt.Sprintf("CIS 8.3: MANUAL CHECK - Verify network restrictions for %d Key Vaults", totalVaults),
 			Remediation:     "Configure network rules to restrict access",
@@ -100,8 +100,8 @@ az keyvault update --name <vault> --enable-rbac-authorization true`,
 		})
 
 		results = append(results, CheckResult{
-			Control:         "CIS-6.1.4",
-			Name:            "[CIS Azure 6.1.4] Key Vault Logging",
+			Control:         "CIS-6.1.1.4",
+			Name:            "Key Vault Logging",
 			Status:          "INFO",
 			Evidence:        "CIS 6.1.4: MANUAL CHECK - Verify diagnostic logging with 180+ day retention",
 			Remediation:     "Enable diagnostic logging for all Key Vaults",

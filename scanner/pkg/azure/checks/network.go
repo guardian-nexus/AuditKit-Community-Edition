@@ -64,7 +64,7 @@ func (c *NetworkChecks) CheckRDPAccess(ctx context.Context) []CheckResult {
 		if err != nil {
 			return append(results, CheckResult{
 				Control:    "CIS-7.1",
-				Name:       "[CIS Azure 7.1] RDP Access from Internet",
+				Name:       "RDP Access from Internet",
 				Status:     "ERROR",
 				Evidence:   fmt.Sprintf("Unable to check NSGs: %v", err),
 				Priority:   PriorityHigh,
@@ -114,7 +114,7 @@ func (c *NetworkChecks) CheckRDPAccess(ctx context.Context) []CheckResult {
 
 		results = append(results, CheckResult{
 			Control:     "CIS-7.1",
-			Name:        "[CIS Azure 7.1] RDP Access from Internet",
+			Name:        "RDP Access from Internet",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("CIS 7.1: %d NSG rules allow RDP (3389) from internet: %s", len(rdpFromInternet), strings.Join(displayRules, ", ")),
@@ -149,7 +149,7 @@ az network bastion create \
 	} else if totalNSGs > 0 {
 		results = append(results, CheckResult{
 			Control:    "CIS-7.1",
-			Name:       "[CIS Azure 7.1] RDP Access from Internet",
+			Name:       "RDP Access from Internet",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 7.1: All %d NSGs properly restrict RDP access from internet", totalNSGs),
 			Priority:   PriorityInfo,
@@ -215,7 +215,7 @@ func (c *NetworkChecks) CheckSSHAccess(ctx context.Context) []CheckResult {
 
 		results = append(results, CheckResult{
 			Control:     "CIS-7.2",
-			Name:        "[CIS Azure 7.2] SSH Access from Internet",
+			Name:        "SSH Access from Internet",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("CIS 7.2: %d NSG rules allow SSH (22) from internet: %s", len(sshFromInternet), strings.Join(displayRules, ", ")),
@@ -240,7 +240,7 @@ Best practice: Combine Azure Bastion + disable password authentication + use SSH
 	} else if totalNSGs > 0 {
 		results = append(results, CheckResult{
 			Control:    "CIS-7.2",
-			Name:       "[CIS Azure 7.2] SSH Access from Internet",
+			Name:       "SSH Access from Internet",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 7.2: All %d NSGs properly restrict SSH access from internet", totalNSGs),
 			Priority:   PriorityInfo,
@@ -309,8 +309,8 @@ func (c *NetworkChecks) CheckUDPAccess(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-7.3",
-			Name:        "[CIS Azure 7.3] UDP Access from Internet",
+			Control:     "AZ-NETWORK-01",
+			Name:        "UDP Access from Internet",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("CIS 7.3: %d NSG rules allow UDP from internet: %s", len(udpFromInternet), strings.Join(displayRules, ", ")),
@@ -333,8 +333,8 @@ Restrict to specific source IPs where possible.`,
 		})
 	} else if totalNSGs > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-7.3",
-			Name:       "[CIS Azure 7.3] UDP Access from Internet",
+			Control:    "AZ-NETWORK-01",
+			Name:       "UDP Access from Internet",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 7.3: All %d NSGs properly restrict UDP access from internet", totalNSGs),
 			Priority:   PriorityInfo,
@@ -400,7 +400,7 @@ func (c *NetworkChecks) CheckHTTPAccess(ctx context.Context) []CheckResult {
 
 		results = append(results, CheckResult{
 			Control:     "CIS-7.4",
-			Name:        "[CIS Azure 7.4] HTTP(S) Access from Internet",
+			Name:        "HTTP(S) Access from Internet",
 			Status:      "INFO",
 			Evidence:    fmt.Sprintf("CIS 7.4: Found NSG rules allowing HTTP(S) from internet: %s - Verify these are for web applications only", strings.Join(evidence, ", ")),
 			Remediation: "Evaluate HTTP(S) exposure and use Application Gateway/Front Door for web apps",
@@ -436,7 +436,7 @@ func (c *NetworkChecks) CheckFlowLogRetention(ctx context.Context) []CheckResult
 
 	results = append(results, CheckResult{
 		Control:     "CIS-7.5",
-		Name:        "[CIS Azure 7.5] NSG Flow Log Retention",
+		Name:        "NSG Flow Log Retention",
 		Status:      "INFO",
 		Evidence:    "CIS 7.5: MANUAL CHECK - Verify NSG flow log retention period is greater than 90 days",
 		Remediation: "Configure flow log retention >= 90 days",
@@ -473,7 +473,7 @@ func (c *NetworkChecks) CheckNetworkWatcher(ctx context.Context) []CheckResult {
 
 	results = append(results, CheckResult{
 		Control:     "CIS-7.6",
-		Name:        "[CIS Azure 7.6] Network Watcher Enabled",
+		Name:        "Network Watcher Enabled",
 		Status:      "INFO",
 		Evidence:    "CIS 7.6: MANUAL CHECK - Verify Network Watcher is enabled for Azure Regions that are in use",
 		Remediation: "Enable Network Watcher in all active regions",
@@ -510,7 +510,7 @@ func (c *NetworkChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
 
 	results = append(results, CheckResult{
 		Control:     "CIS-7.7",
-		Name:        "[CIS Azure 7.7] Public IP Address Evaluation",
+		Name:        "Public IP Address Evaluation",
 		Status:      "INFO",
 		Evidence:    "CIS 7.7: MANUAL CHECK - Ensure Public IP addresses are evaluated on a periodic basis",
 		Remediation: "Review public IPs monthly and remove unused ones",
@@ -611,8 +611,8 @@ func (c *NetworkChecks) CheckOpenPorts(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-6.1",
-			Name:        "[CIS Azure 6.1-6.3] Dangerous Open Ports",
+			Control:     "CIS-7.1",
+			Name:        "Dangerous Open Ports",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("CIS 6.1-6.3: %d NSG rules expose dangerous ports to internet: %s", len(openToInternet), strings.Join(displayNSGs, ", ")),

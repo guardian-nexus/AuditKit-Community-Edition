@@ -71,8 +71,8 @@ func (c *MonitoringChecks) CheckActivityLogDiagnostics(ctx context.Context) []Ch
 	// Provide detailed guidance based on whether we can see activity logs
 	if hasActivityLogs {
 		results = append(results, CheckResult{
-			Control:     "CIS-5.1.2",
-			Name:        "[CIS Azure 5.1.2, 5.1.3, 5.1.4] Activity Log Export and Retention",
+			Control:     "CIS-6.1.1.2",
+			Name:        "Activity Log Export and Retention",
 			Status:      "INFO",
 			Evidence:    fmt.Sprintf("CIS 5.1.2-5.1.4: Activity logs are being collected (%d recent events found). VERIFY diagnostic settings are configured with proper retention and destinations.", logsFound),
 			Remediation: "Verify Activity Log diagnostic settings meet CIS requirements",
@@ -128,8 +128,8 @@ CRITICAL: This is a foundational control. Without proper Activity Log export:
 	} else {
 		// No activity logs found - either diagnostic settings not configured OR permissions issue
 		results = append(results, CheckResult{
-			Control:     "CIS-5.1.2",
-			Name:        "[CIS Azure 5.1.2, 5.1.3, 5.1.4] Activity Log Export and Retention",
+			Control:     "CIS-6.1.1.2",
+			Name:        "Activity Log Export and Retention",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    "CIS 5.1.2-5.1.4: Unable to retrieve activity logs. This indicates either: (1) Diagnostic settings are NOT configured, or (2) Insufficient permissions to read logs. This is a CRITICAL security gap.",
@@ -187,8 +187,8 @@ func (c *MonitoringChecks) CheckResourceDiagnostics(ctx context.Context) []Check
 	// Here we provide overall guidance
 
 	results = append(results, CheckResult{
-		Control:     "CIS-5.1.5",
-		Name:        "[CIS Azure 5.1.5, 5.1.6] Key Vault and NSG Diagnostic Logging",
+		Control:     "CIS-6.1.1.4",
+		Name:        "Key Vault and NSG Diagnostic Logging",
 		Status:      "INFO",
 		Evidence:    "CIS 5.1.5, 5.1.6: VERIFY diagnostic logging is enabled for all Key Vaults and NSG flow logs are configured",
 		Remediation: "Enable diagnostic settings on all Key Vaults and configure NSG flow logging",
@@ -344,7 +344,7 @@ NOTE: PCI-DSS compliance REQUIRES this expense. Budget accordingly.`,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
 			"PCI-DSS":   "10.3.3, 10.5.1",
-			"CIS-Azure": "5.2, 5.3",
+			"CIS-Azure": "6.1.1.1",
 			"SOC2":      "CC7.1",
 		},
 	})

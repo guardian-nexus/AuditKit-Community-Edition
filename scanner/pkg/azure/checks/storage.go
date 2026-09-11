@@ -55,8 +55,8 @@ func (c *StorageChecks) CheckPublicAccess(ctx context.Context) []CheckResult {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
 			return append(results, CheckResult{
-				Control:    "CIS-3.1",
-				Name:       "[CIS Azure 3.1] Storage Account Public Access",
+				Control:    "CIS-8.3.7",
+				Name:       "Storage Account Public Access",
 				Status:     "ERROR",
 				Evidence:   fmt.Sprintf("Unable to check storage accounts: %v", err),
 				Severity:   "HIGH",
@@ -86,8 +86,8 @@ func (c *StorageChecks) CheckPublicAccess(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-3.1",
-			Name:        "[CIS Azure 3.1, 3.2] Storage Account Public Access",
+			Control:     "CIS-8.3.7",
+			Name:        "Storage Account Public Access",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("CIS 3.1: %d/%d storage accounts allow public blob access: %s", len(publicAccounts), totalAccounts, strings.Join(displayAccounts, ", ")),
@@ -109,8 +109,8 @@ az storage account update \
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-3.1",
-			Name:       "[CIS Azure 3.1] Storage Account Public Access",
+			Control:    "CIS-8.3.7",
+			Name:       "Storage Account Public Access",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 3.1, 3.2: All %d storage accounts block public access", totalAccounts),
 			Priority:   PriorityInfo,
@@ -165,8 +165,8 @@ func (c *StorageChecks) CheckEncryption(ctx context.Context) []CheckResult {
 
 	if len(unencryptedAccounts) > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-3.3",
-			Name:        "[CIS Azure 3.3, 3.4] Storage Encryption at Rest",
+			Control:     "AZ-STORAGE-93",
+			Name:        "Storage Encryption at Rest",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("CIS 3.3: %d storage accounts lack encryption", len(unencryptedAccounts)),
@@ -182,8 +182,8 @@ For enhanced security (CIS 3.3), use customer-managed keys in Azure Key Vault.`,
 		})
 	} else if len(weakEncryption) > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-3.4",
-			Name:        "[CIS Azure 3.4] Storage Service Encryption",
+			Control:     "AZ-STORAGE-94",
+			Name:        "Storage Service Encryption",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("CIS 3.4: %d storage services have encryption disabled: %s", len(weakEncryption), strings.Join(weakEncryption[:min(3, len(weakEncryption))], ", ")),
@@ -194,8 +194,8 @@ For enhanced security (CIS 3.3), use customer-managed keys in Azure Key Vault.`,
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-3.3",
-			Name:       "[CIS Azure 3.3, 3.4] Storage Encryption at Rest",
+			Control:    "AZ-STORAGE-93",
+			Name:       "Storage Encryption at Rest",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 3.3, 3.4: All %d storage accounts encrypted", totalAccounts),
 			Priority:   PriorityInfo,
@@ -241,8 +241,8 @@ func (c *StorageChecks) CheckSecureTransfer(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-4.1",
-			Name:        "[CIS Azure 4.1] Secure Transfer Required",
+			Control:     "CIS-9.3.4",
+			Name:        "Secure Transfer Required",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("CIS 4.1: %d storage accounts allow unencrypted transfers: %s", len(insecureAccounts), strings.Join(displayAccounts, ", ")),
@@ -260,8 +260,8 @@ az storage account update \
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-4.1",
-			Name:       "[CIS Azure 4.1] Secure Transfer Required",
+			Control:    "CIS-9.3.4",
+			Name:       "Secure Transfer Required",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 4.1: All %d storage accounts require HTTPS", totalAccounts),
 			Priority:   PriorityInfo,
@@ -313,8 +313,8 @@ func (c *StorageChecks) CheckInfrastructureEncryption(ctx context.Context) []Che
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-4.2",
-			Name:        "[CIS Azure 4.2] Infrastructure Encryption",
+			Control:     "AZ-STORAGE-03",
+			Name:        "Infrastructure Encryption",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Evidence:    fmt.Sprintf("CIS 4.2: %d storage accounts lack infrastructure encryption: %s", len(noInfraEncryption), strings.Join(displayAccounts, ", ")),
@@ -340,8 +340,8 @@ az storage account create \
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-4.2",
-			Name:       "[CIS Azure 4.2] Infrastructure Encryption",
+			Control:    "AZ-STORAGE-03",
+			Name:       "Infrastructure Encryption",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 4.2: All %d storage accounts have infrastructure encryption", totalAccounts),
 			Priority:   PriorityInfo,
@@ -389,8 +389,8 @@ func (c *StorageChecks) CheckPublicNetworkAccess(ctx context.Context) []CheckRes
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-4.6",
-			Name:        "[CIS Azure 4.6] Public Network Access Disabled",
+			Control:     "CIS-8.3.7",
+			Name:        "Public Network Access Disabled",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("CIS 4.6: %d storage accounts allow public network access: %s", len(publicAccessAccounts), strings.Join(displayAccounts, ", ")),
@@ -411,8 +411,8 @@ Then configure Private Endpoints for access from VNets.`, publicAccessAccounts[0
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-4.6",
-			Name:       "[CIS Azure 4.6] Public Network Access Disabled",
+			Control:    "CIS-8.3.7",
+			Name:       "Public Network Access Disabled",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 4.6: All %d storage accounts disable public network access", totalAccounts),
 			Priority:   PriorityInfo,
@@ -462,8 +462,8 @@ func (c *StorageChecks) CheckMinimumTLS(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-4.15",
-			Name:        "[CIS Azure 4.15] Minimum TLS Version",
+			Control:     "CIS-9.3.6",
+			Name:        "Minimum TLS Version",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("CIS 4.15: %d storage accounts allow TLS < 1.2: %s", len(weakTLS), strings.Join(displayAccounts, ", ")),
@@ -482,8 +482,8 @@ az storage account update \
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-4.15",
-			Name:       "[CIS Azure 4.15] Minimum TLS Version",
+			Control:    "CIS-9.3.6",
+			Name:       "Minimum TLS Version",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 4.15: All %d storage accounts require TLS 1.2+", totalAccounts),
 			Priority:   PriorityInfo,
@@ -528,8 +528,8 @@ func (c *StorageChecks) CheckBlobAnonymousAccess(ctx context.Context) []CheckRes
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-4.17",
-			Name:        "[CIS Azure 4.17] Blob Anonymous Access",
+			Control:     "AZ-STORAGE-02",
+			Name:        "Blob Anonymous Access",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("CIS 4.17: %d storage accounts allow blob anonymous access: %s", len(anonymousAccess), strings.Join(displayAccounts, ", ")),
@@ -548,8 +548,8 @@ az storage account update \
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-4.17",
-			Name:       "[CIS Azure 4.17] Blob Anonymous Access",
+			Control:    "AZ-STORAGE-02",
+			Name:       "Blob Anonymous Access",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 4.17: All %d storage accounts block anonymous blob access", totalAccounts),
 			Priority:   PriorityInfo,
@@ -594,8 +594,8 @@ func (c *StorageChecks) CheckCrosstenantReplication(ctx context.Context) []Check
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-4.16",
-			Name:        "[CIS Azure 4.16] Cross-Tenant Replication",
+			Control:     "CIS-9.3.7",
+			Name:        "Cross-Tenant Replication",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Evidence:    fmt.Sprintf("CIS 4.16: %d storage accounts allow cross-tenant replication: %s", len(crossTenantEnabled), strings.Join(displayAccounts, ", ")),
@@ -614,8 +614,8 @@ az storage account update \
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-4.16",
-			Name:       "[CIS Azure 4.16] Cross-Tenant Replication",
+			Control:    "CIS-9.3.7",
+			Name:       "Cross-Tenant Replication",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 4.16: All %d storage accounts block cross-tenant replication", totalAccounts),
 			Priority:   PriorityInfo,
@@ -634,8 +634,8 @@ func (c *StorageChecks) CheckBlobSoftDelete(ctx context.Context) []CheckResult {
 	// This requires additional API calls per storage account
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.10",
-		Name:        "[CIS Azure 4.10] Blob Soft Delete",
+		Control:     "AZ-STORAGE-95",
+		Name:        "Blob Soft Delete",
 		Status:      "INFO",
 		Evidence:    "CIS 4.10: MANUAL CHECK - Verify soft delete is enabled for blobs with 7-365 day retention",
 		Remediation: "Enable soft delete with appropriate retention",
@@ -709,8 +709,8 @@ func (c *StorageChecks) CheckNetworkRestrictions(ctx context.Context) []CheckRes
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-4.7",
-			Name:        "[CIS Azure 4.7] Default Network Access Rule",
+			Control:     "CIS-9.3.5",
+			Name:        "Default Network Access Rule",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Evidence:    fmt.Sprintf("CIS 4.7: %d storage accounts have default action 'Allow': %s", len(openAccounts), strings.Join(displayAccounts, ", ")),
@@ -731,8 +731,8 @@ Then whitelist specific VNets or IP ranges.`, openAccounts[0]),
 		})
 	} else if totalAccounts > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-4.7",
-			Name:       "[CIS Azure 4.7] Default Network Access Rule",
+			Control:    "CIS-9.3.5",
+			Name:       "Default Network Access Rule",
 			Status:     "PASS",
 			Evidence:   fmt.Sprintf("CIS 4.7: All %d storage accounts default to Deny", totalAccounts),
 			Priority:   PriorityInfo,
@@ -751,8 +751,8 @@ func (c *StorageChecks) CheckKeyRotation(ctx context.Context) []CheckResult {
 	// This would need additional tracking/database
 
 	results = append(results, CheckResult{
-		Control:     "CIS-4.3",
-		Name:        "[CIS Azure 4.3, 4.4] Storage Key Rotation",
+		Control:     "CIS-9.3.1.1",
+		Name:        "Storage Key Rotation",
 		Status:      "INFO",
 		Evidence:    "CIS 4.3, 4.4: MANUAL CHECK - Verify storage account keys are rotated periodically",
 		Remediation: "Implement 90-day key rotation policy",
@@ -784,8 +784,8 @@ func (c *StorageChecks) CheckStorageLogging(ctx context.Context) []CheckResult {
 
 	// CIS 4.12, 4.13, 4.14: Storage logging
 	results = append(results, CheckResult{
-		Control:     "CIS-4.12",
-		Name:        "[CIS Azure 4.12-4.14] Storage Logging",
+		Control:     "AZ-STORAGE-01",
+		Name:        "Storage Logging",
 		Status:      "INFO",
 		Evidence:    "CIS 4.12-4.14: MANUAL CHECK - Verify storage logging enabled for Queue, Blob, and Table services",
 		Remediation: "Enable logging for Read, Write, Delete requests",
