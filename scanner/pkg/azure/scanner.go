@@ -11,6 +11,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/applicationinsights/armapplicationinsights"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/databricks/armdatabricks"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/keyvault/armkeyvault"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork"
@@ -41,6 +42,7 @@ type AzureScanner struct {
 	bastionClient       *armnetwork.BastionHostsClient
 	kvKeysClient        *armkeyvault.KeysClient
 	kvSecretsClient     *armkeyvault.SecretsClient
+	databricksClient    *armdatabricks.WorkspacesClient
 	sqlClient           *armsql.ServersClient
 	sqlDBClient         *armsql.DatabasesClient
 	keyVaultClient      *armkeyvault.VaultsClient
@@ -162,6 +164,10 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 	if err != nil {
 		kvSecretsClient = nil
 	}
+	databricksClient, err := armdatabricks.NewWorkspacesClient(subscriptionID, cred, nil)
+	if err != nil {
+		databricksClient = nil
+	}
 
 	sqlClient, err := armsql.NewServersClient(subscriptionID, cred, nil)
 	if err != nil {
@@ -281,6 +287,7 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		bastionClient:       bastionClient,
 		kvKeysClient:        kvKeysClient,
 		kvSecretsClient:     kvSecretsClient,
+		databricksClient:    databricksClient,
 		sqlClient:           sqlClient,
 		sqlDBClient:         sqlDBClient,
 		keyVaultClient:      keyVaultClient,
@@ -367,7 +374,8 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 			s.contactsClient, s.assessmentsClient, s.subscriptionID),
 		checks.NewCISNetworkChecks(s.appGatewayClient, s.wafPolicyClient, s.networkClient, // CIS Azure v6.0.0 section 7
 			s.watcherClient, s.flowLogClient, s.vpnGatewayClient, s.bastionClient),
-		checks.NewCISKeyVaultChecks(s.keyVaultClient, s.kvKeysClient, s.kvSecretsClient), // CIS Azure v6.0.0 section 8.3
+		checks.NewCISKeyVaultChecks(s.keyVaultClient, s.kvKeysClient, s.kvSecretsClient),       // CIS Azure v6.0.0 section 8.3
+		checks.NewCISDatabricksChecks(s.databricksClient, s.networkClient, s.diagnosticClient), // CIS Azure v6.0.0 section 2.1
 		checks.NewAppServiceChecks(s.subscriptionID),
 		checks.NewAzureCC1Checks(s.roleClient, s.roleDefClient),
 		checks.NewAzureCC2Checks(),
