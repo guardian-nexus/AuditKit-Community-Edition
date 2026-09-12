@@ -38,6 +38,9 @@ var catalogFS embed.FS
 // PartialCatalogs names frameworks whose shipped catalog is known to be smaller
 // than the published standard, so callers can say so rather than imply coverage.
 var PartialCatalogs = map[string]string{
+	"gdpr": "the security-relevant obligations of the Regulation, not its 99 articles; " +
+		"data-subject rights, lawful bases and supervisory procedure are out of scope " +
+		"for a configuration scan and are deliberately absent rather than reported as gaps",
 	"fedramp-low":      "derived from the NIST 800-53 Rev5 Low baseline; FedRAMP-specific additions are not included",
 	"fedramp-moderate": "derived from the NIST 800-53 Rev5 Moderate baseline; FedRAMP-specific additions are not included",
 	"fedramp-high":     "derived from the NIST 800-53 Rev5 High baseline; FedRAMP-specific additions are not included",
@@ -59,6 +62,22 @@ var catalogFiles = map[string]string{
 	"fedramp-low":      "fedramp-low",
 	"fedramp-moderate": "fedramp-moderate",
 	"fedramp-high":     "fedramp-high",
+	// The CIS catalogs shipped for a year without being registered here, so
+	// CatalogFor returned nil for them and MissingControls could not report a
+	// recommendation the scan had not reached. It did not bite while AWS and
+	// Azure were fully answered and GCP had its own reporter, but it meant a
+	// future benchmark revision would add recommendations that went missing
+	// silently rather than appearing as manual rows.
+	"cis-aws":   "cis-aws",
+	"cis-azure": "cis-azure",
+	"cis-gcp":   "cis-gcp",
+	"cis-aks":   "cis-aks",
+	"cis-gke":   "cis-gke",
+	// GDPR was an advertised framework that -framework accepted with no
+	// catalog behind it, so a scan reported whatever it happened to check
+	// and there was no denominator at all: 16 articles covered, of an
+	// unstated total. See PartialCatalogs for the scope this catalog claims.
+	"gdpr": "gdpr",
 }
 
 // CatalogFor returns the full control catalog for a framework, keyed by control
@@ -89,9 +108,33 @@ func CatalogFor(framework string) map[string]string {
 		return nil
 	}
 
+	// Two shapes ship. Most catalogs are a flat {id: title}. The CIS benchmark
+	// catalogs wrap theirs in {"_source", "_note", "recommendations"}, because
+	// they record which benchmark edition the identifiers were extracted from
+	// and they carry assessment types rather than titles - CIS titles are CIS
+	// content and are deliberately absent.
+	//
+	// Reading only the flat shape is why the CIS catalogs could not be
+	// registered here: CatalogFor returned nil for them, so MissingControls
+	// returned nil and nothing could report a recommendation the scan had not
+	// reached.
 	catalog := make(map[string]string)
 	if err := json.Unmarshal(data, &catalog); err != nil {
-		return nil
+		var envelope struct {
+			Recommendations map[string]string `json:"recommendations"`
+			Obligations     map[string]string `json:"obligations"`
+		}
+		if err := json.Unmarshal(data, &envelope); err != nil {
+			return nil
+		}
+		switch {
+		case envelope.Recommendations != nil:
+			catalog = envelope.Recommendations
+		case envelope.Obligations != nil:
+			catalog = envelope.Obligations
+		default:
+			return nil
+		}
 	}
 
 	catalogCache[name] = catalog

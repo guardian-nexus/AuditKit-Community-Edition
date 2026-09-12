@@ -42,7 +42,7 @@ More in [Example Commands](#example-commands).
 
 AuditKit scans your cloud infrastructure for compliance gaps and security misconfigurations:
 
-- **Broad Control Coverage:** 228 AWS, 276 Azure and 167 GCP controls assessed - some return an automated verdict, the rest are reported with evidence-collection guidance
+- **Broad Control Coverage:** 228 AWS, 277 Azure and 168 GCP controls assessed - some return an automated verdict, the rest are reported with evidence-collection guidance
 - **Full CMMC Scope:** all 110 Level 1 + 2 practices reported, so you see the whole assessment surface
 - **Multi-Cloud Support:** AWS, Azure and GCP scanned directly, Microsoft 365 via ScubaGear import
 - **Audit-Ready Reports:** PDF/HTML/JSON output with evidence
@@ -111,7 +111,7 @@ scanning, or a desktop interface.
 | | Community Edition (free) | AuditKit Pro ($297/mo) |
 |---|---|---|
 | **Cloud providers** | AWS, Azure, GCP scanned; M365 via ScubaGear import | Same, plus Azure Arc |
-| **Controls assessed** | 228 AWS, 276 Azure, 167 GCP | 315 AWS, 394 Azure, 284 GCP |
+| **Controls assessed** | 228 AWS, 277 Azure, 168 GCP | 315 AWS, 395 Azure, 285 GCP |
 | **SOC2 Type II** | 38, 37, 32 criteria | 38, 38, 36 criteria |
 | **PCI DSS v4.0.1** | 71 requirements | 77 requirements |
 | **CMMC Level 1** | 5 of 17 practices automated | 7 of 17 practices automated |

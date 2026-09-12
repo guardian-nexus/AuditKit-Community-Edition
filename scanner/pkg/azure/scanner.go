@@ -602,6 +602,7 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 	// provider can automate, or a reader cannot tell an absent practice from a
 	// satisfied one.
 	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
+	results = append(results, s.reportRemainingCISAKS(ctx, results)...)
 
 	results = append(results, s.runSuites(ctx, verbose)...)
 
@@ -778,4 +779,34 @@ func dedupeIdenticalResults(results []ScanResult) []ScanResult {
 		deduped = append(deduped, result)
 	}
 	return deduped
+}
+
+// reportRemainingCISAKS accounts for the CIS-AKS recommendations the checks
+// above did not reach. The assessed set is derived from the results just
+// produced, so answering one removes it from the gap rather than leaving it
+// counted both ways.
+func (s *AzureScanner) reportRemainingCISAKS(ctx context.Context, reported []ScanResult) []ScanResult {
+	assessed := map[string]bool{}
+	for _, r := range reported {
+		for _, id := range strings.Split(r.Frameworks["CIS-AKS"], ",") {
+			if id = strings.TrimSpace(id); id != "" {
+				assessed[id] = true
+			}
+		}
+	}
+	rows, _ := checks.NewCISAKSReport(assessed).Run(ctx)
+	var out []ScanResult
+	for _, cr := range rows {
+		out = append(out, ScanResult{
+			Control:         cr.Control,
+			Name:            cr.Name,
+			Status:          cr.Status,
+			Evidence:        cr.Evidence,
+			Remediation:     cr.Remediation,
+			Severity:        cr.Severity,
+			ScreenshotGuide: cr.ScreenshotGuide,
+			Frameworks:      cr.Frameworks,
+		})
+	}
+	return out
 }

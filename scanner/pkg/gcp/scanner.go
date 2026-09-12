@@ -513,6 +513,7 @@ func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 	// the subset this scanner reaches, or a reader cannot tell an absent
 	// recommendation from a satisfied one.
 	results = append(results, s.reportRemainingCISGCP(ctx, results)...)
+	results = append(results, s.reportRemainingCISGKE(ctx, results)...)
 
 	results = append(results, s.runSuites(ctx, verbose, "CIS")...)
 
@@ -572,4 +573,34 @@ func dedupeIdenticalResults(results []ScanResult) []ScanResult {
 		deduped = append(deduped, result)
 	}
 	return deduped
+}
+
+// reportRemainingCISGKE accounts for the CIS-GKE recommendations the checks
+// above did not reach. The assessed set is derived from the results just
+// produced, so answering one removes it from the gap rather than leaving it
+// counted both ways.
+func (s *GCPScanner) reportRemainingCISGKE(ctx context.Context, reported []ScanResult) []ScanResult {
+	assessed := map[string]bool{}
+	for _, r := range reported {
+		for _, id := range strings.Split(r.Frameworks["CIS-GKE"], ",") {
+			if id = strings.TrimSpace(id); id != "" {
+				assessed[id] = true
+			}
+		}
+	}
+	rows, _ := checks.NewCISGKEReport(assessed).Run(ctx)
+	var out []ScanResult
+	for _, cr := range rows {
+		out = append(out, ScanResult{
+			Control:         cr.Control,
+			Name:            cr.Name,
+			Status:          cr.Status,
+			Evidence:        cr.Evidence,
+			Remediation:     cr.Remediation,
+			Severity:        cr.Severity,
+			ScreenshotGuide: cr.ScreenshotGuide,
+			Frameworks:      cr.Frameworks,
+		})
+	}
+	return out
 }

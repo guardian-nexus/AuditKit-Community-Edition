@@ -1563,6 +1563,13 @@ func performScan(provider, profile, framework string, verbose bool, services str
 		sort.Strings(missingIDs)
 		for _, id := range missingIDs {
 			title := missing[id]
+			// The CIS catalogs carry an assessment type where the others
+			// carry a title, because CIS titles are their content and are
+			// deliberately not shipped. Using the value as a name would
+			// label the row "Automated".
+			if title == "Automated" || title == "Manual" {
+				title = "Benchmark recommendation not assessed (" + title + ")"
+			}
 			controls = append(controls, ControlResult{
 				ID:              id,
 				Name:            title,

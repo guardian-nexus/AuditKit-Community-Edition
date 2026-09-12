@@ -72,8 +72,8 @@ Compare to traditional costs:
 
 **Coverage:**
 - AWS: 228 controls - 38 SOC2 criteria, 59 PCI-DSS requirements, 5 of 17 CMMC Level 1 practices automated; all 110 Level 1 + 2 practices reported
-- Azure: 276 controls - 37 SOC2 criteria, 59 PCI-DSS requirements, CMMC Level 1 automated; Level 2 practices reported
-- GCP: 167 controls - 32 SOC2 criteria, 49 PCI-DSS requirements, 5 GKE controls; deep GKE scanning and Vertex AI are Pro
+- Azure: 277 controls - 37 SOC2 criteria, 59 PCI-DSS requirements, CMMC Level 1 automated; Level 2 practices reported
+- GCP: 168 controls - 32 SOC2 criteria, 49 PCI-DSS requirements, 5 GKE controls; deep GKE scanning and Vertex AI are Pro
 - M365: 29+ Entra ID rules via ScubaGear
 
 ### Which GCP services are scanned?

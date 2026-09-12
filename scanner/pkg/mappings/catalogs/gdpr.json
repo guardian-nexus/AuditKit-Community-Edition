@@ -1,0 +1,33 @@
+{
+ "_source": "Regulation (EU) 2016/679, security-relevant obligations only",
+ "_note": "The security-relevant subset, not the full Regulation. GDPR has 99 articles; the great majority concern data-subject rights, lawful bases, definitions and supervisory-authority procedure, which a configuration scan does not evidence and which are deliberately absent rather than reported as gaps. Scope chosen to match the articles gdpr_to_800_53 maps, extended to the sibling paragraphs of the same articles. A privacy adviser should confirm the scope before it is presented as a compliance denominator.",
+ "obligations": {
+  "Art5-1f": "Integrity and confidentiality of personal data",
+  "Art5-2": "Accountability for compliance",
+  "Art24-1": "Implement appropriate technical and organisational measures",
+  "Art24-2": "Implement data protection policies",
+  "Art25-1": "Data protection by design",
+  "Art25-2": "Data protection by default",
+  "Art28-1": "Use only processors providing sufficient guarantees",
+  "Art28-3c": "Processor bound to the security measures of Article 32",
+  "Art30-1": "Controller maintains records of processing activities",
+  "Art30-2": "Processor maintains records of processing activities",
+  "Art32-1a": "Pseudonymisation and encryption of personal data",
+  "Art32-1b": "Ongoing confidentiality, integrity, availability and resilience",
+  "Art32-1c": "Ability to restore availability and access after an incident",
+  "Art32-1d": "Regular testing and evaluation of security measures",
+  "Art32-2": "Security appropriate to the risk",
+  "Art32-4": "Personnel process personal data only under instruction",
+  "Art33-1": "Notify the supervisory authority within 72 hours",
+  "Art33-2": "Processor notifies the controller without undue delay",
+  "Art33-3": "Breach notification contains the required content",
+  "Art33-5": "Document all personal data breaches",
+  "Art34-1": "Communicate high-risk breaches to data subjects",
+  "Art34-2": "Breach communication contains the required content",
+  "Art35-1": "Carry out a data protection impact assessment where required",
+  "Art35-7": "Impact assessment contains the required content",
+  "Art44": "General principle for transfers to third countries",
+  "Art46-1": "Transfers subject to appropriate safeguards",
+  "Art46-2c": "Standard contractual clauses as a transfer safeguard"
+ }
+}

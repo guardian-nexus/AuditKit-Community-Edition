@@ -32,7 +32,7 @@ Free to find your gaps. Paid for the evidence package, multi-account scanning, a
 - PCI-DSS v4.0.1 (71 requirements)
 - CMMC Level 1 automated (5 of 17 practices), and all 110 Level 1 + 2 practices reported for evidence tracking
 - NIST 800-53 Rev 5 (149 technical controls)
-- GCP Core Services (167 controls)
+- GCP Core Services (168 controls)
 - PDF, HTML, JSON, CSV and terminal reports
 - Evidence collection tracker
 - CLI tool
