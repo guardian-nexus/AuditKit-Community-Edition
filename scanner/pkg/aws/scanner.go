@@ -56,13 +56,9 @@ type AWSScanner struct {
 	suiteCache  []ScanResult
 	suiteCached bool
 
-	cfg             aws.Config
-	s3Client        *s3.Client
-	s3controlClient *s3control.Client
-	// moduleResults memoises one check module's results for the duration of a
-	// single ScanServices call. With -framework all the SOC2, PCI and CIS suites
-	// share most modules, which previously ran (and hit the AWS API) three times.
-	moduleResults        map[string][]checks.CheckResult
+	cfg                  aws.Config
+	s3Client             *s3.Client
+	s3controlClient      *s3control.Client
 	iamClient            *iam.Client
 	ec2Client            *ec2.Client
 	ctClient             *cloudtrail.Client
@@ -209,7 +205,6 @@ func (s *AWSScanner) ScanServices(ctx context.Context, services []string, verbos
 
 	var results []ScanResult
 	framework = strings.ToLower(framework)
-	s.moduleResults = make(map[string][]checks.CheckResult)
 
 	switch framework {
 	case "soc2":
@@ -240,177 +235,33 @@ func (s *AWSScanner) ScanServices(ctx context.Context, services []string, verbos
 }
 
 func (s *AWSScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
 	if verbose {
 		cisEd, _ := mappings.EditionFor("CIS-AWS")
 		fmt.Println("Running " + cisEd.Describe())
-		fmt.Println("Using existing checks with CIS control mappings...")
 		fmt.Println("")
 	}
 
-	// Run existing AWS check modules - they return results with Frameworks map
-	checkModules := []checks.Check{
-		checks.NewPCIDSSChecks(s.iamClient, s.ec2Client, s.s3Client, s.ctClient, s.configClient),
-		checks.NewIAMAdvancedChecks(s.iamClient),
-		checks.NewIAMChecks(s.iamClient),
-		checks.NewS3Checks(s.s3Client, s.s3controlClient, s.stsClient),
-		checks.NewEC2Checks(s.ec2Client),
-		checks.NewCloudTrailChecks(s.ctClient),
-		checks.NewConfigChecks(s.configClient),
-		checks.NewRDSChecks(s.rdsClient),
-		checks.NewVPCChecks(s.ec2Client),
-		checks.NewEFSChecks(s.efsClient), // CIS AWS Foundations v7.0.0 3.3.1
-		checks.NewKMSChecks(s.kmsClient), // CIS AWS Foundations v7.0.0 4.6
-		checks.NewNetworkFirewallChecks(s.nfwClient, s.ec2Client),
-		checks.NewLambdaChecks(s.lambdaClient),
-		checks.NewECSChecks(s.ecsClient),
-		checks.NewEKSChecks(s.eksClient),
-		checks.NewRoute53Checks(s.route53Client),
-		checks.NewAccessAnalyzerChecks(s.accessAnalyzerClient, s.cfg.Region),
-		checks.NewSecurityServicesChecks(s.gdClient, s.macieClient, s.shClient, s.inspector2Client),
-		checks.NewMonitoringChecks(s.cwClient, s.snsClient, s.shClient), // Add monitoring checks (CIS 4.16)
-		checks.NewCISManualChecks(),                                     // Add manual CIS controls (Section 4)
-		// Section 10 - Additional Services
-		checks.NewSSMChecks(s.ssmClient),                           // CIS 10.1-10.3
-		checks.NewBeanstalkChecks(s.beanstalkClient),               // CIS 10.4-10.6
-		checks.NewAPIGatewayChecks(s.apigwClient, s.apigwv2Client), // CIS 10.7-10.9
-		checks.NewBackupVaultChecks(s.backupClient),                // CIS 10.10-10.12
-		checks.NewMessagingChecks(s.snsClient, s.sqsClient),        // CIS 10.13-10.15
-		// Sections 11-18 - Extended Coverage for 100%
-		checks.NewOrganizationsAdvancedChecks(s.orgClient, s.ctClient), // CIS 11.1-11.4
-		checks.NewSecretsManagerChecks(s.secretsManagerClient),         // CIS 12.1-12.3
-		checks.NewECRChecks(s.ecrClient),                               // CIS 13.1-13.3
-		checks.NewDynamoDBChecks(s.dynamodbClient),                     // CIS 14.1-14.3
-		checks.NewCloudFormationChecks(s.cloudFormationClient),         // CIS 15.1-15.2
-		checks.NewACMChecks(s.acmClient),                               // CIS 16.1-16.2
-		checks.NewIAMExtendedChecks(s.iamClient),                       // CIS 17.1-17.2
-		checks.NewAuroraChecks(s.rdsClient),                            // CIS 18.1
-		// Sections 19-22 - Data Analytics & ML Services (January 2026)
-		checks.NewSageMakerChecks(s.sagemakerClient),     // CIS 19.1-19.6
-		checks.NewRedshiftChecks(s.redshiftClient),       // CIS 20.1-20.7
-		checks.NewElastiCacheChecks(s.elasticacheClient), // CIS 21.1-21.5
-		checks.NewOpenSearchChecks(s.opensearchClient),   // CIS 22.1-22.6
-	}
-
-	// Track which CIS sections we're covering
-	sectionCounts := make(map[string]int)
-
-	for _, check := range checkModules {
-		if verbose {
-			fmt.Printf("  Running %s...\n", check.Name())
-		}
-
-		checkResults, checkErr := s.runCheckModule(ctx, check)
-		if checkErr != nil && verbose {
-			fmt.Printf("    Warning: %v\n", checkErr)
-		}
-
-		for _, cr := range checkResults {
-			// Check if this control has CIS-AWS mapping in Frameworks
-			if cr.Frameworks != nil && cr.Frameworks["CIS-AWS"] != "" {
-				cisControls := cr.Frameworks["CIS-AWS"]
-
-				// Enhance control name with CIS numbers
-				enhancedName := fmt.Sprintf("[CIS AWS %s] %s", cisControls, cr.Name)
-
-				// Track section coverage (extract first digit from control number)
-				if len(cisControls) > 0 {
-					section := string(cisControls[0])
-					switch section {
-					case "1":
-						sectionCounts["Identity and Access Management"]++
-					case "2":
-						sectionCounts["Storage"]++
-					case "3":
-						sectionCounts["Logging"]++
-					case "4":
-						sectionCounts["Monitoring"]++
-					case "5":
-						sectionCounts["Networking"]++
-					case "6":
-						sectionCounts["Lambda"]++
-					case "7":
-						sectionCounts["ECS"]++
-					case "8":
-						sectionCounts["EKS"]++
-					case "9":
-						sectionCounts["Security Services"]++
-					default:
-						// Handle multi-digit sections (10-18)
-						if len(cisControls) >= 2 {
-							switch cisControls[0:2] {
-							case "10":
-								sectionCounts["Additional Services"]++
-							case "11":
-								sectionCounts["Organizations"]++
-							case "12":
-								sectionCounts["Secrets Manager"]++
-							case "13":
-								sectionCounts["ECR"]++
-							case "14":
-								sectionCounts["DynamoDB"]++
-							case "15":
-								sectionCounts["CloudFormation"]++
-							case "16":
-								sectionCounts["ACM"]++
-							case "17":
-								sectionCounts["IAM Extended"]++
-							case "18":
-								sectionCounts["Aurora"]++
-							case "19":
-								sectionCounts["SageMaker"]++
-							case "20":
-								sectionCounts["Redshift"]++
-							case "21":
-								sectionCounts["ElastiCache"]++
-							case "22":
-								sectionCounts["OpenSearch"]++
-							}
-						}
-					}
-				}
-
-				results = append(results, ScanResult{
-					Control:           enhancedName,
-					Status:            cr.Status,
-					Evidence:          cr.Evidence,
-					Remediation:       cr.Remediation,
-					RemediationDetail: cr.RemediationDetail,
-					Severity:          cr.Severity,
-					ScreenshotGuide:   cr.ScreenshotGuide,
-					ConsoleURL:        cr.ConsoleURL,
-					Frameworks:        cr.Frameworks,
-				})
-			}
-		}
-	}
+	// Every suite, once. This path used to construct its own copy of the suite
+	// list, run it, and then call runSuites as well, so a cis-aws scan ran
+	// every check twice and reported every row twice. The CIS filter, and the
+	// recommendation number a row is displayed under, both live at the report
+	// layer, which reads them from the Frameworks map.
+	var results []ScanResult
+	results = append(results, s.runSuites(ctx, verbose)...)
 
 	if verbose {
-		fmt.Printf("\nCIS AWS scan complete: %d controls tested\n", len(results))
-		if len(sectionCounts) > 0 {
-			fmt.Println("\nSection Coverage:")
-			for section, count := range sectionCounts {
-				fmt.Printf("  %s: %d controls\n", section, count)
-			}
-		}
-		// The old line quoted a control total for a benchmark version nobody
-		// had read. State what this scan covers; the registry states the edition.
-		fmt.Println("\nThis scan covers the CIS controls automatable via the AWS API")
+		fmt.Println("")
+		fmt.Println("This scan covers the CIS controls automatable via the AWS API")
 		fmt.Println("")
 		fmt.Println("Missing controls require:")
-		fmt.Println("  • Manual review of organizational policies")
-		fmt.Println("  • Documentation of operational procedures")
+		fmt.Println("  - Manual review of organizational policies")
+		fmt.Println("  - Documentation of operational procedures")
 	}
-
-	results = append(results, s.runSuites(ctx, verbose)...)
 
 	return results
 }
 
 func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
 	if verbose {
 		fmt.Println("Running CMMC - all 110 practices reported, the technical ones measured")
 		fmt.Println("")
@@ -432,26 +283,28 @@ func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 		fmt.Println("")
 	}
 
-	// ONLY Level 1 (17 practices)
-	level1 := checks.NewAWSCMMCLevel1Checks(s.iamClient, s.s3Client, s.ec2Client, s.ctClient)
-	results1, _ := level1.Run(ctx)
-	for _, cr := range results1 {
-		results = append(results, ScanResult{
-			Control:           cr.Control,
-			Name:              cr.Name,
-			Status:            cr.Status,
-			Evidence:          cr.Evidence,
-			Remediation:       cr.Remediation,
-			RemediationDetail: cr.RemediationDetail,
-			Severity:          cr.Severity,
-			ScreenshotGuide:   cr.ScreenshotGuide,
-			ConsoleURL:        cr.ConsoleURL,
-			Frameworks:        cr.Frameworks,
-		})
-	}
+	// Every suite, once. The Level 1 suite is in allSuites; constructing and
+	// running it here as well reported each of its practices twice and counted
+	// each FAIL twice. Appended onto a fresh slice so the rows added below do
+	// not land in runSuites' cached backing array.
+	var results []ScanResult
+	results = append(results, s.runSuites(ctx, verbose)...)
+
+	// Vulnerability scan coverage, read from Inspector rather than asked for as
+	// a document. Answers RA.L2-3.11.2 with real PASS/FAIL.
+	results = append(results, s.runVulnCoverage(ctx, checks.EmitCMMC)...)
+
+	// Every practice nothing above reported, reported as a manual requirement.
+	// This runs after the suites so it sees every practice a suite answered,
+	// including one answered only through a non-CMMC suite's tag; run before
+	// them it reported those practices twice, once unanswered and once answered.
+	// A CMMC report's denominator is the benchmark's 110, not the subset this
+	// provider can automate, or a reader cannot tell an absent practice from a
+	// satisfied one.
+	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
 
 	if verbose {
-		fmt.Printf("\nCMMC scan complete: %d practices reported\n", len(results))
+		fmt.Printf("\nCMMC scan complete: all %d practices reported\n", mappings.CMMCPracticeCount)
 		fmt.Println("")
 		fmt.Println("WHAT AUDITKIT PRO ADDS:")
 		fmt.Println("  - More of the 110 practices measured rather than asked for")
@@ -460,18 +313,6 @@ func (s *AWSScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 		fmt.Println("")
 		fmt.Println("Visit https://auditkit.io/pro")
 	}
-
-	// Vulnerability scan coverage, read from Inspector rather than asked for as
-	// a document. Answers RA.L2-3.11.2 with real PASS/FAIL.
-	results = append(results, s.runVulnCoverage(ctx, checks.EmitCMMC)...)
-
-	// Every practice nothing above reported, reported as a manual requirement.
-	// A CMMC report's denominator is the benchmark's 110, not the subset this
-	// provider can automate, or a reader cannot tell an absent practice from a
-	// satisfied one.
-	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
-
-	results = append(results, s.runSuites(ctx, verbose)...)
 
 	return results
 }
@@ -631,7 +472,7 @@ func (s *AWSScanner) runSuites(ctx context.Context, verbose bool) []ScanResult {
 	// Run once per scan. The framework paths share this list, so a scan
 	// that calls several of them would otherwise re-run every suite.
 	if s.suiteCached {
-		return s.suiteCache
+		return append([]ScanResult(nil), s.suiteCache...)
 	}
 	var results []ScanResult
 	for _, check := range s.allSuites(ctx) {
@@ -650,7 +491,7 @@ func (s *AWSScanner) runSuites(ctx context.Context, verbose bool) []ScanResult {
 				Evidence:          cr.Evidence,
 				Remediation:       cr.Remediation,
 				RemediationDetail: cr.RemediationDetail,
-				Severity:          cr.Severity,
+				Severity:          severityOf(cr),
 				ScreenshotGuide:   cr.ScreenshotGuide,
 				ConsoleURL:        cr.ConsoleURL,
 				Frameworks:        cr.Frameworks,
@@ -658,7 +499,19 @@ func (s *AWSScanner) runSuites(ctx context.Context, verbose bool) []ScanResult {
 		}
 	}
 	s.suiteCache, s.suiteCached = results, true
-	return results
+	return append([]ScanResult(nil), results...)
+}
+
+// severityOf reads a result's severity from whichever field the suite filled.
+// The AWS and Azure suites mostly set Severity; a few set only Priority.Level,
+// and the framework paths that used to run those suites directly read that
+// field. Now that every suite reaches the report through runSuites, a blank
+// here would drop a HIGH finding to LOW at the report layer.
+func severityOf(cr checks.CheckResult) string {
+	if cr.Severity != "" {
+		return cr.Severity
+	}
+	return cr.Priority.Level
 }
 func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
 	var results []ScanResult
@@ -671,67 +524,22 @@ func (s *AWSScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResu
 }
 
 func (s *AWSScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
-	// Check if pci_dss.go exists, if not fall back to basic checks with PCI mappings
-	pciChecks := checks.NewPCIDSSChecks(s.iamClient, s.ec2Client, s.s3Client, s.ctClient, s.configClient)
-
 	if verbose {
 		fmt.Printf("  Running PCI-DSS v4.0.1 requirements...\n")
 	}
 
-	checkResults, err := pciChecks.Run(ctx)
-	if err != nil && verbose {
-		fmt.Printf("    Warning in PCI-DSS checks: %v\n", err)
-	}
-
-	// Convert CheckResult to ScanResult
-	for _, cr := range checkResults {
-		results = append(results, ScanResult{
-			Control:           cr.Control,
-			Name:              cr.Name,
-			Status:            cr.Status,
-			Evidence:          cr.Evidence,
-			Remediation:       cr.Remediation,
-			RemediationDetail: cr.RemediationDetail,
-			Severity:          cr.Severity,
-			ScreenshotGuide:   cr.ScreenshotGuide,
-			ConsoleURL:        cr.ConsoleURL,
-			Frameworks:        cr.Frameworks,
-		})
-	}
-
-	// Also run basic checks but filter for PCI relevance
+	// Every suite, once. The PCI-DSS suite is in allSuites; constructing and
+	// running it here as well reported each of its rows twice. Appended onto a
+	// fresh slice so the row added below does not land in runSuites' cached
+	// backing array.
+	var results []ScanResult
+	results = append(results, s.runSuites(ctx, verbose)...)
 
 	// PCI-DSS 11.3.1 wants scans quarterly across every in-scope system, which
 	// "Inspector is enabled" never established.
 	results = append(results, s.runVulnCoverage(ctx, checks.EmitPCI)...)
 
-	// Every suite. This path used to keep its own list and filter each
-	// result for a PCI tag, which is narrower than the report filter and
-	// dropped the results that match through the catalog instead.
-	results = append(results, s.runSuites(ctx, verbose)...)
-
 	return results
-}
-
-// runCheckModule executes a check module once per scan, reusing its results if
-// another framework suite in the same run already ran it.
-func (s *AWSScanner) runCheckModule(ctx context.Context, check checks.Check) ([]checks.CheckResult, error) {
-	if s.moduleResults == nil {
-		s.moduleResults = make(map[string][]checks.CheckResult)
-	}
-	if cached, ok := s.moduleResults[check.Name()]; ok {
-		return cached, nil
-	}
-	results, err := check.Run(ctx)
-	if err != nil {
-		// Caching a partial result and replaying it as success would hide the
-		// failure from every later framework suite in the same run.
-		return results, err
-	}
-	s.moduleResults[check.Name()] = results
-	return results, nil
 }
 
 // dedupeIdenticalResults removes results that are the same finding reported by

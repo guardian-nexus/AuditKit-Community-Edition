@@ -167,6 +167,10 @@ func (s *GCPScanner) ScanServices(ctx context.Context, services []string, verbos
 // carry no Frameworks field and match through their control id in the
 // framework's catalog. An in-scan filter on tag presence is narrower than that
 // and silently drops them.
+//
+// The aggregate PCI checker is listed here for the same reason. The PCI path
+// used to construct it itself, so it was the one suite runSuites did not know
+// about, and the only way to run it was to run that path.
 func (s *GCPScanner) allSuites() []checks.Check {
 	return []checks.Check{
 		checks.NewGCPCC1Checks(s.iamClient, s.projectID),
@@ -190,6 +194,7 @@ func (s *GCPScanner) allSuites() []checks.Check {
 		checks.NewGCPCISManualChecks(s.projectID),
 		checks.NewGKEChecks(s.gkeService, s.projectID),
 		checks.NewGCPCMMCLevel1Checks(s.storageClient, s.iamClient, s.computeService, s.projectID),
+		checks.NewGCPPCIChecks(s.storageClient, s.iamClient, s.computeService, s.sqlService, s.kmsClient, s.loggingClient, s.projectID),
 	}
 }
 
@@ -198,8 +203,12 @@ func (s *GCPScanner) allSuites() []checks.Check {
 func (s *GCPScanner) runSuites(ctx context.Context, verbose bool, label string) []ScanResult {
 	// Run once per scan. The framework paths share this list, so a scan
 	// that calls several of them would otherwise re-run every suite.
+	//
+	// Each caller gets its own copy. The paths append their extras to what
+	// this returns, and appending onto the cached slice itself writes into
+	// the backing array the next path's rows start from.
 	if s.suiteCached {
-		return s.suiteCache
+		return append([]ScanResult(nil), s.suiteCache...)
 	}
 	var results []ScanResult
 	for _, check := range s.allSuites() {
@@ -218,7 +227,7 @@ func (s *GCPScanner) runSuites(ctx context.Context, verbose bool, label string) 
 				Evidence:          cr.Evidence,
 				Remediation:       cr.Remediation,
 				RemediationDetail: cr.RemediationDetail,
-				Severity:          cr.Priority.Level,
+				Severity:          severityOf(cr),
 				ScreenshotGuide:   cr.ScreenshotGuide,
 				ConsoleURL:        cr.ConsoleURL,
 				Frameworks:        cr.Frameworks,
@@ -226,21 +235,26 @@ func (s *GCPScanner) runSuites(ctx context.Context, verbose bool, label string) 
 		}
 	}
 	s.suiteCache, s.suiteCached = results, true
-	return results
+	return append([]ScanResult(nil), results...)
+}
+
+// severityOf reads a result's severity from whichever field the suite filled.
+// The GCP suites mostly set Priority.Level; the CMMC suites set only Severity,
+// and the CMMC path that used to run them directly read that field. Now that
+// every suite reaches the report through runSuites, a blank here would drop a
+// HIGH finding to LOW at the report layer.
+func severityOf(cr checks.CheckResult) string {
+	if cr.Priority.Level != "" {
+		return cr.Priority.Level
+	}
+	return cr.Severity
 }
 
 func (s *GCPScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
 	if verbose {
 		fmt.Println("Running SOC2 compliance checks for GCP...")
 	}
-
-	// Run SOC2 CC1-CC9 check modules that exist in GCP
-
-	results = append(results, s.runSuites(ctx, verbose, "SOC2")...)
-
-	return results
+	return s.runSuites(ctx, verbose, "SOC2")
 }
 
 // runVulnCoverage builds the vulnerability coverage check for one framework and
@@ -271,52 +285,21 @@ func (s *GCPScanner) runVulnCoverage(ctx context.Context, emit checks.Emit) []Sc
 }
 
 func (s *GCPScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
 	if verbose {
 		fmt.Println("Running PCI-DSS v4.0.1 checks for GCP...")
-		fmt.Println("Checking all 12 PCI-DSS requirements...")
 	}
 
-	// Use the comprehensive GCPPCIChecks implementation
-	pciChecker := checks.NewGCPPCIChecks(
-		s.storageClient,
-		s.iamClient,
-		s.computeService,
-		s.sqlService,
-		s.kmsClient,
-		s.loggingClient,
-		s.projectID,
-	)
-
-	checkResults, _ := pciChecker.Run(ctx)
-	for _, cr := range checkResults {
-		results = append(results, ScanResult{
-			Control:           cr.Control,
-			Name:              cr.Name,
-			Status:            cr.Status,
-			Evidence:          cr.Evidence,
-			Remediation:       cr.Remediation,
-			RemediationDetail: cr.RemediationDetail,
-			Severity:          cr.Priority.Level,
-			ScreenshotGuide:   cr.ScreenshotGuide,
-			ConsoleURL:        cr.ConsoleURL,
-			Frameworks:        cr.Frameworks,
-		})
-	}
+	// Every suite, once. The aggregate PCI checker this path used to
+	// construct itself is in allSuites with the rest.
+	results := s.runSuites(ctx, verbose, "PCI-DSS")
 
 	// PCI-DSS 11.3.1 wants scans quarterly across every in-scope system.
 	results = append(results, s.runVulnCoverage(ctx, checks.EmitPCI)...)
-
-	// Every suite, not the one aggregate checker this path used to build.
-	results = append(results, s.runSuites(ctx, verbose, "PCI-DSS")...)
 
 	return results
 }
 
 func (s *GCPScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
 	if verbose {
 		fmt.Println("Running CMMC - all 110 practices reported, the technical ones measured")
 		fmt.Println("")
@@ -333,26 +316,23 @@ func (s *GCPScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 		fmt.Println("")
 	}
 
-	// ONLY Level 1 (17 practices) - Note: CMMC checks need different signature
-	level1 := checks.NewGCPCMMCLevel1Checks(s.storageClient, s.iamClient, s.computeService, s.projectID)
-	results1, _ := level1.Run(ctx)
-	for _, cr := range results1 {
-		results = append(results, ScanResult{
-			Control:           cr.Control,
-			Name:              cr.Name,
-			Status:            cr.Status,
-			Evidence:          cr.Evidence,
-			Remediation:       cr.Remediation,
-			RemediationDetail: cr.RemediationDetail,
-			Severity:          cr.Severity,
-			ScreenshotGuide:   cr.ScreenshotGuide,
-			ConsoleURL:        cr.ConsoleURL,
-			Frameworks:        cr.Frameworks,
-		})
-	}
+	// Every suite, once. Level 1 is in allSuites; constructing it here as
+	// well, which this path used to do, ran it twice and reported each of
+	// its practices twice.
+	results := s.runSuites(ctx, verbose, "CMMC")
+
+	// Vulnerability scan coverage, read from VM Manager rather than asked for as a document.
+	results = append(results, s.runVulnCoverage(ctx, checks.EmitCMMC)...)
+
+	// Every practice nothing above reported, reported as a manual requirement.
+	// A CMMC report's denominator is the benchmark's 110, not the subset this
+	// provider can automate, or a reader cannot tell an absent practice from a
+	// satisfied one. This runs after the suites so a practice answered only
+	// through another suite's CMMC tag is not reported as unanswered as well.
+	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
 
 	if verbose {
-		fmt.Printf("\nCMMC scan complete: %d practices reported\n", len(results))
+		fmt.Printf("\nCMMC scan complete: all %d practices reported\n", mappings.CMMCPracticeCount)
 		fmt.Println("")
 		fmt.Println("WHAT AUDITKIT PRO ADDS:")
 		fmt.Println("  - More of the 110 practices measured rather than asked for")
@@ -361,17 +341,6 @@ func (s *GCPScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResu
 		fmt.Println("")
 		fmt.Println("Visit https://auditkit.io/pro")
 	}
-
-	// Vulnerability scan coverage, read from VM Manager rather than asked for as a document.
-	results = append(results, s.runVulnCoverage(ctx, checks.EmitCMMC)...)
-
-	// Every practice nothing above reported, reported as a manual requirement.
-	// A CMMC report's denominator is the benchmark's 110, not the subset this
-	// provider can automate, or a reader cannot tell an absent practice from a
-	// satisfied one.
-	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
-
-	results = append(results, s.runSuites(ctx, verbose, "CMMC")...)
 
 	return results
 }
@@ -412,101 +381,18 @@ func (s *GCPScanner) reportRemainingCMMCPractices(ctx context.Context, reported 
 }
 
 func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
 	if verbose {
 		cisEd, _ := mappings.EditionFor("CIS-GCP")
 		fmt.Println("Running " + cisEd.Describe())
-		fmt.Println("Using existing checks with CIS control mappings...")
 		fmt.Println("")
 	}
 
-	// Run existing GCP check modules - they return results with Frameworks map
-	checkModules := []checks.Check{
-		checks.NewIAMChecks(s.iamClient, s.projectID),
-		checks.NewStorageChecks(s.storageClient, s.projectID),
-		checks.NewComputeChecks(s.computeService, s.projectID),
-		checks.NewNetworkChecks(s.computeService, s.projectID),
-		checks.NewSQLChecks(s.sqlService, s.projectID),
-		checks.NewKMSChecks(s.kmsClient, s.projectID),         // CIS 1.9, 1.10 - KMS security
-		checks.NewLoggingChecks(s.loggingClient, s.projectID), // CIS 2.2, 2.3, 2.13 - Logging
-		checks.NewBigQueryChecks(s.projectID),                 // CIS 7.1, 7.2, 7.3 - BigQuery security
-		checks.NewGCPCISManualChecks(s.projectID),             // CIS manual controls (Section 2 - Logging/Monitoring alerts)
-		checks.NewGKEChecks(s.gkeService, s.projectID),        // CIS 8.1-8.5 - GKE/Kubernetes security
-	}
-
-	// Track which CIS sections we're covering
-	sectionCounts := make(map[string]int)
-
-	for _, check := range checkModules {
-		if verbose {
-			fmt.Printf("  Running CIS check module...\n")
-		}
-
-		checkResults, checkErr := check.Run(ctx)
-		if checkErr != nil && verbose {
-			fmt.Printf("    Warning: %v\n", checkErr)
-		}
-
-		for _, cr := range checkResults {
-			// Check if this control has CIS-GCP mapping in Frameworks
-			if cr.Frameworks != nil && cr.Frameworks["CIS-GCP"] != "" {
-				cisControls := cr.Frameworks["CIS-GCP"]
-
-				// Enhance control name with CIS numbers
-				enhancedName := fmt.Sprintf("[CIS GCP %s] %s", cisControls, cr.Control)
-
-				// Track section coverage (extract first digit from control number)
-				if len(cisControls) > 0 {
-					section := string(cisControls[0])
-					switch section {
-					case "1":
-						sectionCounts["Identity and Access Management"]++
-					case "2":
-						sectionCounts["Logging and Monitoring"]++
-					case "3":
-						sectionCounts["Networking"]++
-					case "4":
-						sectionCounts["Virtual Machines"]++
-					case "5":
-						sectionCounts["Cloud Storage"]++
-					case "6":
-						sectionCounts["Cloud SQL"]++
-					case "7":
-						sectionCounts["BigQuery"]++
-					case "8":
-						sectionCounts["GKE/Kubernetes"]++
-					}
-				}
-
-				results = append(results, ScanResult{
-					Control:           enhancedName,
-					Status:            cr.Status,
-					Evidence:          cr.Evidence,
-					Remediation:       cr.Remediation,
-					RemediationDetail: cr.RemediationDetail,
-					Severity:          cr.Priority.Level,
-					ScreenshotGuide:   cr.ScreenshotGuide,
-					ConsoleURL:        cr.ConsoleURL,
-					Frameworks:        cr.Frameworks,
-				})
-			}
-		}
-	}
-
-	if verbose {
-		fmt.Printf("\nCIS GCP scan complete: %d controls tested\n", len(results))
-		if len(sectionCounts) > 0 {
-			fmt.Println("\nSection Coverage:")
-			for section, count := range sectionCounts {
-				fmt.Printf("  %s: %d controls\n", section, count)
-			}
-		}
-		// The old line quoted a control total for a benchmark version nobody
-		// had read. State what this scan covers; the registry states the edition.
-		fmt.Println("\nThis scan covers the CIS controls automatable via the GCP API")
-		fmt.Println("")
-	}
+	// Every suite, once. This path used to run ten of them itself, keeping
+	// the rows with a CIS-GCP tag under a "[CIS GCP n] ..." display name, and
+	// then call runSuites too, so a CIS scan ran those suites twice and
+	// reported each finding twice. The report layer derives the CIS
+	// recommendation id from the tag, so nothing here renames or filters rows.
+	results := s.runSuites(ctx, verbose, "CIS")
 
 	// Every recommendation nothing above measured, reported with the evidence
 	// an assessor asks for. A report's denominator is the benchmark's 93, not
@@ -515,7 +401,12 @@ func (s *GCPScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResul
 	results = append(results, s.reportRemainingCISGCP(ctx, results)...)
 	results = append(results, s.reportRemainingCISGKE(ctx, results)...)
 
-	results = append(results, s.runSuites(ctx, verbose, "CIS")...)
+	if verbose {
+		// The old line quoted a control total for a benchmark version nobody
+		// had read. State what this scan covers; the registry states the edition.
+		fmt.Println("\nThis scan covers the CIS controls automatable via the GCP API")
+		fmt.Println("")
+	}
 
 	return results
 }

@@ -6,8 +6,13 @@ build-release.sh
 **/cmmc_level2*.go
 **/cmmc_level2_*.go
 
-# Binaries
-auditkit
+# Binaries. Anchored: an unanchored "auditkit" also matched the source
+# directory scanner/cmd/auditkit/, so every new file in it was silently
+# ignored - two test files sat untracked for that reason.
+/scanner/auditkit
+/scanner/auditkit-aws
+/scanner/auditkit-azure
+/scanner/auditkit-gcp
 *.exe
 *.dll
 *.so

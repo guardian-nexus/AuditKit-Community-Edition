@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/mappings"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
@@ -385,6 +386,11 @@ func (s *AzureScanner) ScanServices(ctx context.Context, services []string, verb
 // controlMatchesFramework already applies it - including to the results that
 // carry no Frameworks field and match through their control id in the
 // framework's catalog, which an in-scan filter on tag presence drops.
+//
+// Every framework path runs this list exactly once, through runSuites, and
+// constructs no suite of its own. A path that built a suite here as well ran
+// it twice and reported every one of its rows twice, with each FAIL counted
+// twice in the score.
 func (s *AzureScanner) allSuites() []checks.Check {
 	return []checks.Check{
 		checks.NewDefenderChecks(s.subscriptionID, s.securityClient, s.autoProvisionClient, s.contactsClient),
@@ -419,6 +425,10 @@ func (s *AzureScanner) allSuites() []checks.Check {
 		checks.NewMonitoringChecks(s.monitorClient, s.subscriptionID),
 		checks.NewIdentityChecks(s.subscriptionID),
 		checks.NewAzureCMMCLevel1Checks(s.roleClient, s.storageClient, s.nsgClient, s.graphClient, s.subscriptionID),
+		// PCI-DSS v4.0.1 requirements. Previously constructed by the PCI path
+		// alone, which is the one place a suite must not be built.
+		checks.NewAzurePCIChecks(s.storageClient, s.nsgClient, s.roleClient, s.sqlDBClient,
+			s.monitorClient, s.graphClient, s.diagnosticClient, s.subscriptionID),
 	}
 }
 
@@ -428,7 +438,7 @@ func (s *AzureScanner) runSuites(ctx context.Context, verbose bool) []ScanResult
 	// Run once per scan. The framework paths share this list, so a scan
 	// that calls several of them would otherwise re-run every suite.
 	if s.suiteCached {
-		return s.suiteCache
+		return append([]ScanResult(nil), s.suiteCache...)
 	}
 	var results []ScanResult
 	for _, check := range s.allSuites() {
@@ -447,7 +457,7 @@ func (s *AzureScanner) runSuites(ctx context.Context, verbose bool) []ScanResult
 				Evidence:          cr.Evidence,
 				Remediation:       cr.Remediation,
 				RemediationDetail: cr.RemediationDetail,
-				Severity:          cr.Severity,
+				Severity:          severityOf(cr),
 				ScreenshotGuide:   cr.ScreenshotGuide,
 				ConsoleURL:        cr.ConsoleURL,
 				Frameworks:        cr.Frameworks,
@@ -455,7 +465,19 @@ func (s *AzureScanner) runSuites(ctx context.Context, verbose bool) []ScanResult
 		}
 	}
 	s.suiteCache, s.suiteCached = results, true
-	return results
+	return append([]ScanResult(nil), results...)
+}
+
+// severityOf reads a result's severity from whichever field the suite filled.
+// The AWS and Azure suites mostly set Severity; a few set only Priority.Level,
+// and the framework paths that used to run those suites directly read that
+// field. Now that every suite reaches the report through runSuites, a blank
+// here would drop a HIGH finding to LOW at the report layer.
+func severityOf(cr checks.CheckResult) string {
+	if cr.Severity != "" {
+		return cr.Severity
+	}
+	return cr.Priority.Level
 }
 func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
 	var results []ScanResult
@@ -503,53 +525,25 @@ func (s *AzureScanner) runVulnCoverage(ctx context.Context, emit checks.Emit) []
 }
 
 func (s *AzureScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
 	if verbose {
 		fmt.Println("Running PCI-DSS v4.0.1 checks for Azure...")
-		fmt.Println("Checking all 12 PCI-DSS requirements...")
 	}
 
-	// Use the comprehensive AzurePCIChecks implementation
-	pciChecker := checks.NewAzurePCIChecks(
-		s.storageClient,
-		s.nsgClient,
-		s.roleClient,
-		s.sqlDBClient,
-		s.monitorClient,
-		s.graphClient,
-		s.diagnosticClient,
-		s.subscriptionID,
-	)
-
-	checkResults, _ := pciChecker.Run(ctx)
-	for _, cr := range checkResults {
-		results = append(results, ScanResult{
-			Control:           cr.Control,
-			Name:              cr.Name,
-			Status:            cr.Status,
-			Evidence:          cr.Evidence,
-			Remediation:       cr.Remediation,
-			RemediationDetail: cr.RemediationDetail,
-			Severity:          cr.Priority.Level,
-			ScreenshotGuide:   cr.ScreenshotGuide,
-			ConsoleURL:        cr.ConsoleURL,
-			Frameworks:        cr.Frameworks,
-		})
-	}
+	// Every suite, once. The PCI requirements suite is in allSuites with the
+	// rest; building it here as well ran it twice.
+	//
+	// runSuites hands back the per-scan cache. Clone it before appending, or
+	// this path's extra rows land in the cache's spare capacity, where the next
+	// path to append would overwrite them.
+	results := slices.Clone(s.runSuites(ctx, verbose))
 
 	// PCI-DSS 11.3.1 wants scans quarterly across every in-scope system.
 	results = append(results, s.runVulnCoverage(ctx, checks.EmitPCI)...)
-
-	// Every suite, not the four this path used to build.
-	results = append(results, s.runSuites(ctx, verbose)...)
 
 	return results
 }
 
 func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
 	if verbose {
 		fmt.Println("Running CMMC - all 110 practices reported, the technical ones measured")
 		fmt.Println("")
@@ -566,25 +560,23 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 		fmt.Println("")
 	}
 
-	level1 := checks.NewAzureCMMCLevel1Checks(s.roleClient, s.storageClient, s.nsgClient, s.graphClient, s.subscriptionID)
-	results1, _ := level1.Run(ctx)
-	for _, cr := range results1 {
-		results = append(results, ScanResult{
-			Control:           cr.Control,
-			Name:              cr.Name,
-			Status:            cr.Status,
-			Evidence:          cr.Evidence,
-			Remediation:       cr.Remediation,
-			RemediationDetail: cr.RemediationDetail,
-			Severity:          cr.Severity,
-			ScreenshotGuide:   cr.ScreenshotGuide,
-			ConsoleURL:        cr.ConsoleURL,
-			Frameworks:        cr.Frameworks,
-		})
-	}
+	// Every suite, once. The Level 1 suite is in allSuites with the rest;
+	// building it here as well reported each practice it measures twice.
+	results := slices.Clone(s.runSuites(ctx, verbose))
+
+	// Vulnerability scan coverage, read from Defender rather than asked for as a document.
+	results = append(results, s.runVulnCoverage(ctx, checks.EmitCMMC)...)
+
+	// Every practice nothing above reported, reported as a manual requirement.
+	// A CMMC report's denominator is the benchmark's 110, not the subset this
+	// provider can automate, or a reader cannot tell an absent practice from a
+	// satisfied one. This runs after every suite, so a practice a non-CMMC
+	// suite answered is not reported again as unanswered.
+	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
+	results = append(results, s.reportRemainingCISAKS(ctx, results)...)
 
 	if verbose {
-		fmt.Printf("\nCMMC scan complete: %d practices reported\n", len(results))
+		fmt.Printf("\nCMMC scan complete: all %d practices reported\n", mappings.CMMCPracticeCount)
 		fmt.Println("")
 		fmt.Println("WHAT AUDITKIT PRO ADDS:")
 		fmt.Println("  - More of the 110 practices measured rather than asked for")
@@ -593,18 +585,6 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 		fmt.Println("")
 		fmt.Println("Visit https://auditkit.io/pro")
 	}
-
-	// Vulnerability scan coverage, read from Defender rather than asked for as a document.
-	results = append(results, s.runVulnCoverage(ctx, checks.EmitCMMC)...)
-
-	// Every practice nothing above reported, reported as a manual requirement.
-	// A CMMC report's denominator is the benchmark's 110, not the subset this
-	// provider can automate, or a reader cannot tell an absent practice from a
-	// satisfied one.
-	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
-	results = append(results, s.reportRemainingCISAKS(ctx, results)...)
-
-	results = append(results, s.runSuites(ctx, verbose)...)
 
 	return results
 }
@@ -645,118 +625,17 @@ func (s *AzureScanner) reportRemainingCMMCPractices(ctx context.Context, reporte
 }
 
 func (s *AzureScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
 	if verbose {
 		cisEd, _ := mappings.EditionFor("CIS-Azure")
 		fmt.Println("Running " + cisEd.Describe())
-		fmt.Println("")
 	}
 
-	// Run existing Azure check modules - they now return results with CIS mappings
-	checkModules := []checks.Check{
-		checks.NewAADChecks(s.roleClient, s.roleDefClient, s.graphClient),
-		checks.NewStorageChecks(s.storageClient),
-		checks.NewComputeChecks(s.computeClient, s.disksClient, s.nicClient, s.publicIPClient),
-		checks.NewNetworkChecks(s.nsgClient),
-		checks.NewSQLChecks(s.sqlDBClient, s.sqlClient),
-		checks.NewKeyVaultChecks(s.keyVaultClient),
-		checks.NewMonitoringChecks(s.monitorClient, s.subscriptionID),
-		checks.NewIdentityChecks(s.subscriptionID),
-		// Add CIS manual checks for Azure Monitor alerts
-		checks.NewAzureCISManualChecks(s.subscriptionID),
-		// Add Microsoft Defender for Cloud checks - NOW AUTOMATED!
-		checks.NewDefenderChecks(s.subscriptionID, s.securityClient, s.autoProvisionClient, s.contactsClient),
-		// Add App Service checks
-		checks.NewAppServiceChecks(s.subscriptionID),
-	}
-
-	// Track which CIS sections we're covering
-	sectionCounts := make(map[string]int)
-
-	for _, check := range checkModules {
-		if verbose {
-			fmt.Printf("  Running %s...\n", check.Name())
-		}
-
-		checkResults, checkErr := check.Run(ctx)
-		if checkErr != nil && verbose {
-			fmt.Printf("    Warning: %v\n", checkErr)
-		}
-
-		for _, cr := range checkResults {
-			// Check if this control has CIS-Azure mapping in Frameworks
-			if cr.Frameworks != nil && cr.Frameworks["CIS-Azure"] != "" {
-				cisControls := cr.Frameworks["CIS-Azure"]
-
-				// Track section coverage - parse section number from control ID or framework value
-				// Handle various formats: "1.1", "1.1, 1.2", "2.1.1", etc.
-				section := ""
-				if strings.HasPrefix(cr.Control, "CIS-") {
-					// Extract from Control ID like "CIS-1.1" or "CIS-2.1.1"
-					parts := strings.Split(cr.Control, "-")
-					if len(parts) > 1 {
-						// Get first character after "CIS-"
-						section = string(parts[1][0])
-					}
-				} else if len(cisControls) > 0 {
-					// Extract from Frameworks value like "1.1" or "2.1.1"
-					section = string(cisControls[0])
-				}
-
-				// Map section number to section name
-				switch section {
-				case "1":
-					sectionCounts["Identity and Access Management"]++
-				case "2":
-					sectionCounts["Microsoft Defender for Cloud"]++
-				case "3":
-					sectionCounts["Storage Accounts"]++
-				case "4":
-					sectionCounts["Database Services"]++
-				case "5":
-					sectionCounts["Logging and Monitoring"]++
-				case "6":
-					sectionCounts["Networking"]++
-				case "7":
-					sectionCounts["Virtual Machines"]++
-				case "8":
-					sectionCounts["Key Vault"]++
-				case "9":
-					sectionCounts["AppService"]++
-				}
-
-				results = append(results, ScanResult{
-					Control:           cr.Control,
-					Name:              cr.Name,
-					Status:            cr.Status,
-					Evidence:          cr.Evidence,
-					Remediation:       cr.Remediation,
-					RemediationDetail: cr.RemediationDetail,
-					Severity:          cr.Priority.Level,
-					ScreenshotGuide:   cr.ScreenshotGuide,
-					ConsoleURL:        cr.ConsoleURL,
-					Frameworks:        cr.Frameworks,
-				})
-			}
-		}
-	}
-
-	if verbose {
-		fmt.Printf("\nCIS Azure scan complete: %d controls tested\n", len(results))
-		if len(sectionCounts) > 0 {
-			fmt.Println("\nSection Coverage:")
-			for section, count := range sectionCounts {
-				fmt.Printf("  %s: %d controls\n", section, count)
-			}
-		}
-		// The old line quoted a control total for a benchmark version nobody
-		// had read. State what this scan covers; the registry states the edition.
-		fmt.Println("\nThis scan covers the CIS controls automatable via the Azure API")
-		fmt.Println("")
-	}
-
-	return results
+	// Every suite, once. This path used to build eleven suites of its own and
+	// never call runSuites, so the CIS Azure v6.0.0 suites never ran on a
+	// cis-azure scan; it also kept only the rows tagged CIS-Azure, dropping a
+	// recommendation answered under its control id alone. The framework filter
+	// lives at the report layer, in controlMatchesFramework.
+	return slices.Clone(s.runSuites(ctx, verbose))
 }
 
 // dedupeIdenticalResults removes results that are the same finding reported by

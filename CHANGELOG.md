@@ -5,6 +5,16 @@ All notable changes to AuditKit will be documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- A framework-filtered scan (`-framework cmmc`, `pci`, `cis-aws`, ...) ran
+  every suite twice and reported every row twice, counting each FAIL twice
+  in the score: 123 rows for 110 CMMC practices. Each path now runs the
+  suites once and adds only its own reporters. Two suites that were
+  only ever run by their own path (the Azure and GCP PCI suites) are now in
+  the shared suite list, so they also run on every other scan. Severity is
+  read from whichever field a suite filled.
+- A `cis-azure` scan re-listed every assessed recommendation as an
+  unassessed MANUAL fill (162 rows for a 127-entry benchmark): the
+  reported-id lookup missed the mixed-case `CIS-Azure` tag. The `cis-azure` path also never reached the CIS Azure v6 suites, so 90 recommendations with automated checks were reported as not assessed; it does now.
 - GCP: a project with VM Manager not enabled now FAILs `RA.L2-3.11.2` and
   `PCI-11.3.1` instead of reporting an error. **This lowers the reported score
   for GCP projects without VM Manager.** The score is

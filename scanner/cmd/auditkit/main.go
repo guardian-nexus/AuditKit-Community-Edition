@@ -1507,20 +1507,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 	// evaluate is emitted as MANUAL rather than omitted, so the control count is
 	// the framework's real denominator instead of "whatever we happened to check".
 	if framework != "all" {
-		reported := make([]string, 0, len(controls))
-		for _, control := range controls {
-			reported = append(reported, control.ID)
-			// A check often reports under its own id while carrying the framework's
-			// id in its tags (a CIS-numbered check tagged SOC2 CC6.1). Without the
-			// tag the control was counted as unevaluated and re-emitted as MANUAL
-			// next to the very result that covers it.
-			for _, key := range []string{framework, strings.ToUpper(framework)} {
-				if value, ok := control.Frameworks[key]; ok && value != "" {
-					reported = append(reported, splitControlIDs(value)...)
-				}
-			}
-		}
-		missing := mappings.MissingControls(framework, reported)
+		missing := mappings.MissingControls(framework, reportedControlIDs(framework, controls))
 
 		// 800-53 and its FedRAMP baselines report the uncovered set as one
 		// count. Listing it adds about a thousand rows to a scan that found
@@ -3342,6 +3329,30 @@ func frameworkTagValue(frameworks map[string]string, keys ...string) string {
 		}
 	}
 	return ""
+}
+
+// reportedControlIDs returns the identifiers the scan answered in the requested
+// framework's catalog, for MissingControls to subtract. A control counts under
+// its own id and under whatever the check recorded in the framework's tag: a
+// check often reports under its own id while carrying the framework's id in
+// its tags (a CIS-numbered check tagged SOC2 CC6.1), and without the tag the
+// control was counted as unevaluated and re-emitted as MANUAL next to the very
+// result that covers it.
+//
+// The tag lookup is case-insensitive. The CIS catalogs are keyed by bare
+// recommendation number and only the tag carries that shape - the CIS branch
+// rewrites the control id to CIS-<PROVIDER>-<n>, which the catalog never
+// matches. An exact lookup of the upper-cased framework name found "CIS-AWS"
+// and "CIS-GCP" only because those tags happen to be upper-case; it missed the
+// Azure checks' "CIS-Azure" tag, so a cis-azure scan re-listed every assessed
+// recommendation as an unassessed fill.
+func reportedControlIDs(framework string, controls []ControlResult) []string {
+	reported := make([]string, 0, len(controls))
+	for _, control := range controls {
+		reported = append(reported, control.ID)
+		reported = append(reported, splitControlIDs(frameworkTagValue(control.Frameworks, framework))...)
+	}
+	return reported
 }
 
 // nativeFrameworkIDs turns a check's framework tag into the identifiers that
