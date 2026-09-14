@@ -12,7 +12,7 @@ What AuditKit scans in Amazon Web Services.
 **Supported frameworks:**
 - SOC2 Type II (38 criteria)
 - PCI-DSS v4.0.1 (71 requirements)
-- CMMC Level 1 and Level 2: all 110 practices reported; 5 of the 17 Level 1 practices reach a verdict on AWS, Level 2 automated in Pro
+- CMMC Level 1 and Level 2: all 110 practices reported; 6 reach a verdict on AWS (5 of the 17 Level 1, plus 1 Level 2); Pro adds deeper automation and the evidence package
 - NIST 800-53 Rev 5 (149 controls, derived via crosswalk)
 - HIPAA (30 safeguards, derived via crosswalk)
 
@@ -372,7 +372,7 @@ Automated AWS checks map into all twelve requirement families (1 through 12). Re
 
 ### CMMC Level 2 (110 practices - reported free, automated in Pro)
 
-All Level 1 practices plus 93 additional practices across 14 domains. The Community Edition reports all 110 for evidence tracking and marks the ones it cannot check automatically; automated Level 2 checks are an AuditKit Pro feature.
+All Level 1 practices plus 93 additional practices across 14 domains. The Community Edition reports all 110 for evidence tracking and marks the ones it cannot check automatically; deeper automated coverage and the assessor's evidence package are AuditKit Pro features.
 
 **[View CMMC details →](../frameworks/cmmc.md)**
 

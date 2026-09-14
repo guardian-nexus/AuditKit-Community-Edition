@@ -41,7 +41,7 @@
             <div class="flex flex-wrap justify-center gap-1" style="margin-top: 2rem;">
                 <span class="badge badge-outline">SOC2</span>
                 <span class="badge badge-outline">PCI-DSS</span>
-                <span class="badge badge-outline">CMMC L1 automated, L2 reported</span>
+                <span class="badge badge-outline">CMMC L1 + L2 (all 110)</span>
                 <span class="badge badge-outline">HIPAA</span>
                 <span class="badge badge-outline">CIS Benchmarks</span>
                 <span class="badge badge-outline">NIST 800-53</span>
@@ -95,7 +95,7 @@ cd AuditKit-Community-Edition/scanner && go build ./cmd/auditkit
   <span class="label">Frameworks:</span>  SOC2 (CC7.1), PCI-DSS (10.2.1), HIPAA (164.312(b))
 
 <span class="comment"># Automated Check Score: 27.4% (23/84 passed)</span>
-<span class="comment"># Only 84 of 189 total controls are automated; the rest need evidence you collect</span>
+<span class="comment"># All 189 controls reported: 84 checked automatically (scored above), the rest with evidence-collection guidance</span>
 <span class="comment"># PDF report: compliance-report.pdf</span></div>
 
             <p>Every failed check includes the specific CLI command to fix it, a step-by-step screenshot guide for manual evidence collection, and a direct link to the relevant cloud console page.</p>
@@ -118,7 +118,7 @@ cd AuditKit-Community-Edition/scanner && go build ./cmd/auditkit
     <section class="section section-alt">
         <div class="container text-center">
             <p class="text-muted" style="max-width: 540px; margin: 0 auto;">
-                Need automated Level 2 checks, evidence packages, or continuous monitoring? <a href="/">AuditKit</a> assesses all 110 Level 1 + 2 practices - automated checks where your cloud configuration can prove it, structured evidence guidance where an assessor needs a document - and adds multi-account scanning, drift detection, and more.
+                Need the assessor's evidence package, deeper automated coverage, or continuous monitoring? <a href="/">AuditKit</a> turns your findings into the artifact a C3PAO asks for - and adds multi-account scanning, drift detection, and more.
             </p>
         </div>
     </section>

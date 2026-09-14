@@ -4,15 +4,16 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v0.8.7-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
+[![Version](https://img.shields.io/badge/version-v1.0.0-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://guardiannexus.substack.com)
 
-**New in v0.8.7:** `auditkit update` and the provider binaries now report the version they were actually built from.
+**New in v1.0.0:** the first stable release - a correctness and accuracy pass across the scanner and the site. Empty-scope checks and denied API calls no longer count as compliance results, framework scans no longer double-count, and every published number is measured from the code.
 
-**CMMC Level 2 is reported in the Community Edition** - all 110 practices, with
-Level 1 automated (5 of 17 practices) and the remainder listed with evidence-collection guidance.
+**All 110 CMMC practices are reported in the Community Edition** - every failing
+check with its fix and the console screen to photograph. AuditKit turns those
+findings into the assessor's evidence package.
 
-**Need automated Level 2 checks, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
+**Need the assessor's evidence package, deeper automated coverage, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
 
 ---
 
@@ -67,7 +68,7 @@ measured from the checks themselves.
 | **SOC2 Type II** | 38 of 43 | 38 of 43 | 32 of 43 | SaaS customer requirements |
 | **PCI DSS v4.0.1** | 59 | 63 | 50 | Payment card processing |
 | **CMMC Level 1** | 5 of 17 | 4 of 17 | 4 of 17 | DoW contractor compliance (FCI) |
-| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; 7 practices automated on GCP, none on AWS/Azure. Automated Level 2 across all providers in [AuditKit Pro](https://auditkit.io/) |
+| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; 7 practices automated on GCP, 1 each on AWS and Azure. Pro adds deeper automation and the evidence package via [AuditKit Pro](https://auditkit.io/) |
 
 71 distinct PCI DSS v4.0.1 requirements are assessed across the three providers.
 
@@ -140,7 +141,23 @@ Everything in the Community column runs from this repository with no licence key
 
 ---
 
-## Recent Changes (v0.8.7)
+## Recent Changes (v1.0.0)
+
+**September 2026**
+
+First stable release - a correctness and accuracy pass. No framework was dropped; all 110 CMMC practices are still reported.
+
+Fixes:
+- A check with nothing in scope reports INFO, not PASS, so an empty or wrongly scoped account no longer reads as compliant
+- A denied API call reports ERROR, not a compliance FAIL (12 CMMC checks)
+- Framework-filtered scans (`-framework cmmc`, `pci`, ...) ran every suite twice and double-counted each result; each path now runs the suites once
+- `cis-azure` re-listed assessed recommendations as unassessed and never reached the CIS Azure v6 suites; both fixed
+- GCP projects without VM Manager now FAIL the vulnerability-scanning controls instead of dropping them from the score, which can lower a GCP score
+- The single-cloud binaries are gone; one universal binary scans every cloud with `-provider`
+- Every published number is measured from the code, and the site's generated sections are built from the scanner source
+- Lint clean under golangci-lint 2.5; CI gates on lint
+
+### Previous: v0.8.7
 
 **September 2026**
 

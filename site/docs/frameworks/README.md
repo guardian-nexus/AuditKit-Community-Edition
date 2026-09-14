@@ -36,9 +36,10 @@ Fully tested, comprehensive coverage, used in production environments:
 - **HIPAA Security Rule** - For healthcare (Note: all 12 Technical Safeguards plus 18 of the 31 Administrative Safeguards; does not cover Physical Safeguards)
 
 ### Automated in Pro
-Community reports all 110 CMMC Level 1 and Level 2 practices and automates Level 1
-(5 of the 17 Level 1 practices reach a verdict on AWS, 4 on Azure and GCP).
-An AuditKit subscription adds the automated Level 2 checks:
+Community reports all 110 CMMC Level 1 and Level 2 practices - every failing check
+with its fix and the screen to photograph (5 of the 17 Level 1 practices reach a
+verdict on AWS, 4 on Azure and GCP). An AuditKit subscription turns those findings
+into the assessor's evidence package and adds deeper automated coverage:
 
 - **CMMC Level 2** - For DoW contractors handling CUI. Of the 110 practices Pro assesses, 27 reach a verdict on AWS and 83 are structured evidence guidance.
 
@@ -150,7 +151,7 @@ auditkit scan -provider aws -framework pci
 # CMMC Level 1
 auditkit scan -provider aws -framework cmmc
 
-# CMMC Level 1 + 2 - all 110 practices (Community automates Level 1, Pro automates Level 2)
+# CMMC Level 1 + 2 - all 110 practices (Community reports all 110; Pro adds the evidence package and deeper automation)
 auditkit-pro scan -provider aws -framework cmmc
 
 # CIS Benchmarks

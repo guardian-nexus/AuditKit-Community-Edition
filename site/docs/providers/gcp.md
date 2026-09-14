@@ -12,7 +12,7 @@ What AuditKit scans in Google Cloud Platform.
 **Supported frameworks:**
 - SOC2 Type II
 - PCI-DSS v4.0.1
-- CMMC: 9 of the 17 Level 1 practices automated on GCP; all 110 Level 1 + 2 practices reported (Level 2 automated in Pro)
+- CMMC Level 1 and Level 2: all 110 practices reported; 11 reach a verdict on GCP (4 of the 17 Level 1, plus 7 Level 2); Pro adds deeper automation and the evidence package
 - NIST 800-53 Rev 5 (141 controls, derived via crosswalk)
 - HIPAA (30 safeguards, derived via crosswalk)
 

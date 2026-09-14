@@ -2,7 +2,7 @@
 
 All notable changes to AuditKit will be documented in this file.
 
-## [Unreleased]
+## [1.0.0] - 2026-09-14
 
 ### Removed
 - The single-cloud binaries `auditkit-aws`, `auditkit-azure` and `auditkit-gcp`.
@@ -22,7 +22,7 @@ All notable changes to AuditKit will be documented in this file.
   them. Two dead accumulators and a first-only loop written as an
   unconditional break are gone. CI gates on lint.
 - coverage-counts.py could not see a control id assigned after the literal
-  or a verdict assigned in a helper; GCP emits 175 controls where 168 was
+  or a verdict assigned in a helper; GCP emits 173 controls where 168 was
   published and the vulnerability-scanning practice reaches a verdict. The
   figures are re-measured and written.
 - The GCP PCI checks filed six rows under a section heading (PCI-1.2.1)
@@ -36,7 +36,7 @@ All notable changes to AuditKit will be documented in this file.
   CIS, PCI, HIPAA, NIST 800-53, ISO, CSF, GDPR and FedRAMP figures, the
   CMMC "automated" counts (a practice is automated when the check reaches a
   PASS or FAIL: 5 of 17 Level 1 on AWS, not 13), the homepage's "350+
-  automated checks" (671 controls, measured), and a long list of smaller
+  automated checks" (675 controls, measured), and a long list of smaller
   claims. The html doc pages are rendered from their markdown; the provider
   pages' control lists, the M365 rule lists and the CIS section breakdowns
   are generated from the scanner's source and the shipped catalogs, so they
@@ -76,6 +76,18 @@ All notable changes to AuditKit will be documented in this file.
   finding the control exists to report, so it is now scored as one. A genuine
   permission denial is unchanged and still reports an error, because a call that
   did not complete proves nothing about posture.
+
+## [0.8.7] - 2026-09-07
+
+### Fixed
+- `auditkit update` reported every install as v0.3.0; it now takes its version
+  from the binary it is part of, and compares release numbers numerically so
+  v0.10.0 is correctly newer than v0.9.0.
+- The AWS, Azure and GCP binaries reported v0.8.5 while the universal one
+  reported v0.8.6; all four now agree, and `make build` injects the version
+  instead of leaving it unset.
+
+No scanner, catalog or report changes - coverage is identical to v0.8.6.
 
 ## [0.8.6] - 2026-09-07
 

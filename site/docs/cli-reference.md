@@ -302,7 +302,7 @@ auditkit version
 
 **Output:**
 ```
-AuditKit v0.8.6 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
+AuditKit v1.0.0 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
 ```
 
 ---

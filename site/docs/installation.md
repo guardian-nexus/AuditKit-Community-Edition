@@ -288,7 +288,7 @@ auditkit version
 
 **Expected output:**
 ```
-AuditKit v0.8.7 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
+AuditKit v1.0.0 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
 ```
 
 ### Check Cloud CLI Tools
