@@ -72,3 +72,45 @@ func TestImportedRunReportsTheWholeFramework(t *testing.T) {
 		t.Fatalf("import: total %d, want the %d-criterion catalog", got.TotalControls, want)
 	}
 }
+
+// isPracticeID decides whether a CMMC report may file a tagged row under
+// the practice; a tag that names a level ("L2") or a SOC2 id names nothing.
+func TestIsPracticeIDAndPracticeIDs(t *testing.T) {
+	for _, ok := range []string{"AC.L1-3.1.1", "SC.L2-3.13.11", "RA.L2-3.11.2"} {
+		if !isPracticeID(ok) {
+			t.Errorf("%s is a practice id", ok)
+		}
+	}
+	for _, bad := range []string{"CC6.1", "L2", "CIS-AWS-2.10", "AC.L3-3.1.1", "AC.L1-4.1.1", ""} {
+		if isPracticeID(bad) {
+			t.Errorf("%s is not a practice id", bad)
+		}
+	}
+	got := practiceIDs("IR.L2-3.6.1, L2, CC9.1, SI.L2-3.14.6")
+	if len(got) != 2 || got[0] != "IR.L2-3.6.1" || got[1] != "SI.L2-3.14.6" {
+		t.Fatalf("practiceIDs kept %v", got)
+	}
+}
+
+// A SOC2 row re-filed under IR.L2-3.6.1 arrived beside the practice's own
+// row, so a CMMC report carried three rows for one practice.
+func TestCompleteFrameworkKeepsOneRowPerPractice(t *testing.T) {
+	in := []ControlResult{
+		{ID: "IR.L2-3.6.1", Name: "Incident handling", Status: "PASS", Evidence: "plan present"},
+		{ID: "IR.L2-3.6.1", Name: "Risk assessment cadence (via CC9.1, CMMC)", Status: "FAIL", Evidence: "no cadence"},
+		{ID: "CC6.1", Status: "PASS"},
+	}
+	got := completeFramework(in, "cmmc")
+	n := 0
+	for _, c := range got {
+		if c.ID == "IR.L2-3.6.1" {
+			n++
+			if c.Status != "FAIL" || !strings.Contains(c.Evidence, "no cadence") || !strings.Contains(c.Evidence, "plan present") {
+				t.Fatalf("the surviving row must carry the FAIL and both evidences: %+v", c)
+			}
+		}
+	}
+	if n != 1 {
+		t.Fatalf("IR.L2-3.6.1 appears %d times", n)
+	}
+}

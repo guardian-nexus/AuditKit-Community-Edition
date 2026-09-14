@@ -942,6 +942,9 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 // or Prowler run. Only the single-account
 // scan used to, so the others showed a denominator of what was checked.
 func completeFramework(controls []ControlResult, framework string) []ControlResult {
+	if strings.EqualFold(framework, "cmmc") {
+		controls = collapsePractices(controls)
+	}
 	if framework != "all" {
 		missing := mappings.MissingControls(framework, reportedControlIDs(framework, controls))
 
@@ -3422,6 +3425,68 @@ func practiceIDs(value string) []string {
 		}
 	}
 	return out
+}
+
+// practiceRank orders statuses from most to least serious, so a practice
+// answered by several rows keeps the outcome an assessor must see.
+func practiceRank(status string) int {
+	switch status {
+	case "FAIL":
+		return 4
+	case "ERROR":
+		return 3
+	case "INFO", "MANUAL":
+		return 2
+	case "PASS":
+		return 1
+	}
+	return 0
+}
+
+// collapsePractices keeps one row per CMMC practice. The scanner already
+// collapses the rows its CMMC suites emit, but a SOC2 or CIS check that also
+// answers a practice is filed under the practice here, after that, and so
+// arrived beside the practice's own row - three rows for IR.L2-3.6.1 in one
+// report. The most serious status wins and every row's evidence is kept.
+func collapsePractices(controls []ControlResult) []ControlResult {
+	index := make(map[string]int, len(controls))
+	out := make([]ControlResult, 0, len(controls))
+	for _, c := range controls {
+		if !isPracticeID(c.ID) {
+			out = append(out, c)
+			continue
+		}
+		pos, seen := index[c.ID]
+		if !seen {
+			index[c.ID] = len(out)
+			out = append(out, c)
+			continue
+		}
+		kept := &out[pos]
+		if practiceRank(c.Status) > practiceRank(kept.Status) {
+			merged := c
+			merged.Evidence = joinEvidence(c.Evidence, kept.Evidence)
+			merged.Remediation = joinEvidence(c.Remediation, kept.Remediation)
+			merged.ScreenshotGuide = joinEvidence(c.ScreenshotGuide, kept.ScreenshotGuide)
+			*kept = merged
+			continue
+		}
+		kept.Evidence = joinEvidence(kept.Evidence, c.Evidence)
+		kept.Remediation = joinEvidence(kept.Remediation, c.Remediation)
+		kept.ScreenshotGuide = joinEvidence(kept.ScreenshotGuide, c.ScreenshotGuide)
+	}
+	return out
+}
+
+func joinEvidence(a, b string) string {
+	b = strings.TrimSpace(b)
+	if b == "" || strings.Contains(a, b) {
+		return a
+	}
+	if strings.TrimSpace(a) == "" {
+		return b
+	}
+	return a + " | " + b
 }
 
 // splitControlIDs turns a crosswalk's comma-joined control list into atomic IDs.
