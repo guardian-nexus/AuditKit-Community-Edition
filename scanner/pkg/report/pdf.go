@@ -259,6 +259,11 @@ func generateComplianceDisclaimer(pdf *gofpdf.Fpdf, result ComplianceResult) {
 	}
 	pdf.SetX(20)
 	pdf.MultiCell(170, 5, disclaimerText2, "", "C", false)
+	if note := scopeNote(result.Framework); note != "" {
+		pdf.Ln(2)
+		pdf.SetX(20)
+		pdf.MultiCell(170, 5, note, "", "C", false)
+	}
 
 	pdf.Ln(10)
 

@@ -1,6 +1,6 @@
 # GDPR Compliance
 
-Technical and organisational measures under the EU General Data Protection Regulation.
+Technical measures under Articles 25, 30 and 32 of the EU General Data Protection Regulation, automated where your cloud configuration can show them.
 
 ---
 
@@ -10,14 +10,16 @@ Technical and organisational measures under the EU General Data Protection Regul
 
 **Who needs it:** Any organisation processing personal data of people in the EU or UK
 **Status in AuditKit:** Production
-**Coverage:** 16 articles (AWS 14, Azure 14, GCP 14)
+**Coverage:** 16 article paragraphs reach a verdict through the crosswalk (Articles 5, 24, 25, 30, 32, 33, 34 and 35); 11 more security-relevant obligations are listed in the report for you to document
 **How it works:** Derived from your SOC2, PCI DSS and CMMC results through NIST 800-53
 
 ---
 
 ## Important Disclaimer
 
-**AuditKit covers the technical measures of Article 32. It does not make you GDPR compliant.**
+**AuditKit covers technical measures under Articles 25, 30 and 32. It does not make you GDPR compliant, and nothing it produces is legal advice.**
+
+This is the same line every cloud-configuration tool draws: Prowler and Steampipe map Articles 25, 30 and 32 and nothing else, and AWS Audit Manager ships its GDPR framework as 378 manual controls with no automation at all. A scanner sees configuration; the Regulation is mostly about what you do with data and who you tell.
 
 GDPR is mostly not a technical regulation. The bulk of it concerns lawful basis,
 consent, data subject rights, records of processing, international transfers and
@@ -47,7 +49,12 @@ configuration scan, and no scanner can assess it.
 - Appointing a Data Protection Officer
 - Processor contracts under Article 28
 
-Treat the output as evidence toward Article 32, not as a compliance verdict.
+The security-relevant obligations in that second list still appear in a GDPR
+report - processor guarantees (Art 28), breach records (Art 33(5)), transfer
+safeguards (Art 44, 46) - as rows marked MANUAL for you to document, never as
+automated findings. Treat the output as evidence toward Articles 25, 30 and
+32, not as a compliance verdict, and have a privacy professional review the
+scope before relying on it with a supervisory authority.
 
 ---
 
@@ -93,8 +100,10 @@ time.
 | Art 34(1) | Breach notification to data subjects | IR-6 |
 | Art 35(1) | Data Protection Impact Assessment | RA-3 |
 
-Sixteen articles are in the crosswalk. How many appear in your report depends on
-which controls your provider actually assesses: 14 on AWS, Azure and GCP alike.
+Sixteen article paragraphs are in the crosswalk and every provider reaches all
+sixteen. The report also lists the eleven security-relevant obligations the
+crosswalk cannot reach - processor contracts, breach records, impact-assessment
+content, transfers - as rows to document.
 
 ---
 

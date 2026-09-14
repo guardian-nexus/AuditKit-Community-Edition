@@ -12,6 +12,13 @@ All notable changes to AuditKit will be documented in this file.
   cloud with `-provider`, correctly; the download is ~62 MB.
 
 ### Fixed
+- A GDPR or FedRAMP report said nothing about its catalog being a subset;
+  the CLI printed that caveat beside the score and the PDF and HTML, which
+  are what reach an assessor, did not. Both now carry the scope note and
+  that the report is not legal advice. The GDPR page describes coverage the
+  way the automation peers do: Articles 25, 30 and 32, automated where the
+  cloud can show it, the remaining security-relevant obligations listed to
+  document.
 - An imported ScubaGear or Prowler run reported only the controls the
   mapping file knew, so a SOC2 report from it had a denominator of a few
   findings instead of 43. It carries the whole catalog, as a scan does. The

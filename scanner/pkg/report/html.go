@@ -109,6 +109,11 @@ func GenerateHTML(result ComplianceResult) string {
             </p>
         </div>
     `, automated, automated+manual, automatedScore, automated, manual, manual, erroredNote(errored), getAssessorType(result.Framework))
+	if note := scopeNote(result.Framework); note != "" {
+		disclaimerHTML = strings.Replace(disclaimerHTML, `<div class="disclaimer-grid">`,
+			`<p class="scope-note">`+note+`</p>
+            <div class="disclaimer-grid">`, 1)
+	}
 
 	// Build watermarked footer HTML
 	footerHTML := ""
