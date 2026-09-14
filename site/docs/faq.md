@@ -38,7 +38,7 @@ AuditKit can import Prowler results to broaden NIST 800-53 coverage.
 | AWS/Azure/GCP/M365 | Full support | Full support |
 | SOC2, PCI-DSS, NIST 800-53 | All frameworks | All frameworks |
 | CMMC Level 1 | 5 of 17 practices reach a verdict on AWS | 7 of 17 practices reach a verdict on AWS |
-| CMMC Level 2 | All 110 practices reported for evidence | All 110 practices reported; 28 reach a verdict on AWS, 82 carry evidence guidance |
+| CMMC Level 2 | All 110 practices reported for evidence | All 110 practices reported; 27 reach a verdict on AWS, 83 carry evidence guidance |
 | Controls assessed | 228 AWS, 277 Azure, 168 GCP | 315 AWS, 395 Azure, 285 GCP |
 | GCP Advanced | 5 GKE controls | Deep GKE scanning (15) + Vertex AI (10) |
 | Multi-Account | One at a time | AWS Orgs, Azure Mgmt, GCP Folders |

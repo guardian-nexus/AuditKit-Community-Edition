@@ -49,7 +49,7 @@ func (c *BigQueryChecks) CheckPublicDatasets(ctx context.Context, bqService *big
 		}}
 	}
 
-	if datasetList.Datasets == nil || len(datasetList.Datasets) == 0 {
+	if len(datasetList.Datasets) == 0 {
 		return []CheckResult{{
 			Control:    "CIS-GCP-7.1",
 			Name:       "[CIS-GCP-7.1] BigQuery Datasets Not Public",
@@ -138,7 +138,7 @@ func (c *BigQueryChecks) CheckDatasetEncryption(ctx context.Context, bqService *
 		}}
 	}
 
-	if datasetList.Datasets == nil || len(datasetList.Datasets) == 0 {
+	if len(datasetList.Datasets) == 0 {
 		return []CheckResult{{
 			Control:    "CIS-GCP-7.3",
 			Name:       "[CIS-GCP-7.3] BigQuery CMEK Encryption",
@@ -226,7 +226,7 @@ func (c *BigQueryChecks) CheckTableCMEKEncryption(ctx context.Context, bqService
 		}}
 	}
 
-	if datasetList.Datasets == nil || len(datasetList.Datasets) == 0 {
+	if len(datasetList.Datasets) == 0 {
 		return []CheckResult{{
 			Control:    "CIS-GCP-7.2",
 			Name:       "[CIS-GCP-7.2] BigQuery Tables CMEK Encryption",

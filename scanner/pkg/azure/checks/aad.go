@@ -49,7 +49,6 @@ func (c *AADChecks) CheckPrivilegedRoles(ctx context.Context) []CheckResult {
 	ownerCount := 0
 	contributorCount := 0
 	totalAssignments := 0
-	privilegedUsers := []string{}
 
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
@@ -75,9 +74,6 @@ func (c *AADChecks) CheckPrivilegedRoles(ctx context.Context) []CheckResult {
 				// Check for Owner role (8e3af657-a8ff-443c-a75c-2fe8c4bcb635)
 				if strings.Contains(roleID, "8e3af657-a8ff-443c-a75c-2fe8c4bcb635") {
 					ownerCount++
-					if assignment.Properties.PrincipalID != nil {
-						privilegedUsers = append(privilegedUsers, *assignment.Properties.PrincipalID)
-					}
 				}
 
 				// Check for Contributor role (b24988ac-6180-42a0-ab88-20f7382dd24c)

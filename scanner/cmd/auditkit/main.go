@@ -94,7 +94,7 @@ func main() {
 	}
 
 	command := os.Args[1]
-	flag.CommandLine.Parse(os.Args[2:])
+	_ = flag.CommandLine.Parse(os.Args[2:]) // ExitOnError: a bad flag has already exited
 
 	switch command {
 	case "scan":
@@ -264,7 +264,10 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 		case "json":
 			data, _ := json.MarshalIndent(integrationResult, "", "  ")
 			if output != "" {
-				os.WriteFile(output, data, 0644)
+				if err := os.WriteFile(output, data, 0644); err != nil {
+					fmt.Fprintf(os.Stderr, "Error writing %s: %v\n", output, err)
+					os.Exit(1)
+				}
 				fmt.Printf("Results saved to %s\n", output)
 			} else {
 				fmt.Println(string(data))
@@ -339,7 +342,10 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 		case "json":
 			data, _ := json.MarshalIndent(integrationResult, "", "  ")
 			if output != "" {
-				os.WriteFile(output, data, 0644)
+				if err := os.WriteFile(output, data, 0644); err != nil {
+					fmt.Fprintf(os.Stderr, "Error writing %s: %v\n", output, err)
+					os.Exit(1)
+				}
 				fmt.Printf("Results saved to %s\n", output)
 			} else {
 				fmt.Println(string(data))
@@ -812,7 +818,9 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 
 	result := performScan(provider, profile, framework, verbose, services)
 
-	saveProgress(result.AccountID, result.Score, result.Controls, framework)
+	if err := saveProgress(result.AccountID, result.Score, result.Controls, framework); err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: progress not saved: %v\n", err)
+	}
 
 	// Save to offline cache for later offline use
 	if err := saveScanToCache(result, CurrentVersion); err != nil {
@@ -1511,7 +1519,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 						break
 					}
 				}
-			} else if control.Frameworks != nil && len(control.Frameworks) > 0 {
+			} else if len(control.Frameworks) > 0 {
 				// Standard framework matching for other frameworks (only if Frameworks exists)
 				for fw := range control.Frameworks {
 					fwUpper := strings.ToUpper(fw)
@@ -1616,11 +1624,12 @@ func saveProgress(accountID string, score float64, controls []ControlResult, fra
 	homeDir, _ := os.UserHomeDir()
 	dataPath := filepath.Join(homeDir, ".auditkit", accountID+".json")
 
-	os.MkdirAll(filepath.Dir(dataPath), 0755)
+	_ = os.MkdirAll(filepath.Dir(dataPath), 0755) // the write below reports a missing directory
 
 	var progress ProgressData
 	if data, err := os.ReadFile(dataPath); err == nil {
-		json.Unmarshal(data, &progress)
+		// A corrupt file starts the history over rather than aborting the scan.
+		_ = json.Unmarshal(data, &progress)
 	} else {
 		progress = ProgressData{
 			AccountID:    accountID,
@@ -1699,7 +1708,10 @@ func showProgress(provider, profile string) {
 	}
 
 	var progress ProgressData
-	json.Unmarshal(data, &progress)
+	if err := json.Unmarshal(data, &progress); err != nil {
+		fmt.Fprintf(os.Stderr, "Progress file %s is unreadable: %v\n", dataPath, err)
+		os.Exit(1)
+	}
 
 	fmt.Println("\nYour Compliance Journey Progress")
 	fmt.Println("===================================")
@@ -1791,7 +1803,10 @@ func compareScan(provider, profile string) {
 	}
 
 	var progress ProgressData
-	json.Unmarshal(data, &progress)
+	if err := json.Unmarshal(data, &progress); err != nil {
+		fmt.Fprintf(os.Stderr, "Progress file %s is unreadable: %v\n", dataPath, err)
+		os.Exit(1)
+	}
 
 	if len(progress.ScoreHistory) < 2 {
 		fmt.Println("Need at least 2 scans to compare.")

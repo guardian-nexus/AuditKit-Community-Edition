@@ -111,11 +111,11 @@ scanning, or a desktop interface.
 | | Community Edition (free) | AuditKit Pro ($297/mo) |
 |---|---|---|
 | **Cloud providers** | AWS, Azure, GCP scanned; M365 via ScubaGear import | Same, plus Azure Arc |
-| **Controls assessed** | 228 AWS, 277 Azure, 173 GCP | 315 AWS, 400 Azure, 293 GCP |
+| **Controls assessed** | 228 AWS, 277 Azure, 173 GCP | 314 AWS, 400 Azure, 293 GCP |
 | **SOC2 Type II** | 38, 38, 32 criteria | 38, 38, 36 criteria |
 | **PCI DSS v4.0.1** | 71 requirements | 77 requirements |
 | **CMMC Level 1** | 5 of 17 practices automated | 7 of 17 practices automated |
-| **CMMC Level 2** | All 110 practices reported for evidence | All 110 reported: 28 reach a pass or fail, 82 carry evidence guidance |
+| **CMMC Level 2** | All 110 practices reported for evidence | All 110 reported: 27 reach a pass or fail, 83 carry evidence guidance |
 | **CIS Benchmarks** | 70 AWS, 127 Azure, 93 GCP | 70 AWS, 127 Azure, 93 GCP |
 | **Derived frameworks** | 800-53, ISO 27001, HIPAA, GDPR, NIST CSF, FedRAMP | Same six, from a larger control set |
 | **NIST 800-53 derived** | 149 controls | 151 controls |

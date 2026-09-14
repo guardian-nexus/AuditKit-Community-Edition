@@ -92,8 +92,7 @@ func (c *EKSChecks) CheckEKSEndpointAccess(ctx context.Context) (CheckResult, er
 		if cluster.Cluster.ResourcesVpcConfig != nil {
 			if cluster.Cluster.ResourcesVpcConfig.EndpointPublicAccess {
 				// Public access is enabled - check if restricted
-				if cluster.Cluster.ResourcesVpcConfig.PublicAccessCidrs == nil ||
-					len(cluster.Cluster.ResourcesVpcConfig.PublicAccessCidrs) == 0 ||
+				if len(cluster.Cluster.ResourcesVpcConfig.PublicAccessCidrs) == 0 ||
 					contains(cluster.Cluster.ResourcesVpcConfig.PublicAccessCidrs[0], "0.0.0.0/0") {
 					clustersWithPublicAccess = append(clustersWithPublicAccess, clusterName)
 				}
@@ -263,7 +262,7 @@ func (c *EKSChecks) CheckEKSEncryption(ctx context.Context) (CheckResult, error)
 		}
 
 		hasEncryption := false
-		if cluster.Cluster.EncryptionConfig != nil && len(cluster.Cluster.EncryptionConfig) > 0 {
+		if len(cluster.Cluster.EncryptionConfig) > 0 {
 			hasEncryption = true
 		}
 

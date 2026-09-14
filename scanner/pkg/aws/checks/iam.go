@@ -284,7 +284,7 @@ func (c *IAMChecks) CheckAccessKeyRotation(ctx context.Context) (CheckResult, er
 		if len(veryOldKeys) > 0 {
 			// Extract just the username from "username (X days old!)"
 			firstUser = veryOldKeys[0]
-			if idx := fmt.Sprintf("%s", firstUser); len(idx) > 0 {
+			if idx := firstUser; len(idx) > 0 {
 				if endIdx := len(firstUser); endIdx > 0 {
 					for i, c := range firstUser {
 						if c == ' ' {
@@ -401,7 +401,6 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 		colIndex[col] = i
 	}
 
-	unusedUsers := []string{}
 	unusedPasswords := []string{}
 	unusedKeys := []string{}
 	now := time.Now()
@@ -468,7 +467,7 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 	}
 
 	// Combine all unused credentials
-	unusedUsers = append(unusedPasswords, unusedKeys...)
+	unusedUsers := append(unusedPasswords, unusedKeys...)
 
 	if len(unusedUsers) > 0 {
 		userList := strings.Join(unusedUsers, ", ")

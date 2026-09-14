@@ -120,7 +120,7 @@ func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
 		for _, instance := range instances.Items {
 			totalInstances++
 			for _, networkInterface := range instance.NetworkInterfaces {
-				if networkInterface.AccessConfigs != nil && len(networkInterface.AccessConfigs) > 0 {
+				if len(networkInterface.AccessConfigs) > 0 {
 					instancesWithPublicIP = append(instancesWithPublicIP, instance.Name)
 					break
 				}
@@ -833,7 +833,7 @@ func (c *ComputeChecks) CheckInstancePublicIPs(ctx context.Context) []CheckResul
 			// Check if instance has public IP on any network interface
 			hasPublicIP := false
 			for _, networkInterface := range instance.NetworkInterfaces {
-				if networkInterface.AccessConfigs != nil && len(networkInterface.AccessConfigs) > 0 {
+				if len(networkInterface.AccessConfigs) > 0 {
 					for _, accessConfig := range networkInterface.AccessConfigs {
 						if accessConfig.NatIP != "" {
 							hasPublicIP = true

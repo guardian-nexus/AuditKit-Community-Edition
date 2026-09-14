@@ -100,7 +100,7 @@ func (c *NetworkChecks) CheckFirewallRules(ctx context.Context) []CheckResult {
 
 		// Check if rule allows dangerous ports
 		for _, allowed := range rule.Allowed {
-			if allowed.Ports == nil || len(allowed.Ports) == 0 {
+			if len(allowed.Ports) == 0 {
 				// No ports specified means all ports
 				openToInternet = append(openToInternet, fmt.Sprintf("%s (ALL PORTS - %s)", rule.Name, allowed.IPProtocol))
 				continue
@@ -564,7 +564,7 @@ func (c *NetworkChecks) CheckSSHFromInternet(ctx context.Context) []CheckResult 
 		// Check if rule allows SSH (port 22)
 		for _, allowed := range rule.Allowed {
 			if allowed.IPProtocol == "tcp" {
-				if allowed.Ports == nil || len(allowed.Ports) == 0 {
+				if len(allowed.Ports) == 0 {
 					// All ports allowed
 					sshRulesFromInternet = append(sshRulesFromInternet, fmt.Sprintf("%s (all ports)", rule.Name))
 				} else {
@@ -661,7 +661,7 @@ func (c *NetworkChecks) CheckRDPFromInternet(ctx context.Context) []CheckResult 
 		// Check if rule allows RDP (port 3389)
 		for _, allowed := range rule.Allowed {
 			if allowed.IPProtocol == "tcp" {
-				if allowed.Ports == nil || len(allowed.Ports) == 0 {
+				if len(allowed.Ports) == 0 {
 					// All ports allowed
 					rdpRulesFromInternet = append(rdpRulesFromInternet, fmt.Sprintf("%s (all ports)", rule.Name))
 				} else {

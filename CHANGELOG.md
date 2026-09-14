@@ -12,6 +12,11 @@ All notable changes to AuditKit will be documented in this file.
   cloud with `-provider`, correctly; the download is ~62 MB.
 
 ### Fixed
+- Lint clean under golangci-lint 2.5: a report that fails to write, an
+  unreadable progress file and an unreadable release feed are reported
+  rather than ignored; the rest are explicit discards with the reason beside
+  them. Two dead accumulators and a first-only loop written as an
+  unconditional break are gone. CI gates on lint.
 - coverage-counts.py could not see a control id assigned after the literal
   or a verdict assigned in a helper; GCP emits 175 controls where 168 was
   published and the vulnerability-scanning practice reaches a verdict. The

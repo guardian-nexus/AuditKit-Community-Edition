@@ -32,6 +32,14 @@ jobs:
 
 
 
+      # Lint is a gate now that both configurations load and both trees are
+      # clean; the previous configuration loaded under no release of the tool.
+      - name: Lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.5.0
+          working-directory: scanner
+
       - name: go vet
         run: go vet ./...
 

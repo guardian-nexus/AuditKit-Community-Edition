@@ -109,7 +109,7 @@ func (c *LambdaChecks) CheckLambdaEnvironmentEncryption(ctx context.Context) (Ch
 	totalWithEnvVars := 0
 
 	for _, fn := range functions.Functions {
-		if fn.Environment != nil && fn.Environment.Variables != nil && len(fn.Environment.Variables) > 0 {
+		if fn.Environment != nil && len(fn.Environment.Variables) > 0 {
 			totalWithEnvVars++
 			if fn.KMSKeyArn == nil || *fn.KMSKeyArn == "" {
 				functionsWithoutKMS = append(functionsWithoutKMS, *fn.FunctionName)

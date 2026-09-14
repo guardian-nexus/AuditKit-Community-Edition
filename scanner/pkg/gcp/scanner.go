@@ -98,16 +98,16 @@ func NewScanner(projectID string) (*GCPScanner, error) {
 
 func (s *GCPScanner) Close() error {
 	if s.storageClient != nil {
-		s.storageClient.Close()
+		_ = s.storageClient.Close()
 	}
 	if s.iamClient != nil {
-		s.iamClient.Close()
+		_ = s.iamClient.Close()
 	}
 	if s.loggingClient != nil {
-		s.loggingClient.Close()
+		_ = s.loggingClient.Close()
 	}
 	if s.kmsClient != nil {
-		s.kmsClient.Close()
+		_ = s.kmsClient.Close()
 	}
 	return nil
 }

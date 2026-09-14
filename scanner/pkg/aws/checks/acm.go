@@ -163,7 +163,7 @@ func (c *ACMChecks) CheckCertificateInUse(ctx context.Context) (CheckResult, err
 			continue
 		}
 
-		if detail.Certificate.InUseBy == nil || len(detail.Certificate.InUseBy) == 0 {
+		if len(detail.Certificate.InUseBy) == 0 {
 			unused = append(unused, *cert.DomainName)
 		} else {
 			inUse++

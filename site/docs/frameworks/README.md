@@ -40,7 +40,7 @@ Community reports all 110 CMMC Level 1 and Level 2 practices and automates Level
 (5 of the 17 Level 1 practices reach a verdict on AWS, 4 on Azure and GCP).
 An AuditKit subscription adds the automated Level 2 checks:
 
-- **CMMC Level 2** - For DoW contractors handling CUI. Of the 110 practices Pro assesses, 28 reach a verdict on AWS and 82 are structured evidence guidance.
+- **CMMC Level 2** - For DoW contractors handling CUI. Of the 110 practices Pro assesses, 27 reach a verdict on AWS and 83 are structured evidence guidance.
 
 ---
 

@@ -370,7 +370,7 @@ func (c *CC6Checks) CheckCC6_6_UnauthorizedPrevention(ctx context.Context) []Che
 
 	// Check CloudTrail for unauthorized access monitoring
 	trails, _ := c.cloudtrailClient.DescribeTrails(ctx, &cloudtrail.DescribeTrailsInput{})
-	if trails == nil || trails.TrailList == nil || len(trails.TrailList) == 0 {
+	if trails == nil || len(trails.TrailList) == 0 {
 		results = append(results, CheckResult{
 			Control:     "CC6.6",
 			Name:        "Unauthorized Access Prevention",
@@ -492,7 +492,7 @@ func (c *CC6Checks) CheckCC6_8_ModificationPrevention(ctx context.Context) []Che
 
 	// Check S3 versioning for data modification tracking
 	buckets, _ := c.s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
-	if buckets != nil && buckets.Buckets != nil && len(buckets.Buckets) > 0 {
+	if buckets != nil && len(buckets.Buckets) > 0 {
 		versionedBuckets := 0
 		for _, bucket := range buckets.Buckets {
 			versioning, _ := c.s3Client.GetBucketVersioning(ctx, &s3.GetBucketVersioningInput{
@@ -584,7 +584,7 @@ func (c *CC7Checks) CheckCC7_1_Monitoring(ctx context.Context) []CheckResult {
 
 	// Check CloudTrail logging
 	trails, _ := c.cloudtrailClient.DescribeTrails(ctx, &cloudtrail.DescribeTrailsInput{})
-	if trails != nil && trails.TrailList != nil && len(trails.TrailList) > 0 {
+	if trails != nil && len(trails.TrailList) > 0 {
 		enabledTrails := 0
 		for _, trail := range trails.TrailList {
 			status, _ := c.cloudtrailClient.GetTrailStatus(ctx, &cloudtrail.GetTrailStatusInput{
@@ -679,7 +679,7 @@ func (c *CC7Checks) CheckCC7_3_SecurityEvents(ctx context.Context) []CheckResult
 	if c.ssmClient != nil {
 		patches, _ := c.ssmClient.DescribePatchGroups(ctx, &ssm.DescribePatchGroupsInput{})
 
-		if patches != nil && patches.Mappings != nil && len(patches.Mappings) > 0 {
+		if patches != nil && len(patches.Mappings) > 0 {
 			results = append(results, CheckResult{
 				Control:   "CC7.3",
 				Name:      "Security Event Management",
@@ -756,7 +756,7 @@ func (c *CC8Checks) CheckCC8_1_ChangeManagement(ctx context.Context) []CheckResu
 	if c.lambdaClient != nil {
 		functions, _ := c.lambdaClient.ListFunctions(ctx, &lambda.ListFunctionsInput{})
 
-		if functions != nil && functions.Functions != nil && len(functions.Functions) > 0 {
+		if functions != nil && len(functions.Functions) > 0 {
 			versionedFunctions := 0
 			for _, fn := range functions.Functions {
 				versions, _ := c.lambdaClient.ListVersionsByFunction(ctx, &lambda.ListVersionsByFunctionInput{
@@ -798,7 +798,7 @@ func (c *CC8Checks) CheckCC8_1_ChangeManagement(ctx context.Context) []CheckResu
 		Owners: []string{"self"},
 	})
 
-	if images != nil && images.Images != nil && len(images.Images) > 0 {
+	if images != nil && len(images.Images) > 0 {
 		results = append(results, CheckResult{
 			Control:   "CC8.1",
 			Name:      "Change Management - AMI Management",
@@ -858,7 +858,7 @@ func (c *CC9Checks) CheckCC9_1_VendorRisk(ctx context.Context) []CheckResult {
 
 	// Check RDS for database encryption (data at rest protection)
 	databases, _ := c.rdsClient.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
-	if databases != nil && databases.DBInstances != nil && len(databases.DBInstances) > 0 {
+	if databases != nil && len(databases.DBInstances) > 0 {
 		encryptedDBs := 0
 		for _, db := range databases.DBInstances {
 			if db.StorageEncrypted != nil && *db.StorageEncrypted {
@@ -899,7 +899,7 @@ func (c *CC9Checks) CheckCC9_2_VendorManagement(ctx context.Context) []CheckResu
 
 	// Check S3 for encryption (vendor data protection)
 	buckets, _ := c.s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
-	if buckets != nil && buckets.Buckets != nil && len(buckets.Buckets) > 0 {
+	if buckets != nil && len(buckets.Buckets) > 0 {
 		encryptedBuckets := 0
 		for _, bucket := range buckets.Buckets {
 			encryption, _ := c.s3Client.GetBucketEncryption(ctx, &s3.GetBucketEncryptionInput{

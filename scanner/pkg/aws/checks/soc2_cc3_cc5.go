@@ -77,7 +77,7 @@ func (c *CC3Checks) CheckCC3_1_Objectives(ctx context.Context) []CheckResult {
 			// Check for enabled standards
 			standards, _ := c.securityhubClient.DescribeStandards(ctx, &securityhub.DescribeStandardsInput{})
 
-			if standards != nil && standards.Standards != nil && len(standards.Standards) > 0 {
+			if standards != nil && len(standards.Standards) > 0 {
 				results = append(results, CheckResult{
 					Control:   "CC3.1",
 					Name:      "Security Objectives Management",
@@ -111,7 +111,7 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 	if c.guarddutyClient != nil {
 		detectors, err := c.guarddutyClient.ListDetectors(ctx, &guardduty.ListDetectorsInput{})
 
-		if err != nil || detectors == nil || detectors.DetectorIds == nil || len(detectors.DetectorIds) == 0 {
+		if err != nil || detectors == nil || len(detectors.DetectorIds) == 0 {
 			results = append(results, CheckResult{
 				Control:         "CC3.2",
 				Name:            "Threat Detection and Risk Identification",
@@ -126,7 +126,8 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 			})
 		} else {
 			// Check if detector is actually enabled
-			for _, detectorId := range detectors.DetectorIds {
+			// Only the first detector is examined.
+			for _, detectorId := range detectors.DetectorIds[:min(1, len(detectors.DetectorIds))] {
 				detector, _ := c.guarddutyClient.GetDetector(ctx, &guardduty.GetDetectorInput{
 					DetectorId: &detectorId,
 				})
@@ -152,7 +153,6 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 						Timestamp:   time.Now(),
 					})
 				}
-				break // Check only first detector
 			}
 		}
 	}
@@ -161,7 +161,7 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 	if c.inspector2Client != nil {
 		status, _ := c.inspector2Client.BatchGetAccountStatus(ctx, &inspector2.BatchGetAccountStatusInput{})
 
-		if status != nil && status.Accounts != nil && len(status.Accounts) > 0 {
+		if status != nil && len(status.Accounts) > 0 {
 			// For now, just check if Inspector is enabled at all
 			results = append(results, CheckResult{
 				Control:   "CC3.2",
@@ -195,7 +195,7 @@ func (c *CC3Checks) CheckCC3_3_FraudRisk(ctx context.Context) []CheckResult {
 	if c.guarddutyClient != nil {
 		detectors, _ := c.guarddutyClient.ListDetectors(ctx, &guardduty.ListDetectorsInput{})
 
-		if detectors != nil && detectors.DetectorIds != nil && len(detectors.DetectorIds) > 0 {
+		if detectors != nil && len(detectors.DetectorIds) > 0 {
 			// Simply check if findings exist
 			results = append(results, CheckResult{
 				Control:   "CC3.3",
@@ -276,7 +276,7 @@ func (c *CC4Checks) CheckCC4_1_Evaluations(ctx context.Context) []CheckResult {
 	if c.configClient != nil {
 		recorders, err := c.configClient.DescribeConfigurationRecorders(ctx, &configservice.DescribeConfigurationRecordersInput{})
 
-		if err != nil || recorders == nil || recorders.ConfigurationRecorders == nil || len(recorders.ConfigurationRecorders) == 0 {
+		if err != nil || recorders == nil || len(recorders.ConfigurationRecorders) == 0 {
 			results = append(results, CheckResult{
 				Control:         "CC4.1",
 				Name:            "Continuous Configuration Monitoring",
@@ -293,7 +293,7 @@ func (c *CC4Checks) CheckCC4_1_Evaluations(ctx context.Context) []CheckResult {
 			// Check if recorder is actually running
 			status, _ := c.configClient.DescribeConfigurationRecorderStatus(ctx, &configservice.DescribeConfigurationRecorderStatusInput{})
 
-			if status != nil && status.ConfigurationRecordersStatus != nil && len(status.ConfigurationRecordersStatus) > 0 {
+			if status != nil && len(status.ConfigurationRecordersStatus) > 0 {
 				recording := false
 				for _, recorderStatus := range status.ConfigurationRecordersStatus {
 					if recorderStatus.Recording {
@@ -331,7 +331,7 @@ func (c *CC4Checks) CheckCC4_1_Evaluations(ctx context.Context) []CheckResult {
 	if c.cloudwatchClient != nil {
 		alarms, _ := c.cloudwatchClient.DescribeAlarms(ctx, &cloudwatch.DescribeAlarmsInput{})
 
-		if alarms != nil && alarms.MetricAlarms != nil && len(alarms.MetricAlarms) > 0 {
+		if alarms != nil && len(alarms.MetricAlarms) > 0 {
 			results = append(results, CheckResult{
 				Control:   "CC4.1",
 				Name:      "Performance Monitoring",
@@ -364,7 +364,7 @@ func (c *CC4Checks) CheckCC4_2_Deficiencies(ctx context.Context) []CheckResult {
 	if c.configClient != nil {
 		rules, _ := c.configClient.DescribeConfigRules(ctx, &configservice.DescribeConfigRulesInput{})
 
-		if rules != nil && rules.ConfigRules != nil && len(rules.ConfigRules) > 0 {
+		if rules != nil && len(rules.ConfigRules) > 0 {
 			// Check compliance status
 			complianceResults, _ := c.configClient.DescribeComplianceByConfigRule(ctx, &configservice.DescribeComplianceByConfigRuleInput{})
 
@@ -458,7 +458,7 @@ func (c *CC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) []CheckResu
 	if c.backupClient != nil {
 		plans, err := c.backupClient.ListBackupPlans(ctx, &backup.ListBackupPlansInput{})
 
-		if err != nil || plans == nil || plans.BackupPlansList == nil || len(plans.BackupPlansList) == 0 {
+		if err != nil || plans == nil || len(plans.BackupPlansList) == 0 {
 			results = append(results, CheckResult{
 				Control:         "CC5.1",
 				Name:            "Backup and Recovery Controls",
@@ -501,7 +501,7 @@ func (c *CC5Checks) CheckCC5_2_TechnologyControls(ctx context.Context) []CheckRe
 	if c.kmsClient != nil {
 		keys, err := c.kmsClient.ListKeys(ctx, &kms.ListKeysInput{})
 
-		if err != nil || keys == nil || keys.Keys == nil || len(keys.Keys) == 0 {
+		if err != nil || keys == nil || len(keys.Keys) == 0 {
 			results = append(results, CheckResult{
 				Control:     "CC5.2",
 				Name:        "Encryption Key Management",

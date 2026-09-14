@@ -62,7 +62,7 @@ func (c *MonitoringChecks) CheckActivityLogDiagnostics(ctx context.Context) []Ch
 	// Check if we can retrieve activity logs (indicates logging is functional)
 	if pager.More() {
 		page, err := pager.NextPage(ctx)
-		if err == nil && page.Value != nil && len(page.Value) > 0 {
+		if err == nil && len(page.Value) > 0 {
 			hasActivityLogs = true
 			logsFound = len(page.Value)
 		}

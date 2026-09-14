@@ -685,10 +685,10 @@ func (c *StorageChecks) CheckNetworkRestrictions(ctx context.Context) []CheckRes
 
 				if acls.DefaultAction != nil && *acls.DefaultAction == armstorage.DefaultActionAllow {
 					hasRestrictions := false
-					if acls.IPRules != nil && len(acls.IPRules) > 0 {
+					if len(acls.IPRules) > 0 {
 						hasRestrictions = true
 					}
-					if acls.VirtualNetworkRules != nil && len(acls.VirtualNetworkRules) > 0 {
+					if len(acls.VirtualNetworkRules) > 0 {
 						hasRestrictions = true
 					}
 

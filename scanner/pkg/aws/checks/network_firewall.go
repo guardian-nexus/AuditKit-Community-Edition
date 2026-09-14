@@ -210,8 +210,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallPolicyRules(ctx context.Cont
 
 		if policyDetails.FirewallPolicy != nil {
 			// Check for stateful rule groups
-			if policyDetails.FirewallPolicy.StatefulRuleGroupReferences != nil &&
-				len(policyDetails.FirewallPolicy.StatefulRuleGroupReferences) > 0 {
+			if len(policyDetails.FirewallPolicy.StatefulRuleGroupReferences) > 0 {
 				hasStatefulRules = true
 			}
 		}
@@ -307,7 +306,6 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallLogging(ctx context.Context)
 
 		hasLogging := false
 		if loggingConfig.LoggingConfiguration != nil &&
-			loggingConfig.LoggingConfiguration.LogDestinationConfigs != nil &&
 			len(loggingConfig.LoggingConfiguration.LogDestinationConfigs) > 0 {
 			hasLogging = true
 		}
