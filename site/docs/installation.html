@@ -59,9 +59,6 @@
             <p><strong>Disk Space:</strong></p>
             <ul>
                 <li>Universal binary (all clouds): ~64 MB download, ~325 MB installed</li>
-                <li><code>auditkit-aws</code>: ~7 MB download, ~23 MB installed</li>
-                <li><code>auditkit-azure</code>: ~7 MB download, ~28 MB installed</li>
-                <li><code>auditkit-gcp</code>: ~12 MB download, ~45 MB installed</li>
                 <li>Source code: ~50 MB</li>
                 <li>Scan results: ~1-10 MB per scan</li>
             </ul>
@@ -71,11 +68,8 @@
             <h3>Option 1: Download Pre-Built Binary (Recommended)</h3>
             <p>Fastest and easiest method</p>
 
-            <p>Releases ship a universal binary (all clouds) plus smaller single-cloud
-            builds: <code class="code-inline">auditkit-aws</code>,
-            <code class="code-inline">auditkit-azure</code>,
-            <code class="code-inline">auditkit-gcp</code>. Swap the name in any command below
-            if you only scan one provider.</p>
+            <p>Releases ship one binary for all three clouds; pick the provider with
+            <code class="code-inline">-provider</code> at scan time.</p>
 
             <h4>Linux (x86_64)</h4>
             <pre class="code-block"><code># Download and extract

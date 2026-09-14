@@ -4,6 +4,13 @@ All notable changes to AuditKit will be documented in this file.
 
 ## [Unreleased]
 
+### Removed
+- The single-cloud binaries `auditkit-aws`, `auditkit-azure` and `auditkit-gcp`.
+  They were built from separate, much simpler code that printed the scanner's
+  rows raw: no framework filter, no requirement counting, no PDF or HTML, and
+  a `total_controls` of "whatever passed or failed". The one binary scans every
+  cloud with `-provider`, correctly; the download is ~62 MB.
+
 ### Fixed
 - An imported ScubaGear or Prowler run reported only the controls the
   mapping file knew, so a SOC2 report from it had a denominator of a few

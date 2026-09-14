@@ -10,9 +10,6 @@ build-release.sh
 # directory scanner/cmd/auditkit/, so every new file in it was silently
 # ignored - two test files sat untracked for that reason.
 /scanner/auditkit
-/scanner/auditkit-aws
-/scanner/auditkit-azure
-/scanner/auditkit-gcp
 *.exe
 *.dll
 *.so

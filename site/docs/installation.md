@@ -19,9 +19,6 @@ Complete installation instructions for AuditKit.
 
 **Disk Space:**
 - Universal binary (all clouds): ~64 MB download, ~325 MB installed
-- `auditkit-aws`: ~7 MB download, ~23 MB installed
-- `auditkit-azure`: ~7 MB download, ~28 MB installed
-- `auditkit-gcp`: ~12 MB download, ~45 MB installed
 - Source code: ~50 MB
 - Scan results: ~1-10 MB per scan
 

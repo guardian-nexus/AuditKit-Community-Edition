@@ -295,27 +295,12 @@ Download from [GitHub Releases](https://github.com/guardian-nexus/AuditKit-Commu
 
 ### From Source
 
-**Option 1: Universal Scanner (All Clouds)**
+**Universal Scanner (All Clouds)**
 ```bash
 git clone https://github.com/guardian-nexus/AuditKit-Community-Edition
 cd AuditKit-Community-Edition/scanner
 go build ./cmd/auditkit
 ./auditkit scan -provider aws -framework soc2
-```
-
-**Option 2: Provider-Specific Scanners (Smaller Binaries)**
-```bash
-# AWS-only scanner (~93% smaller: 22 MB vs 310 MB)
-go build -o auditkit-aws ./cmd/auditkit-aws
-./auditkit-aws scan -framework soc2
-
-# Azure-only scanner
-go build -o auditkit-azure ./cmd/auditkit-azure
-./auditkit-azure scan -framework soc2
-
-# GCP-only scanner
-go build -o auditkit-gcp ./cmd/auditkit-gcp
-./auditkit-gcp scan -framework soc2
 ```
 
 **Requirements:**
@@ -372,12 +357,11 @@ go build -o auditkit-gcp ./cmd/auditkit-gcp
 ./auditkit scan -provider azure -framework soc2 -format csv -output azure-soc2.csv
 ```
 
-### Provider-Specific Scanners
+### Every Provider, One Binary
 ```bash
-# Using provider-specific binaries (smaller, faster)
-./auditkit-aws scan -framework soc2 -format pdf -output aws-soc2.pdf
-./auditkit-azure scan -framework pci -format html -output azure-pci.html
-./auditkit-gcp scan -framework cmmc -format json -output gcp-cmmc.json
+./auditkit scan -provider aws -framework soc2 -format pdf -output aws-soc2.pdf
+./auditkit scan -provider azure -framework pci -format html -output azure-pci.html
+./auditkit scan -provider gcp -framework cmmc -format json -output gcp-cmmc.json
 ```
 
 ### External Tool Integration
