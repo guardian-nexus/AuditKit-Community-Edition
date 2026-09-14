@@ -1,7 +1,6 @@
 package gcp
 
 import (
-	"context"
 	"testing"
 
 	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/gcp/checks"
