@@ -57,346 +57,162 @@
 - NIST 800-53 Rev 5 (144 controls, derived via crosswalk)
 - HIPAA (30 safeguards, derived via crosswalk)</p>
 <h2>Covered Services</h2>
+<p>Every control the service checks emit, read from the scanner's source. The
+identifier is the one the report carries; the framework pages say which
+requirement each maps to.</p>
+<h3>AKS</h3>
+<p><strong>Controls checked:</strong> 15</p>
+<ul>
+<li><strong>CIS-AKS-5.4.1</strong> - AKS Cluster Access</li>
+<li><strong>CIS-AKS-5.4.4</strong> - AKS Network Policy</li>
+<li><strong>AZ-AKS-02</strong> - AKS Azure Policy Add-on</li>
+<li><strong>CIS-AKS-5.5.1</strong> - AKS Azure AD Integration</li>
+<li><strong>CIS-AKS-5.5.2</strong> - AKS RBAC Enabled</li>
+<li><strong>CIS-AKS-5.4.2</strong> - AKS Private Cluster</li>
+<li><strong>AZ-AKS-05</strong> - AKS Managed Identity</li>
+<li><strong>AZ-AKS-03</strong> - AKS Disk Encryption (CMK)</li>
+<li><strong>CIS-AKS-5.1.1</strong> - AKS Defender for Containers</li>
+<li><strong>AZ-AKS-01</strong> - AKS Auto-Upgrade</li>
+<li><strong>AZ-AKS-06</strong> - AKS Node Pool Security</li>
+<li><strong>CIS-AKS-2.1.1</strong> - AKS Audit Logging</li>
+<li><strong>AZ-AKS-08</strong> - AKS Secrets Store CSI Driver</li>
+<li><strong>AZ-AKS-07</strong> - AKS Pod Security Standards</li>
+<li><strong>AZ-AKS-04</strong> - AKS Image Cleaner</li>
+</ul>
+<h3>Defender for Cloud</h3>
+<p><strong>Controls checked:</strong> 15</p>
+<ul>
+<li><strong>CIS-8.1.3.1</strong> - Microsoft Defender for Servers</li>
+<li><strong>CIS-8.1.6.1</strong> - Microsoft Defender for App Service</li>
+<li><strong>CIS-8.1.7.3</strong> - Microsoft Defender for Azure SQL Databases</li>
+<li><strong>CIS-8.1.7.4</strong> - Microsoft Defender for SQL Servers on Machines</li>
+<li><strong>CIS-8.1.7.2</strong> - Microsoft Defender for Open-Source Relational Databases</li>
+<li><strong>CIS-8.1.7.1</strong> - Microsoft Defender for Azure Cosmos DB</li>
+<li><strong>CIS-8.1.5.1</strong> - Microsoft Defender for Storage</li>
+<li><strong>CIS-8.1.4.1</strong> - Microsoft Defender for Containers</li>
+<li><strong>AZ-DEFENDER-03</strong> - Microsoft Defender for DNS</li>
+<li><strong>CIS-8.1.8.1</strong> - Microsoft Defender for Key Vault</li>
+<li><strong>CIS-8.1.2.1</strong> - Microsoft Defender for APIs</li>
+<li><strong>CIS-8.1.9.1</strong> - Microsoft Defender for Resource Manager</li>
+<li><strong>AZ-DEFENDER-01</strong> - Auto-Provisioning of Defender Components</li>
+<li><strong>CIS-8.1.13</strong> - Security Contact Email</li>
+<li><strong>CIS-8.1.14</strong> - Security Alert Notifications</li>
+</ul>
+<h3>SQL</h3>
+<p><strong>Controls checked:</strong> 15</p>
+<ul>
+<li><strong>AZ-SQL-05</strong> - SQL TDE Encryption</li>
+<li><strong>AZ-SQL-04</strong> - SQL TDE Check</li>
+<li><strong>AZ-SQL-03</strong> - SQL Transparent Data Encryption</li>
+<li><strong>AZ-SQL-02</strong> - SQL Auditing</li>
+<li><strong>AZ-SQL-01</strong> - SQL Server Auditing</li>
+<li><strong>AZ-SQL-13</strong> - SQL Server Firewall and Public Access</li>
+<li><strong>AZ-SQL-06</strong> - SQL Entra ID Authentication</li>
+<li><strong>CIS-8.1.7.3</strong> - Microsoft Defender for SQL</li>
+<li><strong>AZ-SQL-07</strong> - PostgreSQL Require Secure Transport</li>
+<li><strong>AZ-SQL-08</strong> - PostgreSQL Logging Configuration</li>
+<li><strong>AZ-SQL-14</strong> - PostgreSQL Public Network Access</li>
+<li><strong>AZ-SQL-09</strong> - PostgreSQL Single Server (Legacy)</li>
+<li><strong>AZ-SQL-10</strong> - MySQL Require Secure Transport</li>
+<li><strong>AZ-SQL-11</strong> - MySQL TLS Version</li>
+<li><strong>AZ-SQL-12</strong> - MySQL Audit Logging</li>
+</ul>
 <h3>Storage Accounts</h3>
 <p><strong>Controls checked:</strong> 13</p>
 <ul>
-<li><strong>CIS-3.1</strong> - Storage account public access blocked (SOC2 CC6.2)</li>
-<li><strong>CIS-3.3 / CIS-3.4</strong> - Storage encryption at rest and storage service encryption (SOC2 CC6.3)</li>
-<li><strong>CIS-4.1</strong> - Secure transfer (HTTPS) required (SOC2 CC6.7)</li>
-<li><strong>CIS-4.2</strong> - Infrastructure encryption</li>
-<li><strong>CIS-4.3</strong> - Storage account key rotation</li>
-<li><strong>CIS-4.6</strong> - Public network access disabled</li>
-<li><strong>CIS-4.7</strong> - Default network access rule set to Deny</li>
-<li><strong>CIS-4.10</strong> - Blob soft delete enabled (SOC2 CC9.1)</li>
-<li><strong>CIS-4.12</strong> - Storage logging</li>
-<li><strong>CIS-4.15</strong> - Minimum TLS version</li>
-<li><strong>CIS-4.16</strong> - Cross-tenant replication disabled</li>
-<li><strong>CIS-4.17</strong> - Blob anonymous access disabled</li>
+<li><strong>CIS-9.3.8</strong> - Storage Account Public Access</li>
+<li><strong>AZ-STORAGE-93</strong> - Storage Encryption at Rest</li>
+<li><strong>AZ-STORAGE-94</strong> - Storage Service Encryption</li>
+<li><strong>CIS-9.3.4</strong> - Secure Transfer Required</li>
+<li><strong>AZ-STORAGE-03</strong> - Infrastructure Encryption</li>
+<li><strong>CIS-9.3.2.2</strong> - Public Network Access Disabled</li>
+<li><strong>CIS-9.3.6</strong> - Minimum TLS Version</li>
+<li><strong>AZ-STORAGE-02</strong> - Blob Anonymous Access</li>
+<li><strong>CIS-9.3.7</strong> - Cross-Tenant Replication</li>
+<li><strong>AZ-STORAGE-95</strong> - Blob Soft Delete</li>
+<li><strong>CIS-9.3.2.3</strong> - Default Network Access Rule</li>
+<li><strong>CIS-9.3.1.1</strong> - Storage Key Rotation</li>
+<li><strong>AZ-STORAGE-01</strong> - Storage Logging</li>
 </ul>
-<p><strong>Example fixes:</strong></p>
-<pre class="code-block"><code># Disable public blob access
-az storage account update \
-  --name STORAGE_ACCOUNT \
-  --resource-group RESOURCE_GROUP \
-  --allow-blob-public-access false
-
-# Require secure transfer
-az storage account update \
-  --name STORAGE_ACCOUNT \
-  --resource-group RESOURCE_GROUP \
-  --https-only true
-
-# Enable soft delete
-az storage blob service-properties delete-policy update \
-  --account-name STORAGE_ACCOUNT \
-  --enable true \
-  --days-retained 7
-</code></pre>
-<h3>Azure AD (Entra ID)</h3>
-<p><strong>Controls checked:</strong> 17</p>
+<h3>Entra ID</h3>
+<p><strong>Controls checked:</strong> 12</p>
 <ul>
-<li><strong>CC6.1</strong> - Privileged Role Management</li>
-<li><strong>CC6.1</strong> - Guest User Access Control</li>
-<li><strong>CC6.6</strong> - Global Administrator MFA</li>
-<li><strong>CC6.7</strong> - Azure AD Password Policy</li>
-<li><strong>CC6.7</strong> - Stale Account Detection</li>
-<li><strong>CIS-1.1</strong> - MFA for All Users</li>
-<li><strong>CIS-1.2</strong> - MFA for Privileged Users</li>
-<li><strong>CIS-1.3</strong> - Password Policy Configuration</li>
-<li><strong>CIS-1.4</strong> - Privileged and Owner Role Assignments</li>
-<li><strong>CIS-1.5</strong> - App Registration Owner Requirements</li>
-<li><strong>CIS-1.6</strong> - Contributor Role Assignments</li>
-<li><strong>CIS-1.7</strong> - Guest User Access Review</li>
-<li><strong>CIS-1.8</strong> - Guest Invite Restrictions</li>
-<li><strong>CIS-1.9</strong> - Conditional Access Policies</li>
-<li><strong>CIS-1.10</strong> - Block Legacy Authentication</li>
-<li><strong>CIS-1.11</strong> - Guest Invite Restrictions</li>
-<li><strong>CIS-1.12</strong> - Security Defaults or Conditional Access</li>
+<li><strong>CIS-5.3.4</strong> - Privileged Role Assignments</li>
+<li><strong>CIS-5.7</strong> - Excessive Owner Assignments</li>
+<li><strong>CIS-5.3.7</strong> - Contributor Role Assignments</li>
+<li><strong>CIS-5.1.3</strong> - MFA for All Users</li>
+<li><strong>AZ-ENTRA-90</strong> - MFA for Privileged Users</li>
+<li><strong>AZ-ENTRA-01</strong> - Password Policy Configuration</li>
+<li><strong>AZ-ENTRA-91</strong> - Conditional Access - Untrusted Locations</li>
+<li><strong>CIS-5.1.1</strong> - Block Legacy Authentication</li>
+<li><strong>CIS-5.3.2</strong> - Guest User Access Review</li>
+<li><strong>AZ-ENTRA-92</strong> - Guest Invite Restrictions</li>
+<li><strong>PCI-8.2.8</strong> - Session Timeout Configuration</li>
+<li><strong>PCI-8.2.6</strong> - Remove Inactive Users</li>
 </ul>
-<p><strong>Example fixes:</strong></p>
-<pre class="code-block"><code># (Most Azure AD configuration done via portal)
-
-# Enable security defaults (basic MFA)
-az rest --method PATCH \
-  --uri https://graph.microsoft.com/beta/policies/identitySecurityDefaultsEnforcementPolicy \
-  --body '{&quot;isEnabled&quot;: true}'
-
-# List Conditional Access policies
-az rest --method GET \
-  --uri https://graph.microsoft.com/beta/identity/conditionalAccess/policies
-</code></pre>
-<p><strong>Note:</strong> Full Azure AD configuration requires Azure AD Premium P1/P2 licenses</p>
-<h3>Network Security Groups (NSGs)</h3>
-<p><strong>Controls checked:</strong> 13</p>
+<h3>App Service</h3>
+<p><strong>Controls checked:</strong> 7</p>
 <ul>
-<li><strong>CIS-6.1</strong> - Dangerous Open Ports</li>
-<li><strong>CIS-6.2</strong> - RDP Access from Internet Restricted</li>
-<li><strong>CIS-6.3</strong> - SSH Access from Internet Restricted</li>
-<li><strong>CIS-6.4</strong> - SQL Server Port Access Restricted</li>
-<li><strong>CIS-6.5</strong> - PostgreSQL Port Access Restricted</li>
-<li><strong>CIS-6.6</strong> - MySQL Port Access Restricted</li>
+<li><strong>AZ-APPSVC-02</strong> - App Service Authentication</li>
+<li><strong>AZ-APPSVC-03</strong> - HTTPS Only Redirect</li>
+<li><strong>AZ-APPSVC-04</strong> - TLS Version</li>
+<li><strong>AZ-APPSVC-05</strong> - Client Certificates</li>
+<li><strong>AZ-APPSVC-06</strong> - Managed Identity</li>
+<li><strong>AZ-APPSVC-07</strong> - Runtime Versions</li>
+<li><strong>AZ-APPSVC-01</strong> - FTP Deployment Disabled</li>
+</ul>
+<h3>Virtual Machines</h3>
+<p><strong>Controls checked:</strong> 7</p>
+<ul>
+<li><strong>CC6.3</strong> - Disk Encryption at Rest</li>
+<li><strong>AZ-COMPUTE-01</strong> - Managed Disks</li>
+<li><strong>CC7.1</strong> - VM Monitoring Agents</li>
+<li><strong>PCI-5.2.1</strong> - Endpoint Protection</li>
+<li><strong>AZ-COMPUTE-05</strong> - VM Backup</li>
+<li><strong>AZ-COMPUTE-02</strong> - Disk Network Access Restriction</li>
+<li><strong>CC6.1</strong> - VM Public IP Exposure</li>
+</ul>
+<h3>Networking</h3>
+<p><strong>Controls checked:</strong> 7</p>
+<ul>
 <li><strong>CIS-7.1</strong> - RDP Access from Internet</li>
 <li><strong>CIS-7.2</strong> - SSH Access from Internet</li>
-<li><strong>CIS-7.3</strong> - UDP Access from Internet</li>
+<li><strong>AZ-NETWORK-01</strong> - UDP Access from Internet</li>
 <li><strong>CIS-7.4</strong> - HTTP(S) Access from Internet</li>
 <li><strong>CIS-7.5</strong> - NSG Flow Log Retention</li>
 <li><strong>CIS-7.6</strong> - Network Watcher Enabled</li>
 <li><strong>CIS-7.7</strong> - Public IP Address Evaluation</li>
 </ul>
-<p><strong>Example fixes:</strong></p>
-<pre class="code-block"><code># Delete overly permissive rule
-az network nsg rule delete \
-  --resource-group RESOURCE_GROUP \
-  --nsg-name NSG_NAME \
-  --name RULE_NAME
-
-# Create restrictive rule
-az network nsg rule create \
-  --resource-group RESOURCE_GROUP \
-  --nsg-name NSG_NAME \
-  --name AllowSSHFromSpecificIP \
-  --priority 100 \
-  --source-address-prefixes YOUR_IP/32 \
-  --destination-port-ranges 22 \
-  --access Allow \
-  --protocol Tcp
-
-# Enable NSG flow logs
-az network watcher flow-log create \
-  --resource-group RESOURCE_GROUP \
-  --nsg NSG_NAME \
-  --name FlowLogName \
-  --storage-account STORAGE_ACCOUNT \
-  --enabled true
-</code></pre>
-<h3>Virtual Machines</h3>
-<p><strong>Controls checked:</strong> 7</p>
-<ul>
-<li><strong>CC6.1</strong> - VM Public IP Exposure</li>
-<li><strong>CC7.1</strong> - VM Monitoring Agents</li>
-<li><strong>CIS-7.1</strong> - Disk Encryption at Rest</li>
-<li><strong>CIS-7.3</strong> - Managed Disks</li>
-<li><strong>CIS-7.4</strong> - Endpoint Protection</li>
-<li><strong>CIS-7.6</strong> - VM Backup</li>
-<li><strong>CIS-8.5</strong> - Disk Network Access Restriction</li>
-</ul>
-<p><strong>Example fixes:</strong></p>
-<pre class="code-block"><code># Enable disk encryption
-az vm encryption enable \
-  --resource-group RESOURCE_GROUP \
-  --name VM_NAME \
-  --disk-encryption-keyvault KEY_VAULT_NAME
-
-# Remove public IP
-az network nic ip-config update \
-  --resource-group RESOURCE_GROUP \
-  --nic-name NIC_NAME \
-  --name ipconfig1 \
-  --remove PublicIpAddress
-
-# Enable boot diagnostics
-az vm boot-diagnostics enable \
-  --resource-group RESOURCE_GROUP \
-  --name VM_NAME \
-  --storage STORAGE_ACCOUNT
-</code></pre>
-<h3>SQL Database</h3>
-<p><strong>Controls checked:</strong> 12</p>
-<ul>
-<li><strong>CIS-3.1.7.3</strong> - Microsoft Defender for SQL</li>
-<li><strong>CIS-5.1.1</strong> - SQL Server Auditing</li>
-<li><strong>CIS-5.1.2</strong> - SQL Server Firewall and Public Access</li>
-<li><strong>CIS-5.1.3</strong> - SQL Transparent Data Encryption</li>
-<li><strong>CIS-5.1.4</strong> - SQL Entra ID Authentication</li>
-<li><strong>CIS-5.2.1</strong> - PostgreSQL Require Secure Transport</li>
-<li><strong>CIS-5.2.2</strong> - PostgreSQL Logging Configuration</li>
-<li><strong>CIS-5.2.5</strong> - PostgreSQL Public Network Access</li>
-<li><strong>CIS-5.2.6</strong> - PostgreSQL Single Server (Legacy)</li>
-<li><strong>CIS-5.3.1</strong> - MySQL Require Secure Transport</li>
-<li><strong>CIS-5.3.2</strong> - MySQL TLS Version</li>
-<li><strong>CIS-5.3.3</strong> - MySQL Audit Logging</li>
-</ul>
-<p><strong>Example fixes:</strong></p>
-<pre class="code-block"><code># Enable TDE (enabled by default for new databases)
-az sql db tde set \
-  --resource-group RESOURCE_GROUP \
-  --server SQL_SERVER \
-  --database DATABASE_NAME \
-  --status Enabled
-
-# Enable auditing
-az sql server audit-policy update \
-  --resource-group RESOURCE_GROUP \
-  --name SQL_SERVER \
-  --state Enabled \
-  --storage-account STORAGE_ACCOUNT
-
-# Remove public firewall rule
-az sql server firewall-rule delete \
-  --resource-group RESOURCE_GROUP \
-  --server SQL_SERVER \
-  --name AllowAllAzureIPs
-</code></pre>
 <h3>Key Vault</h3>
-<p><strong>Controls checked:</strong> 9</p>
+<p><strong>Controls checked:</strong> 5</p>
 <ul>
-<li><strong>CIS-3.3.5</strong> - Key Vault Recovery Settings</li>
-<li><strong>CIS-3.3.6</strong> - Key Vault RBAC Authorization</li>
-<li><strong>CIS-3.3.7</strong> - Key Vault Private Endpoints</li>
-<li><strong>CIS-6.1.4</strong> - Key Vault Logging</li>
-<li><strong>CIS-8.1</strong> - Key Vault Recoverable</li>
-<li><strong>CIS-8.2</strong> - Key Vault Keys Have Expiration Dates</li>
-<li><strong>CIS-8.3</strong> - Key Vault Network Access</li>
-<li><strong>CIS-8.4</strong> - Key Vault Secrets Have Expiration Dates</li>
-<li><strong>CIS-8.6</strong> - Key Vault Certificates Auto-Renew</li>
+<li><strong>AZ-KEYVAULT-01</strong> - Key Vault Recovery Settings</li>
+<li><strong>AZ-KEYVAULT-02</strong> - Key Vault RBAC Authorization</li>
+<li><strong>CIS-8.3.8</strong> - Key Vault Private Endpoints</li>
+<li><strong>CIS-8.3.7</strong> - Key Vault Network Access</li>
+<li><strong>CIS-6.1.1.4</strong> - Key Vault Logging</li>
 </ul>
-<p><strong>Example fixes:</strong></p>
-<pre class="code-block"><code># Enable soft delete
-az keyvault update \
-  --name KEY_VAULT_NAME \
-  --enable-soft-delete true \
-  --retention-days 90
-
-# Enable purge protection
-az keyvault update \
-  --name KEY_VAULT_NAME \
-  --enable-purge-protection true
-
-# Enable diagnostic logging
-az monitor diagnostic-settings create \
-  --resource /subscriptions/SUB_ID/resourceGroups/RG/providers/Microsoft.KeyVault/vaults/VAULT_NAME \
-  --name DiagnosticLogs \
-  --logs '[{&quot;category&quot;:&quot;AuditEvent&quot;,&quot;enabled&quot;:true}]' \
-  --storage-account STORAGE_ACCOUNT
-</code></pre>
-<h3>Azure Policy</h3>
-<p><strong>Controls checked:</strong> 2</p>
-<ul>
-<li><strong>CC5.3</strong> - Policies and Procedures</li>
-<li><strong>CIS-5.2.2</strong> - Create Alert for Policy Assignment Changes</li>
-</ul>
-<p><strong>Example fixes:</strong></p>
-<pre class="code-block"><code># Assign built-in policy
-az policy assignment create \
-  --name 'RequireEncryption' \
-  --policy '/providers/Microsoft.Authorization/policyDefinitions/POLICY_ID' \
-  --scope /subscriptions/SUBSCRIPTION_ID
-
-# List non-compliant resources
-az policy state list --filter &quot;isCompliant eq false&quot;
-</code></pre>
-<h3>Defender for Cloud</h3>
-<p><strong>Controls checked:</strong> 15</p>
-<ul>
-<li><strong>CIS-2.1.1</strong> - Microsoft Defender for Servers</li>
-<li><strong>CIS-2.1.2</strong> - Microsoft Defender for App Service</li>
-<li><strong>CIS-2.1.3</strong> - Microsoft Defender for Azure SQL Databases</li>
-<li><strong>CIS-2.1.4</strong> - Microsoft Defender for SQL Servers on Machines</li>
-<li><strong>CIS-2.1.5</strong> - Microsoft Defender for Open-Source Relational Databases</li>
-<li><strong>CIS-2.1.6</strong> - Microsoft Defender for Azure Cosmos DB</li>
-<li><strong>CIS-2.1.7</strong> - Microsoft Defender for Storage</li>
-<li><strong>CIS-2.1.8</strong> - Microsoft Defender for Containers</li>
-<li><strong>CIS-2.1.9</strong> - Microsoft Defender for DNS</li>
-<li><strong>CIS-2.1.10</strong> - Microsoft Defender for Key Vault</li>
-<li><strong>CIS-2.1.11</strong> - Microsoft Defender for APIs</li>
-<li><strong>CIS-2.1.12</strong> - Microsoft Defender for Resource Manager</li>
-<li><strong>CIS-2.1.17</strong> - Auto-Provisioning of Defender Components</li>
-<li><strong>CIS-2.1.19</strong> - Security Contact Email</li>
-<li><strong>CIS-2.1.20</strong> - Security Alert Notifications</li>
-</ul>
-<p><strong>Example fixes:</strong></p>
-<pre class="code-block"><code># Enable Defender for Cloud (via portal or ARM template)
-# Standard tier required for full features
-
-# View security alerts
-az security alert list
-
-# View security recommendations
-az security assessment list
-</code></pre>
-<h3>Activity Logs</h3>
+<h3>Identity</h3>
 <p><strong>Controls checked:</strong> 3</p>
 <ul>
-<li><strong>CIS-5.1.2</strong> - Activity Log Export and Retention</li>
-<li><strong>CIS-5.1.5</strong> - Key Vault and NSG Diagnostic Logging</li>
+<li><strong>CC6.6</strong> - Global Administrator MFA</li>
+<li><strong>CC6.7</strong> - Azure AD Password Policy</li>
+<li><strong>CC6.1</strong> - Privileged Role Management</li>
+</ul>
+<h3>Monitor</h3>
+<p><strong>Controls checked:</strong> 3</p>
+<ul>
+<li><strong>CIS-6.1.1.2</strong> - Activity Log Export and Retention</li>
+<li><strong>CIS-6.1.1.4</strong> - Key Vault and NSG Diagnostic Logging</li>
 <li><strong>PCI-10.5.1</strong> - Activity Log Retention - 12 Months Immediately Available</li>
 </ul>
-<p><strong>Example fixes:</strong></p>
-<pre class="code-block"><code># Create diagnostic setting for Activity Log
-az monitor diagnostic-settings create \
-  --name ActivityLogExport \
-  --resource /subscriptions/SUBSCRIPTION_ID \
-  --logs '[{&quot;category&quot;:&quot;Administrative&quot;,&quot;enabled&quot;:true},{&quot;category&quot;:&quot;Security&quot;,&quot;enabled&quot;:true}]' \
-  --storage-account STORAGE_ACCOUNT
-
-# Create activity log alert
-az monitor activity-log alert create \
-  --name SecurityGroupChange \
-  --resource-group RESOURCE_GROUP \
-  --condition category=Administrative and operationName=Microsoft.Network/networkSecurityGroups/write
-</code></pre>
-<h3>Azure Monitor</h3>
-<p><strong>Controls checked:</strong> 8</p>
+<h3>Types</h3>
+<p><strong>Controls checked:</strong> 1</p>
 <ul>
-<li><strong>CIS-5.2.1</strong> - Create Alert for Authorization Changes</li>
-<li><strong>CIS-5.2.2</strong> - Create Alert for Policy Assignment Changes</li>
-<li><strong>CIS-5.2.3</strong> - Create Alert for NSG Changes</li>
-<li><strong>CIS-5.2.4</strong> - Create Alert for Security Group Changes</li>
-<li><strong>CIS-5.2.5</strong> - Create Alert for Security Solutions Changes</li>
-<li><strong>CIS-5.2.6</strong> - Create Alert for SQL Firewall Changes</li>
-<li><strong>CIS-5.2.7</strong> - Create Alert for Key Vault Deletion</li>
-<li><strong>CIS-5.2.8</strong> - Create Alert for Storage Account Deletion</li>
+<li><strong>CIS-5.3.2</strong></li>
 </ul>
-<p><strong>Example fixes:</strong></p>
-<pre class="code-block"><code># Create Log Analytics workspace
-az monitor log-analytics workspace create \
-  --resource-group RESOURCE_GROUP \
-  --workspace-name WORKSPACE_NAME
-
-# Set retention policy
-az monitor log-analytics workspace update \
-  --resource-group RESOURCE_GROUP \
-  --workspace-name WORKSPACE_NAME \
-  --retention-time 90
-
-# Create alert rule
-az monitor metrics alert create \
-  --name HighCPU \
-  --resource-group RESOURCE_GROUP \
-  --scopes /subscriptions/SUB_ID/resourceGroups/RG/providers/Microsoft.Compute/virtualMachines/VM_NAME \
-  --condition &quot;avg Percentage CPU &gt; 80&quot; \
-  --window-size 5m \
-  --evaluation-frequency 1m
-</code></pre>
-<h3>Virtual Networks</h3>
-<p><strong>Controls checked:</strong> 4</p>
-<ul>
-<li><strong>CIS-6.1</strong> - Dangerous Open Ports</li>
-<li><strong>CIS-7.5</strong> - NSG Flow Log Retention</li>
-<li><strong>CIS-7.6</strong> - Network Watcher Enabled</li>
-<li><strong>CIS-7.7</strong> - Public IP Address Evaluation</li>
-</ul>
-<p><strong>Example fixes:</strong></p>
-<pre class="code-block"><code># Enable DDoS Protection
-az network ddos-protection create \
-  --resource-group RESOURCE_GROUP \
-  --name DDoSPlan
-
-az network vnet update \
-  --resource-group RESOURCE_GROUP \
-  --name VNET_NAME \
-  --ddos-protection true \
-  --ddos-protection-plan DDoSPlan
-
-# Create private endpoint
-az network private-endpoint create \
-  --resource-group RESOURCE_GROUP \
-  --name PrivateEndpoint \
-  --vnet-name VNET_NAME \
-  --subnet SUBNET_NAME \
-  --private-connection-resource-id RESOURCE_ID \
-  --connection-name Connection
-</code></pre>
+<h3>Framework suites</h3>
+<p>The framework suites add their own identifiers on top of the service checks: CIS (91), CMMC (13), PCI DSS (39), SOC 2 (30), vulnerability coverage (2). Those are described on the framework pages rather than here.</p>
 <h2>Controls by Framework</h2>
 <h3>SOC2 Type II (37 of the 43 criteria carry automated Azure checks)</h3>
 <p><strong>CC1 - Control Environment:</strong> 5 criteria<br />

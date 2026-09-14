@@ -441,16 +441,31 @@ Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams -OutPath ./ScubaResults
 <p>Review logs after scans to verify activity.</p>
 <h2>M365 Compliance Mappings</h2>
 <h3>SOC2 Type II</h3>
-<p>ScubaGear rules map to SOC2 controls:
-- CC6.1 (Logical Access) - 15 rules
-- CC6.6 (MFA) - 8 rules
-- CC7.2 (Monitoring) - 12 rules
-- CC8.1 (Encryption) - 10 rules</p>
+<p>ScubaGear rules map to SOC 2 criteria; the criteria with the most rules:</p>
+<ul>
+<li>CC7.2 - 48 rules</li>
+<li>CC6.6 - 38 rules</li>
+<li>CC6.2 - 35 rules</li>
+<li>CC7.1 - 35 rules</li>
+<li>CC6.3 - 32 rules</li>
+<li>CC7.3 - 17 rules</li>
+<li>CC8.1 - 8 rules</li>
+<li>CC6.1 - 6 rules</li>
+</ul>
 <h3>PCI-DSS v4.0.1</h3>
-<p>ScubaGear rules map to PCI requirements:
-- Req 8 (Access Control) - 12 rules
-- Req 10 (Logging) - 8 rules
-- Req 12 (Security Policies) - 6 rules</p>
+<p>ScubaGear rules map to PCI DSS requirements:</p>
+<ul>
+<li>Requirement 1 - 10 rules</li>
+<li>Requirement 2 - 1 rule</li>
+<li>Requirement 3 - 18 rules</li>
+<li>Requirement 5 - 24 rules</li>
+<li>Requirement 6 - 13 rules</li>
+<li>Requirement 7 - 48 rules</li>
+<li>Requirement 8 - 24 rules</li>
+<li>Requirement 9 - 1 rule</li>
+<li>Requirement 10 - 56 rules</li>
+<li>Requirement 12 - 34 rules</li>
+</ul>
 <h3>CMMC</h3>
 <p>ScubaGear rules do not currently carry CMMC mappings. M365 findings are mapped to SOC2 and PCI-DSS only; run an Azure scan for CMMC coverage of your Microsoft cloud infrastructure.</p>
 <h2>Additional Resources</h2>

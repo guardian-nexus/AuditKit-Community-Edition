@@ -12,6 +12,15 @@ All notable changes to AuditKit will be documented in this file.
   cloud with `-provider`, correctly; the download is ~62 MB.
 
 ### Fixed
+- The site's numbers and claims were corrected against the code: control,
+  CIS, PCI, HIPAA, NIST 800-53, ISO, CSF, GDPR and FedRAMP figures, the
+  CMMC "automated" counts (a practice is automated when the check reaches a
+  PASS or FAIL: 5 of 17 Level 1 on AWS, not 13), the homepage's "350+
+  automated checks" (671 controls, measured), and a long list of smaller
+  claims. The html doc pages are rendered from their markdown; the provider
+  pages' control lists, the M365 rule lists and the CIS section breakdowns
+  are generated from the scanner's source and the shipped catalogs, so they
+  cannot drift again.
 - A GDPR or FedRAMP report said nothing about its catalog being a subset;
   the CLI printed that caveat beside the score and the PDF and HTML, which
   are what reach an assessor, did not. Both now carry the scope note and

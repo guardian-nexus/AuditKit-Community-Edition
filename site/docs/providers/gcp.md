@@ -20,476 +20,124 @@ What AuditKit scans in Google Cloud Platform.
 
 ## Core Services (Free & Pro)
 
-### Cloud Storage (GCS) - 6 Checks
-
-#### CC6.2 - Public Access Controls
-**What it checks:**
-- Buckets with public access (allUsers or allAuthenticatedUsers)
-- Bucket-level IAM policies allowing public read/write
-- Object-level ACLs granting public access
-
-**Pass criteria:**
-- No buckets allow public access
-- Bucket policies restrict to authorized users only
-- Object ACLs are private
-
-**Fix command:**
-```bash
-# Remove public access from bucket
-gsutil iam ch -d allUsers:objectViewer gs://BUCKET_NAME
-gsutil iam ch -d allAuthenticatedUsers:objectViewer gs://BUCKET_NAME
-
-# Set uniform bucket-level access
-gsutil uniformbucketlevelaccess set on gs://BUCKET_NAME
-```
-
-#### CC8.1 - Bucket Encryption (CMEK)
-**What it checks:**
-- Default encryption enabled on buckets
-- Customer-managed encryption keys (CMEK) used
-- Key rotation configured
-
-**Pass criteria:**
-- All buckets use CMEK for encryption
-- Keys managed in Cloud KMS
-- Automatic key rotation enabled
-
-**Fix command:**
-```bash
-# Enable CMEK on bucket
-gsutil encryption set \
-  -k projects/PROJECT/locations/LOCATION/keyRings/KEYRING/cryptoKeys/KEY \
-  gs://BUCKET_NAME
-```
-
-#### CC7.3 - Uniform Bucket-Level Access
-**What it checks:**
-- Uniform bucket-level access enabled
-- No object-level ACLs in use
-- IAM-only access control
-
-**Pass criteria:**
-- All buckets use uniform bucket-level access
-- Object ACLs disabled
-- Access managed through IAM
-
-**Fix command:**
-```bash
-gsutil uniformbucketlevelaccess set on gs://BUCKET_NAME
-```
-
-#### CC7.2 - Object Versioning
-**What it checks:**
-- Versioning enabled on buckets
-- Previous versions retained
-- Version lifecycle configured
-
-**Pass criteria:**
-- Versioning enabled on critical buckets
-- Version retention policy configured
-
-**Fix command:**
-```bash
-gsutil versioning set on gs://BUCKET_NAME
-```
-
----
-
-### Cloud IAM - 5 Checks
-
-#### CC6.1 - Service Account Key Age
-**What it checks:**
-- Service account keys older than 90 days (PCI-DSS requirement)
-- Number of keys per service account
-- Last used date for keys
-
-**Pass criteria:**
-- All service account keys rotated within 90 days
-- No unused keys present
-- Maximum 2 keys per service account
-
-**Fix command:**
-```bash
-# Create new key
-gcloud iam service-accounts keys create new-key.json \
-  --iam-account=SERVICE_ACCOUNT_EMAIL
-
-# Delete old key
-gcloud iam service-accounts keys delete KEY_ID \
-  --iam-account=SERVICE_ACCOUNT_EMAIL
-```
-
-#### CC6.7 - Primitive Role Usage
-**What it checks:**
-- Use of Owner, Editor, or Viewer roles (overly permissive)
-- Predefined or custom roles preferred
-- Principle of least privilege
-
-**Pass criteria:**
-- No primitive roles (Owner/Editor/Viewer) in use
-- All access uses predefined or custom roles
-- Roles follow least privilege
-
-**Fix command:**
-```bash
-# Remove primitive role
-gcloud projects remove-iam-policy-binding PROJECT_ID \
-  --member=user:USER_EMAIL \
-  --role=roles/editor
-
-# Add specific role
-gcloud projects add-iam-policy-binding PROJECT_ID \
-  --member=user:USER_EMAIL \
-  --role=roles/compute.instanceAdmin.v1
-```
-
-#### CC6.6 - User MFA Enforcement
-**What it checks:**
-- 2-Step Verification enforced in Google Workspace
-- Number of users without MFA
-- Admin accounts require MFA
-
-**Pass criteria:**
-- 2-Step Verification enforced for all users
-- Admin accounts use security keys
-
-**Fix (manual verification):**
-- Enforce 2-Step Verification in Google Workspace Admin Console
-- Navigate to: https://admin.google.com/ac/security/2sv
-- Requires Google Workspace (cannot be automated via API)
-
-#### CC6.3 - Service Account Key Count
-**What it checks:**
-- Number of active keys per service account
-- Unused keys present
-- Key creation patterns
-
-**Pass criteria:**
-- Maximum 2 keys per service account
-- All keys actively used
-
-**Fix command:**
-```bash
-# List keys
-gcloud iam service-accounts keys list \
-  --iam-account=SERVICE_ACCOUNT_EMAIL
-
-# Delete unused key
-gcloud iam service-accounts keys delete KEY_ID \
-  --iam-account=SERVICE_ACCOUNT_EMAIL
-```
-
-#### CC6.8 - Service Account Permissions
-**What it checks:**
-- Service accounts with excessive permissions
-- Service accounts used by humans (anti-pattern)
-- Cross-project service account usage
-
-**Pass criteria:**
-- Service accounts follow least privilege
-- No human use of service accounts
-- Workload Identity used where possible
-
-**Fix command:**
-```bash
-# Review and restrict permissions
-gcloud projects get-iam-policy PROJECT_ID
-
-# Remove unnecessary roles
-gcloud projects remove-iam-policy-binding PROJECT_ID \
-  --member=serviceAccount:SERVICE_ACCOUNT_EMAIL \
-  --role=ROLE_TO_REMOVE
-```
-
----
-
-### Compute Engine - 3 Checks
-
-#### CC6.4 - Public IP Assignments
-**What it checks:**
-- VMs with external IP addresses
-- Unnecessary public exposure
-- Private-only instances preferred
-
-**Pass criteria:**
-- Only necessary VMs have external IPs
-- Internal-only VMs use Cloud NAT for outbound
-- Bastion hosts properly configured
-
-**Fix command:**
-```bash
-# Remove external IP
-gcloud compute instances delete-access-config INSTANCE_NAME \
-  --zone=ZONE \
-  --access-config-name="External NAT"
-```
-
-#### CC7.1 - OS Patch Management
-**What it checks:**
-- OS Config management enabled
-- Patch compliance status
-- Automatic patch deployment configured
-
-**Pass criteria:**
-- OS Config enabled on all VMs
-- Patches applied within 30 days
-- Automated patching scheduled
-
-**Fix (manual verification):**
-- Enable OS Config in console
-- Configure patch management policies
-- Schedule patch windows
-
-#### CC8.1 - Disk Encryption
-**What it checks:**
-- Boot disks encrypted at rest
-- Data disks encrypted
-- Customer-managed keys (CMEK) used
-
-**Pass criteria:**
-- All disks encrypted (default in GCP)
-- CMEK used for sensitive data
-- Keys managed in Cloud KMS
-
-**Fix command:**
-```bash
-# Create disk with CMEK
-gcloud compute disks create DISK_NAME \
-  --kms-key=projects/PROJECT/locations/LOCATION/keyRings/KEYRING/cryptoKeys/KEY
-```
-
----
-
-### VPC Networks - 3 Checks
-
-#### CC6.5 - Firewall Rule Restrictions
-**What it checks:**
-- Overly permissive firewall rules
-- Rules allowing 0.0.0.0/0 access
-- Unused firewall rules
-
-**Pass criteria:**
-- No rules allowing 0.0.0.0/0 for production services
-- Specific IP ranges defined
-- Unused rules removed
-
-**Fix command:**
-```bash
-# Delete overly permissive rule
-gcloud compute firewall-rules delete RULE_NAME
-
-# Create restricted rule
-gcloud compute firewall-rules create RULE_NAME \
-  --allow=tcp:443 \
-  --source-ranges=SPECIFIC_IP_RANGE
-```
-
-#### CIS GCP 3.1 - Default VPC Network Deleted
-**What it checks:**
-- Use of default VPC network
-- Custom VPCs preferred
-- Network segmentation
-
-**Pass criteria:**
-- Default network not in use
-- Custom VPCs configured
-- Network segmentation implemented
-
-**Fix command:**
-```bash
-# Create custom VPC
-gcloud compute networks create custom-vpc --subnet-mode=custom
-
-# Delete default network (after migration)
-gcloud compute networks delete default
-```
-
-#### CC6.6 - Open Ingress Rules
-**What it checks:**
-- Firewall rules allowing 0.0.0.0/0 ingress
-- Ports exposed to internet
-- Unnecessary services accessible
-
-**Pass criteria:**
-- No production services exposed to 0.0.0.0/0
-- Only specific IPs allowed
-- Bastion/jump hosts properly configured
-
-**Fix command:**
-```bash
-# Update rule to specific IPs
-gcloud compute firewall-rules update RULE_NAME \
-  --source-ranges=SPECIFIC_IP/32
-```
-
----
-
-### Cloud SQL - 4 Checks
-
-#### CC6.6 - Cloud SQL Public IP
-**What it checks:**
-- Cloud SQL instances with public IPs
-- Authorized networks configured
-- Private IP usage
-
-**Pass criteria:**
-- Instances use private IP only
-- If public IP required, authorized networks configured
-- Cloud SQL Proxy recommended
-
-**Fix command:**
-```bash
-# Disable public IP
-gcloud sql instances patch INSTANCE_NAME \
-  --no-assign-ip
-
-# Enable private IP
-gcloud sql instances patch INSTANCE_NAME \
-  --network=projects/PROJECT/global/networks/VPC_NAME
-```
-
-#### CC6.1 - Cloud SQL SSL Enforcement
-**What it checks:**
-- SSL/TLS required for connections
-- Certificate validation enabled
-- Encrypted connections only
-
-**Pass criteria:**
-- SSL/TLS enforced on all instances
-- No unencrypted connections allowed
-
-**Fix command:**
-```bash
-gcloud sql instances patch INSTANCE_NAME \
-  --require-ssl
-```
-
-#### CC7.4 - Automated Backups
-**What it checks:**
-- Automated backups enabled
-- Backup retention period
-- Point-in-time recovery
-
-**Pass criteria:**
-- Automated backups enabled
-- 7+ day retention (30 days for PCI-DSS)
-- Point-in-time recovery enabled
-
-**Fix command:**
-```bash
-gcloud sql instances patch INSTANCE_NAME \
-  --backup-start-time=02:00 \
-  --enable-bin-log
-```
-
-#### CC9.1 - High Availability
-**What it checks:**
-- High availability configuration
-- Regional instances
-- Automatic failover
-
-**Pass criteria:**
-- HA enabled for production databases
-- Regional configuration
-- Tested failover procedures
-
-**Fix command:**
-```bash
-gcloud sql instances patch INSTANCE_NAME \
-  --availability-type=REGIONAL
-```
-
----
-
-### Cloud KMS - 2 Checks
-
-#### CIS GCP 1.10 - KMS Key Rotation
-**What it checks:**
-- Key rotation enabled
-- Rotation period configured
-- Key version management
-
-**Pass criteria:**
-- Automatic rotation enabled
-- 90-day rotation period (PCI-DSS)
-- Key versions tracked
-
-**Fix command:**
-```bash
-# Enable rotation
-gcloud kms keys update KEY_NAME \
-  --keyring=KEYRING \
-  --location=LOCATION \
-  --rotation-period=90d \
-  --next-rotation-time=2025-11-01T00:00:00Z
-```
-
-#### CIS GCP 1.9 - KMS Separation of Duties
-
-**What it checks:**
-- No principal holds both `cloudkms.admin` and a key-usage role
-  (`cloudkms.cryptoKeyEncrypterDecrypter`, `...Encrypter`, `...Decrypter`)
-  on the same key
-
-**Pass criteria:**
-- Key administration and key use are held by different principals
-
-**Fix command:**
-```bash
-# Remove the key-usage role from an account that also administers keys
-gcloud kms keys remove-iam-policy-binding KEY_NAME \
-  --keyring=KEYRING --location=LOCATION \
-  --member=serviceAccount:ACCOUNT \
-  --role=roles/cloudkms.cryptoKeyEncrypterDecrypter
-```
-
-KMS audit logging is not checked here. `CIS GCP 2.1` under Cloud Logging covers
-Cloud Audit Logs, and `CIS GCP 1.8` and `CIS GCP 1.16` under Cloud IAM cover
-public key exposure and KMS role separation at the project level.
-
----
-
-### Cloud Logging - 2 Checks
-
-#### CC7.1 - Audit Log Configuration
-**What it checks:**
-- Admin Activity logs enabled (default)
-- Data Access logs enabled
-- System Event logs enabled
-
-**Pass criteria:**
-- All audit log types enabled
-- Logs exported to Cloud Storage/BigQuery
-- 1-year retention minimum (PCI-DSS)
-
-**Fix command:**
-```bash
-# Enable Data Access logs
-gcloud projects get-iam-policy PROJECT_ID > policy.yaml
-# Edit policy.yaml to add auditConfigs
-gcloud projects set-iam-policy PROJECT_ID policy.yaml
-```
-
-#### CC7.5 - Log Retention and Export
-**What it checks:**
-- Log retention period
-- Log sinks configured
-- Long-term storage setup
-
-**Pass criteria:**
-- Logs retained for 1+ year
-- Exported to Cloud Storage or BigQuery
-- Immutable storage for compliance
-
-**Fix command:**
-```bash
-# Create log sink to Cloud Storage
-gcloud logging sinks create SINK_NAME \
-  storage.googleapis.com/BUCKET_NAME \
-  --log-filter='resource.type="gce_instance"'
-```
-
----
+Every control the service checks emit, read from the scanner's source. The
+identifier is the one the report carries; the framework pages say which
+requirement each maps to.
+
+### IAM
+
+**Controls checked:** 12
+
+- **CC6.1** - Service Account Key Rotation
+- **CC6.3** - Primitive Role Usage
+- **CIS-GCP-1.13** - API Keys Usage
+- **CIS-GCP-1.9** - Service Account Admin Separation
+- **CIS-GCP-1.2** - Corporate Login Enforcement
+- **GCP-GKE-01** - GKE Workload Identity
+- **GCP-IAM-03** - Default Service Account Disabled
+- **CIS-GCP-1.16** - API Keys Rotated Every 90 Days
+- **GCP-IAM-02** - Separation of Duties
+- **CIS-GCP-1.10** - KMS Keys Not Publicly Accessible
+- **CIS-GCP-1.12** - KMS Role Separation of Duties
+- **CIS-GCP-1.7** - Service Account Roles at Project Level
+
+### VPC
+
+**Controls checked:** 12
+
+- **CC6.6** - VPC Firewall Rules Check
+- **CIS-GCP-3.1** - Default VPC Network Deleted
+- **CC6.1** - Private Google Access
+- **CIS-GCP-3.10** - VPC Flow Logs
+- **CIS-GCP-3.3** - DNSSEC on Cloud DNS
+- **CIS-GCP-2.17** - Load Balancer Logging
+- **CIS-GCP-3.2** - Legacy Networks
+- **CIS-GCP-3.6** - SSH Access from Internet
+- **CIS-GCP-3.7** - RDP Access from Internet
+- **GCP-NET-01** - HTTPS Load Balancer Configuration
+- **CIS-GCP-3.11** - SSL Policy TLS Version
+- **CIS-GCP-3.4** - DNSSEC Algorithm Not RSASHA1
+
+### Compute Engine
+
+**Controls checked:** 11
+
+- **CC6.7** - Disk Encryption with CMEK
+- **CC6.6** - Compute Instances - Public IP Addresses
+- **CC7.1** - OS Patch Management
+- **CIS-GCP-4.4** - OS Login Enabled
+- **CIS-GCP-4.8** - Shielded VM Features
+- **CIS-GCP-4.5** - Serial Port Access Disabled
+- **CIS-GCP-4.6** - IP Forwarding Disabled
+- **CIS-GCP-4.3** - Project-Wide SSH Keys
+- **CIS-GCP-4.2** - Default SA Full Access
+- **CIS-GCP-4.11** - Confidential Computing
+- **CIS-GCP-4.9** - No Public IP Addresses
+
+### Cloud SQL
+
+**Controls checked:** 10
+
+- **CC6.6** - Cloud SQL - Public IP
+- **A1.2** - Cloud SQL - Automated Backups
+- **CIS-GCP-6.8** - SQL Backup Retention
+- **CC6.1** - Cloud SQL - SSL Enforcement
+- **GCP-SQL-01** - PostgreSQL log_checkpoints Flag
+- **CIS-GCP-6.2.2** - PostgreSQL log_connections Flag
+- **CIS-GCP-6.1.2** - MySQL skip_show_database Flag
+- **CIS-GCP-6.2.3** - PostgreSQL log_disconnections Flag
+- **CIS-GCP-6.2.7** - PostgreSQL log_min_duration_statement Flag
+- **CIS-GCP-6.3.6** - SQL Server Trace Flag 3625
+
+### Cloud Storage
+
+**Controls checked:** 6
+
+- **CC6.1** - GCS Bucket Public Access Check
+- **CC6.7** - GCS Bucket Encryption Check
+- **A1.2** - GCS Bucket Versioning Check
+- **CC7.2** - GCS Bucket Logging Check
+- **CIS-GCP-5.2** - GCS Uniform Bucket-Level Access
+- **GCP-STOR-01** - GCS Bucket Retention Policy
+
+### GKE
+
+**Controls checked:** 5
+
+- **CIS-GKE-5.1.3** - GKE Binary Authorization
+- **CIS-GKE-4.3.1** - GKE Network Policies
+- **GCP-GKE-02** - Kubernetes Dashboard Disabled
+- **CIS-GKE-4.2.1** - Pod Security Policy
+- **CIS-GKE-5.2.2** - GKE Workload Identity
+
+### Cloud Logging
+
+**Controls checked:** 4
+
+- **CIS-GCP-2.1** - Cloud Audit Logs Enabled
+- **CIS-GCP-2.3** - Log Sinks Configured
+- **CIS-GCP-2.4** - Log Retention Period
+- **CIS-GCP-2.13** - DNS Logging Enabled
+
+### BigQuery
+
+**Controls checked:** 3
+
+- **CIS-GCP-7.1** - BigQuery Datasets Not Public
+- **CIS-GCP-7.3** - BigQuery CMEK Encryption
+- **CIS-GCP-7.2** - BigQuery Tables CMEK Encryption
+
+### Cloud KMS
+
+**Controls checked:** 2
+
+- **CIS-GCP-1.11** - KMS Key Rotation
+- **CIS-GCP-1.12** - KMS Separation of Duties
+
+### Framework suites
+
+The framework suites add their own identifiers on top of the service checks: CIS (10), CMMC (9), PCI DSS (35), SOC 2 (23), vulnerability coverage (2). Those are described on the framework pages rather than here.
+
 
 ## Advanced Services
 
