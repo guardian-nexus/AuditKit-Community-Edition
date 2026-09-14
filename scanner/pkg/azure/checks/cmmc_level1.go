@@ -210,6 +210,26 @@ func (c *AzureCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult 
 			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
 		}
 	}
+	// Every page. A subscription whose resources spanned more than one page
+	// was judged on the first page alone.
+	for pager.More() {
+		next, err := pager.NextPage(ctx)
+		if err != nil {
+			return CheckResult{
+				Control:         "AC.L1-3.1.2",
+				Name:            "[CMMC L1] Limit System Access to Authorized Types",
+				Status:          "ERROR",
+				Evidence:        fmt.Sprintf("Unable to verify role assignments: %v", err),
+				Remediation:     "Configure RBAC to limit access to authorized transaction types",
+				Priority:        PriorityCritical,
+				Timestamp:       time.Now(),
+				ScreenshotGuide: "Azure Portal → Subscriptions → IAM → Role assignments → Screenshot",
+				ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
+				Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
+			}
+		}
+		page.Value = append(page.Value, next.Value...)
+	}
 
 	ownerCount := 0
 	for _, assignment := range page.Value {
@@ -438,6 +458,26 @@ func (c *AzureCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult 
 			ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FnetworkSecurityGroups",
 			Frameworks:      map[string]string{"CMMC": "SC.L1-3.13.1", "NIST 800-171": "3.13.1"},
 		}
+	}
+	// Every page. A subscription whose resources spanned more than one page
+	// was judged on the first page alone.
+	for pager.More() {
+		next, err := pager.NextPage(ctx)
+		if err != nil {
+			return CheckResult{
+				Control:         "SC.L1-3.13.1",
+				Name:            "[CMMC L1] Monitor Communications",
+				Status:          "ERROR",
+				Evidence:        fmt.Sprintf("Unable to verify NSGs: %v", err),
+				Remediation:     "Configure Network Security Groups",
+				Priority:        PriorityCritical,
+				Timestamp:       time.Now(),
+				ScreenshotGuide: "Azure Portal → NSGs → Screenshot",
+				ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FnetworkSecurityGroups",
+				Frameworks:      map[string]string{"CMMC": "SC.L1-3.13.1", "NIST 800-171": "3.13.1"},
+			}
+		}
+		page.Value = append(page.Value, next.Value...)
 	}
 
 	nsgCount := len(page.Value)

@@ -12,6 +12,10 @@ All notable changes to AuditKit will be documented in this file.
   cloud with `-provider`, correctly; the download is ~62 MB.
 
 ### Fixed
+- Two Azure CMMC checks read only the first page of role assignments or
+  NSGs and judged the subscription on that page.
+- A CMMC report files a SOC2 or CIS check that also answers a practice
+  under the practice, not the check's own id.
 - The site's numbers and claims were corrected against the code: control,
   CIS, PCI, HIPAA, NIST 800-53, ISO, CSF, GDPR and FedRAMP figures, the
   CMMC "automated" counts (a practice is automated when the check reaches a

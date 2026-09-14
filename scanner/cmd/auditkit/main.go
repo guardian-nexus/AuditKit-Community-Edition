@@ -1436,6 +1436,18 @@ func performScan(provider, profile, framework string, verbose bool, services str
 						fmt.Fprintf(os.Stderr, "Mapped %s -> %s (NIST CSF 2.0)\n", originalID, subcategories)
 					}
 				}
+			} else if requestedUpper == "CMMC" && !isPracticeID(control.ID) {
+				// A SOC2 or CIS check that also answers a practice carries it in
+				// its Frameworks map. A CMMC report files the row under the
+				// practice, not the check's own id: an assessor reading CC9.1
+				// where they expect IR.L2-3.6.1 cannot use it.
+				if ids := practiceIDs(frameworkTagValue(control.Frameworks, "CMMC")); len(ids) > 0 {
+					hasRequestedFramework = true
+					originalID := control.ID
+					control.ID = strings.Join(ids, ", ")
+					crosswalkIDs = ids
+					control.Name = crosswalkName(control.Name, fmt.Sprintf("(via %s, CMMC)", originalID))
+				}
 			} else if requestedUpper == "PCI" || requestedUpper == "PCI-DSS" {
 				// A PCI scan must report PCI-DSS requirement numbers. Checks record
 				// the requirement they satisfy in their Frameworks map but kept
@@ -3376,6 +3388,25 @@ func nativeFrameworkIDs(value, prefix string) []string {
 		ids[i] = id
 	}
 	return ids
+}
+
+// isPracticeID reports whether an identifier is a CMMC practice (AC.L2-3.1.5).
+func isPracticeID(id string) bool {
+	id = strings.TrimSpace(id)
+	return len(id) > 8 && id[2] == '.' && id[3] == 'L' && (id[4] == '1' || id[4] == '2') && id[5] == '-' && strings.HasPrefix(id[6:], "3.")
+}
+
+// practiceIDs keeps the practice identifiers in a CMMC tag value. Older tags
+// carried a level ("L2") rather than a practice; those name nothing to file
+// under.
+func practiceIDs(value string) []string {
+	out := []string{}
+	for _, id := range splitControlIDs(value) {
+		if isPracticeID(id) {
+			out = append(out, strings.TrimSpace(id))
+		}
+	}
+	return out
 }
 
 // splitControlIDs turns a crosswalk's comma-joined control list into atomic IDs.
