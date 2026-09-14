@@ -176,6 +176,21 @@ func (c *AzureCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult 
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if total == 0 {
+		return CheckResult{
+			Control:         "AC.L1-3.1.1",
+			Name:            "[CMMC L1] Limit System Access",
+			Status:          "INFO",
+			Evidence:        "No role assignments in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "Azure Portal → Subscription → Access control (IAM) → Role assignments → Screenshot",
+			ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "AC.L1-3.1.1",
 		Name:            "[CMMC L1] Limit System Access",
@@ -256,6 +271,21 @@ func (c *AzureCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult 
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(page.Value) == 0 {
+		return CheckResult{
+			Control:         "AC.L1-3.1.2",
+			Name:            "[CMMC L1] Limit System Access to Authorized Types",
+			Status:          "INFO",
+			Evidence:        "No role assignments in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "Azure Portal → Subscriptions → IAM → Screenshot role assignments",
+			ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
+		}
+	}
 	return CheckResult{
 		Control:         "AC.L1-3.1.2",
 		Name:            "[CMMC L1] Limit System Access to Authorized Types",
@@ -331,6 +361,21 @@ func (c *AzureCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult 
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if userCount == 0 {
+		return CheckResult{
+			Control:         "IA.L1-3.5.1",
+			Name:            "[CMMC L1] Identify Users",
+			Status:          "INFO",
+			Evidence:        "No Entra ID users in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "Azure Portal → Azure AD → Users → Screenshot unique identities",
+			ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/UsersManagementMenuBlade/AllUsers",
+			Frameworks:      map[string]string{"CMMC": "IA.L1-3.5.1", "NIST 800-171": "3.5.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "IA.L1-3.5.1",
 		Name:            "[CMMC L1] Identify Users",
@@ -510,6 +555,21 @@ func (c *AzureCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult 
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if nsgCount == 0 {
+		return CheckResult{
+			Control:         "SC.L1-3.13.1",
+			Name:            "[CMMC L1] Monitor Communications",
+			Status:          "INFO",
+			Evidence:        "No network security groups in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "Azure Portal → NSGs → Screenshot monitoring controls",
+			ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FnetworkSecurityGroups",
+			Frameworks:      map[string]string{"CMMC": "SC.L1-3.13.1", "NIST 800-171": "3.13.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "SC.L1-3.13.1",
 		Name:            "[CMMC L1] Monitor Communications",

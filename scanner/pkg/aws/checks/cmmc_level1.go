@@ -124,6 +124,21 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 	}
 
 	if active == 0 {
+		// Nothing in scope is not a pass: an empty or wrongly scoped account
+		// read as compliant.
+		if len(users.Users) == 0 {
+			return CheckResult{
+				Control:         "AC.L1-3.1.1",
+				Name:            "[CMMC L1] Limit System Access",
+				Status:          "INFO",
+				Evidence:        "No IAM users in scope; nothing to assess",
+				Priority:        PriorityInfo,
+				Timestamp:       time.Now(),
+				ScreenshotGuide: "AWS Console → IAM → Users → Security credentials → Screenshot showing no active keys",
+				ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
+				Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+			}
+		}
 		return CheckResult{
 			Control:         "AC.L1-3.1.1",
 			Name:            "[CMMC L1] Limit System Access",
@@ -157,6 +172,21 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(users.Users) == 0 {
+		return CheckResult{
+			Control:         "AC.L1-3.1.1",
+			Name:            "[CMMC L1] Limit System Access",
+			Status:          "INFO",
+			Evidence:        "No IAM users in scope; nothing to assess",
+			Priority:        PriorityInfo,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "AWS Console → IAM → Credential report → Screenshot the access key last-used columns",
+			ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "AC.L1-3.1.1",
 		Name:            "[CMMC L1] Limit System Access",
@@ -204,6 +234,21 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(policies.Policies) == 0 {
+		return CheckResult{
+			Control:         "AC.L1-3.1.2",
+			Name:            "[CMMC L1] Limit Access to Permitted Transactions",
+			Status:          "INFO",
+			Evidence:        "No customer-managed IAM policies in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "AWS Console → IAM → Policies → Screenshot showing custom access policies",
+			ConsoleURL:      "https://console.aws.amazon.com/iam/home#/policies",
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
+		}
+	}
 	return CheckResult{
 		Control:         "AC.L1-3.1.2",
 		Name:            "[CMMC L1] Limit Access to Permitted Transactions",
@@ -261,6 +306,21 @@ func (c *AWSCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(users.Users) == 0 {
+		return CheckResult{
+			Control:         "IA.L1-3.5.1",
+			Name:            "[CMMC L1] Identify Users",
+			Status:          "INFO",
+			Evidence:        "No IAM users in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "AWS Console → IAM → Users → Screenshot showing unique user identities",
+			ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
+			Frameworks:      map[string]string{"CMMC": "IA.L1-3.5.1", "NIST 800-171": "3.5.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "IA.L1-3.5.1",
 		Name:            "[CMMC L1] Identify Users",
@@ -311,6 +371,21 @@ func (c *AWSCMMCLevel1Checks) CheckIA_L1_002(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if users == 0 {
+		return CheckResult{
+			Control:         "IA.L1-3.5.2",
+			Name:            "[CMMC L1] Authenticate Users",
+			Status:          "INFO",
+			Evidence:        "No IAM users in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "AWS Console → IAM → Users → Screenshot showing MFA enabled for all users",
+			ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
+			Frameworks:      map[string]string{"CMMC": "IA.L1-3.5.2", "NIST 800-171": "3.5.2"},
+		}
+	}
 	return CheckResult{
 		Control:         "IA.L1-3.5.2",
 		Name:            "[CMMC L1] Authenticate Users",
@@ -451,6 +526,21 @@ func (c *AWSCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(groups.SecurityGroups) == 0 {
+		return CheckResult{
+			Control:         "SC.L1-3.13.1",
+			Name:            "[CMMC L1] Monitor Communications",
+			Status:          "INFO",
+			Evidence:        "No security groups in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "AWS Console → VPC → Security Groups → Screenshot showing monitoring controls",
+			ConsoleURL:      "https://console.aws.amazon.com/vpc/home#SecurityGroups:",
+			Frameworks:      map[string]string{"CMMC": "SC.L1-3.13.1", "NIST 800-171": "3.13.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "SC.L1-3.13.1",
 		Name:            "[CMMC L1] Monitor Communications",

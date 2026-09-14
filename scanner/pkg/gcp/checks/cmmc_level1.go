@@ -129,6 +129,21 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(policy.Bindings) == 0 {
+		return CheckResult{
+			Control:         "AC.L1-3.1.1",
+			Name:            "[CMMC L1] Limit System Access",
+			Status:          "INFO",
+			Evidence:        "No project role bindings in scope; nothing to assess",
+			Priority:        PriorityInfo,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "IAM & Admin → IAM → Screenshot showing role assignments",
+			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "AC.L1-3.1.1",
 		Name:            "[CMMC L1] Limit System Access",
@@ -193,6 +208,19 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(policy.Bindings) == 0 {
+		return CheckResult{
+			Control:    "AC.L1-3.1.2",
+			Name:       "[CMMC L1] Limit Access to Authorized Types",
+			Status:     "INFO",
+			Evidence:   "No project role bindings in scope; nothing to assess",
+			Priority:   PriorityInfo,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
+		}
+	}
 	return CheckResult{
 		Control:    "AC.L1-3.1.2",
 		Name:       "[CMMC L1] Limit Access to Authorized Types",
@@ -257,6 +285,19 @@ func (c *GCPCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(userAccounts) == 0 {
+		return CheckResult{
+			Control:    "IA.L1-3.5.1",
+			Name:       "[CMMC L1] Identify Users",
+			Status:     "INFO",
+			Evidence:   "No user accounts in scope; nothing to assess",
+			Priority:   PriorityInfo,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"CMMC": "IA.L1-3.5.1", "NIST 800-171": "3.5.1"},
+		}
+	}
 	return CheckResult{
 		Control:    "IA.L1-3.5.1",
 		Name:       "[CMMC L1] Identify Users",
@@ -381,6 +422,21 @@ func (c *GCPCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(firewallList.Items) == 0 {
+		return CheckResult{
+			Control:         "SC.L1-3.13.1",
+			Name:            "[CMMC L1] Monitor Communications",
+			Status:          "INFO",
+			Evidence:        "No VPC firewall rules in scope; nothing to assess",
+			Priority:        PriorityInfo,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "VPC Network → Firewall → Screenshot monitoring controls",
+			ConsoleURL:      "https://console.cloud.google.com/net-security/firewall-manager/firewall-policies/list",
+			Frameworks:      map[string]string{"CMMC": "SC.L1-3.13.1", "NIST 800-171": "3.13.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "SC.L1-3.13.1",
 		Name:            "[CMMC L1] Monitor Communications",

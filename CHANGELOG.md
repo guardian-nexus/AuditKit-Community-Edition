@@ -12,6 +12,10 @@ All notable changes to AuditKit will be documented in this file.
   cloud with `-provider`, correctly; the download is ~62 MB.
 
 ### Fixed
+- A check with nothing in scope reported PASS - "all 0 NSGs have restricted
+  access rules" - so an empty or wrongly scoped account read as mostly
+  compliant. Zero resources in scope is INFO, excluded from the score, with
+  "nothing to assess" as the evidence.
 - Lint clean under golangci-lint 2.5: a report that fails to write, an
   unreadable progress file and an unreadable release feed are reported
   rather than ignored; the rest are explicit discards with the reason beside
