@@ -39,292 +39,457 @@
 
     <section class="section">
         <div class="container-prose">
+<p>Common questions about AuditKit.</p>
+<h2>General Questions</h2>
+<h3>Does this replace my auditor?</h3>
+<p>No. AuditKit automates the <strong>technical controls</strong> portion of compliance audits, but you still need:</p>
+<ul>
+<li><strong>SOC2:</strong> CPA firm for certification ($15,000 - $30,000)</li>
+<li><strong>CMMC:</strong> C3PAO for assessment ($25,000 - $150,000)</li>
+<li><strong>PCI-DSS:</strong> QSA for certification ($15,000 - $50,000)</li>
+</ul>
+<p><strong>What AuditKit replaces:</strong> Technical consultant fees ($30,000 - $100,000) for infrastructure scanning and remediation</p>
+<p><strong>What you still need:</strong> Certified auditor/assessor for final certification</p>
+<p>Think of AuditKit as doing the heavy lifting on infrastructure checks, so you can focus on organizational policies and procedures with your auditor.</p>
+<h3>Is this a security scanner?</h3>
+<p>No. AuditKit checks <strong>compliance controls</strong>, not vulnerabilities. </p>
+<p>For security scanning, use tools like:
+- <strong>Prowler</strong> - AWS security scanner
+- <strong>Scout Suite</strong> - Multi-cloud security auditing
+- <strong>Trivy</strong> - Container vulnerability scanning</p>
+<p>AuditKit can import Prowler results to broaden NIST 800-53 coverage.</p>
+<h3>What's the difference between Free and Pro?</h3>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Free</th>
+<th>Pro ($297/mo)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AWS/Azure/GCP/M365</td>
+<td>Full support</td>
+<td>Full support</td>
+</tr>
+<tr>
+<td>SOC2, PCI-DSS, NIST 800-53</td>
+<td>All frameworks</td>
+<td>All frameworks</td>
+</tr>
+<tr>
+<td>CMMC Level 1</td>
+<td>5 of 17 practices reach a verdict on AWS</td>
+<td>7 of 17 practices reach a verdict on AWS</td>
+</tr>
+<tr>
+<td>CMMC Level 2</td>
+<td>All 110 practices reported for evidence</td>
+<td>All 110 practices reported; 26 reach a verdict on AWS, 84 carry evidence guidance</td>
+</tr>
+<tr>
+<td>Controls assessed</td>
+<td>228 AWS, 277 Azure, 168 GCP</td>
+<td>315 AWS, 395 Azure, 285 GCP</td>
+</tr>
+<tr>
+<td>GCP Advanced</td>
+<td>5 GKE controls</td>
+<td>Deep GKE scanning (15) + Vertex AI (10)</td>
+</tr>
+<tr>
+<td>Multi-Account</td>
+<td>One at a time</td>
+<td>AWS Orgs, Azure Mgmt, GCP Folders</td>
+</tr>
+<tr>
+<td>Support</td>
+<td>Community</td>
+<td>Priority + 14-day trial</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong><a href="https://auditkit.io/pro/">Try Pro free for 14 days →</a></strong></p>
+<h3>How much does it cost?</h3>
+<p><strong>Free version:</strong> $0 forever (open source)<br />
+<strong>Pro version:</strong> $297/month with 14-day free trial</p>
+<p>Compare to traditional costs:
+- SOC2 consultant: $50,000+
+- CMMC C3PAO assessment: $25,000+
+- Compliance platforms (Vanta/Drata): $5,000+/year</p>
+<p><strong><a href="https://auditkit.io/pro/">Start Pro trial →</a></strong></p>
+<h2>Technical Questions</h2>
+<h3>Which cloud providers are supported?</h3>
+<p><strong>Fully supported:</strong>
+- AWS (Amazon Web Services)
+- Azure (Microsoft Azure)
+- GCP (Google Cloud Platform)
+- M365 (Microsoft 365) via ScubaGear integration</p>
+<p><strong>Coverage:</strong>
+- AWS: 228 controls - 38 SOC2 criteria, 59 PCI-DSS requirements, 5 of 17 CMMC Level 1 practices automated; all 110 Level 1 + 2 practices reported
+- Azure: 277 controls - 38 SOC2 criteria, 63 PCI-DSS requirements, 4 of 17 CMMC Level 1 practices automated; Level 2 practices reported
+- GCP: 168 controls - 32 SOC2 criteria, 50 PCI-DSS requirements, 5 GKE controls; deep GKE scanning and Vertex AI are Pro
+- M365: 29+ Entra ID rules via ScubaGear</p>
+<h3>Which GCP services are scanned?</h3>
+<p><strong>Free version (228 AWS, 277 Azure, 168 GCP controls):</strong>
+- Cloud Storage (GCS)
+- Cloud IAM
+- Compute Engine
+- VPC Networks
+- Cloud SQL
+- Cloud KMS
+- Cloud Logging</p>
+<p><strong>Pro version adds (20 additional checks):</strong>
+- GKE Security (10 checks)
+- Vertex AI Compliance (10 checks)</p>
+<p><strong><a href="./providers/gcp.html">View full GCP coverage →</a></strong></p>
+<h3>What frameworks are supported?</h3>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Status</th>
+<th>Coverage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CIS Benchmarks</td>
+<td>Production</td>
+<td>70 AWS, 127 Azure, 93 GCP</td>
+</tr>
+<tr>
+<td>FedRAMP</td>
+<td>Production</td>
+<td>Low / Moderate / High baselines (149 / 287 / 370 controls reported)</td>
+</tr>
+<tr>
+<td>SOC2 Type II</td>
+<td>Production</td>
+<td>38 criteria</td>
+</tr>
+<tr>
+<td>PCI-DSS v4.0.1</td>
+<td>Production</td>
+<td>71 requirements</td>
+</tr>
+<tr>
+<td>CMMC Level 1</td>
+<td>Production</td>
+<td>5 of 17 reach a verdict on AWS</td>
+</tr>
+<tr>
+<td>CMMC Level 2</td>
+<td>Reported free; automated in Pro</td>
+<td>110 practices</td>
+</tr>
+<tr>
+<td>NIST 800-53 Rev 5</td>
+<td>Production</td>
+<td>149 technical controls</td>
+</tr>
+<tr>
+<td>ISO 27001:2022</td>
+<td>Production</td>
+<td>53 controls, derived via crosswalk</td>
+</tr>
+<tr>
+<td>NIST CSF 2.0</td>
+<td>Production</td>
+<td>65 subcategories, derived via crosswalk</td>
+</tr>
+<tr>
+<td>GDPR</td>
+<td>Production</td>
+<td>16 articles, derived via crosswalk</td>
+</tr>
+<tr>
+<td>HIPAA</td>
+<td>Production</td>
+<td>30 safeguards, derived via crosswalk</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong><a href="./frameworks/">Framework details →</a></strong></p>
+<h3>Can I scan multiple accounts/projects?</h3>
+<p><strong>Free version:</strong> One account/project at a time. Switch between them:</p>
+<pre class="code-block"><code># AWS - use profiles
+auditkit scan -provider aws -profile production
+auditkit scan -provider aws -profile staging
 
-            <!-- General -->
-            <div class="faq-section">
-                <h2 class="faq-section-title">General Questions</h2>
+# Azure - change subscription
+export AZURE_SUBSCRIPTION_ID=&quot;sub-1&quot;
+auditkit scan -provider azure
 
-                <div class="faq-item">
-                    <h3><span class="faq-number">1</span>Does this replace my auditor?</h3>
-                    <p><strong>No.</strong> AuditKit automates the technical controls portion of compliance audits, but you still need:</p>
-                    <ul>
-                        <li><strong>SOC2:</strong> CPA firm for certification ($15,000 - $30,000)</li>
-                        <li><strong>CMMC:</strong> C3PAO for assessment ($25,000 - $150,000)</li>
-                        <li><strong>PCI-DSS:</strong> QSA for certification ($15,000 - $50,000)</li>
-                    </ul>
-                    <p><strong>What AuditKit replaces:</strong> Technical consultant fees ($30,000 - $100,000) for infrastructure scanning and remediation</p>
-                    <p><strong>What you still need:</strong> Certified auditor/assessor for final certification</p>
-                </div>
+# GCP - change project
+export GOOGLE_CLOUD_PROJECT=project-1
+auditkit scan -provider gcp
+</code></pre>
+<p><strong>Pro version:</strong> Scan entire organizations automatically:</p>
+<pre class="code-block"><code># Scan AWS Organization
+auditkit-pro scan -provider aws --scan-all
 
-                <div class="faq-item">
-                    <h3><span class="faq-number">2</span>What's the difference between Community Edition and AuditKit?</h3>
-                    <table>
-                        <tr>
-                            <th>Feature</th>
-                            <th>Community Edition</th>
-                            <th>AuditKit ($297/mo)</th>
-                        </tr>
-                        <tr>
-                            <td>AWS/Azure/GCP/M365</td>
-                            <td>Full support</td>
-                            <td>Full support</td>
-                        </tr>
-                        <tr>
-                            <td>SOC2, PCI-DSS, NIST 800-53</td>
-                            <td>All frameworks</td>
-                            <td>All frameworks</td>
-                        </tr>
-                        <tr>
-                            <td>CMMC Level 1</td>
-                            <td>5 of 17 practices automated</td>
-                            <td>7 of 17 practices automated</td>
-                        </tr>
-                        <tr>
-                            <td>CMMC Level 2</td>
-                            <td>All 110 practices reported for evidence</td>
-                            <td>All 110 practices reported, 26 reach a verdict on AWS (CUI)</td>
-                        </tr>
-                        <tr>
-                            <td>Multi-Account Scanning</td>
-                            <td>One at a time</td>
-                            <td>AWS Orgs, Azure MG, GCP Folders</td>
-                        </tr>
-                        <tr>
-                            <td>Evidence Package Generator</td>
-                            <td>-</td>
-                            <td>C3PAO-ready ZIP files</td>
-                        </tr>
-                        <tr>
-                            <td>Support</td>
-                            <td>Community</td>
-                            <td>Priority + 14-day trial</td>
-                        </tr>
-                    </table>
-                    <p><a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary">Start Free Trial →</a></p>
-                </div>
+# Scan Azure Management Group
+auditkit-pro scan -provider azure --scan-all
 
-                <div class="faq-item">
-                    <h3><span class="faq-number">3</span>How much does it cost?</h3>
-                    <p><strong>Community Edition:</strong> $0 forever (open source)<br>
-                    <strong>AuditKit:</strong> $297/month with 14-day free trial</p>
-                    <p>Compare to traditional costs:</p>
-                    <ul>
-                        <li>SOC2 consultant: $50,000+</li>
-                        <li>CMMC C3PAO assessment: $25,000+</li>
-                        <li>Compliance platforms (Vanta/Drata): $5,000+/year</li>
-                    </ul>
-                </div>
-            </div>
+# Scan GCP Folders/Organization
+auditkit-pro scan -provider gcp --scan-all
+</code></pre>
+<p><strong><a href="https://auditkit.io/pro/">Upgrade to Pro →</a></strong></p>
+<h3>Why is my compliance score low?</h3>
+<p>Common reasons:</p>
+<p><strong>1. Security services not enabled</strong></p>
+<p>Enable these first:
+- <strong>AWS:</strong> GuardDuty, Config, CloudTrail, Security Hub
+- <strong>Azure:</strong> Defender for Cloud, Azure Policy, Activity Logs
+- <strong>GCP:</strong> Security Command Center, Cloud Logging, Cloud KMS</p>
+<p><strong>2. Basic security controls missing</strong>
+- MFA not enforced
+- CloudTrail/logging not configured
+- Encryption not enabled
+- Public access on storage</p>
+<p><strong>3. Old infrastructure</strong>
+- IAM keys older than 90 days
+- Unpatched EC2 instances
+- Legacy security groups</p>
+<p><strong>Fix critical issues first, then re-scan.</strong></p>
+<h3>Does AuditKit make any changes to my infrastructure?</h3>
+<p><strong>No.</strong> AuditKit is <strong>read-only</strong>. It only:
+- Reads configuration
+- Checks security settings
+- Generates reports</p>
+<p>It <strong>never</strong> modifies your infrastructure.</p>
+<p>The <code>auditkit fix</code> command generates a script for you to review and run manually.</p>
+<h3>What permissions does AuditKit need?</h3>
+<p><strong>AWS:</strong> <code>ReadOnlyAccess</code> managed policy<br />
+<strong>Azure:</strong> <code>Reader</code> role<br />
+<strong>GCP:</strong> <code>roles/viewer</code> role  </p>
+<p>All read-only, no write permissions required.</p>
+<p><strong><a href="./setup/">Setup guides →</a></strong></p>
+<h2>CMMC Questions</h2>
+<h3>What's the difference between CMMC Level 1 and Level 2?</h3>
+<p><strong>CMMC Level 1 (17 practices) - 5 of the 17 reach a verdict on AWS in the free Community Edition; all 17 are reported</strong>
+- Protects Federal Contract Information (FCI)
+- Basic cybersecurity hygiene
+- Required for all DoW contractors
+- Self-assessment allowed</p>
+<p><strong>CMMC Level 2 (110 practices) - reported free; automated checks in AuditKit Pro</strong>
+- Protects Controlled Unclassified Information (CUI)
+- Based on NIST SP 800-171 Rev 2
+- Required for contractors handling CUI
+- Requires C3PAO assessment</p>
+<p><strong>Example CUI:</strong> Technical specs, mission plans, personnel records, logistics data</p>
+<p><strong>If your DoW contract mentions CUI, you need Level 2.</strong></p>
+<h3>How much does CMMC Level 2 Pro cost?</h3>
+<p><strong>$297/month</strong> with 14-day free trial (no credit card required)</p>
+<p>Compare to:
+- C3PAO assessment: $25,000 - $150,000
+- CMMC consultants: $50,000+
+- Traditional compliance platforms: $5,000+/year (without CMMC L2)</p>
+<p><strong><a href="https://auditkit.io/pro/">Try Pro free →</a></strong></p>
+<h3>When is the CMMC deadline?</h3>
+<p><strong>November 10, 2025</strong> - CMMC requirements start appearing in DoW contracts</p>
+<p>DoW contractors must be compliant when specified in contract solicitations. Many contracts now include CMMC Level 1 or Level 2 requirements.</p>
+<p><strong><a href="./getting-started.html">Start your assessment now →</a></strong></p>
+<h3>Can AuditKit prepare me for C3PAO assessment?</h3>
+<p>Yes, for <strong>technical controls</strong>. AuditKit automates:
+- Technical security configuration checks
+- Evidence collection guides
+- Remediation commands
+- Assessment reports</p>
+<p>You still need to handle:
+- Organizational policies
+- Security awareness training
+- Incident response procedures
+- Physical security measures</p>
+<p><strong>Timeline:</strong> Most contractors fix 80%+ of technical issues in 2-4 weeks with AuditKit.</p>
+<h2>Scanning Questions</h2>
+<h3>How long does a scan take?</h3>
+<p><strong>Single account scan:</strong> 2-5 minutes</p>
+<p><strong>Factors affecting speed:</strong>
+- Number of resources in your account
+- Number of regions (AWS)
+- Network latency
+- API rate limits</p>
+<p><strong>Pro multi-account scans:</strong> 10-30 minutes depending on organization size</p>
+<h3>Can I scan specific services only?</h3>
+<p>Not currently. AuditKit scans all supported services for the chosen framework. The <code>-services</code> flag shown in <code>auditkit scan --help</code> is accepted but not yet honoured — it does not narrow the scan.</p>
+<p><strong>Workaround:</strong> Run scan, then filter results in JSON output:</p>
+<pre class="code-block"><code>auditkit scan -format json -output results.json
+jq '.controls[] | select(.category == &quot;Storage&quot;)' results.json
+</code></pre>
+<h3>Can I run scans automatically?</h3>
+<p>Yes. AuditKit works great in CI/CD:</p>
+<pre class="code-block"><code># In your CI pipeline
+auditkit scan -provider aws -framework soc2 -format json -output results.json
 
-            <!-- CMMC -->
-            <div class="faq-section">
-                <h2 class="faq-section-title">CMMC Questions</h2>
+# Check compliance score
+SCORE=$(jq '.score' results.json)
+if (( $(echo &quot;$SCORE &lt; 80&quot; | bc -l) )); then
+  echo &quot;Compliance score too low: $SCORE%&quot;
+  exit 1
+fi
+</code></pre>
+<p><strong><a href="../examples/cicd.html">CI/CD examples →</a></strong></p>
+<h3>What if I get rate limited?</h3>
+<p>Cloud providers have API rate limits. If you hit them:</p>
+<p><strong>AWS:</strong></p>
+<pre class="code-block"><code># Reduce concurrent requests (Pro only)
+auditkit-pro scan --scan-all --max-concurrent 2
+</code></pre>
+<p><strong>All providers:</strong>
+- Run scans during off-peak hours
+- Increase service quotas in cloud console
+- Contact cloud provider support</p>
+<h2>Reporting Questions</h2>
+<h3>What report formats are available?</h3>
+<p><strong>Terminal output</strong> - Quick results</p>
+<pre class="code-block"><code>auditkit scan
+</code></pre>
+<p><strong>PDF</strong> - For auditors and management</p>
+<pre class="code-block"><code>auditkit scan -format pdf -output report.pdf
+</code></pre>
+<p><strong>HTML</strong> - Tabbed: failed, passed and manual controls</p>
+<pre class="code-block"><code>auditkit scan -format html -output report.html
+</code></pre>
+<p><strong>JSON</strong> - For automation</p>
+<pre class="code-block"><code>auditkit scan -format json -output results.json
+</code></pre>
+<h3>Can I customize reports?</h3>
+<p>Not in the Free version. Reports follow standard compliance framework formats.</p>
+<p><strong>Pro version:</strong> Reports include:
+- Watermarking with license info</p>
+<h3>What's in the PDF report?</h3>
+<ul>
+<li>Executive summary</li>
+<li>Compliance score and grade</li>
+<li>Passed controls (with evidence)</li>
+<li>Failed controls (with remediation)</li>
+<li>Evidence collection guides</li>
+<li>Compliance framework mapping</li>
+<li>Scan metadata (date, account, etc.)</li>
+</ul>
+<p><strong><a href="../examples/">View sample reports →</a></strong></p>
+<h2>Integration Questions</h2>
+<h3>Does AuditKit integrate with Jira/Slack/ServiceNow?</h3>
+<p>Not for Jira or ServiceNow. The AuditKit Pro daemon already posts scan alerts natively to Slack and Microsoft Teams, and to any webhook, SMTP mailbox or syslog target.</p>
+<p><strong>Workaround:</strong> Use JSON output with custom scripts:</p>
+<pre class="code-block"><code># Export results to JSON
+auditkit scan -format json -output results.json
 
-                <div class="faq-item">
-                    <h3><span class="faq-number">4</span>What's the difference between CMMC Level 1 and Level 2?</h3>
-                    <p><strong>CMMC Level 1 (17 practices) - 5 of the 17 automated in the free Community Edition</strong></p>
-                    <ul>
-                        <li>Protects Federal Contract Information (FCI)</li>
-                        <li>Basic cybersecurity hygiene</li>
-                        <li>Required for all DoW contractors</li>
-                        <li>Self-assessment allowed</li>
-                    </ul>
-                    <p><strong>CMMC Level 2 (110 practices) - reported free; automated checks in AuditKit Pro</strong></p>
-                    <ul>
-                        <li>Protects Controlled Unclassified Information (CUI)</li>
-                        <li>Based on NIST SP 800-171 Rev 2</li>
-                        <li>Required for contractors handling CUI</li>
-                        <li>Requires C3PAO assessment</li>
-                    </ul>
-                    <div class="callout-warning">
-                        <h4>Important</h4>
-                        <p>If your DoW contract mentions CUI, you need Level 2.</p>
-                    </div>
-                </div>
+# Parse and create Jira tickets
+python create-jira-tickets.py results.json
+</code></pre>
+<h3>Can I use AuditKit with Prowler?</h3>
+<p>Yes! AuditKit can import Prowler scan results directly:</p>
+<pre class="code-block"><code># Run Prowler scan first
+prowler aws --output-formats json -o prowler-output
 
-                <div class="faq-item">
-                    <h3><span class="faq-number">5</span>When is the CMMC deadline?</h3>
-                    <p><strong>November 10, 2025</strong> - CMMC requirements started appearing in DoW contracts</p>
-                    <p>DoW contractors must be compliant when specified in contract solicitations. Many contracts now include CMMC Level 1 or Level 2 requirements.</p>
-                    <p><a href="./getting-started.html">Start your assessment now →</a></p>
-                </div>
+# Import into AuditKit with framework mapping
+auditkit integrate -source prowler -file prowler-output.json
 
-                <div class="faq-item">
-                    <h3><span class="faq-number">6</span>Can AuditKit prepare me for C3PAO assessment?</h3>
-                    <p><strong>Yes, for technical controls.</strong> AuditKit automates:</p>
-                    <ul>
-                        <li>Technical security configuration checks</li>
-                        <li>Evidence collection guides</li>
-                        <li>Remediation commands</li>
-                        <li>Assessment reports</li>
-                    </ul>
-                    <p>You still need to handle:</p>
-                    <ul>
-                        <li>Organizational policies</li>
-                        <li>Security awareness training</li>
-                        <li>Incident response procedures</li>
-                        <li>Physical security measures</li>
-                    </ul>
-                    <p><strong>Timeline:</strong> Most contractors fix 80%+ of technical issues in 2-4 weeks with AuditKit.</p>
-                </div>
-            </div>
+# Generate PDF report from Prowler results
+auditkit integrate -source prowler -file prowler-output.json -format pdf -output prowler-report.pdf
+</code></pre>
+<p>This maps Prowler findings to SOC2, PCI-DSS, CMMC, HIPAA, and other compliance frameworks.</p>
+<p><strong><a href="./cli-reference.html#integrate">Prowler integration guide →</a></strong></p>
+<h3>How do I integrate M365?</h3>
+<p>AuditKit uses CISA ScubaGear for M365 scanning:</p>
+<pre class="code-block"><code># 1. Install ScubaGear (Windows PowerShell)
+Install-Module -Name ScubaGear
 
-            <!-- Technical -->
-            <div class="faq-section">
-                <h2 class="faq-section-title">Technical Questions</h2>
+# 2. Run ScubaGear
+Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams -OutPath ./ScubaResults
 
-                <div class="faq-item">
-                    <h3><span class="faq-number">7</span>Which cloud providers are supported?</h3>
-                    <p><strong>Fully supported:</strong></p>
-                    <ul>
-                        <li>AWS (Amazon Web Services)</li>
-                        <li>Azure (Microsoft Azure)</li>
-                        <li>GCP (Google Cloud Platform)</li>
-                        <li>M365 (Microsoft 365) via ScubaGear integration</li>
-                    </ul>
-                    <p><strong>Coverage:</strong></p>
-                    <ul>
-                        <li>AWS: 228 controls, 38 SOC2 criteria, 59 PCI-DSS requirements, 5 of 17 CMMC Level 1 practices automated; all 110 Level 1 + 2 practices reported</li>
-                        <li>Azure: 277 controls, SOC2, PCI-DSS, CMMC Level 1 automated; Level 2 practices reported</li>
-                        <li>GCP: 168 controls, including 5 GKE controls; deep GKE scanning and Vertex AI are AuditKit Pro</li>
-                        <li>M365: 29+ Entra ID rules via ScubaGear</li>
-                    </ul>
-                </div>
-
-                <div class="faq-item">
-                    <h3><span class="faq-number">8</span>What frameworks are supported?</h3>
-                    <table>
-                        <tr>
-                            <th>Framework</th>
-                            <th>Status</th>
-                            <th>Coverage</th>
-                        </tr>
-                        <tr>
-                            <td>SOC2 Type II</td>
-                            <td>Production</td>
-                            <td>38 criteria</td>
-                        </tr>
-                        <tr>
-                            <td>PCI-DSS v4.0.1</td>
-                            <td>Production</td>
-                            <td>71 requirements</td>
-                        </tr>
-                        <tr>
-                            <td>CMMC Level 1</td>
-                            <td>Production</td>
-                            <td>5 of 17 automated</td>
-                        </tr>
-                        <tr>
-                            <td>CMMC Level 2</td>
-                            <td>Reported free; automated in Pro</td>
-                            <td>110 practices</td>
-                        </tr>
-                        <tr>
-                            <td>NIST 800-53 Rev 5</td>
-                            <td>Production</td>
-                            <td>149 controls</td>
-                        </tr>
-                        <tr>
-                            <td>HIPAA Security Rule</td>
-                            <td>Production</td>
-                            <td>30 safeguards, derived via crosswalk</td>
-                        </tr>
-                        <tr>
-                            <td>CIS Benchmarks</td>
-                            <td>Production</td>
-                            <td>70 AWS, 127 Azure, 93 GCP</td>
-                        </tr>
-                        <tr>
-                            <td>ISO 27001:2022</td>
-                            <td>Production</td>
-                            <td>Via framework crosswalk</td>
-                        </tr>
-                        <tr>
-                            <td>FedRAMP</td>
-                            <td>Production</td>
-                            <td>Low / Moderate / High baselines (149 / 287 / 370 controls reported)</td>
-                        </tr>
-                        <tr>
-                            <td>GDPR</td>
-                            <td>Production</td>
-                            <td>Technical measures (Articles 25, 30, 32 automated where the cloud can show it; 5, 24, 33, 34, 35 derived)</td>
-                        </tr>
-                    </table>
-                </div>
-
-                <div class="faq-item">
-                    <h3><span class="faq-number">9</span>Does AuditKit make any changes to my infrastructure?</h3>
-                    <p><strong>No.</strong> AuditKit is read-only. It only reads configuration, checks security settings, and generates reports. It never modifies your infrastructure.</p>
-                    <p>The <code>auditkit fix</code> command generates a script for you to review and run manually.</p>
-                </div>
-
-                <div class="faq-item">
-                    <h3><span class="faq-number">10</span>What permissions does AuditKit need?</h3>
-                    <ul>
-                        <li><strong>AWS:</strong> <code>ReadOnlyAccess</code> managed policy</li>
-                        <li><strong>Azure:</strong> <code>Reader</code> role</li>
-                        <li><strong>GCP:</strong> <code>roles/viewer</code> role</li>
-                    </ul>
-                    <p>All read-only, no write permissions required.</p>
-                    <p><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/tree/main/docs/setup">Setup guides →</a></p>
-                </div>
-            </div>
-
-            <!-- Troubleshooting -->
-            <div class="faq-section">
-                <h2 class="faq-section-title">Troubleshooting</h2>
-
-                <div class="faq-item">
-                    <h3><span class="faq-number">11</span>Why is my compliance score low?</h3>
-                    <p><strong>1. Security services not enabled</strong> — enable these first:</p>
-                    <ul>
-                        <li><strong>AWS:</strong> GuardDuty, Config, CloudTrail, Security Hub</li>
-                        <li><strong>Azure:</strong> Defender for Cloud, Azure Policy, Activity Logs</li>
-                        <li><strong>GCP:</strong> Security Command Center, Cloud Logging, Cloud KMS</li>
-                    </ul>
-                    <p><strong>2. Basic security controls missing:</strong></p>
-                    <ul>
-                        <li>MFA not enforced</li>
-                        <li>CloudTrail/logging not configured</li>
-                        <li>Encryption not enabled</li>
-                        <li>Public access on storage</li>
-                    </ul>
-                    <p><strong>Fix critical issues first, then re-scan.</strong></p>
-                </div>
-
-                <div class="faq-item">
-                    <h3><span class="faq-number">12</span>"Error: AWS credentials not configured"</h3>
-                    <pre class="code-block"><code>aws configure
-# Enter your AWS Access Key ID and Secret Access Key</code></pre>
-                    <p><a href="/docs/setup/aws.html">AWS setup guide →</a></p>
-                </div>
-            </div>
-
-            <!-- Support -->
-            <div class="faq-section">
-                <h2 class="faq-section-title">Getting More Help</h2>
-
-                <div class="faq-item">
-                    <h3><span class="faq-number">13</span>Where can I get support?</h3>
-                    <p><strong>Documentation:</strong></p>
-                    <ul>
-                        <li><a href="./getting-started.html">Getting Started</a></li>
-                        <li><a href="./installation.html">Installation Guide</a></li>
-                        <li><a href="./cli-reference.html">CLI Reference</a></li>
-                        <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/tree/main/docs/setup">Cloud Setup Guides</a></li>
-                    </ul>
-                    <p><strong>Community Support:</strong></p>
-                    <ul>
-                        <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/issues">GitHub Issues</a></li>
-                        <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/discussions">GitHub Discussions</a></li>
-                    </ul>
-                    <p><strong>AuditKit Support:</strong></p>
-                    <ul>
-                        <li>Priority email support: <a href="mailto:hello@auditkit.io">hello@auditkit.io</a></li>
-                        <li><a href="/">Start Free Trial →</a></li>
-                    </ul>
-                </div>
-            </div>
+# 3. Import into AuditKit
+auditkit integrate -source scubagear -file ScubaResults/ScubaResults.json
+</code></pre>
+<p><strong><a href="./setup/m365.html">M365 setup guide →</a></strong></p>
+<h2>Troubleshooting</h2>
+<h3>"Error: AWS credentials not configured"</h3>
+<p><strong>Solution:</strong></p>
+<pre class="code-block"><code>aws configure
+# Enter your AWS Access Key ID and Secret Access Key
+</code></pre>
+<p><strong><a href="./setup/aws.html">AWS setup guide →</a></strong></p>
+<h3>"Error: Azure subscription not found"</h3>
+<p><strong>Solution:</strong></p>
+<pre class="code-block"><code>az login
+export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
+</code></pre>
+<p><strong><a href="./setup/azure.html">Azure setup guide →</a></strong></p>
+<h3>"Error: GCP project not found"</h3>
+<p><strong>Solution:</strong></p>
+<pre class="code-block"><code>gcloud auth application-default login
+export GOOGLE_CLOUD_PROJECT=your-project-id
+</code></pre>
+<p><strong><a href="./setup/gcp.html">GCP setup guide →</a></strong></p>
+<h3>"Error: Permission denied"</h3>
+<p><strong>Cause:</strong> IAM user/service account lacks required permissions</p>
+<p><strong>Solution:</strong>
+- <strong>AWS:</strong> Attach <code>ReadOnlyAccess</code> policy
+- <strong>Azure:</strong> Grant <code>Reader</code> role
+- <strong>GCP:</strong> Grant <code>roles/viewer</code> role</p>
+<p><strong><a href="./setup/">Setup guides →</a></strong></p>
+<h3>Scan results show "INFO" for many controls</h3>
+<p><strong>This is normal.</strong> Some controls require manual verification:
+- Physical security measures
+- Security awareness training
+- Vendor management processes
+- Incident response procedures</p>
+<p>Generate evidence tracker for manual controls:</p>
+<pre class="code-block"><code>auditkit evidence -format html -output evidence-tracker.html
+</code></pre>
+<h2>Comparison Questions</h2>
+<h3>AuditKit vs Vanta/Drata?</h3>
+<p><strong>Vanta/Drata:</strong>
+- Full compliance platforms ($5,000+/year)
+- Include policy management, vendor tracking, employee training
+- Automated evidence collection
+- Great for SOC2, but expensive</p>
+<p><strong>AuditKit:</strong>
+- Technical control scanning only
+- Free for SOC2/PCI/CMMC L1
+- $297/month for CMMC L2 + advanced features
+- Open source, self-hosted</p>
+<p><strong>Use AuditKit if:</strong> You want technical scanning without paying for full compliance platform</p>
+<h3>AuditKit vs Prowler/Scout Suite?</h3>
+<p><strong>Prowler/Scout Suite:</strong>
+- Security scanners (not compliance-focused)
+- Check 1000+ security findings
+- No compliance framework mapping
+- No evidence collection guides</p>
+<p><strong>AuditKit:</strong>
+- Compliance scanners (not security-focused)
+- Check 219 AWS / 174 Azure / 133 GCP compliance controls
+- Maps to SOC2, PCI-DSS, CMMC, NIST 800-53
+- Includes evidence collection guides</p>
+<p><strong>Use both:</strong> Prowler for security, AuditKit for compliance</p>
+<h3>AuditKit vs manual compliance?</h3>
+<p><strong>Manual compliance:</strong>
+- Take screenshots manually (days)
+- Document everything in spreadsheets
+- Hope you didn't miss anything
+- Pay consultant $50,000+</p>
+<p><strong>AuditKit:</strong>
+- Automated scanning (5 minutes)
+- Generate reports instantly
+- Evidence guides included
+- Free (or $297/month for Pro)</p>
+<p><strong>What AuditKit removes:</strong> the manual hunt for what to collect. Every control ships with the evidence that triggered it, a console link and a step-by-step collection guide, so the work is a checklist rather than a search.</p>
+<h2>Getting More Help</h2>
+<p><strong>Documentation:</strong>
+- <a href="./getting-started.html">Getting Started →</a>
+- <a href="./setup/">Setup Guides →</a>
+- <a href="./cli-reference.html">CLI Reference →</a>
+- <a href="./frameworks/">Framework Guides →</a></p>
+<p><strong>Support:</strong>
+- <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/issues">GitHub Issues</a>
+- <a href="https://guardiannexus.substack.com">Newsletter</a>
+- Pro Support: info@auditkit.io</p>
+<p><strong>Try Pro:</strong>
+- <a href="https://auditkit.io/pro/">14-day free trial →</a></p>
 
             <div class="cta-block">
                 <h4>Need automated Level 2 checks or advanced multi-cloud features?</h4>

@@ -48,7 +48,7 @@
         <div class="container-prose">
 <p>How to configure Azure credentials for AuditKit scanning.</p>
 <h2>Quick Start</h2>
-<div class="code-block"># Option 1: Azure CLI (easiest)
+<pre class="code-block"><code># Option 1: Azure CLI (easiest)
 az login
 export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
 
@@ -57,12 +57,12 @@ az account show
 
 # Run scan
 ./auditkit scan -provider azure -framework soc2
-</div>
+</code></pre>
 <h2>Authentication Methods</h2>
 <p>AuditKit supports three authentication methods for Azure:</p>
 <h3>Option 1: Azure CLI (Recommended)</h3>
 <p><strong>Best for:</strong> Local scanning, development</p>
-<div class="code-block"># Install Azure CLI
+<pre class="code-block"><code># Install Azure CLI
 # macOS: brew install azure-cli
 # Linux: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 # Windows: Download from docs.microsoft.com/cli/azure
@@ -78,17 +78,17 @@ export AZURE_SUBSCRIPTION_ID=&quot;12345678-1234-1234-1234-123456789012&quot;
 
 # Or set default subscription
 az account set --subscription &quot;12345678-1234-1234-1234-123456789012&quot;
-</div>
+</code></pre>
 <h3>Option 2: Service Principal (Environment Variables)</h3>
 <p><strong>Best for:</strong> CI/CD pipelines, automation</p>
-<div class="code-block">export AZURE_CLIENT_ID=&quot;your-client-id&quot;
+<pre class="code-block"><code>export AZURE_CLIENT_ID=&quot;your-client-id&quot;
 export AZURE_CLIENT_SECRET=&quot;your-client-secret&quot;
 export AZURE_TENANT_ID=&quot;your-tenant-id&quot;
 export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
 
 # Run scan
 ./auditkit scan -provider azure -framework soc2
-</div>
+</code></pre>
 <p><strong>How to create service principal:</strong> See <a href="#creating-a-service-principal-for-auditkit">Creating a Service Principal</a> below</p>
 <h3>Option 3: Managed Identity (Azure VMs)</h3>
 <p><strong>Best for:</strong> Running AuditKit on Azure infrastructure</p>
@@ -96,28 +96,28 @@ export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
 - Azure Virtual Machine with managed identity
 - Azure Container Instance with managed identity
 - Azure Functions with managed identity</p>
-<div class="code-block"># Set subscription ID (required even with managed identity)
+<pre class="code-block"><code># Set subscription ID (required even with managed identity)
 export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
 
 # Run scan - identity auto-detected
 ./auditkit scan -provider azure -framework soc2
-</div>
+</code></pre>
 <h2>Required Permissions</h2>
 <p>AuditKit needs the <strong>Reader</strong> role on your Azure subscription, plus Microsoft Graph read permissions for the identity checks.</p>
 <p>Azure RBAC covers the infrastructure checks. The MFA, authentication-methods and Conditional Access checks call Microsoft Graph, which Reader does not cover — grant the scanning identity these Graph application permissions and admin-consent them:</p>
 <ul>
-<li><code class="code-inline">User.Read.All</code></li>
-<li><code class="code-inline">UserAuthenticationMethod.Read.All</code></li>
-<li><code class="code-inline">Policy.Read.All</code></li>
+<li><code>User.Read.All</code></li>
+<li><code>UserAuthenticationMethod.Read.All</code></li>
+<li><code>Policy.Read.All</code></li>
 </ul>
 <p>Without them the identity checks report ERROR rather than a pass or fail.</p>
 <h3>Reader Role (Recommended)</h3>
-<p><strong>Role:</strong> <code class="code-inline">Reader</code><br />
+<p><strong>Role:</strong> <code>Reader</code><br />
 <strong>Scope:</strong> Subscription level</p>
 <p>This provides read-only access to all resources in the subscription.</p>
 <h3>Custom Role (Least Privilege)</h3>
 <p>If you need tighter control:</p>
-<div class="code-block">{
+<pre class="code-block"><code>{
   &quot;Name&quot;: &quot;AuditKit Scanner&quot;,
   &quot;Description&quot;: &quot;Read-only access for AuditKit compliance scanning&quot;,
   &quot;Actions&quot;: [
@@ -140,58 +140,58 @@ export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
     &quot;/subscriptions/YOUR-SUBSCRIPTION-ID&quot;
   ]
 }
-</div>
+</code></pre>
 <h2>Creating a Service Principal for AuditKit</h2>
 <h3>Step 1: Create Service Principal</h3>
-<div class="code-block"># Create service principal with Reader role
+<pre class="code-block"><code># Create service principal with Reader role
 az ad sp create-for-rbac \
   --name &quot;auditkit-scanner&quot; \
   --role &quot;Reader&quot; \
   --scopes &quot;/subscriptions/YOUR-SUBSCRIPTION-ID&quot;
-</div>
+</code></pre>
 <p><strong>Output:</strong></p>
-<div class="code-block">{
+<pre class="code-block"><code>{
   &quot;appId&quot;: &quot;12345678-1234-1234-1234-123456789012&quot;,
   &quot;displayName&quot;: &quot;auditkit-scanner&quot;,
   &quot;password&quot;: &quot;your-client-secret&quot;,
   &quot;tenant&quot;: &quot;87654321-4321-4321-4321-210987654321&quot;
 }
-</div>
+</code></pre>
 <p><strong>Save these values:</strong>
-- <code class="code-inline">appId</code> = AZURE_CLIENT_ID
-- <code class="code-inline">password</code> = AZURE_CLIENT_SECRET
-- <code class="code-inline">tenant</code> = AZURE_TENANT_ID</p>
+- <code>appId</code> = AZURE_CLIENT_ID
+- <code>password</code> = AZURE_CLIENT_SECRET
+- <code>tenant</code> = AZURE_TENANT_ID</p>
 <h3>Step 2: Configure Environment Variables</h3>
-<div class="code-block">export AZURE_CLIENT_ID=&quot;12345678-1234-1234-1234-123456789012&quot;
+<pre class="code-block"><code>export AZURE_CLIENT_ID=&quot;12345678-1234-1234-1234-123456789012&quot;
 export AZURE_CLIENT_SECRET=&quot;your-client-secret&quot;
 export AZURE_TENANT_ID=&quot;87654321-4321-4321-4321-210987654321&quot;
 export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
-</div>
+</code></pre>
 <h3>Step 3: Test Authentication</h3>
-<div class="code-block">az login --service-principal \
+<pre class="code-block"><code>az login --service-principal \
   -u $AZURE_CLIENT_ID \
   -p $AZURE_CLIENT_SECRET \
   --tenant $AZURE_TENANT_ID
 
 az account show
-</div>
+</code></pre>
 <h3>Step 4: Run Scan</h3>
-<div class="code-block">./auditkit scan -provider azure -framework soc2
-</div>
+<pre class="code-block"><code>./auditkit scan -provider azure -framework soc2
+</code></pre>
 <h2>Multi-Subscription Scanning</h2>
 <p><strong>Free version:</strong> Scan one subscription at a time</p>
 <p><strong>Pro version:</strong> Scan entire Management Group automatically</p>
 <h3>Community Edition - Switching Subscriptions</h3>
-<div class="code-block"># Scan first subscription
+<pre class="code-block"><code># Scan first subscription
 export AZURE_SUBSCRIPTION_ID=&quot;sub-1-id&quot;
 ./auditkit scan -provider azure -framework soc2 -output sub1-results.json
 
 # Scan second subscription
 export AZURE_SUBSCRIPTION_ID=&quot;sub-2-id&quot;
 ./auditkit scan -provider azure -framework soc2 -output sub2-results.json
-</div>
+</code></pre>
 <h3>Pro Version - Management Group Scanning</h3>
-<div class="code-block"># Scan entire Management Group (Pro only)
+<pre class="code-block"><code># Scan entire Management Group (Pro only)
 ./auditkit-pro scan -provider azure -framework soc2 --scan-all
 
 # Limit concurrency
@@ -199,84 +199,84 @@ export AZURE_SUBSCRIPTION_ID=&quot;sub-2-id&quot;
 
 # Generate consolidated report
 ./auditkit-pro scan -provider azure --scan-all -format pdf -output mgmt-group-report.pdf
-</div>
+</code></pre>
 <p><strong><a href="https://auditkit.io/pro/">Upgrade to Pro →</a></strong></p>
 <h2>Troubleshooting</h2>
 <h3>"Error: Azure credentials not configured"</h3>
 <p><strong>Cause:</strong> Not logged in</p>
 <p><strong>Solution:</strong></p>
-<div class="code-block">az login
+<pre class="code-block"><code>az login
 export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
-</div>
+</code></pre>
 <h3>"Error: Subscription not found"</h3>
 <p><strong>Cause:</strong> Subscription ID not set or incorrect</p>
 <p><strong>Solution:</strong></p>
-<div class="code-block"># List all subscriptions
+<pre class="code-block"><code># List all subscriptions
 az account list --output table
 
 # Set correct subscription
 export AZURE_SUBSCRIPTION_ID=&quot;correct-subscription-id&quot;
-</div>
+</code></pre>
 <h3>"Error: Access Denied" or "Authorization Failed"</h3>
 <p><strong>Cause:</strong> Service principal lacks Reader role</p>
 <p><strong>Solution:</strong></p>
-<div class="code-block"># Assign Reader role
+<pre class="code-block"><code># Assign Reader role
 az role assignment create \
   --assignee $AZURE_CLIENT_ID \
   --role &quot;Reader&quot; \
   --scope &quot;/subscriptions/YOUR-SUBSCRIPTION-ID&quot;
-</div>
+</code></pre>
 <h3>"Error: Invalid client secret"</h3>
 <p><strong>Cause:</strong> Service principal secret expired or incorrect</p>
 <p><strong>Solution:</strong></p>
-<div class="code-block"># Reset credential
+<pre class="code-block"><code># Reset credential
 az ad sp credential reset --id $AZURE_CLIENT_ID
 
 # Use new password as AZURE_CLIENT_SECRET
-</div>
+</code></pre>
 <h3>"Error: Tenant not found"</h3>
 <p><strong>Cause:</strong> Wrong tenant ID</p>
 <p><strong>Solution:</strong></p>
-<div class="code-block"># List tenants
+<pre class="code-block"><code># List tenants
 az account list --output table
 
 # Use correct tenant ID
 export AZURE_TENANT_ID=&quot;correct-tenant-id&quot;
-</div>
+</code></pre>
 <h2>Security Best Practices</h2>
 <h3>1. Use Dedicated Service Principal</h3>
 <p>Don't use your personal credentials.</p>
-<div class="code-block">az ad sp create-for-rbac --name &quot;auditkit-scanner&quot; --role &quot;Reader&quot;
-</div>
+<pre class="code-block"><code>az ad sp create-for-rbac --name &quot;auditkit-scanner&quot; --role &quot;Reader&quot;
+</code></pre>
 <h3>2. Rotate Client Secrets Regularly</h3>
-<div class="code-block"># Every 90 days
+<pre class="code-block"><code># Every 90 days
 az ad sp credential reset --id $AZURE_CLIENT_ID
-</div>
+</code></pre>
 <h3>3. Enable Activity Log Monitoring</h3>
 <p>Monitor what AuditKit accesses:</p>
-<div class="code-block"># View activity logs
+<pre class="code-block"><code># View activity logs
 az monitor activity-log list --caller auditkit-scanner@YOUR-TENANT
-</div>
+</code></pre>
 <h3>4. Scope Permissions Appropriately</h3>
 <p>Only grant Reader access at the subscription level:</p>
-<div class="code-block">az role assignment create \
+<pre class="code-block"><code>az role assignment create \
   --assignee $AZURE_CLIENT_ID \
   --role &quot;Reader&quot; \
   --scope &quot;/subscriptions/YOUR-SUBSCRIPTION-ID&quot;
-</div>
+</code></pre>
 <h2>Finding Your IDs</h2>
 <h3>Find Subscription ID</h3>
-<div class="code-block"># List all subscriptions
+<pre class="code-block"><code># List all subscriptions
 az account list --query &quot;[].{Name:name, ID:id}&quot; --output table
-</div>
+</code></pre>
 <h3>Find Tenant ID</h3>
-<div class="code-block"># Show current account details
+<pre class="code-block"><code># Show current account details
 az account show --query tenantId --output tsv
-</div>
+</code></pre>
 <h3>Find Service Principal ID</h3>
-<div class="code-block"># List service principals
+<pre class="code-block"><code># List service principals
 az ad sp list --display-name &quot;auditkit-scanner&quot; --query &quot;[].appId&quot; --output tsv
-</div>
+</code></pre>
 <h2>Next Steps</h2>
 <ul>
 <li><strong><a href="../getting-started.html">Run your first scan →</a></strong></li>

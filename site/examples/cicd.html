@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CI/CD Integration - AuditKit</title>
+    <link rel="icon" type="image/svg+xml" href="../auditkit-logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <nav class="site-nav" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <img src="../auditkit-logo-dark.svg" alt="AuditKit">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+            <div class="nav-links">
+                <a href="/#features">Features</a>
+                <a href="/docs/frameworks/">Frameworks</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/docs/">Docs</a>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="nav-cta">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>CI/CD Integration</h1>
+            <p class="subtitle">Run AuditKit in your pipeline and gate on the score.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container-prose">
+<p>Automate compliance checks in your CI/CD pipelines to catch security misconfigurations before they reach production.</p>
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#github-actions">GitHub Actions</a></li>
+<li><a href="#gitlab-ci">GitLab CI</a></li>
+<li><a href="#jenkins">Jenkins</a></li>
+<li><a href="#aws-codepipeline">AWS CodePipeline</a></li>
+<li><a href="#azure-devops">Azure DevOps</a></li>
+<li><a href="#cloud-build-gcp">Cloud Build (GCP)</a></li>
+<li><a href="#failing-builds-on-compliance-issues">Failing Builds on Compliance Issues</a></li>
+<li><a href="#multi-cloud-pipelines">Multi-Cloud Pipelines</a></li>
+</ul>
+<h2>Overview</h2>
+<p>AuditKit can run in CI/CD pipelines to:
+- <strong>Prevent regressions</strong> - Catch new compliance failures before deployment
+- <strong>Automate security checks</strong> - Run compliance scans on every commit or PR
+- <strong>Track compliance over time</strong> - Store JSON reports as build artifacts
+- <strong>Block deployments</strong> - Fail builds when critical controls fail
+- <strong>Generate audit trails</strong> - Archive compliance reports for auditors</p>
+<p><strong>Key Features:</strong>
+- JSON output for programmatic parsing (<code>-format json</code>)
+- A JSON report you can gate on with <code>jq</code> (see the examples below)</p>
+<p>A completed scan exits 0 whatever the compliance score; a non-zero exit means
+the scan itself could not run. Gate the build on the score, not the exit code.
+- Lightweight binaries (~50-80MB) run in Docker containers</p>
+<h2>GitHub Actions</h2>
+<h3>AWS Compliance Check (SOC2)</h3>
+<pre class="code-block"><code>name: AWS SOC2 Compliance Check
+
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2am UTC
+
+jobs:
+  compliance-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Download AuditKit
+        run: |
+          curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+          chmod +x auditkit
+
+      - name: Run SOC2 compliance scan
+        run: |
+          ./auditkit scan -provider aws -framework soc2 -format json -output soc2-results.json
+
+      - name: Check compliance score
+        run: |
+          SCORE=$(jq -r '.score' soc2-results.json)
+          echo &quot;Compliance Score: $SCORE%&quot;
+          if (( $(echo &quot;$SCORE &lt; 80&quot; | bc -l) )); then
+            echo &quot;FAIL:Compliance score below 80% threshold&quot;
+            exit 1
+          fi
+          echo &quot;PASS:Compliance score meets threshold&quot;
+
+      - name: Upload compliance report
+        uses: actions/upload-artifact@v3
+        with:
+          name: soc2-compliance-report
+          path: soc2-results.json
+</code></pre>
+<h3>Multi-Cloud Compliance Check</h3>
+<pre class="code-block"><code>name: Multi-Cloud Compliance
+
+on: [push, pull_request]
+
+jobs:
+  aws-compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Run AWS scan
+        run: |
+          curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+          chmod +x auditkit
+          ./auditkit scan -provider aws -framework soc2 -format json -output aws-soc2.json
+      - uses: actions/upload-artifact@v3
+        with:
+          name: aws-compliance
+          path: aws-soc2.json
+
+  azure-compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Run Azure scan
+        run: |
+          curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+          chmod +x auditkit
+          export AZURE_SUBSCRIPTION_ID=&quot;$(az account show --query id -o tsv)&quot;
+          ./auditkit scan -provider azure -framework soc2 -format json -output azure-soc2.json
+      - uses: actions/upload-artifact@v3
+        with:
+          name: azure-compliance
+          path: azure-soc2.json
+
+  gcp-compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Run GCP scan
+        run: |
+          curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+          chmod +x auditkit
+          ./auditkit scan -provider gcp -framework soc2 -format json -output gcp-soc2.json
+      - uses: actions/upload-artifact@v3
+        with:
+          name: gcp-compliance
+          path: gcp-soc2.json
+</code></pre>
+<h2>GitLab CI</h2>
+<h3>AWS PCI-DSS Compliance</h3>
+<pre class="code-block"><code># .gitlab-ci.yml
+stages:
+  - compliance
+
+aws-pci-scan:
+  stage: compliance
+  image: ubuntu:22.04
+  before_script:
+    - apt-get update &amp;&amp; apt-get install -y curl jq
+    - curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+    - chmod +x auditkit
+  script:
+    - ./auditkit scan -provider aws -framework pci -format json -output pci-results.json
+    - |
+      CRITICAL_FAILURES=$(jq '[.controls[] | select(.status==&quot;FAIL&quot; and .severity==&quot;CRITICAL&quot;)] | length' pci-results.json)
+      if [ &quot;$CRITICAL_FAILURES&quot; -gt 0 ]; then
+        echo &quot;FAIL:Found $CRITICAL_FAILURES CRITICAL failures&quot;
+        exit 1
+      fi
+  artifacts:
+    paths:
+      - pci-results.json
+    expire_in: 30 days
+  only:
+    - main
+    - merge_requests
+</code></pre>
+<h3>Azure CMMC Compliance</h3>
+<pre class="code-block"><code># .gitlab-ci.yml
+azure-cmmc-scan:
+  stage: compliance
+  image: mcr.microsoft.com/azure-cli
+  before_script:
+    - az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+    - curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+    - chmod +x auditkit
+  script:
+    - export AZURE_SUBSCRIPTION_ID=&quot;$(az account show --query id -o tsv)&quot;
+    - ./auditkit scan -provider azure -framework cmmc -format json -output cmmc-results.json
+  artifacts:
+    paths:
+      - cmmc-results.json
+    reports:
+      junit: cmmc-results.json
+</code></pre>
+<h2>Jenkins</h2>
+<h3>AWS SOC2 Pipeline</h3>
+<pre class="code-block"><code>// Jenkinsfile
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = 'us-east-1'
+    }
+
+    stages {
+        stage('Download AuditKit') {
+            steps {
+                sh '''
+                    curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+                    chmod +x auditkit
+                '''
+            }
+        }
+
+        stage('AWS Compliance Scan') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh './auditkit scan -provider aws -framework soc2 -format json -output soc2-results.json'
+                }
+            }
+        }
+
+        stage('Check Compliance') {
+            steps {
+                script {
+                    def results = readJSON file: 'soc2-results.json'
+                    def score = results.score
+
+                    echo &quot;Compliance Score: ${score}%&quot;
+
+                    if (score &lt; 80) {
+                        error(&quot;Compliance score ${score}% is below 80% threshold&quot;)
+                    }
+                }
+            }
+        }
+
+        stage('Archive Results') {
+            steps {
+                archiveArtifacts artifacts: 'soc2-results.json', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        always {
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: '.',
+                reportFiles: 'soc2-results.json',
+                reportName: 'SOC2 Compliance Report'
+            ])
+        }
+    }
+}
+</code></pre>
+<h3>Multi-Cloud Jenkins Pipeline</h3>
+<pre class="code-block"><code>// Jenkinsfile
+pipeline {
+    agent any
+
+    stages {
+        stage('Parallel Compliance Scans') {
+            parallel {
+                stage('AWS') {
+                    steps {
+                        sh '''
+                            curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+                            chmod +x auditkit
+                            ./auditkit scan -provider aws -framework soc2 -format json -output aws-soc2.json
+                        '''
+                    }
+                }
+
+                stage('Azure') {
+                    steps {
+                        sh '''
+                            curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+                            chmod +x auditkit
+                            az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+                            export AZURE_SUBSCRIPTION_ID=&quot;$(az account show --query id -o tsv)&quot;
+                            ./auditkit scan -provider azure -framework soc2 -format json -output azure-soc2.json
+                        '''
+                    }
+                }
+
+                stage('GCP') {
+                    steps {
+                        sh '''
+                            curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+                            chmod +x auditkit
+                            gcloud auth activate-service-account --key-file=$GCP_CREDENTIALS
+                            ./auditkit scan -provider gcp -framework soc2 -format json -output gcp-soc2.json
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Aggregate Results') {
+            steps {
+                script {
+                    def awsScore = readJSON(file: 'aws-soc2.json').score
+                    def azureScore = readJSON(file: 'azure-soc2.json').score
+                    def gcpScore = readJSON(file: 'gcp-soc2.json').score
+
+                    echo &quot;AWS Score: ${awsScore}%&quot;
+                    echo &quot;Azure Score: ${azureScore}%&quot;
+                    echo &quot;GCP Score: ${gcpScore}%&quot;
+
+                    def avgScore = (awsScore + azureScore + gcpScore) / 3
+                    echo &quot;Average Multi-Cloud Score: ${avgScore}%&quot;
+
+                    if (avgScore &lt; 75) {
+                        error(&quot;Multi-cloud compliance score below threshold&quot;)
+                    }
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<h2>AWS CodePipeline</h2>
+<h3>CodeBuild buildspec.yml</h3>
+<pre class="code-block"><code># buildspec.yml
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo &quot;Installing AuditKit...&quot;
+      - curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+      - chmod +x auditkit
+  build:
+    commands:
+      - echo &quot;Running SOC2 compliance scan...&quot;
+      - ./auditkit scan -provider aws -framework soc2 -format json -output soc2-results.json
+
+  post_build:
+    commands:
+      - |
+        SCORE=$(jq -r '.score' soc2-results.json)
+        echo &quot;Compliance Score: $SCORE%&quot;
+        if [ $(echo &quot;$SCORE &lt; 80&quot; | bc) -eq 1 ]; then
+          echo &quot;Compliance score below 80% threshold&quot;
+          exit 1
+        fi
+
+artifacts:
+  files:
+    - soc2-results.json
+  name: compliance-report
+
+reports:
+  compliance:
+    files:
+      - soc2-results.json
+    file-format: JSON
+</code></pre>
+<h2>Azure DevOps</h2>
+<h3>Azure Pipeline YAML</h3>
+<pre class="code-block"><code># azure-pipelines.yml
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: AzureCLI@2
+    displayName: 'Azure Login'
+    inputs:
+      azureSubscription: '$(AzureServiceConnection)'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: 'az account show'
+
+  - script: |
+      curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+      chmod +x auditkit
+    displayName: 'Download AuditKit'
+
+  - script: |
+      export AZURE_SUBSCRIPTION_ID=&quot;$(az account show --query id -o tsv)&quot;
+      ./auditkit scan -provider azure -framework soc2 -format json -output soc2-results.json
+    displayName: 'Run SOC2 Compliance Scan'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Compliance Report'
+    inputs:
+      PathtoPublish: 'soc2-results.json'
+      ArtifactName: 'compliance-report'
+
+  - script: |
+      SCORE=$(jq -r '.score' soc2-results.json)
+      echo &quot;Compliance Score: $SCORE%&quot;
+      if (( $(echo &quot;$SCORE &lt; 80&quot; | bc -l) )); then
+        echo &quot;##vso[task.logissue type=error]Compliance score below 80%&quot;
+        exit 1
+      fi
+    displayName: 'Validate Compliance Score'
+</code></pre>
+<h2>Cloud Build (GCP)</h2>
+<h3>cloudbuild.yaml</h3>
+<pre class="code-block"><code># cloudbuild.yaml
+steps:
+  # Download AuditKit
+  - name: 'ubuntu'
+    args:
+      - 'bash'
+      - '-c'
+      - |
+        curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+        chmod +x auditkit
+  # Run GCP SOC2 scan
+  - name: 'ubuntu'
+    env:
+      - 'GOOGLE_CLOUD_PROJECT=$PROJECT_ID'
+    args:
+      - 'bash'
+      - '-c'
+      - './auditkit scan -provider gcp -framework soc2 -format json -output soc2-results.json'
+
+  # Check compliance score
+  - name: 'gcr.io/cloud-builders/jq'
+    args:
+      - '-r'
+      - '.score'
+      - 'soc2-results.json'
+
+artifacts:
+  objects:
+    location: 'gs://${PROJECT_ID}_cloudbuild/compliance-reports'
+    paths:
+      - 'soc2-results.json'
+
+timeout: '600s'
+</code></pre>
+<h2>Failing Builds on Compliance Issues</h2>
+<h3>Fail on Any Critical Failures</h3>
+<pre class="code-block"><code>#!/bin/bash
+# fail-on-critical.sh
+
+CRITICAL_FAILURES=$(jq '[.controls[] | select(.status==&quot;FAIL&quot; and .severity==&quot;CRITICAL&quot;)] | length' results.json)
+
+if [ &quot;$CRITICAL_FAILURES&quot; -gt 0 ]; then
+  echo &quot;FAIL:Found $CRITICAL_FAILURES CRITICAL compliance failures:&quot;
+  jq -r '.controls[] | select(.status==&quot;FAIL&quot; and .severity==&quot;CRITICAL&quot;) | &quot;\(.id): \(.name)&quot;' results.json
+  exit 1
+fi
+
+echo &quot;PASS:No critical compliance failures&quot;
+</code></pre>
+<h3>Fail on Score Below Threshold</h3>
+<pre class="code-block"><code>#!/bin/bash
+# fail-on-score.sh
+
+THRESHOLD=80
+SCORE=$(jq -r '.score' results.json)
+
+echo &quot;Compliance Score: $SCORE%&quot;
+
+if (( $(echo &quot;$SCORE &lt; $THRESHOLD&quot; | bc -l) )); then
+  echo &quot;FAIL:Compliance score $SCORE% is below threshold $THRESHOLD%&quot;
+  exit 1
+fi
+
+echo &quot;PASS:Compliance score meets threshold&quot;
+</code></pre>
+<h3>Fail on Specific Controls</h3>
+<pre class="code-block"><code>#!/bin/bash
+# fail-on-controls.sh
+
+# Fail if specific high-priority controls fail
+REQUIRED_CONTROLS=(
+  &quot;CC6.1&quot;  # Encryption at rest
+  &quot;CC6.6&quot;  # MFA for privileged users
+  &quot;CC7.2&quot;  # Audit logging enabled
+)
+
+FAILED=false
+
+for CONTROL in &quot;${REQUIRED_CONTROLS[@]}&quot;; do
+  STATUS=$(jq -r &quot;.controls[] | select(.id==\&quot;$CONTROL\&quot;) | .status&quot; results.json)
+
+  if [ &quot;$STATUS&quot; == &quot;FAIL&quot; ]; then
+    echo &quot;FAIL:Required control $CONTROL failed&quot;
+    FAILED=true
+  fi
+done
+
+if [ &quot;$FAILED&quot; = true ]; then
+  exit 1
+fi
+
+echo &quot;PASS:All required controls passed&quot;
+</code></pre>
+<h2>Multi-Cloud Pipelines</h2>
+<h3>Parallel Multi-Cloud Scan (GitHub Actions)</h3>
+<pre class="code-block"><code>name: Multi-Cloud Compliance
+
+on: [push]
+
+jobs:
+  compliance-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        provider: [aws, azure, gcp]
+        framework: [soc2, pci, cmmc]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup credentials
+        run: |
+          if [ &quot;${{ matrix.provider }}&quot; == &quot;aws&quot; ]; then
+            echo &quot;AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}&quot; &gt;&gt; $GITHUB_ENV
+            echo &quot;AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}&quot; &gt;&gt; $GITHUB_ENV
+          elif [ &quot;${{ matrix.provider }}&quot; == &quot;azure&quot; ]; then
+            az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+          elif [ &quot;${{ matrix.provider }}&quot; == &quot;gcp&quot; ]; then
+            echo &quot;${{ secrets.GCP_CREDENTIALS }}&quot; &gt; gcp-key.json
+            gcloud auth activate-service-account --key-file=gcp-key.json
+          fi
+
+      - name: Run compliance scan
+        run: |
+          curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-${{ matrix.provider }}-linux-amd64.tar.gz &amp;&amp; tar -xzf auditkit-${{ matrix.provider }}-linux-amd64.tar.gz &amp;&amp; mv auditkit-${{ matrix.provider }}-linux-amd64 auditkit
+          chmod +x auditkit
+          ./auditkit scan -framework ${{ matrix.framework }} -format json -output ${{ matrix.provider }}-${{ matrix.framework }}.json
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.provider }}-${{ matrix.framework }}
+          path: ${{ matrix.provider }}-${{ matrix.framework }}.json
+</code></pre>
+<h2>Docker Integration</h2>
+<h3>Dockerfile for CI/CD</h3>
+<pre class="code-block"><code>FROM ubuntu:22.04
+
+# Install dependencies
+RUN apt-get update &amp;&amp; apt-get install -y \
+    curl \
+    jq \
+    bc \
+    &amp;&amp; rm -rf /var/lib/apt/lists/*
+
+# Download AuditKit (one binary for all clouds)
+RUN curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz &amp;&amp; \
+    tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 /usr/local/bin/auditkit &amp;&amp; \
+    chmod +x /usr/local/bin/auditkit
+
+
+WORKDIR /workspace
+
+ENTRYPOINT [&quot;/usr/local/bin/auditkit&quot;]
+</code></pre>
+<h3>Using Docker in CI/CD</h3>
+<pre class="code-block"><code># Build Docker image
+docker build -t auditkit:latest .
+
+# Run compliance scan in container
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY \
+  -v $(pwd):/workspace \
+  auditkit:latest scan -provider aws -framework soc2 -format json -output /workspace/results.json
+</code></pre>
+<h2>Best Practices</h2>
+<ol>
+<li><strong>Pin a release</strong> - download a versioned asset rather than <code>latest</code>, so a new release cannot change a passing pipeline</li>
+<li><strong>Cache binaries</strong> - Download once, reuse across pipeline steps</li>
+<li><strong>Run scans in parallel</strong> - Scan AWS, Azure, GCP simultaneously</li>
+<li><strong>Store JSON artifacts</strong> - Archive compliance reports for audit trails</li>
+<li><strong>Fail fast</strong> - Check critical controls first, exit immediately on failures</li>
+<li><strong>Schedule regular scans</strong> - Daily/weekly cron jobs catch drift</li>
+<li><strong>Use read-only credentials</strong> - AuditKit never modifies cloud resources</li>
+<li><strong>Version pin binaries</strong> - Use specific release URLs for reproducible builds</li>
+</ol>
+<h2>Troubleshooting</h2>
+<h3>Permission Errors</h3>
+<p>If scans fail with permission errors:</p>
+<pre class="code-block"><code># AWS - Use read-only IAM policy
+aws iam attach-user-policy --user-name ci-user --policy-arn arn:aws:iam::aws:policy/SecurityAudit
+
+# Azure - Assign Reader + Security Reader roles
+az role assignment create --assignee &lt;service-principal-id&gt; --role &quot;Security Reader&quot;
+
+# GCP - Grant Viewer + Security Reviewer roles
+gcloud projects add-iam-policy-binding PROJECT_ID \
+  --member=&quot;serviceAccount:ci-sa@PROJECT_ID.iam.gserviceaccount.com&quot; \
+  --role=&quot;roles/viewer&quot;
+</code></pre>
+<h3>Binary Download Failures</h3>
+<p>If binary downloads fail in CI/CD:</p>
+<pre class="code-block"><code># Use GitHub API for latest release
+LATEST_URL=$(curl -s https://api.github.com/repos/guardian-nexus/AuditKit-Community-Edition/releases/latest | jq -r '.assets[] | select(.name==&quot;auditkit-linux-amd64.tar.gz&quot;) | .browser_download_url')
+curl -L $LATEST_URL -o auditkit-linux-amd64.tar.gz
+tar -xzf auditkit-linux-amd64.tar.gz &amp;&amp; mv auditkit-linux-amd64 auditkit
+</code></pre>
+<h3>JSON Parsing Errors</h3>
+<p>If <code>jq</code> is not available:</p>
+<pre class="code-block"><code># Install jq in pipeline
+apt-get update &amp;&amp; apt-get install -y jq   # Ubuntu/Debian
+yum install -y jq                         # CentOS/RHEL
+apk add jq                                # Alpine
+</code></pre>
+<h2>Example Output</h2>
+<h3>Successful Build</h3>
+<pre class="code-block"><code>PASS:AWS SOC2 Compliance Scan Complete
+   Score: 87.5% (56/64 checks passed)
+   Critical Failures: 0
+   High Failures: 3
+   Medium Failures: 5
+
+PASS:Compliance score meets 80% threshold
+PASS:No critical failures detected
+</code></pre>
+<h3>Failed Build</h3>
+<pre class="code-block"><code>FAIL:AWS SOC2 Compliance Scan Complete
+   Score: 68.8% (44/64 checks passed)
+   Critical Failures: 2
+   High Failures: 12
+   Medium Failures: 6
+
+FAIL:CRITICAL: CC6.1 - Encryption at rest not enabled on S3 buckets
+FAIL:CRITICAL: CC6.6 - MFA not enforced for IAM users with console access
+
+FAIL:Compliance score 68.8% below 80% threshold
+FAIL:Build failed due to compliance issues
+</code></pre>
+<h2>Additional Resources</h2>
+<ul>
+<li><a href="../docs/cli-reference.html">AuditKit CLI Reference</a></li>
+<li><a href="../docs/getting-started.html">Getting Started</a></li>
+<li><a href="../docs/setup/">Cloud Provider Setup</a></li>
+<li><a href="./reports/">Sample Reports</a></li>
+</ul>
+
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p style="margin-bottom: 2rem; color: var(--slate-300); font-size: 1rem;">
+                <strong style="color: var(--white);">Built for compliance teams, by engineers who understand the audit process.</strong>
+            </p>
+
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/">AuditKit</a></li>
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/community.html">Community Edition (Open Source)</a></li>
+                        <li><a href="/about.html">About</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="/docs/getting-started.html">Quick Start Guide</a></li>
+                        <li><a href="/docs/installation.html">Installation</a></li>
+                        <li><a href="/docs/cli-reference.html">CLI Reference</a></li>
+                        <li><a href="/docs/faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Frameworks</h4>
+                    <ul>
+                        <li><a href="/docs/frameworks/cmmc.html">CMMC</a></li>
+                        <li><a href="/docs/frameworks/soc2.html">SOC2</a></li>
+                        <li><a href="/docs/frameworks/pci-dss.html">PCI-DSS</a></li>
+                        <li><a href="/docs/frameworks/hipaa.html">HIPAA</a></li>
+                        <li><a href="/docs/frameworks/nist-800-53.html">NIST 800-53</a></li>
+                        <li><a href="/docs/frameworks/iso27001.html">ISO 27001</a></li>
+                        <li><a href="/docs/frameworks/fedramp.html">FedRAMP</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/docs/setup/aws.html">AWS Setup</a></li>
+                        <li><a href="/docs/setup/azure.html">Azure Setup</a></li>
+                        <li><a href="/docs/setup/gcp.html">GCP Setup</a></li>
+                        <li><a href="/docs/setup/m365.html">M365 Setup</a></li>
+                        <li><a href="/examples/">Examples</a></li>
+                        <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition">GitHub</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>Community Edition is Apache 2.0. AuditKit is commercially licensed.</p>
+                <p>&copy; 2026 Guardian Nexus LLC &middot; <a href="#" data-cookie-preferences>Cookie Preferences</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../cookie-consent.js"></script>
+    <script src="../main.js"></script>
+    <script>
+        (function() {
+            var toggle = document.querySelector('.nav-toggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function() {
+                    var open = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', open);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

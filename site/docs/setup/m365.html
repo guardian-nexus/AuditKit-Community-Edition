@@ -68,62 +68,62 @@
 - Microsoft 365 E3 or E5 (recommended)</p>
 <h2>Quick Start</h2>
 <h3>Step 1: Install ScubaGear (Windows PowerShell)</h3>
-<div class="code-block"># Run PowerShell as Administrator
+<pre class="code-block"><code># Run PowerShell as Administrator
 
 # Install ScubaGear module
 Install-Module -Name ScubaGear -Scope CurrentUser
 
 # Verify installation
 Get-Module -ListAvailable ScubaGear
-</div>
+</code></pre>
 <h3>Step 2: Run ScubaGear Scan</h3>
-<div class="code-block"># Authenticate to M365
+<pre class="code-block"><code># Authenticate to M365
 # This will open a browser for login
 Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams -OutPath ./ScubaResults
 
 # Wait for scan to complete (5-15 minutes)
-</div>
+</code></pre>
 <h3>Step 3: Import Results to AuditKit</h3>
-<p>ScubaGear names its consolidated output <code class="code-inline">ScubaResults_&lt;uuid&gt;.json</code>, so the glob
+<p>ScubaGear names its consolidated output <code>ScubaResults_&lt;uuid&gt;.json</code>, so the glob
 below picks it up. If a directory holds more than one run, name the file you
 want explicitly.</p>
-<div class="code-block"># On Linux/macOS/Windows (with AuditKit installed)
+<pre class="code-block"><code># On Linux/macOS/Windows (with AuditKit installed)
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json
 
 # Generate PDF report
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json -format pdf -output m365-report.pdf
-</div>
+</code></pre>
 <h2>Detailed Setup Guide</h2>
 <h3>Installing ScubaGear</h3>
 <p><strong>Option 1: PowerShell Gallery (Recommended)</strong></p>
-<div class="code-block"># Run as Administrator
+<pre class="code-block"><code># Run as Administrator
 Install-Module -Name ScubaGear -Scope CurrentUser -Force
 
 # Trust PSGallery if prompted
 Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-</div>
+</code></pre>
 <p><strong>Option 2: Manual Installation</strong></p>
-<div class="code-block"># Download from GitHub
+<pre class="code-block"><code># Download from GitHub
 git clone https://github.com/cisagov/ScubaGear
 cd ScubaGear
 
 # Import module
 Import-Module ./PowerShell/ScubaGear/ScubaGear.psd1
-</div>
+</code></pre>
 <h3>Verifying Installation</h3>
-<div class="code-block"># Check module is installed
+<pre class="code-block"><code># Check module is installed
 Get-Module -ListAvailable ScubaGear
 
 # Check version
 (Get-Module -ListAvailable ScubaGear).Version
-</div>
+</code></pre>
 <h2>Running ScubaGear Scans</h2>
 <h3>Scan All Products</h3>
-<div class="code-block"># Full M365 scan (recommended)
+<pre class="code-block"><code># Full M365 scan (recommended)
 Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams,powerplatform,defender -OutPath ./ScubaResults
-</div>
+</code></pre>
 <h3>Scan Specific Products</h3>
-<div class="code-block"># Entra ID (Azure AD) only
+<pre class="code-block"><code># Entra ID (Azure AD) only
 Invoke-SCuBA -ProductNames aad -OutPath ./ScubaResults
 
 # Exchange Online only
@@ -134,7 +134,7 @@ Invoke-SCuBA -ProductNames sharepoint -OutPath ./ScubaResults
 
 # Teams only
 Invoke-SCuBA -ProductNames teams -OutPath ./ScubaResults
-</div>
+</code></pre>
 <h3>Available Products</h3>
 <div style="overflow-x:auto;"><table>
 <thead>
@@ -147,58 +147,58 @@ Invoke-SCuBA -ProductNames teams -OutPath ./ScubaResults
 <tbody>
 <tr>
 <td>Entra ID (Azure AD)</td>
-<td><code class="code-inline">aad</code></td>
+<td><code>aad</code></td>
 <td>MFA, Conditional Access, Identity Protection</td>
 </tr>
 <tr>
 <td>Exchange Online</td>
-<td><code class="code-inline">exo</code></td>
+<td><code>exo</code></td>
 <td>Anti-phishing, DLP, Email encryption</td>
 </tr>
 <tr>
 <td>SharePoint</td>
-<td><code class="code-inline">sharepoint</code></td>
+<td><code>sharepoint</code></td>
 <td>Sharing policies, DLP, Access controls</td>
 </tr>
 <tr>
 <td>Teams</td>
-<td><code class="code-inline">teams</code></td>
+<td><code>teams</code></td>
 <td>Meeting security, External access</td>
 </tr>
 <tr>
 <td>Power Platform</td>
-<td><code class="code-inline">powerplatform</code></td>
+<td><code>powerplatform</code></td>
 <td>DLP policies, Connector governance</td>
 </tr>
 <tr>
 <td>Defender</td>
-<td><code class="code-inline">defender</code></td>
+<td><code>defender</code></td>
 <td>Safe Links, Safe Attachments, ATP</td>
 </tr>
 </tbody>
 </table></div>
 <h2>Authentication</h2>
 <h3>Interactive Authentication (Default)</h3>
-<div class="code-block"># Opens browser for login
+<pre class="code-block"><code># Opens browser for login
 Invoke-SCuBA -ProductNames aad,exo -OutPath ./ScubaResults
 
 # Login with Global Administrator account
 # Accept permissions when prompted
-</div>
+</code></pre>
 <p><strong>Required permissions:</strong>
 - Global Administrator role
 - Or equivalent permissions per product</p>
 <h3>Service Principal Authentication</h3>
-<div class="code-block"># Create service principal with required permissions
+<pre class="code-block"><code># Create service principal with required permissions
 # Not recommended - interactive auth is simpler
 
 # See ScubaGear docs for service principal setup:
 # https://github.com/cisagov/ScubaGear/wiki
-</div>
+</code></pre>
 <h2>Understanding ScubaGear Output</h2>
 <h3>Output Files</h3>
 <p>After running ScubaGear, you'll find:</p>
-<div class="code-block">ScubaResults/
+<pre class="code-block"><code>ScubaResults/
 ├── ScubaResults_&lt;uuid&gt;.json    # Main results file (use this with AuditKit)
 ├── BaselineReports.html        # HTML report
 ├── IndividualReports/          # Per-product HTML reports
@@ -206,9 +206,9 @@ Invoke-SCuBA -ProductNames aad,exo -OutPath ./ScubaResults
 │   ├── EXOReport.html
 │   └── ...
 └── TestResults/                # Detailed test results
-</div>
+</code></pre>
 <h3>Results Format</h3>
-<div class="code-block">{
+<pre class="code-block"><code>{
   &quot;ReportSummary&quot;: { &quot;Date&quot;: &quot;2026-09-07&quot;, &quot;Tenant&quot;: &quot;contoso.onmicrosoft.com&quot;, &quot;ProductsRun&quot;: [&quot;aad&quot;] },
   &quot;Results&quot;: {
     &quot;AAD&quot;: [
@@ -222,27 +222,27 @@ Invoke-SCuBA -ProductNames aad,exo -OutPath ./ScubaResults
     ]
   }
 }
-</div>
+</code></pre>
 <p>Points worth knowing when reading the file yourself:</p>
 <ul>
-<li><code class="code-inline">Results</code> is keyed by ScubaGear's baseline names - <code class="code-inline">AAD</code>, <code class="code-inline">EXO</code>, <code class="code-inline">SharePoint</code>,
-  <code class="code-inline">Teams</code>, <code class="code-inline">PowerPlatform</code>, <code class="code-inline">PowerBI</code> - not by the lower-case product arguments
-  you pass to <code class="code-inline">-ProductNames</code>.</li>
-<li>The policy identifier is in <strong><code class="code-inline">Control ID</code></strong>; <code class="code-inline">Requirement</code> holds the prose.</li>
-<li><code class="code-inline">Result</code> is a string: <code class="code-inline">Pass</code>, <code class="code-inline">Fail</code>, <code class="code-inline">Warning</code>, <code class="code-inline">Error</code>, <code class="code-inline">Omitted</code> or
-  <code class="code-inline">Incorrect result</code>. AuditKit scores <code class="code-inline">Pass</code> and <code class="code-inline">Fail</code>; <code class="code-inline">Omitted</code> and <code class="code-inline">Error</code>
+<li><code>Results</code> is keyed by ScubaGear's baseline names - <code>AAD</code>, <code>EXO</code>, <code>SharePoint</code>,
+  <code>Teams</code>, <code>PowerPlatform</code>, <code>PowerBI</code> - not by the lower-case product arguments
+  you pass to <code>-ProductNames</code>.</li>
+<li>The policy identifier is in <strong><code>Control ID</code></strong>; <code>Requirement</code> holds the prose.</li>
+<li><code>Result</code> is a string: <code>Pass</code>, <code>Fail</code>, <code>Warning</code>, <code>Error</code>, <code>Omitted</code> or
+  <code>Incorrect result</code>. AuditKit scores <code>Pass</code> and <code>Fail</code>; <code>Omitted</code> and <code>Error</code>
   are reported but excluded from the score, so a policy your team chose not to
   evaluate does not count against you.</li>
-<li>Policy ids carry a baseline version suffix (<code class="code-inline">MS.AAD.1.1v1</code>). AuditKit matches
+<li>Policy ids carry a baseline version suffix (<code>MS.AAD.1.1v1</code>). AuditKit matches
   on the identifier with or without it.</li>
 </ul>
 <h2>Importing to AuditKit</h2>
 <h3>Basic Import</h3>
-<div class="code-block"># Import ScubaGear results
+<pre class="code-block"><code># Import ScubaGear results
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json
-</div>
+</code></pre>
 <p><strong>Output:</strong></p>
-<div class="code-block">M365 Compliance Scan Results (via ScubaGear)
+<pre class="code-block"><code>M365 Compliance Scan Results (via ScubaGear)
 ============================================
 Scanned Products: Entra ID, Exchange Online, SharePoint, Teams,
                   Power Platform, Power BI, Defender for Office 365
@@ -259,14 +259,14 @@ Framework Mappings:
 Critical Issues: 4
 High Priority: 8
 Medium Priority: 14
-</div>
+</code></pre>
 <h3>Generate Reports</h3>
-<div class="code-block"># PDF report
+<pre class="code-block"><code># PDF report
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json -format pdf -output m365-report.pdf
 
 # JSON output
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json -format json -output m365-results.json
-</div>
+</code></pre>
 <h2>M365 Service Coverage</h2>
 <h3>Entra ID (Azure AD) - 30 Rules</h3>
 <p><strong>Authentication &amp; Access:</strong>
@@ -345,8 +345,8 @@ Medium Priority: 14
 <h3>"Module ScubaGear not found"</h3>
 <p><strong>Cause:</strong> ScubaGear not installed</p>
 <p><strong>Solution:</strong></p>
-<div class="code-block">Install-Module -Name ScubaGear -Scope CurrentUser -Force
-</div>
+<pre class="code-block"><code>Install-Module -Name ScubaGear -Scope CurrentUser -Force
+</code></pre>
 <h3>"Access Denied" during scan</h3>
 <p><strong>Cause:</strong> Insufficient permissions</p>
 <p><strong>Solution:</strong>
@@ -356,12 +356,12 @@ Medium Priority: 14
 <h3>"Cannot connect to Exchange Online"</h3>
 <p><strong>Cause:</strong> Exchange Online PowerShell not accessible</p>
 <p><strong>Solution:</strong></p>
-<div class="code-block"># Install Exchange Online module
+<pre class="code-block"><code># Install Exchange Online module
 Install-Module -Name ExchangeOnlineManagement -Force
 
 # Test connection
 Connect-ExchangeOnline -UserPrincipalName admin@yourdomain.com
-</div>
+</code></pre>
 <h3>"ScubaGear scan times out"</h3>
 <p><strong>Cause:</strong> Large tenant with many users/policies</p>
 <p><strong>Solution:</strong>
@@ -370,15 +370,15 @@ Connect-ExchangeOnline -UserPrincipalName admin@yourdomain.com
 - Increase timeout (see ScubaGear docs)</p>
 <h3>"AuditKit can't parse the ScubaGear results"</h3>
 <p><strong>Cause:</strong> the wrong file was passed, or the output is truncated.</p>
-<p>Pass the consolidated <code class="code-inline">ScubaResults_&lt;uuid&gt;.json</code>, not a per-product report from
-<code class="code-inline">IndividualReports/</code> and not <code class="code-inline">BaselineReports.html</code>.</p>
+<p>Pass the consolidated <code>ScubaResults_&lt;uuid&gt;.json</code>, not a per-product report from
+<code>IndividualReports/</code> and not <code>BaselineReports.html</code>.</p>
 <p><strong>Solution:</strong></p>
-<div class="code-block"># Update ScubaGear to latest version
+<pre class="code-block"><code># Update ScubaGear to latest version
 Update-Module -Name ScubaGear
 
 # Re-run scan
 Invoke-SCuBA -ProductNames aad,exo -OutPath ./ScubaResults
-</div>
+</code></pre>
 <h3>The import succeeds but reports zero findings</h3>
 <p>AuditKit only imports policies it has a mapping for - 134 rules across Entra,
 Exchange Online, SharePoint, Teams, Power Platform, Power BI and Defender.
@@ -387,12 +387,12 @@ Check that the products you ran are among those listed under
 <a href="../providers/m365.html">Covered Domains</a>.</p>
 <h2>Best Practices</h2>
 <h3>1. Run Scans Regularly</h3>
-<div class="code-block"># Monthly compliance check
+<pre class="code-block"><code># Monthly compliance check
 # Create scheduled task or use Task Scheduler
 
 $products = &quot;aad,exo,sharepoint,teams,powerplatform,defender&quot;
 Invoke-SCuBA -ProductNames $products -OutPath &quot;C:\ComplianceScans\$(Get-Date -Format 'yyyy-MM-dd')&quot;
-</div>
+</code></pre>
 <h3>2. Use Dedicated Admin Account</h3>
 <p>Don't use your daily-use account:
 - Create compliance-scanning@yourdomain.com
@@ -406,7 +406,7 @@ Invoke-SCuBA -ProductNames $products -OutPath &quot;C:\ComplianceScans\$(Get-Dat
 - Track remediation progress
 - Re-scan after fixes</p>
 <h3>4. Combine with AuditKit Cloud Scans</h3>
-<div class="code-block"># Complete compliance picture:
+<pre class="code-block"><code># Complete compliance picture:
 
 # 1. Scan Azure infrastructure
 ./auditkit scan -provider azure -framework soc2 -format pdf -output azure-report.pdf
@@ -418,7 +418,7 @@ Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams -OutPath ./ScubaResults
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json -format pdf -output m365-report.pdf
 
 # Now you have complete Azure + M365 compliance coverage
-</div>
+</code></pre>
 <h2>Security Considerations</h2>
 <h3>What ScubaGear Accesses</h3>
 <p><strong>Read-only access to:</strong>

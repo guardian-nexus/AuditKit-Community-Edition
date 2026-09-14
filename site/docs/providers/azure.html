@@ -74,7 +74,7 @@
 <li><strong>CIS-4.17</strong> - Blob anonymous access disabled</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Disable public blob access
+<pre class="code-block"><code># Disable public blob access
 az storage account update \
   --name STORAGE_ACCOUNT \
   --resource-group RESOURCE_GROUP \
@@ -91,7 +91,7 @@ az storage blob service-properties delete-policy update \
   --account-name STORAGE_ACCOUNT \
   --enable true \
   --days-retained 7
-</div>
+</code></pre>
 <h3>Azure AD (Entra ID)</h3>
 <p><strong>Controls checked:</strong> 17</p>
 <ul>
@@ -114,7 +114,7 @@ az storage blob service-properties delete-policy update \
 <li><strong>CIS-1.12</strong> - Security Defaults or Conditional Access</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># (Most Azure AD configuration done via portal)
+<pre class="code-block"><code># (Most Azure AD configuration done via portal)
 
 # Enable security defaults (basic MFA)
 az rest --method PATCH \
@@ -124,7 +124,7 @@ az rest --method PATCH \
 # List Conditional Access policies
 az rest --method GET \
   --uri https://graph.microsoft.com/beta/identity/conditionalAccess/policies
-</div>
+</code></pre>
 <p><strong>Note:</strong> Full Azure AD configuration requires Azure AD Premium P1/P2 licenses</p>
 <h3>Network Security Groups (NSGs)</h3>
 <p><strong>Controls checked:</strong> 13</p>
@@ -144,7 +144,7 @@ az rest --method GET \
 <li><strong>CIS-7.7</strong> - Public IP Address Evaluation</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Delete overly permissive rule
+<pre class="code-block"><code># Delete overly permissive rule
 az network nsg rule delete \
   --resource-group RESOURCE_GROUP \
   --nsg-name NSG_NAME \
@@ -168,7 +168,7 @@ az network watcher flow-log create \
   --name FlowLogName \
   --storage-account STORAGE_ACCOUNT \
   --enabled true
-</div>
+</code></pre>
 <h3>Virtual Machines</h3>
 <p><strong>Controls checked:</strong> 7</p>
 <ul>
@@ -181,7 +181,7 @@ az network watcher flow-log create \
 <li><strong>CIS-8.5</strong> - Disk Network Access Restriction</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable disk encryption
+<pre class="code-block"><code># Enable disk encryption
 az vm encryption enable \
   --resource-group RESOURCE_GROUP \
   --name VM_NAME \
@@ -199,7 +199,7 @@ az vm boot-diagnostics enable \
   --resource-group RESOURCE_GROUP \
   --name VM_NAME \
   --storage STORAGE_ACCOUNT
-</div>
+</code></pre>
 <h3>SQL Database</h3>
 <p><strong>Controls checked:</strong> 12</p>
 <ul>
@@ -217,7 +217,7 @@ az vm boot-diagnostics enable \
 <li><strong>CIS-5.3.3</strong> - MySQL Audit Logging</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable TDE (enabled by default for new databases)
+<pre class="code-block"><code># Enable TDE (enabled by default for new databases)
 az sql db tde set \
   --resource-group RESOURCE_GROUP \
   --server SQL_SERVER \
@@ -236,7 +236,7 @@ az sql server firewall-rule delete \
   --resource-group RESOURCE_GROUP \
   --server SQL_SERVER \
   --name AllowAllAzureIPs
-</div>
+</code></pre>
 <h3>Key Vault</h3>
 <p><strong>Controls checked:</strong> 9</p>
 <ul>
@@ -251,7 +251,7 @@ az sql server firewall-rule delete \
 <li><strong>CIS-8.6</strong> - Key Vault Certificates Auto-Renew</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable soft delete
+<pre class="code-block"><code># Enable soft delete
 az keyvault update \
   --name KEY_VAULT_NAME \
   --enable-soft-delete true \
@@ -268,7 +268,7 @@ az monitor diagnostic-settings create \
   --name DiagnosticLogs \
   --logs '[{&quot;category&quot;:&quot;AuditEvent&quot;,&quot;enabled&quot;:true}]' \
   --storage-account STORAGE_ACCOUNT
-</div>
+</code></pre>
 <h3>Azure Policy</h3>
 <p><strong>Controls checked:</strong> 2</p>
 <ul>
@@ -276,7 +276,7 @@ az monitor diagnostic-settings create \
 <li><strong>CIS-5.2.2</strong> - Create Alert for Policy Assignment Changes</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Assign built-in policy
+<pre class="code-block"><code># Assign built-in policy
 az policy assignment create \
   --name 'RequireEncryption' \
   --policy '/providers/Microsoft.Authorization/policyDefinitions/POLICY_ID' \
@@ -284,7 +284,7 @@ az policy assignment create \
 
 # List non-compliant resources
 az policy state list --filter &quot;isCompliant eq false&quot;
-</div>
+</code></pre>
 <h3>Defender for Cloud</h3>
 <p><strong>Controls checked:</strong> 15</p>
 <ul>
@@ -305,7 +305,7 @@ az policy state list --filter &quot;isCompliant eq false&quot;
 <li><strong>CIS-2.1.20</strong> - Security Alert Notifications</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable Defender for Cloud (via portal or ARM template)
+<pre class="code-block"><code># Enable Defender for Cloud (via portal or ARM template)
 # Standard tier required for full features
 
 # View security alerts
@@ -313,7 +313,7 @@ az security alert list
 
 # View security recommendations
 az security assessment list
-</div>
+</code></pre>
 <h3>Activity Logs</h3>
 <p><strong>Controls checked:</strong> 3</p>
 <ul>
@@ -322,7 +322,7 @@ az security assessment list
 <li><strong>PCI-10.5.1</strong> - Activity Log Retention - 12 Months Immediately Available</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Create diagnostic setting for Activity Log
+<pre class="code-block"><code># Create diagnostic setting for Activity Log
 az monitor diagnostic-settings create \
   --name ActivityLogExport \
   --resource /subscriptions/SUBSCRIPTION_ID \
@@ -334,7 +334,7 @@ az monitor activity-log alert create \
   --name SecurityGroupChange \
   --resource-group RESOURCE_GROUP \
   --condition category=Administrative and operationName=Microsoft.Network/networkSecurityGroups/write
-</div>
+</code></pre>
 <h3>Azure Monitor</h3>
 <p><strong>Controls checked:</strong> 8</p>
 <ul>
@@ -348,7 +348,7 @@ az monitor activity-log alert create \
 <li><strong>CIS-5.2.8</strong> - Create Alert for Storage Account Deletion</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Create Log Analytics workspace
+<pre class="code-block"><code># Create Log Analytics workspace
 az monitor log-analytics workspace create \
   --resource-group RESOURCE_GROUP \
   --workspace-name WORKSPACE_NAME
@@ -367,7 +367,7 @@ az monitor metrics alert create \
   --condition &quot;avg Percentage CPU &gt; 80&quot; \
   --window-size 5m \
   --evaluation-frequency 1m
-</div>
+</code></pre>
 <h3>Virtual Networks</h3>
 <p><strong>Controls checked:</strong> 4</p>
 <ul>
@@ -377,7 +377,7 @@ az monitor metrics alert create \
 <li><strong>CIS-7.7</strong> - Public IP Address Evaluation</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable DDoS Protection
+<pre class="code-block"><code># Enable DDoS Protection
 az network ddos-protection create \
   --resource-group RESOURCE_GROUP \
   --name DDoSPlan
@@ -396,7 +396,7 @@ az network private-endpoint create \
   --subnet SUBNET_NAME \
   --private-connection-resource-id RESOURCE_ID \
   --connection-name Connection
-</div>
+</code></pre>
 <h2>Controls by Framework</h2>
 <h3>SOC2 Type II (37 of the 43 criteria carry automated Azure checks)</h3>
 <p><strong>CC1 - Control Environment:</strong> 5 criteria<br />
@@ -424,7 +424,7 @@ az network private-endpoint create \
 <p>All Level 1 practices plus 93 additional practices across 14 domains.</p>
 <p><strong><a href="../frameworks/cmmc.html">View CMMC details →</a></strong></p>
 <h2>Running Azure Scans</h2>
-<div class="code-block"># Configure credentials
+<pre class="code-block"><code># Configure credentials
 az login
 export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
 
@@ -442,18 +442,18 @@ export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
 
 # Generate report
 ./auditkit scan -provider azure -framework soc2 -format pdf -output azure-report.pdf
-</div>
+</code></pre>
 <h2>Multi-Subscription Scanning</h2>
 <p><strong>Free version:</strong> One subscription at a time</p>
-<div class="code-block"># Switch subscriptions
+<pre class="code-block"><code># Switch subscriptions
 export AZURE_SUBSCRIPTION_ID=&quot;sub-1&quot;
 auditkit scan -provider azure -framework soc2
 
 export AZURE_SUBSCRIPTION_ID=&quot;sub-2&quot;
 auditkit scan -provider azure -framework soc2
-</div>
+</code></pre>
 <p><strong>Pro version:</strong> Scan entire Management Group</p>
-<div class="code-block"># Scan all subscriptions
+<pre class="code-block"><code># Scan all subscriptions
 auditkit-pro scan -provider azure --scan-all
 
 # Limit concurrency
@@ -461,7 +461,7 @@ auditkit-pro scan -provider azure --scan-all --max-concurrent 3
 
 # Generate consolidated report
 auditkit-pro scan -provider azure --scan-all -format pdf -output mgmt-group-report.pdf
-</div>
+</code></pre>
 <p><strong><a href="https://auditkit.io/pro/">Try Pro free for 14 days →</a></strong></p>
 <h2>Azure-Specific Considerations</h2>
 <h3>Azure AD Premium Requirements</h3>

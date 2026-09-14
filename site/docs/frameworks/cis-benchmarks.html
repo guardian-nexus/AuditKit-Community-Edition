@@ -58,9 +58,9 @@
 <p>Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on <strong>technical security hardening</strong>.</p>
 <h2>Supported Benchmarks</h2>
 <h3>AWS Foundations Benchmark</h3>
-<p><strong>Status:</strong> Production (v0.8.7)
-<strong>Controls:</strong> 158 unique AWS controls implemented
-<strong>Command:</strong> <code class="code-inline">./auditkit scan -provider aws -framework cis-aws</code></p>
+<p><strong>Status:</strong> Production (v0.8.7)<br />
+<strong>Controls:</strong> 158 unique AWS controls implemented<br />
+<strong>Command:</strong> <code>./auditkit scan -provider aws -framework cis-aws</code></p>
 <p><strong>What's Covered:</strong></p>
 <ul>
 <li><strong>Section 1:</strong> Identity and Access Management (IAM) - 21/22 automated controls (only 1.7 is not automated)</li>
@@ -82,9 +82,9 @@
 <li><strong>Total Coverage:</strong> AWS 158, Azure 108, GCP 71 benchmark controls</li>
 </ul>
 <h3>Azure Foundations Benchmark</h3>
-<p><strong>Status:</strong> Production
-<strong>Automated Controls:</strong> 108 checks (CIS Microsoft Azure Foundations Benchmark v3.0)
-<strong>Command:</strong> <code class="code-inline">./auditkit scan -provider azure -framework cis-azure</code></p>
+<p><strong>Status:</strong> Production<br />
+<strong>Automated Controls:</strong> 108 checks (CIS Microsoft Azure Foundations Benchmark v3.0)<br />
+<strong>Command:</strong> <code>./auditkit scan -provider azure -framework cis-azure</code></p>
 <p><strong>Current Coverage:</strong></p>
 <ul>
 <li>Identity and Access Management (Azure AD)</li>
@@ -96,9 +96,9 @@
 <li>Security Center</li>
 </ul>
 <h3>GCP Foundations Benchmark</h3>
-<p><strong>Status:</strong> Production - <strong>NEAR-COMPLETE COVERAGE</strong>
-<strong>Controls:</strong> 71 GCP benchmark controls
-<strong>Command:</strong> <code class="code-inline">./auditkit scan -provider gcp -framework cis-gcp</code></p>
+<p><strong>Status:</strong> Production - <strong>NEAR-COMPLETE COVERAGE</strong><br />
+<strong>Controls:</strong> 71 GCP benchmark controls<br />
+<strong>Command:</strong> <code>./auditkit scan -provider gcp -framework cis-gcp</code></p>
 <p><strong>What's Covered:</strong></p>
 <ul>
 <li><strong>Section 1:</strong> Identity and Access Management - 9 automated controls</li>
@@ -197,38 +197,38 @@
 <h2>How AuditKit Scans CIS Benchmarks</h2>
 <h3>Automated Checks (AWS Example)</h3>
 <p><strong>Section 1: IAM</strong></p>
-<div class="code-block">[PASS] Root account MFA enabled
+<pre class="code-block"><code>[PASS] Root account MFA enabled
 [FAIL] IAM password policy requires minimum length of 14 characters
 [FAIL] Access keys rotated within 90 days
 [PASS] Credentials unused for 90 days are disabled
-</div>
+</code></pre>
 <p><strong>Section 2: Storage</strong></p>
-<div class="code-block">[PASS] S3 buckets have encryption enabled
+<pre class="code-block"><code>[PASS] S3 buckets have encryption enabled
 [FAIL] S3 buckets have MFA delete enabled
 [PASS] EBS volumes are encrypted
 [FAIL] RDS instances have automatic backups enabled
-</div>
+</code></pre>
 <p><strong>Section 3: Logging</strong></p>
-<div class="code-block">[PASS] CloudTrail enabled in all regions
+<pre class="code-block"><code>[PASS] CloudTrail enabled in all regions
 [PASS] CloudTrail log file validation enabled
 [FAIL] CloudWatch log groups encrypted with KMS
-</div>
+</code></pre>
 <h2>Running CIS Scans</h2>
 <h3>AWS Foundations Benchmark</h3>
 <p><strong>Basic scan:</strong></p>
-<div class="code-block">./auditkit scan -provider aws -framework cis-aws
-</div>
+<pre class="code-block"><code>./auditkit scan -provider aws -framework cis-aws
+</code></pre>
 <p><strong>Verbose output:</strong></p>
-<div class="code-block">./auditkit scan -provider aws -framework cis-aws -verbose
-</div>
+<pre class="code-block"><code>./auditkit scan -provider aws -framework cis-aws -verbose
+</code></pre>
 <p><strong>Generate PDF report:</strong></p>
-<div class="code-block">./auditkit scan -provider aws -framework cis-aws -format pdf -output cis-aws-report.pdf
-</div>
+<pre class="code-block"><code>./auditkit scan -provider aws -framework cis-aws -format pdf -output cis-aws-report.pdf
+</code></pre>
 <p><strong>JSON output for automation:</strong></p>
-<div class="code-block">./auditkit scan -provider aws -framework cis-aws -format json -output cis-aws.json
-</div>
+<pre class="code-block"><code>./auditkit scan -provider aws -framework cis-aws -format json -output cis-aws.json
+</code></pre>
 <h2>Example Output</h2>
-<div class="code-block">CIS AWS Foundations Benchmark Scan Results
+<pre class="code-block"><code>CIS AWS Foundations Benchmark Scan Results
 ==========================================
 
 Overall Compliance: Sample output (actual coverage depends on your infrastructure)
@@ -252,7 +252,7 @@ PASSED (36 controls):
   [PASS] [CIS-1.6] Ensure hardware MFA is enabled for root account
   [PASS] [CIS-2.1.3] Ensure S3 bucket logging is enabled
   ...
-</div>
+</code></pre>
 <h2>Remediation Examples</h2>
 <h3>CIS-1.5: Enable Root Account MFA</h3>
 <p><strong>Manual Steps:</strong>
@@ -260,20 +260,20 @@ PASSED (36 controls):
 2. Click "Activate MFA on your root account"
 3. Follow wizard to add virtual or hardware MFA</p>
 <p><strong>AWS CLI:</strong></p>
-<div class="code-block"># Enable virtual MFA for root account
+<pre class="code-block"><code># Enable virtual MFA for root account
 aws iam enable-mfa-device \
   --user-name root \
   --serial-number arn:aws:iam::ACCOUNT_ID:mfa/root \
   --authentication-code-1 123456 \
   --authentication-code-2 789012
-</div>
+</code></pre>
 <p><strong>Terraform:</strong></p>
-<div class="code-block"># Root account MFA must be configured manually
+<pre class="code-block"><code># Root account MFA must be configured manually
 # Add to your security checklist
-</div>
+</code></pre>
 <h3>CIS-2.1.1: Enable S3 Bucket Encryption</h3>
 <p><strong>AWS CLI:</strong></p>
-<div class="code-block"># Enable default encryption for all S3 buckets
+<pre class="code-block"><code># Enable default encryption for all S3 buckets
 aws s3api put-bucket-encryption \
   --bucket your-bucket-name \
   --server-side-encryption-configuration '{
@@ -283,9 +283,9 @@ aws s3api put-bucket-encryption \
       }
     }]
   }'
-</div>
+</code></pre>
 <p><strong>Terraform:</strong></p>
-<div class="code-block">resource &quot;aws_s3_bucket_server_side_encryption_configuration&quot; &quot;example&quot; {
+<pre class="code-block"><code>resource &quot;aws_s3_bucket_server_side_encryption_configuration&quot; &quot;example&quot; {
   bucket = aws_s3_bucket.example.id
 
   rule {
@@ -294,7 +294,7 @@ aws s3api put-bucket-encryption \
     }
   }
 }
-</div>
+</code></pre>
 <h2>Frequently Asked Questions</h2>
 <h3>Q: Do I need to run CIS scans if I'm already SOC2 compliant?</h3>
 <p><strong>A:</strong> Yes! SOC2 focuses on business controls and governance. CIS Benchmarks provide technical security hardening that goes beyond compliance requirements. Many SOC2-compliant companies still have security misconfigurations that CIS would catch.</p>
@@ -312,8 +312,8 @@ aws s3api put-bucket-encryption \
 <p><strong>A:</strong> AuditKit combines both! v3.0 is newer and consolidated, but v1.4 has some additional checks that are still valuable. Our implementation gives you the best of both versions (158 unique controls).</p>
 <h3>Q: Can I export results to my SIEM or ticketing system?</h3>
 <p><strong>A:</strong> Yes! Use JSON output:</p>
-<div class="code-block">./auditkit scan -provider aws -framework cis-aws -format json -output cis.json
-</div>
+<pre class="code-block"><code>./auditkit scan -provider aws -framework cis-aws -format json -output cis.json
+</code></pre>
 <p>Then parse the JSON in your automation workflows.</p>
 <h2>Official CIS Resources</h2>
 <ul>
@@ -330,7 +330,7 @@ aws s3api put-bucket-encryption \
 <li>Improve remediation guidance</li>
 <li>Add Terraform/CloudFormation templates</li>
 </ul>
-<p><strong><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/CONTRIBUTING.md">Contributing Guide →</a></strong></p>
+<p><strong><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/blob/main/CONTRIBUTING.html">Contributing Guide →</a></strong></p>
 <h2>Support</h2>
 <ul>
 <li><strong>Issues:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/issues">GitHub Issues</a></li>

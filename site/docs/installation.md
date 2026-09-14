@@ -30,13 +30,11 @@ Complete installation instructions for AuditKit.
 
 **Fastest and easiest method**
 
-#### Linux
+#### Linux (x86_64)
 
 ```bash
-# Download latest release
+# Download and extract
 curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz
-
-# Extract
 tar -xzf auditkit-linux-amd64.tar.gz
 
 # Move to PATH
@@ -47,24 +45,51 @@ sudo chmod +x /usr/local/bin/auditkit
 auditkit version
 ```
 
-#### macOS
+#### Linux (ARM64)
+
+For AWS Graviton, Raspberry Pi, and Linux VMs on Apple Silicon Macs.
 
 ```bash
-# Download latest release
-curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-arm64.tar.gz   # Apple Silicon
-# curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-amd64.tar.gz  # Intel
-
-# Extract and rename
-tar -xzf auditkit-darwin-*.tar.gz && mv auditkit-darwin-* auditkit
-
-# Make executable
-chmod +x auditkit
+# Download and extract
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-arm64.tar.gz
+tar -xzf auditkit-linux-arm64.tar.gz
 
 # Move to PATH
-sudo mv auditkit /usr/local/bin/
+sudo mv auditkit-linux-arm64 /usr/local/bin/auditkit
+sudo chmod +x /usr/local/bin/auditkit
 
-# If you get security warning on first run:
-# System Preferences > Security & Privacy > Allow
+# Verify installation
+auditkit version
+```
+
+#### macOS (Apple Silicon)
+
+```bash
+# Download and extract
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-arm64.tar.gz
+tar -xzf auditkit-darwin-arm64.tar.gz
+
+# Move to PATH
+sudo mv auditkit-darwin-arm64 /usr/local/bin/auditkit
+sudo chmod +x /usr/local/bin/auditkit
+
+# The binary is unsigned. If macOS blocks it on first run:
+# System Settings -> Privacy and Security -> Open Anyway
+
+# Verify installation
+auditkit version
+```
+
+#### macOS (Intel)
+
+```bash
+# Download and extract
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-amd64.tar.gz
+tar -xzf auditkit-darwin-amd64.tar.gz
+
+# Move to PATH
+sudo mv auditkit-darwin-amd64 /usr/local/bin/auditkit
+sudo chmod +x /usr/local/bin/auditkit
 
 # Verify installation
 auditkit version

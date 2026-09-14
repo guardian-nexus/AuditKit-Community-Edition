@@ -48,8 +48,8 @@
         <div class="container-prose">
 <p>Scan your on-premises servers connected via Azure Arc.</p>
 <h2>Overview</h2>
-<p><strong>Status:</strong> Pro only
-<strong>Coverage:</strong> Defender for Cloud assessments + Guest Configuration compliance
+<p><strong>Status:</strong> Pro only<br />
+<strong>Coverage:</strong> Defender for Cloud assessments + Guest Configuration compliance<br />
 <strong>Supported in:</strong> AuditKit Pro v0.8.2-pro and later (current release v0.9.9-pro)</p>
 <p>Azure Arc extends Azure management to your on-premises servers. AuditKit can scan Arc-enabled machines for compliance by pulling:</p>
 <ul>
@@ -69,13 +69,13 @@
 <ol>
 <li><strong>Azure Arc-enabled servers</strong> - On-prem machines with the Arc agent installed</li>
 <li><strong>Microsoft Defender for Cloud</strong> - Enabled on your subscription (for security assessments)</li>
-<li><strong>Azure credentials</strong> - <code class="code-inline">az login</code> or service principal configured</li>
+<li><strong>Azure credentials</strong> - <code>az login</code> or service principal configured</li>
 <li><strong>Reader access</strong> - To the subscription containing Arc machines</li>
 </ol>
 <h3>Verify Arc Machines Are Connected</h3>
-<div class="code-block"># List Arc-enabled servers in your subscription
+<pre class="code-block"><code># List Arc-enabled servers in your subscription
 az connectedmachine list --query &quot;[].{name:name, status:status}&quot; -o table
-</div>
+</code></pre>
 <h3>Enable Defender for Cloud</h3>
 <p>For security assessments, enable Defender for Servers on Arc machines:</p>
 <ol>
@@ -86,7 +86,7 @@ az connectedmachine list --query &quot;[].{name:name, status:status}&quot; -o ta
 </ol>
 <h2>Setup</h2>
 <h3>1. Configure Azure Credentials</h3>
-<div class="code-block"># Interactive login
+<pre class="code-block"><code># Interactive login
 az login
 
 # Set subscription containing Arc machines
@@ -94,10 +94,10 @@ export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
 
 # Verify access
 az account show
-</div>
+</code></pre>
 <h3>2. Service Principal (Optional)</h3>
 <p>For automation/CI/CD:</p>
-<div class="code-block"># Create service principal with Reader access
+<pre class="code-block"><code># Create service principal with Reader access
 az ad sp create-for-rbac \
   --name &quot;auditkit-arc-scanner&quot; \
   --role Reader \
@@ -108,10 +108,10 @@ export AZURE_CLIENT_ID=&quot;app-id-from-output&quot;
 export AZURE_CLIENT_SECRET=&quot;password-from-output&quot;
 export AZURE_TENANT_ID=&quot;tenant-from-output&quot;
 export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
-</div>
+</code></pre>
 <h2>Usage</h2>
 <h3>CLI</h3>
-<div class="code-block"># Scan Arc machines against PCI-DSS
+<pre class="code-block"><code># Scan Arc machines against PCI-DSS
 auditkit-pro scan -provider arc -framework pci
 
 # Scan against SOC2
@@ -125,10 +125,10 @@ auditkit-pro scan -provider arc -framework pci -format pdf -output arc-complianc
 
 # Verbose output
 auditkit-pro scan -provider arc -framework soc2 -verbose
-</div>
+</code></pre>
 <h3>Desktop GUI</h3>
 <ol>
-<li>Open AuditKit Desktop (<code class="code-inline">http://localhost:1337</code>)</li>
+<li>Open AuditKit Desktop (<code>http://localhost:1337</code>)</li>
 <li>Click "Run Scan"</li>
 <li>Select "Azure Arc (On-Prem)" as provider</li>
 <li>Choose framework(s)</li>
@@ -213,7 +213,7 @@ auditkit-pro scan -provider arc -framework soc2 -verbose
 </tr>
 </tbody>
 </table></div>
-<div class="code-block"># Assign Reader role
+<pre class="code-block"><code># Assign Reader role
 az role assignment create \
   --assignee YOUR_SP_OR_USER \
   --role Reader \
@@ -224,7 +224,7 @@ az role assignment create \
   --assignee YOUR_SP_OR_USER \
   --role &quot;Security Reader&quot; \
   --scope /subscriptions/YOUR_SUBSCRIPTION_ID
-</div>
+</code></pre>
 <h2>Limitations</h2>
 <ul>
 <li><strong>Requires Defender for Cloud</strong> - Security assessments only available if Defender is enabled</li>
@@ -234,13 +234,13 @@ az role assignment create \
 </ul>
 <h2>Troubleshooting</h2>
 <h3>"No Arc machines found"</h3>
-<div class="code-block"># Verify Arc machines exist
+<pre class="code-block"><code># Verify Arc machines exist
 az connectedmachine list -o table
 
 # Check subscription
 echo $AZURE_SUBSCRIPTION_ID
 az account show --query id
-</div>
+</code></pre>
 <h3>"Failed to get assessments"</h3>
 <ul>
 <li>Ensure Defender for Cloud is enabled</li>
@@ -248,12 +248,12 @@ az account show --query id
 <li>Some machines may not have assessments if recently onboarded</li>
 </ul>
 <h3>"Authentication failed"</h3>
-<div class="code-block"># Re-authenticate
+<pre class="code-block"><code># Re-authenticate
 az login
 
 # Or check service principal
 az ad sp show --id $AZURE_CLIENT_ID
-</div>
+</code></pre>
 <h2>Related</h2>
 <ul>
 <li><a href="./azure.html">Azure Provider Setup</a></li>

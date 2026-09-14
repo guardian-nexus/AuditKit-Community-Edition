@@ -61,14 +61,14 @@
 - Comprehensive security baseline
 - Regular updates from CISA</p>
 <h2>How It Works</h2>
-<div class="code-block">1. Run ScubaGear (Windows PowerShell)
+<pre class="code-block"><code>1. Run ScubaGear (Windows PowerShell)
    ↓
 2. Generate ScubaResults_&lt;uuid&gt;.json
    ↓
 3. Import to AuditKit
    ↓
 4. Get compliance-mapped report
-</div>
+</code></pre>
 <p><strong><a href="../setup/m365.html">Setup guide →</a></strong></p>
 <h2>Covered Domains</h2>
 <h3>Entra ID (Azure AD) - 30 Rules</h3>
@@ -313,7 +313,7 @@
 - PCI-DSS: Requirement 5</p>
 <h2>Running M365 Scans</h2>
 <h3>Step 1: Run ScubaGear (Windows PowerShell)</h3>
-<div class="code-block"># Install ScubaGear
+<pre class="code-block"><code># Install ScubaGear
 Install-Module -Name ScubaGear
 
 # Run scan (all domains)
@@ -321,16 +321,16 @@ Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams,powerplatform,defender -OutP
 
 # Run scan (specific domains)
 Invoke-SCuBA -ProductNames aad,exo -OutPath ./ScubaResults
-</div>
+</code></pre>
 <h3>Step 2: Import to AuditKit</h3>
-<div class="code-block"># Import results. The rule mappings ship inside the binary, so this runs from
+<pre class="code-block"><code># Import results. The rule mappings ship inside the binary, so this runs from
 # any directory.
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json
 
 # Generate PDF report
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json -format pdf -output m365-report.pdf
 
-</div>
+</code></pre>
 <h2>M365 License Requirements</h2>
 <h3>Free M365 Features</h3>
 <ul>
@@ -401,13 +401,13 @@ Invoke-SCuBA -ProductNames aad,exo -OutPath ./ScubaResults
 </tbody>
 </table></div>
 <p><strong>Recommendation:</strong> Run both for complete coverage</p>
-<div class="code-block"># Scan Azure infrastructure
+<pre class="code-block"><code># Scan Azure infrastructure
 ./auditkit scan -provider azure -framework soc2
 
 # Scan M365 applications
 Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams -OutPath ./ScubaResults
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json
-</div>
+</code></pre>
 <h2>Next Steps</h2>
 <ul>
 <li><strong><a href="../setup/m365.html">M365 Setup Guide →</a></strong></li>

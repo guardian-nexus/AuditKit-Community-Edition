@@ -52,18 +52,18 @@
 <p><strong>Who needs it:</strong> Federal contractors, FedRAMP Cloud Service Providers<br />
 <strong>Certification:</strong> Not a certification itself (used by FedRAMP, FISMA)<br />
 <strong>Total controls:</strong> 1,196 controls<br />
-<strong>AuditKit coverage:</strong> 95 automated technical controls, reached through the SOC 2 / PCI / CMMC crosswalk<br />
+<strong>AuditKit coverage:</strong> 149 automated technical controls, reached through the SOC 2 / PCI / CMMC crosswalk<br />
 <strong>What's not covered:</strong> the remaining 1,047 organizational and policy controls</p>
 <h2>How AuditKit Uses 800-53</h2>
 <p><strong>Framework crosswalk:</strong> AuditKit maps existing SOC2, PCI-DSS, and CMMC controls to NIST 800-53 control families.</p>
 <p><strong>Example:</strong></p>
-<div class="code-block">Your SOC2 control: CC6.6 - MFA enforcement
+<pre class="code-block"><code>Your SOC2 control: CC6.6 - MFA enforcement
 
 Maps to NIST 800-53:
 - IA-2: Identification and Authentication
 - IA-2(1): Multi-Factor Authentication
 - IA-5: Authenticator Management
-</div>
+</code></pre>
 <p><strong>Benefit:</strong> Run one scan, see compliance across all frameworks</p>
 <h2>Control Families</h2>
 <p>NIST 800-53 has 20 control families. AuditKit reaches controls in 18 of them; PT (Personally Identifiable Information Processing) and SR (Supply Chain Risk Management) have no automated coverage:</p>
@@ -156,7 +156,7 @@ Maps to NIST 800-53:
 <h3>SR - Supply Chain Risk Management</h3>
 <p><strong>What AuditKit checks:</strong> Limited - mostly organizational policies</p>
 <h2>What AuditKit Automates</h2>
-<p><strong>Technical controls (95):</strong></p>
+<p><strong>Technical controls (149):</strong></p>
 <ul>
 <li>Access controls and authentication</li>
 <li>Logging and monitoring</li>
@@ -179,7 +179,7 @@ Maps to NIST 800-53:
 <li>Privacy controls</li>
 </ul>
 <h2>Running 800-53 Scan</h2>
-<div class="code-block"># AWS
+<pre class="code-block"><code># AWS
 auditkit scan -provider aws -framework 800-53
 
 # Azure
@@ -190,15 +190,15 @@ auditkit scan -provider gcp -framework 800-53
 
 # Generate report
 auditkit scan -provider aws -framework 800-53 -format pdf -output nist-report.pdf
-</div>
+</code></pre>
 <p><strong>Output shows:</strong></p>
-<div class="code-block">[FAIL] IA-2, IA-2(1), IA-5 - Authentication Controls (via CC6.6)
+<pre class="code-block"><code>[FAIL] IA-2, IA-2(1), IA-5 - Authentication Controls (via CC6.6)
   Issue: 12 users without MFA enabled
   Source: SOC2 CC6.6 maps to NIST IA-2
 
 [PASS] AU-2, AU-3, AU-12 - Audit Logging (via CC7.1)
   Source: SOC2 CC7.1 maps to NIST AU-2
-</div>
+</code></pre>
 <h2>FedRAMP Baselines</h2>
 <p>NIST 800-53 is used by <strong>FedRAMP</strong> (Federal Risk and Authorization Management Program) for cloud services.</p>
 <h3>FedRAMP LOW</h3>

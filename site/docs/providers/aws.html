@@ -71,7 +71,7 @@
 <li><strong>CIS-2.1.7</strong> - S3 Account Public Access Block</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Block public access
+<pre class="code-block"><code># Block public access
 aws s3api put-public-access-block \
   --bucket BUCKET_NAME \
   --public-access-block-configuration \
@@ -87,7 +87,7 @@ aws s3api put-bucket-encryption \
 aws s3api put-bucket-versioning \
   --bucket BUCKET_NAME \
   --versioning-configuration Status=Enabled
-</div>
+</code></pre>
 <h3>IAM (Identity &amp; Access Management)</h3>
 <p><strong>Controls checked:</strong> 30</p>
 <ul>
@@ -123,7 +123,7 @@ aws s3api put-bucket-versioning \
 <li><strong>CIS-17.2</strong> - IAM Permission Boundaries Configured</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enforce password policy
+<pre class="code-block"><code># Enforce password policy
 aws iam update-account-password-policy \
   --minimum-password-length 14 \
   --require-symbols \
@@ -143,7 +143,7 @@ aws iam enable-mfa-device \
 # Rotate access key
 aws iam create-access-key --user-name USERNAME
 aws iam delete-access-key --user-name USERNAME --access-key-id OLD_KEY_ID
-</div>
+</code></pre>
 <h3>EC2 (Elastic Compute Cloud)</h3>
 <p><strong>Controls checked:</strong> 11</p>
 <ul>
@@ -160,7 +160,7 @@ aws iam delete-access-key --user-name USERNAME --access-key-id OLD_KEY_ID
 <li><strong>CIS-5.6</strong> - EC2 IMDSv2</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Restrict security group
+<pre class="code-block"><code># Restrict security group
 aws ec2 revoke-security-group-ingress \
   --group-id sg-XXXXXXXX \
   --ip-permissions IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges='[{CidrIp=0.0.0.0/0}]'
@@ -177,7 +177,7 @@ aws ec2 modify-instance-metadata-options \
   --instance-id i-XXXXXXXX \
   --http-tokens required \
   --http-put-response-hop-limit 1
-</div>
+</code></pre>
 <h3>CloudTrail</h3>
 <p><strong>Controls checked:</strong> 11</p>
 <ul>
@@ -194,7 +194,7 @@ aws ec2 modify-instance-metadata-options \
 <li><strong>CIS-3.11</strong> - S3 Object-Level Logging (Read)</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable CloudTrail in all regions
+<pre class="code-block"><code># Enable CloudTrail in all regions
 aws cloudtrail create-trail \
   --name my-trail \
   --s3-bucket-name my-cloudtrail-bucket \
@@ -207,7 +207,7 @@ aws cloudtrail start-logging --name my-trail
 aws cloudtrail update-trail \
   --name my-trail \
   --kms-key-id arn:aws:kms:REGION:ACCOUNT:key/KEY_ID
-</div>
+</code></pre>
 <h3>RDS (Relational Database Service)</h3>
 <p><strong>Controls checked:</strong> 6</p>
 <ul>
@@ -219,7 +219,7 @@ aws cloudtrail update-trail \
 <li><strong>CIS-2.3.5</strong> - RDS Deletion Protection</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable encryption (must be done at creation)
+<pre class="code-block"><code># Enable encryption (must be done at creation)
 aws rds create-db-instance \
   --db-instance-identifier mydb \
   --storage-encrypted \
@@ -235,7 +235,7 @@ aws rds modify-db-instance \
   --db-instance-identifier mydb \
   --backup-retention-period 7 \
   --preferred-backup-window &quot;03:00-04:00&quot;
-</div>
+</code></pre>
 <h3>VPC (Virtual Private Cloud)</h3>
 <p><strong>Controls checked:</strong> 13</p>
 <ul>
@@ -254,7 +254,7 @@ aws rds modify-db-instance \
 <li><strong>CIS-5.20</strong> - VPC Endpoints for S3</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable VPC Flow Logs
+<pre class="code-block"><code># Enable VPC Flow Logs
 aws ec2 create-flow-logs \
   --resource-type VPC \
   --resource-ids vpc-XXXXXXXX \
@@ -270,18 +270,18 @@ aws ec2 revoke-security-group-ingress \
 aws ec2 revoke-security-group-egress \
   --group-id sg-default \
   --ip-permissions IpProtocol=-1,IpRanges='[{CidrIp=0.0.0.0/0}]'
-</div>
+</code></pre>
 <h3>KMS (Key Management Service)</h3>
 <p><strong>Controls checked:</strong> 1</p>
 <ul>
 <li><strong>CC5.2</strong> - Encryption Key Management</li>
 </ul>
 <p>There is no dedicated KMS check set. The KMS-adjacent checks live with the
-service that uses the key: <code class="code-inline">CIS-3.7</code> and <code class="code-inline">CIS-3.8</code> under CloudTrail, <code class="code-inline">CIS-12.2</code>
-under Secrets Manager, and <code class="code-inline">CIS-4.7</code> (a metric filter for key disable and delete
+service that uses the key: <code>CIS-3.7</code> and <code>CIS-3.8</code> under CloudTrail, <code>CIS-12.2</code>
+under Secrets Manager, and <code>CIS-4.7</code> (a metric filter for key disable and delete
 events) under CloudWatch monitoring.</p>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable automatic key rotation
+<pre class="code-block"><code># Enable automatic key rotation
 aws kms enable-key-rotation --key-id KEY_ID
 
 # Update key policy for least privilege
@@ -289,7 +289,7 @@ aws kms put-key-policy \
   --key-id KEY_ID \
   --policy-name default \
   --policy file://policy.json
-</div>
+</code></pre>
 <h3>GuardDuty</h3>
 <p><strong>Controls checked:</strong> 2</p>
 <ul>
@@ -297,12 +297,12 @@ aws kms put-key-policy \
 <li><strong>CIS-9.1</strong> - GuardDuty Enabled</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable GuardDuty
+<pre class="code-block"><code># Enable GuardDuty
 aws guardduty create-detector --enable
 
 # List findings
 aws guardduty list-findings --detector-id DETECTOR_ID
-</div>
+</code></pre>
 <h3>Config</h3>
 <p><strong>Controls checked:</strong> 2</p>
 <ul>
@@ -310,7 +310,7 @@ aws guardduty list-findings --detector-id DETECTOR_ID
 <li><strong>CIS-3.5</strong> - AWS Config Recording Status</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable AWS Config
+<pre class="code-block"><code># Enable AWS Config
 aws configservice put-configuration-recorder \
   --configuration-recorder name=default,roleARN=arn:aws:iam::ACCOUNT:role/ConfigRole
 
@@ -318,7 +318,7 @@ aws configservice put-delivery-channel \
   --delivery-channel name=default,s3BucketName=my-config-bucket
 
 aws configservice start-configuration-recorder --configuration-recorder-name default
-</div>
+</code></pre>
 <h3>Security Hub</h3>
 <p><strong>Controls checked:</strong> 2</p>
 <ul>
@@ -326,13 +326,13 @@ aws configservice start-configuration-recorder --configuration-recorder-name def
 <li><strong>CIS-9.3</strong> - Security Hub Enabled</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Enable Security Hub
+<pre class="code-block"><code># Enable Security Hub
 aws securityhub enable-security-hub
 
 # Enable CIS standard
 aws securityhub batch-enable-standards \
   --standards-subscription-requests StandardsArn=arn:aws:securityhub:REGION::standards/cis-aws-foundations-benchmark/v/1.2.0
-</div>
+</code></pre>
 <h3>Systems Manager</h3>
 <p><strong>Controls checked:</strong> 6</p>
 <ul>
@@ -344,7 +344,7 @@ aws securityhub batch-enable-standards \
 <li><strong>CIS-10.3</strong> - SSM Patch Compliance</li>
 </ul>
 <p><strong>Example fixes:</strong></p>
-<div class="code-block"># Create patch baseline
+<pre class="code-block"><code># Create patch baseline
 aws ssm create-patch-baseline \
   --name &quot;Production-Baseline&quot; \
   --operating-system AMAZON_LINUX_2 \
@@ -357,7 +357,7 @@ aws ssm create-maintenance-window \
   --duration 4 \
   --cutoff 1 \
   --allow-unassociated-targets
-</div>
+</code></pre>
 <h2>Controls by Framework</h2>
 <h3>SOC2 Type II (38 of the 43 criteria carry automated AWS checks)</h3>
 <p>The 43-criteria catalogue breaks down as:</p>
@@ -386,7 +386,7 @@ aws ssm create-maintenance-window \
 <p>All Level 1 practices plus 93 additional practices across 14 domains. The Community Edition reports all 110 for evidence tracking and marks the ones it cannot check automatically; automated Level 2 checks are an AuditKit Pro feature.</p>
 <p><strong><a href="../frameworks/cmmc.html">View CMMC details →</a></strong></p>
 <h2>Running AWS Scans</h2>
-<div class="code-block"># Configure credentials
+<pre class="code-block"><code># Configure credentials
 aws configure
 
 # Scan for SOC2
@@ -403,15 +403,15 @@ aws configure
 
 # Generate report
 ./auditkit scan -provider aws -framework soc2 -format pdf -output aws-report.pdf
-</div>
+</code></pre>
 <h2>Multi-Account Scanning</h2>
 <p><strong>Free version:</strong> One account at a time</p>
-<div class="code-block"># Switch profiles
+<pre class="code-block"><code># Switch profiles
 auditkit scan -provider aws -profile production
 auditkit scan -provider aws -profile staging
-</div>
+</code></pre>
 <p><strong>Pro version:</strong> Scan entire AWS Organization</p>
-<div class="code-block"># Scan all accounts
+<pre class="code-block"><code># Scan all accounts
 auditkit-pro scan -provider aws --scan-all
 
 # Limit concurrency
@@ -419,7 +419,7 @@ auditkit-pro scan -provider aws --scan-all --max-concurrent 5
 
 # Generate consolidated report
 auditkit-pro scan -provider aws --scan-all -format pdf -output org-report.pdf
-</div>
+</code></pre>
 <p><strong><a href="https://auditkit.io/pro/">Try Pro free for 14 days →</a></strong></p>
 <h2>Next Steps</h2>
 <ul>

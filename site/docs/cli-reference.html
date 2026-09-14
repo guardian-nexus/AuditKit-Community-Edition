@@ -39,97 +39,386 @@
 
     <section class="section">
         <div class="container-prose">
-            <h2>Main Commands</h2>
+<p>Complete command reference for AuditKit.</p>
+<h2>Command Structure</h2>
+<pre class="code-block"><code>auditkit [command] [flags]
+</code></pre>
+<h2>Commands</h2>
+<h3>cache</h3>
+<p>List and manage the offline scan cache.</p>
+<pre class="code-block"><code>auditkit cache
+</code></pre>
+<p>Every scan is cached under <code>~/.auditkit/cache</code>. Combined with <code>-offline</code>, this lets you scan on a connected machine and produce reports on an air-gapped one.</p>
+<pre class="code-block"><code># Report from the newest cached scan, no cloud API calls
+auditkit scan -provider aws -framework soc2 -offline
 
-            <h3>scan - Run compliance scan</h3>
-            <pre class="code-block"><code>auditkit scan [options]</code></pre>
-            <p><strong>Common options:</strong></p>
-            <ul>
-                <li><code>-provider</code> - Cloud provider: aws, azure, gcp (default: aws)</li>
-                <li><code>-framework</code> - Framework: soc2, pci, cmmc, hipaa, gdpr, nist-csf, 800-53, iso27001, fedramp-low, fedramp-moderate, fedramp-high, cis, cis-aws, cis-azure, cis-gcp, all (default: all)</li>
-                <li><code>-format</code> - Output format: text, json, html, pdf, csv (default: text)</li>
-                <li><code>-output</code> - Output file path (default: stdout)</li>
-                <li><code>-verbose</code> - Show detailed output</li>
-            </ul>
-            <p><strong>Examples:</strong></p>
-            <pre class="code-block"><code># Basic scan
+# Report from a specific cache file
+auditkit scan -offline -cache-file /path/to/scan.json
+</code></pre>
+<h3>scan</h3>
+<p>Run a compliance scan against your cloud infrastructure.</p>
+<pre class="code-block"><code>auditkit scan [flags]
+</code></pre>
+<p><strong>Examples:</strong></p>
+<pre class="code-block"><code># Basic scan (defaults to AWS, all frameworks)
 auditkit scan
 
-# SOC2 scan with PDF report
-auditkit scan -framework soc2 -format pdf -output report.pdf
+# Specify provider and framework
+auditkit scan -provider aws -framework soc2
+auditkit scan -provider azure -framework pci
+auditkit scan -provider gcp -framework cmmc
 
-# Azure PCI-DSS scan
-auditkit scan -provider azure -framework pci -verbose
+# All frameworks
+auditkit scan -framework all
 
-# All frameworks, JSON output
-auditkit scan -framework all -format json -output results.json</code></pre>
+# Verbose output
+auditkit scan -verbose
 
-            <h3>fix - Generate remediation script</h3>
-            <pre class="code-block"><code>auditkit fix -output fixes.sh</code></pre>
-            <p>Generates shell script with commands to fix failed controls.</p>
-            <p><strong>Note:</strong> Always review the script before running it.</p>
+# Show all controls (no truncation)
+auditkit scan --full
+</code></pre>
+<p><strong>Flags:</strong>
+- <code>-provider</code> - Cloud provider: <code>aws</code>, <code>azure</code>, <code>gcp</code> (default: <code>aws</code>)
+- <code>-framework</code> - Compliance framework: <code>soc2</code>, <code>pci</code>, <code>cmmc</code>, <code>hipaa</code>, <code>gdpr</code>, <code>nist-csf</code>, <code>800-53</code>, <code>iso27001</code>, <code>fedramp-low</code>, <code>fedramp-moderate</code>, <code>fedramp-high</code>, <code>cis</code>, <code>cis-aws</code>, <code>cis-azure</code>, <code>cis-gcp</code>, <code>all</code> (default: <code>all</code>)
+- <code>-verbose</code> - Show detailed output
+- <code>--full</code> - Show all controls without truncation
+- <code>-format</code> - Output format: <code>text</code>, <code>json</code>, <code>html</code>, <code>pdf</code>, <code>csv</code> (default: <code>text</code>)
+- <code>-output</code> - Output file path (e.g., <code>report.pdf</code>)
+- <code>-profile</code> - AWS profile name (AWS only)</p>
+<p>These exist only on the Pro binary. Passing them to Community Edition exits with
+<code>flag provided but not defined</code>:</p>
+<ul>
+<li><code>--scan-all</code> - Scan all accounts/subscriptions/projects</li>
+<li><code>--max-concurrent</code> - Max concurrent scans (default: 5)</li>
+<li><code>--summary-only</code> - Show summary only, skip detailed results</li>
+</ul>
+<h3>integrate</h3>
+<p>Import results from third-party tools (Prowler, ScubaGear).</p>
+<pre class="code-block"><code>auditkit integrate -source [tool] -file [path] [flags]
+</code></pre>
+<p><strong>Examples:</strong></p>
+<pre class="code-block"><code># Import Prowler results (AWS/Azure/GCP)
+auditkit integrate -source prowler -file prowler-output.json
 
-            <h3>progress - Show compliance improvement</h3>
-            <pre class="code-block"><code>auditkit progress</code></pre>
-            <p>Shows compliance score trends over time.</p>
+# Generate PDF from Prowler results
+auditkit integrate -source prowler -file prowler-output.json -format pdf -output prowler-report.pdf
 
-            <h3>compare - Compare last two scans</h3>
-            <pre class="code-block"><code>auditkit compare</code></pre>
-            <p>Shows what changed between the last two scans.</p>
+# Import ScubaGear results (M365)
+auditkit integrate -source scubagear -file ScubaResults/ScubaResults.json
 
-            <h3>version - Show version</h3>
-            <pre class="code-block"><code>auditkit version</code></pre>
-            <p>Displays AuditKit version and build information.</p>
+# Generate PDF from ScubaGear results
+auditkit integrate -source scubagear -file ScubaResults.json -format pdf -output m365-report.pdf
+</code></pre>
+<p><strong>Flags:</strong>
+- <code>-source</code> - Source tool: <code>prowler</code>, <code>scubagear</code>
+- <code>-file</code> - Path to results file
+- <code>-format</code> - Output format: <code>text</code>, <code>json</code>, <code>pdf</code> (default: <code>text</code>)
+- <code>-output</code> - Output file path</p>
+<h3>fix</h3>
+<p>Generate remediation scripts for failed controls.</p>
+<pre class="code-block"><code>auditkit fix [flags]
+</code></pre>
+<p><strong>Examples:</strong></p>
+<pre class="code-block"><code># Generate fix script
+auditkit fix
 
-            <h2>AuditKit Commands</h2>
-
-            <h3>evidence-package - Generate C3PAO-ready evidence</h3>
-            <pre class="code-block"><code>auditkit-pro evidence-package -framework cmmc -output ./evidence</code></pre>
-            <p>Creates ZIP file with organized evidence for auditors.</p>
-
-            <h3>Multi-account scanning</h3>
-            <pre class="code-block"><code># Scan AWS Organization
-auditkit-pro scan -provider aws --scan-all
-
-# Scan with custom concurrency
-auditkit-pro scan --scan-all --max-concurrent 10
-
-# Summary only
-auditkit-pro scan --scan-all --summary-only</code></pre>
-
-            <h2>Common Workflows</h2>
-
-            <h3>Initial assessment</h3>
-            <pre class="code-block"><code># 1. Run scan
-auditkit scan -framework cmmc -verbose
-
-# 2. Generate PDF for stakeholders
-auditkit scan -framework cmmc -format pdf -output cmmc-report.pdf
-
-# 3. Generate fix script
+# Save to file
 auditkit fix -output fixes.sh
 
-# 4. Review and run fixes
+# Review before running
+cat fixes.sh
+bash fixes.sh  # Run after review
+</code></pre>
+<p><strong>Flags:</strong>
+- <code>-output</code> - Output file path (default: <code>auditkit-&lt;provider&gt;-fixes.sh</code>)
+- <code>-provider</code> - Cloud provider to re-scan; <code>fix</code> runs a fresh scan rather than reusing the last one (default: <code>aws</code>)</p>
+<h3>progress</h3>
+<p>Show compliance improvement over time.</p>
+<pre class="code-block"><code>auditkit progress
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code-block"><code>Compliance Progress Report
+==========================
+Framework: SOC2
+Provider: AWS
+
+Scan History:
+2025-10-15: 65.0% (42/64 passed)
+2025-10-18: 72.5% (46/64 passed)
+2025-10-19: 78.1% (50/64 passed)
+
+Improvement: +13.1% over 4 days
+Trend: Increasing
+</code></pre>
+<h3>compare</h3>
+<p>Compare the last two scans.</p>
+<pre class="code-block"><code>auditkit compare
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code-block"><code>Compliance Comparison
+=====================
+Framework: SOC2
+Provider: AWS
+
+Previous Scan: 2025-10-18 (72.5%)
+Current Scan:  2025-10-19 (78.1%)
+
+Improvements:
++ CC6.1 - IAM Key Rotation (now passing)
++ CC6.2 - S3 Public Access (now passing)
++ CC7.1 - CloudTrail Logging (now passing)
++ CC8.1 - Encryption at Rest (now passing)
+
+New Failures:
+- None
+
+Score Change: +5.6%
+</code></pre>
+<h3>evidence</h3>
+<p>Track the evidence an assessor will ask for. Auditors want evidence for every
+control, including the ones that pass, so this covers the whole scan rather than
+just failures.</p>
+<p><strong>Note:</strong> the tracker currently always runs the SOC2 control set. The <code>-framework</code>
+flag does not apply to this command.</p>
+<pre class="code-block"><code>auditkit evidence [flags]
+</code></pre>
+<p>Runs a scan, writes an HTML checklist, and records the controls in a durable
+tracker at <code>~/.auditkit/evidence_&lt;account&gt;.json</code>. The checklist keeps ticks in
+your browser; the tracker is the copy you can share, review, or hand over.</p>
+<p><strong>Flags:</strong>
+- <code>-provider</code> - Cloud provider: <code>aws</code>, <code>azure</code>, <code>gcp</code> (default: <code>aws</code>)
+- <code>-profile</code> - AWS profile, Azure subscription, or GCP project
+- <code>-output</code> - Where to write the HTML checklist (default: <code>evidence-tracker.html</code>)</p>
+<h3>evidence status</h3>
+<p>Show what evidence has been collected, what is outstanding, and what has gone
+stale. Runs against the stored tracker, so it needs no cloud credentials.</p>
+<pre class="code-block"><code>auditkit evidence status [flags]
+</code></pre>
+<p><strong>Flags:</strong>
+- <code>-account</code> - Account ID, if you track more than one
+- <code>-stale-after</code> - Days before collected evidence is considered stale (default: 90)
+- <code>-all</code> - List every outstanding control rather than the first 20</p>
+<p>Evidence older than the staleness window is reported as outstanding rather than
+collected. Assessors sample evidence from within the period under review, so a
+screenshot from last year is not evidence.</p>
+<h3>evidence collect</h3>
+<p>Record that evidence has been captured for a control.</p>
+<pre class="code-block"><code>auditkit evidence collect CONTROL-ID [flags]
+</code></pre>
+<p><strong>Examples:</strong></p>
+<pre class="code-block"><code>auditkit evidence collect CC6.1 -notes &quot;IAM policy export and console screenshot&quot; -by rob
+auditkit evidence collect CC7.2 -artifact ./evidence/cloudwatch-alarms.png
+</code></pre>
+<p><strong>Flags:</strong>
+- <code>-notes</code> - What was captured and where it came from
+- <code>-artifact</code> - Path to the screenshot or export
+- <code>-by</code> - Who collected it
+- <code>-account</code> - Account ID, if you track more than one</p>
+<h3>evidence import</h3>
+<p>Load the JSON exported from the HTML checklist, so ticks made in the browser
+become part of the durable record.</p>
+<pre class="code-block"><code>auditkit evidence import PROGRESS.json [-by name]
+</code></pre>
+<p>Controls in the file that the scanner has not seen are reported and skipped.</p>
+<h3>update</h3>
+<p>Check for newer version of AuditKit.</p>
+<pre class="code-block"><code>auditkit update
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code-block"><code>Current version: v0.7.0
+Latest version:  v0.7.1
+Update available!
+
+Download: https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/tag/v0.7.1
+</code></pre>
+<h3>version</h3>
+<p>Show AuditKit version.</p>
+<pre class="code-block"><code>auditkit version
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre class="code-block"><code>AuditKit v0.8.6 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
+</code></pre>
+<h2>Global Flags</h2>
+<p>These flags work with all commands:</p>
+<ul>
+<li><code>auditkit version</code> - Show version</li>
+<li><code>auditkit &lt;command&gt; --help</code> - Show the flag list (e.g. <code>auditkit scan --help</code>)</li>
+</ul>
+<p>Note: bare <code>-h</code>, <code>--help</code>, <code>-v</code> and <code>--version</code> are not recognised — they are treated as commands and print the usage block with an "Unknown command" warning.</p>
+<h2>Output Formats</h2>
+<h3>text (default)</h3>
+<p>Human-readable terminal output with colors.</p>
+<pre class="code-block"><code>auditkit scan
+</code></pre>
+<h3>json</h3>
+<p>Machine-readable JSON for automation.</p>
+<pre class="code-block"><code>auditkit scan -format json -output results.json
+</code></pre>
+<p><strong>JSON Structure:</strong></p>
+<pre class="code-block"><code>{
+  &quot;timestamp&quot;: &quot;2025-10-19T14:30:00Z&quot;,
+  &quot;provider&quot;: &quot;aws&quot;,
+  &quot;framework&quot;: &quot;soc2&quot;,
+  &quot;account_id&quot;: &quot;123456789012&quot;,
+  &quot;score&quot;: 72.5,
+  &quot;total_controls&quot;: 64,
+  &quot;passed_controls&quot;: 46,
+  &quot;failed_controls&quot;: 18,
+  &quot;controls&quot;: [
+    {
+      &quot;id&quot;: &quot;CC6.6&quot;,
+      &quot;name&quot;: &quot;User MFA Enforcement&quot;,
+      &quot;status&quot;: &quot;FAIL&quot;,
+      &quot;severity&quot;: &quot;CRITICAL&quot;,
+      &quot;evidence&quot;: &quot;12 users without MFA&quot;,
+      &quot;remediation&quot;: &quot;Enable MFA for all users&quot;
+    }
+  ]
+}
+</code></pre>
+<h3>html</h3>
+<p>HTML report with Failed, Passed and Manual tabs.</p>
+<pre class="code-block"><code>auditkit scan -format html -output report.html
+</code></pre>
+<h3>pdf</h3>
+<p>Audit-ready PDF report for auditors and management.</p>
+<pre class="code-block"><code>auditkit scan -format pdf -output report.pdf
+</code></pre>
+<p><strong>PDF includes:</strong>
+- Executive summary
+- Compliance score
+- Passed/failed controls
+- Evidence collection guides
+- Remediation commands
+- Compliance mappings</p>
+<h2>Environment Variables</h2>
+<h3>AWS</h3>
+<pre class="code-block"><code>AWS_ACCESS_KEY_ID          # AWS access key
+AWS_SECRET_ACCESS_KEY      # AWS secret key
+AWS_DEFAULT_REGION         # Default AWS region
+AWS_PROFILE                # AWS CLI profile name
+</code></pre>
+<h3>Azure</h3>
+<pre class="code-block"><code>AZURE_CLIENT_ID            # Service principal client ID
+AZURE_CLIENT_SECRET        # Service principal secret
+AZURE_TENANT_ID            # Azure tenant ID
+AZURE_SUBSCRIPTION_ID      # Subscription to scan
+</code></pre>
+<h3>GCP</h3>
+<pre class="code-block"><code>GOOGLE_APPLICATION_CREDENTIALS  # Path to service account JSON
+GOOGLE_CLOUD_PROJECT            # GCP project ID
+GCP_PROJECT                     # Alternative project ID variable
+</code></pre>
+<h2>Exit Codes</h2>
+<ul>
+<li><code>0</code> - Success</li>
+<li><code>1</code> - Any error the scanner reports (missing credentials, permission denied, or a failed scan)</li>
+<li><code>2</code> - A flag the binary does not recognise, or a malformed one; the flag parser exits before the scanner runs</li>
+</ul>
+<p>AuditKit does not currently distinguish error classes by exit code. To branch on the result in CI, parse the JSON report rather than the exit status.</p>
+<h2>Examples by Use Case</h2>
+<h3>Initial Assessment</h3>
+<pre class="code-block"><code># Run first scan
+auditkit scan -provider aws -framework soc2 -verbose
+
+# Generate PDF report for auditor
+auditkit scan -provider aws -framework soc2 -format pdf -output initial-assessment.pdf
+
+# Generate evidence tracker
+auditkit evidence -format html -output evidence-tracker.html
+</code></pre>
+<h3>Fix and Verify</h3>
+<pre class="code-block"><code># Generate fix script
+auditkit fix -output fixes.sh
+
+# Review and run fixes
 cat fixes.sh
 bash fixes.sh
 
-# 5. Re-scan to verify
-auditkit scan -framework cmmc</code></pre>
+# Re-scan to verify
+auditkit scan -provider aws -framework soc2
 
-            <h3>Continuous monitoring</h3>
-            <pre class="code-block"><code># Daily scan in CI/CD
-auditkit scan -format json -output results.json
+# Compare improvements
+auditkit compare
+</code></pre>
+<h3>Multi-Cloud Scanning</h3>
+<pre class="code-block"><code># Scan all providers
+auditkit scan -provider aws -framework soc2 -output aws-results.json -format json
+auditkit scan -provider azure -framework soc2 -output azure-results.json -format json
+auditkit scan -provider gcp -framework soc2 -output gcp-results.json -format json
 
-# Check compliance threshold
-SCORE=$(jq '.score' results.json)
-if (( $(echo "$SCORE < 80" | bc -l) )); then
-  echo "Compliance dropped below 80%"
+# Generate individual reports
+auditkit scan -provider aws -framework soc2 -format pdf -output aws-report.pdf
+auditkit scan -provider azure -framework soc2 -format pdf -output azure-report.pdf
+auditkit scan -provider gcp -framework soc2 -format pdf -output gcp-report.pdf
+</code></pre>
+<h3>CI/CD Integration</h3>
+<pre class="code-block"><code># Run scan in pipeline
+auditkit scan -provider aws -framework soc2 -format json -output results.json
+
+# Check exit code
+if [ $? -eq 0 ]; then
+  echo &quot;Scan completed successfully&quot;
+else
+  echo &quot;Scan failed&quot;
   exit 1
-fi</code></pre>
+fi
 
-            <p>
-                <a href="/docs/cli-reference.html">View complete CLI reference →</a>
-            </p>
+# Parse results
+jq '.score' results.json  # Get compliance score
+jq '.failed_controls' results.json  # Get failed control count
+</code></pre>
+<h3>Progress Tracking</h3>
+<pre class="code-block"><code># Weekly scans
+# Monday
+auditkit scan -provider aws -framework soc2
+
+# Friday (after fixes)
+auditkit scan -provider aws -framework soc2
+
+# Show progress
+auditkit progress
+
+# Compare before/after
+auditkit compare
+</code></pre>
+<h2>Pro-Only Features</h2>
+<p>These features require <a href="https://auditkit.io/">AuditKit</a>:</p>
+<h3>Multi-Account Scanning</h3>
+<pre class="code-block"><code># Scan entire AWS Organization
+auditkit-pro scan -provider aws -framework soc2 --scan-all
+
+# Scan Azure Management Group
+auditkit-pro scan -provider azure -framework soc2 --scan-all
+
+# Scan GCP Organization
+auditkit-pro scan -provider gcp -framework soc2 --scan-all
+
+# Control concurrency
+auditkit-pro scan -provider aws --scan-all --max-concurrent 5
+</code></pre>
+<h3>CMMC Level 2</h3>
+<pre class="code-block"><code># Scan for CMMC Level 2 (110 practices)
+auditkit-pro scan -provider aws -framework cmmc
+
+# Generate Level 2 report
+auditkit-pro scan -provider aws -framework cmmc -format pdf -output cmmc-l2-report.pdf
+</code></pre>
+<h3>Advanced GCP</h3>
+<pre class="code-block"><code># Scan GKE clusters (Pro only)
+auditkit-pro scan -provider gcp -framework soc2  # Includes GKE checks
+
+# Scan Vertex AI (Pro only)
+auditkit-pro scan -provider gcp -framework soc2  # Includes Vertex AI checks
+</code></pre>
+<h2>Getting Help</h2>
+<ul>
+<li><strong>Command help:</strong> <code>auditkit [command] --help</code></li>
+<li><strong>Documentation:</strong> <a href="../">Full docs →</a></li>
+<li><strong>Examples:</strong> <a href="../examples/">Sample usage →</a></li>
+<li><strong>Issues:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/issues">GitHub Issues</a></li>
+</ul>
+
         </div>
     </section>
 
