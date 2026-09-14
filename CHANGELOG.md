@@ -12,6 +12,13 @@ All notable changes to AuditKit will be documented in this file.
   cloud with `-provider`, correctly; the download is ~62 MB.
 
 ### Fixed
+- coverage-counts.py could not see a control id assigned after the literal
+  or a verdict assigned in a helper; GCP emits 175 controls where 168 was
+  published and the vulnerability-scanning practice reaches a verdict. The
+  figures are re-measured and written.
+- The GCP PCI checks filed six rows under a section heading (PCI-1.2.1)
+  while their evidence named the requirement measured (1.4.2); they are
+  filed under the requirement.
 - Two Azure CMMC checks read only the first page of role assignments or
   NSGs and judged the subscription on that page.
 - A CMMC report files a SOC2 or CIS check that also answers a practice

@@ -38,7 +38,7 @@ AuditKit can import Prowler results to broaden NIST 800-53 coverage.
 | AWS/Azure/GCP/M365 | Full support | Full support |
 | SOC2, PCI-DSS, NIST 800-53 | All frameworks | All frameworks |
 | CMMC Level 1 | 5 of 17 practices reach a verdict on AWS | 7 of 17 practices reach a verdict on AWS |
-| CMMC Level 2 | All 110 practices reported for evidence | All 110 practices reported; 26 reach a verdict on AWS, 84 carry evidence guidance |
+| CMMC Level 2 | All 110 practices reported for evidence | All 110 practices reported; 28 reach a verdict on AWS, 82 carry evidence guidance |
 | Controls assessed | 228 AWS, 277 Azure, 168 GCP | 315 AWS, 395 Azure, 285 GCP |
 | GCP Advanced | 5 GKE controls | Deep GKE scanning (15) + Vertex AI (10) |
 | Multi-Account | One at a time | AWS Orgs, Azure Mgmt, GCP Folders |
@@ -73,7 +73,7 @@ Compare to traditional costs:
 **Coverage:**
 - AWS: 228 controls - 38 SOC2 criteria, 59 PCI-DSS requirements, 5 of 17 CMMC Level 1 practices automated; all 110 Level 1 + 2 practices reported
 - Azure: 277 controls - 38 SOC2 criteria, 63 PCI-DSS requirements, 4 of 17 CMMC Level 1 practices automated; Level 2 practices reported
-- GCP: 168 controls - 32 SOC2 criteria, 50 PCI-DSS requirements, 5 GKE controls; deep GKE scanning and Vertex AI are Pro
+- GCP: 173 controls - 32 SOC2 criteria, 50 PCI-DSS requirements, 5 GKE controls; deep GKE scanning and Vertex AI are Pro
 - M365: 29+ Entra ID rules via ScubaGear
 
 ### Which GCP services are scanned?

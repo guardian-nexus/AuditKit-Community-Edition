@@ -42,7 +42,7 @@ More in [Example Commands](#example-commands).
 
 AuditKit scans your cloud infrastructure for compliance gaps and security misconfigurations:
 
-- **Broad Control Coverage:** 228 AWS, 277 Azure and 168 GCP controls assessed - some return an automated verdict, the rest are reported with evidence-collection guidance
+- **Broad Control Coverage:** 228 AWS, 277 Azure and 173 GCP controls assessed - some return an automated verdict, the rest are reported with evidence-collection guidance
 - **Full CMMC Scope:** all 110 Level 1 + 2 practices reported, so you see the whole assessment surface
 - **Multi-Cloud Support:** AWS, Azure and GCP scanned directly, Microsoft 365 via ScubaGear import
 - **Audit-Ready Reports:** PDF/HTML/JSON output with evidence
@@ -67,7 +67,7 @@ measured from the checks themselves.
 | **SOC2 Type II** | 38 of 43 | 38 of 43 | 32 of 43 | SaaS customer requirements |
 | **PCI DSS v4.0.1** | 59 | 63 | 50 | Payment card processing |
 | **CMMC Level 1** | 5 of 17 | 4 of 17 | 4 of 17 | DoW contractor compliance (FCI) |
-| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; 6 practices automated on GCP, none on AWS/Azure. Automated Level 2 across all providers in [AuditKit Pro](https://auditkit.io/) |
+| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; 7 practices automated on GCP, none on AWS/Azure. Automated Level 2 across all providers in [AuditKit Pro](https://auditkit.io/) |
 
 71 distinct PCI DSS v4.0.1 requirements are assessed across the three providers.
 
@@ -111,11 +111,11 @@ scanning, or a desktop interface.
 | | Community Edition (free) | AuditKit Pro ($297/mo) |
 |---|---|---|
 | **Cloud providers** | AWS, Azure, GCP scanned; M365 via ScubaGear import | Same, plus Azure Arc |
-| **Controls assessed** | 228 AWS, 277 Azure, 168 GCP | 315 AWS, 395 Azure, 285 GCP |
+| **Controls assessed** | 228 AWS, 277 Azure, 173 GCP | 315 AWS, 400 Azure, 293 GCP |
 | **SOC2 Type II** | 38, 38, 32 criteria | 38, 38, 36 criteria |
 | **PCI DSS v4.0.1** | 71 requirements | 77 requirements |
 | **CMMC Level 1** | 5 of 17 practices automated | 7 of 17 practices automated |
-| **CMMC Level 2** | All 110 practices reported for evidence | All 110 reported: 26 reach a pass or fail, 84 carry evidence guidance |
+| **CMMC Level 2** | All 110 practices reported for evidence | All 110 reported: 28 reach a pass or fail, 82 carry evidence guidance |
 | **CIS Benchmarks** | 70 AWS, 127 Azure, 93 GCP | 70 AWS, 127 Azure, 93 GCP |
 | **Derived frameworks** | 800-53, ISO 27001, HIPAA, GDPR, NIST CSF, FedRAMP | Same six, from a larger control set |
 | **NIST 800-53 derived** | 149 controls | 151 controls |

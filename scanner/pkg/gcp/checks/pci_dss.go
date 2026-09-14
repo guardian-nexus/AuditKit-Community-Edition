@@ -108,7 +108,7 @@ func (c *GCPPCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 	for _, result := range firewallResults {
 		if result.Status == "FAIL" {
 			// Re-label with PCI control ID
-			result.Control = "PCI-1.2.1"
+			result.Control = "PCI-1.4.2"
 			result.Evidence = fmt.Sprintf("PCI-DSS 1.4.2 VIOLATION: %s", result.Evidence)
 			results = append(results, result)
 		}
@@ -209,7 +209,7 @@ func (c *GCPPCIChecks) CheckReq4_TransitEncryption(ctx context.Context) []CheckR
 
 	for _, result := range sslResults {
 		if result.Status == "FAIL" {
-			result.Control = "PCI-4.1"
+			result.Control = "PCI-4.2.1"
 			result.Evidence = fmt.Sprintf("PCI-DSS 4.2.1 VIOLATION: %s", result.Evidence)
 			result.Severity = "CRITICAL"
 			result.Priority = PriorityCritical
@@ -244,7 +244,7 @@ func (c *GCPPCIChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 
 	for _, result := range iamResults {
 		if result.Status == "FAIL" && strings.Contains(result.Evidence, "primitive roles") {
-			result.Control = "PCI-7.1"
+			result.Control = "PCI-7.2.1"
 			result.Evidence = fmt.Sprintf("PCI-DSS 7.2.1: %s", result.Evidence)
 			result.Severity = "HIGH"
 			results = append(results, result)
@@ -295,7 +295,7 @@ func (c *GCPPCIChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 
 	for _, result := range keyResults {
 		if result.Status == "FAIL" && strings.Contains(result.Evidence, "90 days") {
-			result.Control = "PCI-8.2.4"
+			result.Control = "PCI-8.3.9"
 			result.Evidence = fmt.Sprintf("PCI-DSS 8.3.9: %s", result.Evidence)
 			results = append(results, result)
 		}
@@ -331,7 +331,7 @@ func (c *GCPPCIChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 		if result.Control == "CC7.2" {
 			// Re-map to PCI control
 			newResult := result
-			newResult.Control = "PCI-10.1"
+			newResult.Control = "PCI-10.2.1.1"
 			newResult.Evidence = fmt.Sprintf("PCI-DSS 10.2.1.1: %s", result.Evidence)
 			results = append(results, newResult)
 		}

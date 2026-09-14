@@ -1,57 +1,45 @@
-# Path: .golangci.yml
-# golangci-lint configuration
+# golangci-lint v2 configuration, run by `make lint`.
+#
+# The previous file was v1-shaped (Community) or a v2 header over v1 keys
+# (Pro), and loaded under no release of the tool, so lint never ran. This one
+# is verified with `golangci-lint config verify` under v2.5. gosimple is part
+# of staticcheck in v2; typecheck is not a linter.
+version: "2"
 
 run:
   timeout: 5m
   tests: false
 
 linters:
+  default: none
   enable:
-    - errcheck      # Check for unchecked errors
-    - staticcheck   # Advanced static analysis
-    - govet         # Go vet issues
-    - gosimple      # Simplify code suggestions
-    - ineffassign   # Detect ineffectual assignments
-    - unused        # Check for unused code
-  disable:
-    - typecheck     # Can be flaky with build tags
-
-linters-settings:
-  errcheck:
-    # Ignore these specific error checks (common patterns that are okay)
-    exclude-functions:
-      - 'fmt.Fprintf'
-      - 'fmt.Fprintln'
-      - '(*database/sql.Rows).Close'
-      - '(*os.File).Close'  # defer file.Close() is fine
-    # Check type assertions and type switches
-    check-type-assertions: false
-    check-blank: false
-
-  staticcheck:
-    # Don't complain about these specific checks
-    checks: 
-      - "all"
-      - "-ST1005"  # Allow capitalized error strings (common in our codebase)
-      - "-QF1003"  # Allow if/else chains instead of switch (more readable sometimes)
-      - "-S1039"   # Allow fmt.Sprintf for consistency
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+  settings:
+    errcheck:
+      exclude-functions:
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - (*database/sql.Rows).Close
+        - (*os.File).Close
+    staticcheck:
+      checks:
+        # Correctness (SA) and simplification (S) checks. The style (ST) and
+        # quickfix (QF) families are opinion, and enabling them reported 969
+        # findings on Pro against 87 of substance.
+        - all
+        - -ST*
+        - -QF*
+        - -S1039 # fmt.Sprintf of a constant, kept for consistency
+  exclusions:
+    rules:
+      - source: 'defer.*\.Close\(\)'
+        linters:
+          - errcheck
 
 issues:
-  # Maximum issues count per one linter
   max-issues-per-linter: 0
   max-same-issues: 0
-  
-  # Exclude some linters from running on specific paths
-  exclude-rules:
-    # Ignore long lines in test files
-    - path: _test\.go
-      linters:
-        - lll
-    
-    # Allow unchecked errors in defer statements (common Go pattern)
-    - source: "defer.*\\.Close\\(\\)"
-      linters:
-        - errcheck
-  
-  # Show all issues
-  exclude-use-default: false

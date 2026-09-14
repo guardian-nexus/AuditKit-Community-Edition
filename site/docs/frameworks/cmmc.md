@@ -261,7 +261,7 @@ Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14
 
 ### What AuditKit Checks (Level 2)
 
-**Reach a PASS or FAIL verdict from your cloud configuration (26 of the 110 on AWS); the remaining 84 are
+**Reach a PASS or FAIL verdict from your cloud configuration (28 of the 110 on AWS); the remaining 82 are
 assessed as structured evidence guidance, telling you what an assessor needs to see:**
 All technical controls across:
 
@@ -277,7 +277,7 @@ All technical controls across:
 - Key rotation
 - Public access controls
 
-**Structured evidence guidance (84 practices):**
+**Structured evidence guidance (82 practices):**
 Organizational controls:
 
 - Policies and procedures
@@ -329,7 +329,7 @@ auditkit-pro evidence -output cmmc-evidence.html
 | **Cost (AuditKit)** | Free | $297/month |
 | **Cost (Assessment)** | $0 | $0 under Phase 1; $25,000-$150,000 if C3PAO resumes |
 | **Timeline** | 2-4 weeks | 3-6 months |
-| **Automated Checks** | 5 of 17 reach a verdict (AWS) | 26 of 110 reach a verdict (AWS) |
+| **Automated Checks** | 5 of 17 reach a verdict (AWS) | 28 of 110 reach a verdict (AWS) |
 | **Manual Docs** | 4 | 68 assessed as evidence guidance |
 | **Required For** | All DoW contracts | CUI contracts |
 | **Deadline** | Now | Now (Phase 1, self-assessment) |
