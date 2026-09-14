@@ -39,6 +39,8 @@ jobs:
         with:
           version: v2.5.0
           working-directory: scanner
+          # Loading every provider SDK exceeds the 1m default on a shared runner.
+          args: --timeout=15m
 
       - name: go vet
         run: go vet ./...

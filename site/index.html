@@ -182,6 +182,7 @@
                     <ul class="feature-list">
                         <li>675 controls across 10 frameworks</li>
                         <li>AWS, Azure, GCP (Microsoft 365 via ScubaGear import)</li>
+                        <li>Vulnerability evidence from Inspector, Defender for Cloud and VM Manager; Nessus, Trivy and Grype import</li>
                         <li>PDF, HTML, JSON, CSV output</li>
                         <li>Fix scripts for every finding</li>
                     </ul>
@@ -349,7 +350,7 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
             <div style="max-width: 900px; margin: 0 auto;">
                 <h3>Defense Contractors</h3>
                 <p style="margin-bottom: 0.75rem;">
-                    Phase 1 is in force: DoW contracts require self-assessment against the Level 2 practices. Phase 2 C3PAO assessment is suspended pending review, so the live obligation today is documenting your own posture. AuditKit assesses all 110 Level 2 practices across your AWS, Azure and GCP environments, and folds in Microsoft 365 findings imported from ScubaGear: automated checks where your cloud configuration can prove it, and structured evidence guidance where an assessor needs a document. It generates evidence packages and remediation commands for every automated finding.
+                    Phase 1 is in force: DoW contracts require self-assessment against the Level 2 practices. Phase 2 C3PAO assessment is suspended pending review, so the live obligation today is documenting your own posture. AuditKit assesses all 110 Level 2 practices across your AWS, Azure and GCP environments, and folds in Microsoft 365 findings imported from ScubaGear: automated checks where your cloud configuration can prove it, the vulnerability practices answered from what Inspector, Defender for Cloud or VM Manager actually reaches and how quickly findings are closed, and structured evidence guidance where an assessor needs a document. It generates evidence packages and remediation commands for every automated finding.
                 </p>
                 <p class="mb-0">
                     The <a href="/community.html">Community Edition</a> reports all 110 practices for free, each gap with its fix and the console screen to photograph. AuditKit turns those findings into the artifact your assessor asks for: evidence packages, deeper automated coverage, multi-account scanning, and continuous monitoring.
@@ -393,7 +394,7 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
 
                 <div class="card card-flex">
                     <h3>Evidence Packages</h3>
-                    <p>Generates auditor-ready ZIP files with configuration dumps, logs and documentation in the format auditors expect, with a folder per control holding the finding, a console link and a step-by-step evidence guide.</p>
+                    <p>Generates auditor-ready ZIP files with configuration dumps, logs and documentation in the format auditors expect, with a folder per control holding the finding, a console link and a step-by-step evidence guide, plus a vulnerability-management appendix listing which assets your scanner reaches and which findings are past their remediation window.</p>
                     <div class="card-command">./auditkit-pro evidence-package -framework soc2</div>
                 </div>
 

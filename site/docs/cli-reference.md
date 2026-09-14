@@ -550,6 +550,28 @@ auditkit-pro scan -provider gcp -framework soc2  # Includes GKE checks
 auditkit-pro scan -provider gcp -framework soc2  # Includes Vertex AI checks
 ```
 
+### Vulnerability Remediation Evidence
+
+Both editions answer RA.L2-3.11.2 and PCI 11.3.1 from what Inspector, Defender
+for Cloud or VM Manager actually reaches. Pro adds remediation ageing
+(RA.L2-3.11.3), a configurable policy, third-party scan import and the
+`vulnerability-management/` folder in the evidence package.
+
+```bash
+# Measure open findings against your own remediation windows
+auditkit-pro scan -provider aws -framework cmmc -vuln-policy vuln-policy.yaml
+
+# Evaluate a Nessus, Trivy or Grype report against the same policy
+auditkit-pro integrate -source nessus -file scan.nessus
+auditkit-pro integrate -source trivy -file trivy.json
+auditkit-pro integrate -source grype -file grype.json
+```
+
+`-vuln-policy` is also read from `./vuln-policy.yaml`, `~/.auditkit/` and
+`/etc/auditkit/`. Without one, the built-in policy applies: critical within 30
+days, high 90, medium 180, and a scan is stale after 30. The report names the
+policy it measured against.
+
 ---
 
 ## Getting Help

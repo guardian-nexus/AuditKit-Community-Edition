@@ -147,6 +147,9 @@ Everything in the Community column runs from this repository with no licence key
 
 First stable release - a correctness and accuracy pass. No framework was dropped; all 110 CMMC practices are still reported.
 
+New:
+- Vulnerability scanning evidence: `RA.L2-3.11.2` and `PCI-11.3.1` are answered from what Amazon Inspector, Defender for Cloud or GCP VM Manager actually reaches - every in-scope asset, scanned within 30 days - rather than a note to document a procedure. Remediation ageing (`RA.L2-3.11.3`), a configurable policy and Nessus/Trivy/Grype import are Pro
+
 Fixes:
 - A check with nothing in scope reports INFO, not PASS, so an empty or wrongly scoped account no longer reads as compliant
 - A denied API call reports ERROR, not a compliance FAIL (12 CMMC checks)

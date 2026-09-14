@@ -22,14 +22,14 @@ Think of AuditKit as doing the heavy lifting on infrastructure checks, so you ca
 
 ### Is this a security scanner?
 
-No. AuditKit checks **compliance controls**, not vulnerabilities. 
+No. AuditKit checks **compliance controls**; it does not look for vulnerabilities itself.
 
-For security scanning, use tools like:
-- **Prowler** - AWS security scanner
+It does read what your vulnerability scanner found. The vulnerability practices (CMMC RA.L2-3.11.2, PCI DSS 11.3.1) are answered from what Amazon Inspector, Microsoft Defender for Cloud or GCP VM Manager actually reaches: every in-scope asset, scanned recently, or a named gap. Pro also measures open findings against a remediation window (RA.L2-3.11.3) and imports Nessus, Trivy and Grype reports for the assets the cloud scanner does not cover.
+
+For security scanning itself, use tools like:
+- **Prowler** - AWS security scanner (AuditKit imports its results to broaden NIST 800-53 coverage)
 - **Scout Suite** - Multi-cloud security auditing
 - **Trivy** - Container vulnerability scanning
-
-AuditKit can import Prowler results to broaden NIST 800-53 coverage.
 
 ### What's the difference between Free and Pro?
 

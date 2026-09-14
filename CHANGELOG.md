@@ -4,6 +4,21 @@ All notable changes to AuditKit will be documented in this file.
 
 ## [1.0.0] - 2026-09-14
 
+### Added
+- Vulnerability scanning evidence. `RA.L2-3.11.2` and `PCI-11.3.1` are answered
+  from what the cloud's own scanner actually reaches - Amazon Inspector, Microsoft
+  Defender for Cloud and GCP VM Manager - instead of asking the reader to document
+  a procedure. The check inventories the account's instances, containers and
+  functions, asks the scanner which of them it covers and how recently each was
+  scanned, and fails only on a genuine gap: an in-scope asset the scanner has never
+  heard of, or one whose last scan is older than 30 days. Assets the operator
+  scoped out, or that the scanner cannot support (an unsupported OS, a stopped
+  instance), are counted and listed, never failed. A denied API call is ERROR, not
+  PASS. Findings are not read and CVSS is not re-scored; the check consumes the
+  provider's own severity. Remediation ageing against a policy window
+  (`RA.L2-3.11.3`), a configurable policy, third-party scan import and the evidence
+  appendix are AuditKit Pro.
+
 ### Removed
 - The single-cloud binaries `auditkit-aws`, `auditkit-azure` and `auditkit-gcp`.
   They were built from separate, much simpler code that printed the scanner's

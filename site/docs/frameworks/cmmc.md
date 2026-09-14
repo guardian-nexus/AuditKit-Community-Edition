@@ -270,7 +270,7 @@ All technical controls across:
 - Encryption
 - Logging and monitoring
 - Backup and recovery
-- Vulnerability management
+- Vulnerability management: RA.L2-3.11.2 is answered from what Inspector, Defender for Cloud or VM Manager actually reaches (every in-scope asset, scanned recently, or a named gap); Pro also answers RA.L2-3.11.3 by measuring open findings against a remediation window and imports Nessus, Trivy and Grype scans
 - Patch management
 - Access controls
 - Security groups/firewalls
