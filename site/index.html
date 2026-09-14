@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AuditKit - Multi-Cloud Compliance Scanning | SOC2, PCI-DSS, CMMC, HIPAA</title>
-    <meta name="description" content="Find every compliance gap before your auditor does. 350+ automated checks across SOC2, PCI-DSS, CMMC, HIPAA, and more. CLI scanner + desktop GUI. $297/month vs $50K+ consultants.">
+    <meta name="description" content="Find every compliance gap before your auditor does. 671 controls across SOC2, PCI-DSS, CMMC, HIPAA, and more. CLI scanner + desktop GUI. $297/month vs $50K+ consultants.">
     <link rel="icon" type="image/svg+xml" href="./auditkit-logo.svg">
     <meta property="og:title" content="AuditKit — Find Every Compliance Gap Before Your Auditor Does">
-    <meta property="og:description" content="350+ automated checks across SOC2, PCI-DSS, CMMC, HIPAA. CLI scanner + desktop GUI. $297/month vs $50K+ consultants.">
+    <meta property="og:description" content="671 controls across SOC2, PCI-DSS, CMMC, HIPAA. CLI scanner + desktop GUI. $297/month vs $50K+ consultants.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://auditkit.io/">
     <meta property="og:image" content="https://auditkit.io/examples/screenshots/auditkitwebgui-dashboard.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="AuditKit — Find Every Compliance Gap Before Your Auditor Does">
-    <meta name="twitter:description" content="350+ automated checks across SOC2, PCI-DSS, CMMC, HIPAA. CLI scanner + desktop GUI. $297/month vs $50K+ consultants.">
+    <meta name="twitter:description" content="671 controls across SOC2, PCI-DSS, CMMC, HIPAA. CLI scanner + desktop GUI. $297/month vs $50K+ consultants.">
     <meta name="twitter:image" content="https://auditkit.io/examples/screenshots/auditkitwebgui-dashboard.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,16 +68,16 @@
 
             <div class="grid-4 mb-3" style="max-width: 900px; margin-left: auto; margin-right: auto;">
                 <div class="stat">
-                    <div class="stat-number">350+</div>
-                    <div class="stat-label">Automated Checks</div>
+                    <div class="stat-number">671</div>
+                    <div class="stat-label">Controls</div>
                 </div>
                 <div class="stat">
                     <div class="stat-number">10</div>
                     <div class="stat-label">Compliance Frameworks</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number">4</div>
-                    <div class="stat-label">Cloud Providers</div>
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Clouds, plus Microsoft 365 import</div>
                 </div>
                 <div class="stat">
                     <div class="stat-number">30 min</div>
@@ -180,7 +180,7 @@
                     <h3>CLI Scanner</h3>
                     <p>Terminal-based scanning for engineers. Run compliance checks from your command line, integrate with CI/CD pipelines, automate with cron. Works in air-gapped environments with zero external dependencies.</p>
                     <ul class="feature-list">
-                        <li>350+ automated checks across 10 frameworks</li>
+                        <li>671 controls across 10 frameworks</li>
                         <li>AWS, Azure, GCP (Microsoft 365 via ScubaGear import)</li>
                         <li>PDF, HTML, JSON, CSV output</li>
                         <li>Fix scripts for every finding</li>
@@ -197,7 +197,7 @@
                         <li>Scan history with drift comparison between any two scans</li>
                         <li>Evidence packages, generated and downloaded in the browser</li>
                         <li>Multi-account scanning across an AWS Organization or OU</li>
-                        <li>ScubaGear and Prowler import for Microsoft 365</li>
+                        <li>ScubaGear import for Microsoft 365; Prowler import for AWS, Azure and GCP</li>
                     </ul>
                     <div class="code-inline">./auditkit-pro-desktop --port 1337</div>
                 </div>
@@ -300,8 +300,8 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
   &rarr; Remediation: aws iam enable-mfa-device --user-name admin-user
   &rarr; Evidence needed: IAM console screenshot showing MFA enabled
 
-<span class="pass">&#10003; PASS</span> | CC6.1 | CloudTrail Logging Enabled
-  &rarr; Frameworks: SOC2 (CC6.1), PCI-DSS (10.2.2), CMMC (AU.L2-3.3.1)
+<span class="pass">&#10003; PASS</span> | CC7.1 | CloudTrail Logging Enabled
+  &rarr; Frameworks: SOC2 (CC7.1), PCI-DSS (10.2.1), HIPAA (164.312(b))
 
 <span class="comment"># 3. Fix issues and re-scan (unlimited)</span>
 ./auditkit-pro scan -provider aws -framework soc2 -verbose
@@ -341,8 +341,8 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
                     <div class="stat-label">Savings vs Consultants</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-number">4</div>
-                    <div class="stat-label">Cloud Providers</div>
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Clouds, plus Microsoft 365 import</div>
                 </div>
             </div>
 
@@ -451,7 +451,6 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
 &#9474;   &#9474;   &#9500;&#9472;&#9472; console-url.txt         <span class="comment"># Direct link</span>
 &#9474;   &#9474;   &#9492;&#9472;&#9472; remediation.sh          <span class="comment"># Fix script</span>
 &#9500;&#9472;&#9472; <span class="command">04-passed-controls/</span>             <span class="comment"># Evidence for passed controls</span>
-&#9500;&#9472;&#9472; <span class="command">05-manual-controls/</span>             <span class="comment"># Manual verification needed</span>
 &#9492;&#9472;&#9472; <span class="command">05-manual-controls/</span>             <span class="comment"># Manual verification needed</span>
 
 <span class="comment"># Pass an output path ending in .zip to get a single archive instead:</span>
@@ -552,7 +551,7 @@ mkdir -p ~/.auditkit-pro &amp;&amp; cp license.lic ~/.auditkit-pro/license.lic
         <div class="container text-center">
             <h2>Know Exactly Where You Stand in 30 Minutes</h2>
             <p class="text-lg mb-3" style="color: var(--slate-300);">
-                350+ automated checks. 10 compliance frameworks. Specific remediation for every finding. Evidence packages your auditor expects. CLI + Desktop GUI included.
+                671 controls. 10 compliance frameworks. Specific remediation for every finding. Evidence packages your auditor expects. CLI + Desktop GUI included.
             </p>
             <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="btn btn-primary btn-lg">
                 Start 14-Day Free Trial

@@ -263,7 +263,7 @@ auditkit version
 
 **Expected output:**
 ```
-AuditKit v0.8.6 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
+AuditKit v0.8.7 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
 ```
 
 ### Check Cloud CLI Tools
@@ -543,7 +543,6 @@ auditkit-pro scan -provider aws -framework cmmc
 
 **Note:** Pro version uses `auditkit-pro` command, not `auditkit`
 
-**Legacy method (deprecated):** The old `export AUDITKIT_PRO_LICENSE=AKP-...` environment variable still works but is deprecated in favor of the `.lic` file.
 
 **[Pro feature details →](../pricing.md)**
 

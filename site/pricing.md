@@ -108,9 +108,9 @@ Free to find your gaps. Paid for the evidence package, multi-account scanning, a
 | **Cloud Providers** |
 | AWS | Full support | Full support |
 | Azure | Full support | Full support |
-| Total controls assessed | 219 AWS, 174 Azure, 133 GCP | 317 AWS, 322 Azure, 259 GCP |
+| Total controls assessed | 228 AWS, 277 Azure, 168 GCP | 315 AWS, 395 Azure, 285 GCP |
 | GCP Core | Full support | Full support |
-| GCP Advanced | 5 basic GKE checks (CIS GCP 8.1-8.5) | Adds GKE deep security + Vertex AI (20 checks) |
+| GCP Advanced | 5 basic GKE checks (CIS GKE benchmark) | Adds GKE deep security + Vertex AI (20 checks) |
 | M365 (ScubaGear) | Full support | Full support |
 | **Frameworks** |
 | SOC2 Type II | 38 criteria | 38 criteria |
@@ -118,7 +118,7 @@ Free to find your gaps. Paid for the evidence package, multi-account scanning, a
 | CMMC Level 1 | 5 of 17 practices automated | 7 of 17 practices automated |
 | CMMC Level 2 | All 110 L1 + L2 practices reported for evidence tracking | All 110 assessed: automated checks where the cloud configuration can prove it, evidence guidance elsewhere |
 | NIST 800-53 Rev 5 | 149 controls | 151 controls |
-| HIPAA | 18 safeguards, derived | 18 safeguards, derived |
+| HIPAA | 30 safeguards, derived | 30 safeguards, derived |
 | **Scanning** |
 | Single account/project | Yes | Yes |
 | Multi-account (AWS Orgs) | - | Yes |

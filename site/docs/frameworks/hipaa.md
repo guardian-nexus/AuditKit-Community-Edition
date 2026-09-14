@@ -10,8 +10,8 @@ Health Insurance Portability and Accountability Act guide.
 
 **Who needs it:** Healthcare providers, health plans, healthcare clearinghouses, business associates
 **Status in AuditKit:** Production - Technical and part of Administrative Safeguards
-**Coverage:** 27 of the 75 Security Rule safeguards carry an automated check on AWS (12 of 12 Technical, 15 of 31 Administrative)
-**What's not covered:** Physical safeguards (164.310), organizational requirements (164.314) and policies/documentation (164.316); 16 of the 31 administrative safeguards
+**Coverage:** 30 of the 75 Security Rule safeguards are reached on AWS, Azure and GCP (12 of 12 Technical, 18 of 31 Administrative)
+**What's not covered:** Physical safeguards (164.310), organizational requirements (164.314) and policies/documentation (164.316); 13 of the 31 administrative safeguards
 
 ---
 

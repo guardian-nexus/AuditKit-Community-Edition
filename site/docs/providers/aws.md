@@ -6,15 +6,15 @@ What AuditKit scans in Amazon Web Services.
 
 ## Overview
 
-**Coverage:** 219 controls across AWS services  
+**Coverage:** 228 controls across AWS services  
 **Supported in:** Free and Pro versions
 
 **Supported frameworks:**
 - SOC2 Type II (38 criteria)
-- PCI-DSS v4.0.1 (69 requirements)
-- CMMC Level 1 and Level 2: all 110 practices reported; 13 of the 17 Level 1 practices automated, Level 2 automated in Pro
+- PCI-DSS v4.0.1 (71 requirements)
+- CMMC Level 1 and Level 2: all 110 practices reported; 5 of the 17 Level 1 practices reach a verdict on AWS, Level 2 automated in Pro
 - NIST 800-53 Rev 5 (149 controls, derived via crosswalk)
-- HIPAA (18 safeguards, derived via crosswalk)
+- HIPAA (30 safeguards, derived via crosswalk)
 
 ---
 

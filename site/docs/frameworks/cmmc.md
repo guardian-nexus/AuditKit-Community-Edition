@@ -68,7 +68,7 @@ SPRS score postings and annual affirmations.
 
 ### The 17 Practices
 
-AuditKit reports all 17 practices. 13 carry an automated check on AWS and Azure, 9 on GCP; the rest are reported for evidence tracking:
+AuditKit reports all 17 practices. 5 reach a PASS or FAIL verdict on AWS, 4 on Azure and GCP; the rest are reported for evidence tracking:
 
 #### Access Control (AC)
 1. **AC.L1-3.1.1** - Limit system access to authorized users
@@ -105,30 +105,22 @@ level and NIST SP 800-171 Rev 2 requirement number.
 
 ### What AuditKit Checks (Level 1)
 
-**Queried automatically from your cloud configuration (13 of the 17 on AWS and Azure, 9 of 17 on GCP):**
+**Reach a PASS or FAIL verdict from your cloud configuration (5 of the 17 on AWS, 4 on Azure and GCP):**
 
-- IAM password policy configuration
-- MFA enforcement
-- Access key rotation
-- CloudTrail/logging enabled
-- Security group rules
-- Public access on storage
-- Encryption at rest
-- Patch management
+- AC.L1-3.1.1 - Limit system access to authorized users (IAM users and stale access keys)
+- AC.L1-3.1.2 - Limit access to the transactions and functions authorized users may execute (IAM policies and role assignments)
+- IA.L1-3.5.1 - Identify system users, processes and devices (directory and user inventory)
+- IA.L1-3.5.2 - Authenticate users, processes and devices (MFA; AWS only)
+- SC.L1-3.13.1 - Monitor, control and protect communications at external boundaries (security groups, NSGs, firewall rules)
 
-**No automated check - manual verification required (4 practices):**
+**Reported for evidence (the other 12):**
 
-- AC.L1-3.1.20 - Verify and control connections to external systems
-- AC.L1-3.1.22 - Control publicly posted information
-- SI.L1-3.14.4 - Update malicious code protection mechanisms
-- SI.L1-3.14.5 - Perform periodic and real-time scans
-- Physical security measures
-- Visitor escort procedures
-- Media sanitization procedures
-- Network monitoring processes
-- Vulnerability scanning schedule
-- Security alert response
-- System update procedures
+Every other Level 1 practice appears in the report with what an assessor will
+ask to see. Several run a check and report what they found without deciding -
+encryption at rest, public access on storage, logging, patching - because the
+practice asks for a process that configuration alone cannot prove. The rest are
+physical, media and personnel practices no cloud API can see: visitor escort,
+media sanitization, malicious-code protection and its updates, periodic scans.
 
 ### Running Level 1 Scan
 
@@ -269,7 +261,7 @@ Level 2 includes all 17 Level 1 practices plus 93 additional practices across 14
 
 ### What AuditKit Checks (Level 2)
 
-**Queried automatically from your cloud configuration (42 of the 110); the remaining 68 are
+**Reach a PASS or FAIL verdict from your cloud configuration (26 of the 110 on AWS); the remaining 84 are
 assessed as structured evidence guidance, telling you what an assessor needs to see:**
 All technical controls across:
 
@@ -285,7 +277,7 @@ All technical controls across:
 - Key rotation
 - Public access controls
 
-**Structured evidence guidance (68 practices):**
+**Structured evidence guidance (84 practices):**
 Organizational controls:
 
 - Policies and procedures
@@ -337,7 +329,7 @@ auditkit-pro evidence -output cmmc-evidence.html
 | **Cost (AuditKit)** | Free | $297/month |
 | **Cost (Assessment)** | $0 | $0 under Phase 1; $25,000-$150,000 if C3PAO resumes |
 | **Timeline** | 2-4 weeks | 3-6 months |
-| **Automated Checks** | 13 of 17 | 42 of 110 query the cloud |
+| **Automated Checks** | 5 of 17 reach a verdict (AWS) | 26 of 110 reach a verdict (AWS) |
 | **Manual Docs** | 4 | 68 assessed as evidence guidance |
 | **Required For** | All DoW contracts | CUI contracts |
 | **Deadline** | Now | Now (Phase 1, self-assessment) |
@@ -348,7 +340,7 @@ auditkit-pro evidence -output cmmc-evidence.html
 
 **CMMC Level 2 is based on NIST SP 800-171 Rev 2**
 
-AuditKit maps all 110 CMMC Level 2 practices to their corresponding NIST SP 800-171 controls.
+AuditKit maps all 110 CMMC practices to their corresponding NIST SP 800-171 controls.
 
 **Example mapping:**
 

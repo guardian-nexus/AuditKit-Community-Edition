@@ -53,7 +53,7 @@
 <strong>Auditor:</strong> CPA firm<br />
 <strong>Cost:</strong> $15,000 - $30,000 for audit<br />
 <strong>Timeline:</strong> 3-6 months prep + 3-12 month observation period<br />
-<strong>AuditKit coverage:</strong> 38 of the 43 SOC 2 criteria on AWS (37 on Azure, 32 on GCP)</p>
+<strong>AuditKit coverage:</strong> 38 of the 43 SOC 2 criteria on AWS (38 on Azure, 32 on GCP)</p>
 <h2>Trust Services Criteria</h2>
 <p>SOC2 is based on 5 Trust Services Criteria:</p>
 <h3>Security (Required)</h3>
@@ -99,7 +99,7 @@
   Fix: aws s3api put-public-access-block --bucket BUCKET_NAME
 </div>
 <h3>CC7 - System Operations</h3>
-<p><strong>Most automated controls - AuditKit automates 12 checks</strong></p>
+<p><strong>Most automated controls - AuditKit automates 20 checks</strong></p>
 <ul>
 <li>CC7.1: CloudTrail/logging enabled</li>
 <li>CC7.2: Log retention and monitoring</li>
@@ -109,7 +109,7 @@
 <h3>CC8 - Change Management</h3>
 <p>Configuration management, system components, data</p>
 <ul>
-<li>CC8.1: Encryption at rest (S3, RDS, disks)</li>
+<li>CC8.1: Change management (AMI management, function versioning)</li>
 </ul>
 <h3>CC9 - Risk Mitigation</h3>
 <p>System changes, incident management, business continuity</p>
@@ -169,9 +169,9 @@ auditkit scan -provider azure -framework soc2
 auditkit scan -provider gcp -framework soc2
 
 # All providers
-auditkit scan -provider aws -framework soc2 -output aws-soc2.pdf
-auditkit scan -provider azure -framework soc2 -output azure-soc2.pdf
-auditkit scan -provider gcp -framework soc2 -output gcp-soc2.pdf
+auditkit scan -provider aws -framework soc2 -format pdf -output aws-soc2.pdf
+auditkit scan -provider azure -framework soc2 -format pdf -output azure-soc2.pdf
+auditkit scan -provider gcp -framework soc2 -format pdf -output gcp-soc2.pdf
 
 # Generate evidence tracker
 # Evidence tracker (covers every framework; -framework and -format are not honoured here)
@@ -220,7 +220,7 @@ auditkit evidence -output evidence.html
 <li>CloudTrail not enabled (CC7.1)</li>
 <li>Weak password policies (CC6.1)</li>
 <li>No log retention (CC7.2)</li>
-<li>Encryption not enabled (CC8.1)</li>
+<li>Encryption not enabled (CC6.3)</li>
 <li>Access keys not rotated (CC6.1)</li>
 <li>No backup testing (CC7.3)</li>
 </ol>

@@ -20,7 +20,7 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 ## Supported Benchmarks
 
 ### AWS Foundations Benchmark
-**Status:** Production (v0.8.6)
+**Status:** Production (v0.8.7)
 **Controls:** 158 unique AWS controls implemented
 **Command:** `./auditkit scan -provider aws -framework cis-aws`
 

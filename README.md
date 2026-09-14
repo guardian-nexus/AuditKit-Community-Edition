@@ -112,7 +112,7 @@ scanning, or a desktop interface.
 |---|---|---|
 | **Cloud providers** | AWS, Azure, GCP scanned; M365 via ScubaGear import | Same, plus Azure Arc |
 | **Controls assessed** | 228 AWS, 277 Azure, 168 GCP | 315 AWS, 395 Azure, 285 GCP |
-| **SOC2 Type II** | 38, 37, 32 criteria | 38, 38, 36 criteria |
+| **SOC2 Type II** | 38, 38, 32 criteria | 38, 38, 36 criteria |
 | **PCI DSS v4.0.1** | 71 requirements | 77 requirements |
 | **CMMC Level 1** | 5 of 17 practices automated | 7 of 17 practices automated |
 | **CMMC Level 2** | All 110 practices reported for evidence | All 110 reported: 26 reach a pass or fail, 84 carry evidence guidance |
@@ -271,7 +271,6 @@ cp ~/Downloads/license.lic ~/.auditkit-pro/license.lic
 # Browser opens automatically to http://localhost:1337
 # Change port if needed: ./auditkit-pro-desktop --port 8080
 
-# Legacy method (deprecated): export AUDITKIT_PRO_LICENSE="AKP-..."
 ```
 
 **[Learn More →](https://auditkit.io/)** • **[Start 14-Day Trial →](https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01)**
@@ -335,9 +334,9 @@ go build ./cmd/auditkit
 
 ### Security Hardening (CIS Benchmarks)
 ```bash
-./auditkit scan -provider aws -framework cis-aws      # CIS AWS (158 controls)
-./auditkit scan -provider azure -framework cis-azure  # CIS Azure (108 controls)
-./auditkit scan -provider gcp -framework cis-gcp      # CIS GCP (71 controls)
+./auditkit scan -provider aws -framework cis-aws      # CIS AWS (70 controls)
+./auditkit scan -provider azure -framework cis-azure  # CIS Azure (127 controls)
+./auditkit scan -provider gcp -framework cis-gcp      # CIS GCP (93 controls)
 ```
 
 ### Report Generation

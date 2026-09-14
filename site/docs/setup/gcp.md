@@ -114,7 +114,6 @@ includedPermissions:
 - bigquery.datasets.list
 - storage.buckets.get
 
-(And add `gcloud services enable container.googleapis.com` and `gcloud services enable bigquery.googleapis.com` to the API-enablement block at lines 302-308.)
 - storage.buckets.getIamPolicy
 - storage.buckets.list
 - compute.instances.get
@@ -312,6 +311,8 @@ gcloud services enable storage.googleapis.com
 gcloud services enable sqladmin.googleapis.com
 gcloud services enable cloudkms.googleapis.com
 gcloud services enable logging.googleapis.com
+gcloud services enable container.googleapis.com
+gcloud services enable bigquery.googleapis.com
 ```
 
 ---
@@ -391,13 +392,13 @@ gcloud config get-value project
 **Free version includes:**
 - Cloud Storage (6 checks)
 - Cloud IAM (12 checks)
-- Compute Engine (12 checks)
-- VPC Networks (11 checks)
+- Compute Engine (11 checks)
+- VPC Networks (12 checks)
 - Cloud SQL (10 checks)
 - Cloud KMS (2 checks)
 - Cloud Logging (4 checks)
 - GKE (5 CIS checks)
-- BigQuery (2 CIS checks)
+- BigQuery (3 CIS checks)
 
 **Pro version adds:**
 - Deep GKE Security (10 further checks, 15 in total)

@@ -48,14 +48,14 @@
         <div class="container-prose">
 <p>What AuditKit scans in Microsoft Azure.</p>
 <h2>Overview</h2>
-<p><strong>Coverage:</strong> 174 controls across Azure services<br />
+<p><strong>Coverage:</strong> 277 controls across Azure services<br />
 <strong>Supported in:</strong> Free and Pro versions</p>
 <p><strong>Supported frameworks:</strong>
-- SOC2 Type II (37 criteria)
-- PCI-DSS v4.0.1 (59 requirements)
+- SOC2 Type II (38 criteria)
+- PCI-DSS v4.0.1 (63 requirements)
 - CMMC Level 1 and Level 2: all 110 practices reported; Level 1 automated, Level 2 automated in Pro
-- NIST 800-53 Rev 5 (83 controls, derived via crosswalk)
-- HIPAA (18 safeguards, derived via crosswalk)</p>
+- NIST 800-53 Rev 5 (144 controls, derived via crosswalk)
+- HIPAA (30 safeguards, derived via crosswalk)</p>
 <h2>Covered Services</h2>
 <h3>Storage Accounts</h3>
 <p><strong>Controls checked:</strong> 13</p>
@@ -405,13 +405,13 @@ az network private-endpoint create \
 <strong>CC4 - Monitoring:</strong> 2 criteria<br />
 <strong>CC5 - Control Activities:</strong> 3 criteria<br />
 <strong>CC6 - Logical Access:</strong> 8 criteria<br />
-<strong>CC7 - System Operations:</strong> 4 of 5 criteria<br />
+<strong>CC7 - System Operations:</strong> 5 of 5 criteria<br />
 <strong>CC8 - Change Management:</strong> 1 criterion<br />
 <strong>CC9 - Risk Mitigation:</strong> 2 criteria<br />
 <strong>A1 - Availability:</strong> 3 criteria<br />
 <strong>C1 - Confidentiality:</strong> 2 criteria<br />
 <strong>PI1 - Processing Integrity:</strong> no automated Azure check (reported as MANUAL)</p>
-<h3>PCI-DSS v4.0.1 (59 requirements with automated checks)</h3>
+<h3>PCI-DSS v4.0.1 (63 requirements with automated checks)</h3>
 <p>Automated checks map into all twelve requirement families (1 through 12). Requirements with no automated check are still reported and marked "No automated check covers this control".</p>
 <h3>CMMC Level 1 (17 practices, 13 automated)</h3>
 <p><strong>Access Control (AC):</strong> 4 practices<br />

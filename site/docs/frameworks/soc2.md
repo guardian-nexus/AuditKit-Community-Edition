@@ -12,7 +12,7 @@ System and Organization Controls (SOC) 2 framework guide.
 **Auditor:** CPA firm  
 **Cost:** $15,000 - $30,000 for audit  
 **Timeline:** 3-6 months prep + 3-12 month observation period  
-**AuditKit coverage:** 38 of the 43 SOC 2 criteria on AWS (37 on Azure, 32 on GCP)
+**AuditKit coverage:** 38 of the 43 SOC 2 criteria on AWS (38 on Azure, 32 on GCP)
 
 ---
 
@@ -82,7 +82,7 @@ Policies and procedures to ensure directives are carried out
 ```
 
 ### CC7 - System Operations
-**Most automated controls - AuditKit automates 12 checks**
+**Most automated controls - AuditKit automates 20 checks**
 
 - CC7.1: CloudTrail/logging enabled
 - CC7.2: Log retention and monitoring
@@ -92,7 +92,7 @@ Policies and procedures to ensure directives are carried out
 ### CC8 - Change Management
 Configuration management, system components, data
 
-- CC8.1: Encryption at rest (S3, RDS, disks)
+- CC8.1: Change management (AMI management, function versioning)
 ### CC9 - Risk Mitigation
 System changes, incident management, business continuity
 
@@ -159,9 +159,9 @@ auditkit scan -provider azure -framework soc2
 auditkit scan -provider gcp -framework soc2
 
 # All providers
-auditkit scan -provider aws -framework soc2 -output aws-soc2.pdf
-auditkit scan -provider azure -framework soc2 -output azure-soc2.pdf
-auditkit scan -provider gcp -framework soc2 -output gcp-soc2.pdf
+auditkit scan -provider aws -framework soc2 -format pdf -output aws-soc2.pdf
+auditkit scan -provider azure -framework soc2 -format pdf -output azure-soc2.pdf
+auditkit scan -provider gcp -framework soc2 -format pdf -output gcp-soc2.pdf
 
 # Generate evidence tracker
 # Evidence tracker (covers every framework; -framework and -format are not honoured here)
@@ -217,7 +217,7 @@ Based on SOC2 audits, most common technical failures:
 3. CloudTrail not enabled (CC7.1)
 4. Weak password policies (CC6.1)
 5. No log retention (CC7.2)
-6. Encryption not enabled (CC8.1)
+6. Encryption not enabled (CC6.3)
 7. Access keys not rotated (CC6.1)
 8. No backup testing (CC7.3)
 

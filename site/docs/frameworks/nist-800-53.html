@@ -53,7 +53,7 @@
 <strong>Certification:</strong> Not a certification itself (used by FedRAMP, FISMA)<br />
 <strong>Total controls:</strong> 1,196 controls<br />
 <strong>AuditKit coverage:</strong> 95 automated technical controls, reached through the SOC 2 / PCI / CMMC crosswalk<br />
-<strong>What's not covered:</strong> the remaining 1,101 organizational and policy controls</p>
+<strong>What's not covered:</strong> the remaining 1,047 organizational and policy controls</p>
 <h2>How AuditKit Uses 800-53</h2>
 <p><strong>Framework crosswalk:</strong> AuditKit maps existing SOC2, PCI-DSS, and CMMC controls to NIST 800-53 control families.</p>
 <p><strong>Example:</strong></p>
@@ -167,7 +167,7 @@ Maps to NIST 800-53:
 <li>Incident detection</li>
 <li>Backup and recovery</li>
 </ul>
-<p><strong>What AuditKit doesn't cover (~850 controls):</strong></p>
+<p><strong>What AuditKit doesn't cover (about 1,050 controls):</strong></p>
 <ul>
 <li>Organizational policies</li>
 <li>Training programs</li>
@@ -203,19 +203,19 @@ auditkit scan -provider aws -framework 800-53 -format pdf -output nist-report.pd
 <p>NIST 800-53 is used by <strong>FedRAMP</strong> (Federal Risk and Authorization Management Program) for cloud services.</p>
 <h3>FedRAMP LOW</h3>
 <ul>
-<li>~125 controls</li>
+<li>149 controls</li>
 <li>Low-impact data</li>
 <li>Public information</li>
 </ul>
 <h3>FedRAMP MODERATE</h3>
 <ul>
-<li>~325 controls</li>
+<li>287 controls</li>
 <li>Moderate-impact data</li>
 <li>Most common baseline</li>
 </ul>
 <h3>FedRAMP HIGH</h3>
 <ul>
-<li>~421 controls</li>
+<li>370 controls</li>
 <li>High-impact data</li>
 <li>National security systems</li>
 </ul>
@@ -233,7 +233,7 @@ auditkit scan -provider aws -framework 800-53 -format pdf -output nist-report.pd
 <tr>
 <td>NIST 800-53</td>
 <td>1,196</td>
-<td>95 (8%)</td>
+<td>149 (12%)</td>
 </tr>
 <tr>
 <td>SOC2</td>
@@ -243,7 +243,7 @@ auditkit scan -provider aws -framework 800-53 -format pdf -output nist-report.pd
 <tr>
 <td>PCI-DSS</td>
 <td>312 requirements</td>
-<td>69 (22%)</td>
+<td>71 (23%)</td>
 </tr>
 <tr>
 <td>CMMC Level 2</td>
@@ -258,7 +258,7 @@ auditkit scan -provider aws -framework 800-53 -format pdf -output nist-report.pd
 <p><strong>Need:</strong> NIST 800-53 compliance for FISMA</p>
 <p><strong>AuditKit approach:</strong>
 1. Scan for automated technical controls (~150)
-2. Document organizational controls manually (~850)
+2. Document organizational controls manually (about 1,050)
 3. Use scan results as evidence for technical controls
 4. Complete remaining documentation</p>
 <h3>FedRAMP Applicant</h3>

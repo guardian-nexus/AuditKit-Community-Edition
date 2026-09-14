@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community Edition - AuditKit Open Source Compliance Scanner</title>
-    <meta name="description" content="AuditKit Community Edition is a free, open-source multi-cloud compliance scanner. Apache 2.0 licensed. Scan AWS, Azure, GCP, and M365 for SOC2, PCI-DSS, CMMC, HIPAA, and more.">
+    <meta name="description" content="AuditKit Community Edition is a free, open-source multi-cloud compliance scanner. Apache 2.0 licensed. Scan AWS, Azure and GCP - and import Microsoft 365 findings from ScubaGear - for SOC2, PCI-DSS, CMMC, HIPAA, and more.">
     <link rel="icon" type="image/svg+xml" href="./auditkit-logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -90,9 +90,9 @@ cd AuditKit-Community-Edition/scanner && go build ./cmd/auditkit
   <span class="label">Screenshot:</span>  IAM &rarr; Users &rarr; Security credentials &rarr; Show MFA enabled
   <span class="label">Console URL:</span> <span class="url">https://console.aws.amazon.com/iam/home#/users</span>
 
-<span class="pass">&#10003; PASS</span> | <span class="framework">CC6.1</span> | CloudTrail Logging Enabled
+<span class="pass">&#10003; PASS</span> | <span class="framework">CC7.1</span> | CloudTrail Logging Enabled
   <span class="label">Evidence:</span>    CloudTrail enabled in all regions, logs encrypted
-  <span class="label">Frameworks:</span>  SOC2 (CC6.1), PCI-DSS (10.2.2), CMMC (AU.L2-3.3.1)
+  <span class="label">Frameworks:</span>  SOC2 (CC7.1), PCI-DSS (10.2.1), HIPAA (164.312(b))
 
 <span class="comment"># Automated Check Score: 27.4% (23/84 passed)</span>
 <span class="comment"># Only 84 of 189 total controls are automated; the rest need evidence you collect</span>

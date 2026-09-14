@@ -129,7 +129,7 @@ Checks connectivity status of all Arc-enabled servers:
 - **PASS** - Agent connected and reporting
 - **FAIL** - Agent disconnected or expired
 
-**Frameworks:** PCI 10.2.1, SOC2 CC7.1, ISO 27001 A.12.4, CMMC AU.L2-3.3.1
+**Frameworks:** PCI 10.1, SOC2 CC7.1, ISO 27001 A.12.4, CMMC AU.L2-3.3.1
 
 ### 2. Defender for Cloud Assessments
 

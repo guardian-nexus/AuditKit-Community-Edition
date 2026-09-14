@@ -10,7 +10,7 @@ The NIST Cybersecurity Framework, version 2.0.
 
 **Who needs it:** Anyone who wants a common language for security posture; often asked for by insurers, boards and enterprise customers
 **Status in AuditKit:** Production
-**Coverage:** 65 subcategories on GCP, 65 on AWS and 62 on Azure, out of the 106 subcategories a CSF scan lists (71 are in the crosswalk)
+**Coverage:** 65 subcategories on GCP, 67 on AWS and 65 on Azure, out of the 106 subcategories a CSF scan lists (71 are in the crosswalk)
 **How it works:** Derived from your SOC2, PCI DSS and CMMC results through NIST 800-53
 
 ---
@@ -74,7 +74,7 @@ consequence of the SOC2, PCI DSS and CMMC scanning you already ran.
 | **Govern** (GV) | 12 | Only the parts a configuration scan can see; the strategy, roles and policy subcategories are not covered |
 
 71 subcategories are in the crosswalk. How many reach your report depends on the
-provider: 65 on AWS, 62 on Azure, 63 on GCP, out of the 106 the CSF catalog lists.
+provider: 67 on AWS, 65 on Azure, 65 on GCP, out of the 106 the CSF catalog lists.
 
 The absence of Govern is not a gap in AuditKit so much as a statement about what
 configuration scanning can see. If a customer asks for CSF 2.0 coverage, expect

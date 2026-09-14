@@ -51,7 +51,7 @@
 <p><strong>FedRAMP</strong> standardizes security assessments for cloud services used by US federal agencies.</p>
 <p><strong>Who needs it:</strong> Cloud service providers (CSPs) serving federal agencies
 <strong>Status in AuditKit:</strong> Production
-<strong>Coverage:</strong> Low: 56 of 149, Moderate: 77 of 287, High: 78 of 370 controls carry an automated check on AWS
+<strong>Coverage:</strong> Low: 81 of 149, Moderate: 131 of 287, High: 133 of 370 controls are reached through the crosswalk on AWS
 <strong>What's covered:</strong> Technical controls from NIST 800-53 Rev 5</p>
 <h2>Important Disclaimer</h2>
 <p><strong>AuditKit's FedRAMP support covers technical controls only - NOT sufficient for FedRAMP authorization.</strong></p>
@@ -76,7 +76,7 @@
 <strong>Hire a 3PAO for:</strong> Complete FedRAMP authorization package and assessment</p>
 <h2>FedRAMP Baselines</h2>
 <p>FedRAMP defines three security impact levels based on FIPS 199:</p>
-<h3>Low Impact (149 controls total, 56 automatable)</h3>
+<h3>Low Impact (149 controls total, 81 reachable)</h3>
 <p><strong>When to use:</strong></p>
 <ul>
 <li>Low-impact SaaS applications</li>
@@ -91,8 +91,8 @@
 </ul>
 <p><strong>Timeline:</strong> 3-6 months for initial authorization
 <strong>Cost:</strong> $50,000 - $150,000 (3PAO + infrastructure)</p>
-<p><strong>AuditKit Coverage:</strong> 56 of the 149 Low controls carry an automated check on AWS</p>
-<h3>Moderate Impact (287 controls total, 77 automatable)</h3>
+<p><strong>AuditKit Coverage:</strong> 81 of the 149 Low controls are reached through the crosswalk on AWS</p>
+<h3>Moderate Impact (287 controls total, 131 reachable)</h3>
 <p><strong>When to use:</strong> (Most common - 80%+ of FedRAMP authorizations)</p>
 <ul>
 <li>Most SaaS and cloud services</li>
@@ -108,8 +108,8 @@
 </ul>
 <p><strong>Timeline:</strong> 6-12 months for initial authorization
 <strong>Cost:</strong> $250,000 - $500,000 (3PAO + infrastructure)</p>
-<p><strong>AuditKit Coverage:</strong> 77 of the 287 Moderate controls carry an automated check on AWS</p>
-<h3>High Impact (370 controls total, 78 automatable)</h3>
+<p><strong>AuditKit Coverage:</strong> 131 of the 287 Moderate controls are reached through the crosswalk on AWS</p>
+<h3>High Impact (370 controls total, 133 reachable)</h3>
 <p><strong>When to use:</strong></p>
 <ul>
 <li>High-impact systems</li>
@@ -125,7 +125,7 @@
 </ul>
 <p><strong>Timeline:</strong> 12-18 months for initial authorization
 <strong>Cost:</strong> $500,000+ (3PAO + infrastructure)</p>
-<p><strong>AuditKit Coverage:</strong> 78 of the 370 High controls carry an automated check on AWS</p>
+<p><strong>AuditKit Coverage:</strong> 133 of the 370 High controls are reached through the crosswalk on AWS</p>
 <h2>Running FedRAMP Scans</h2>
 <p>Baseline filtering is supported directly via <code class="code-inline">fedramp-low</code>, <code class="code-inline">fedramp-moderate</code>
 and <code class="code-inline">fedramp-high</code>. NIST 800-53 covers all FedRAMP requirements if you prefer

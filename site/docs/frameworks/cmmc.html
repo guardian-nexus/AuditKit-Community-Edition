@@ -94,7 +94,7 @@ SPRS score postings and annual affirmations.</p>
 <p><strong>Timeline:</strong> In force since November 10, 2025 (Phase 1)</p>
 <h2>CMMC Level 1 (Free)</h2>
 <h3>The 17 Practices</h3>
-<p>AuditKit reports all 17 practices. 13 carry an automated check on AWS and Azure, 9 on GCP; the rest are reported for evidence tracking:</p>
+<p>AuditKit reports all 17 practices. 5 reach a PASS or FAIL verdict on AWS, 4 on Azure and GCP; the rest are reported for evidence tracking:</p>
 <h4>Access Control (AC)</h4>
 <ol>
 <li><strong>AC.L1-3.1.1</strong> - Limit system access to authorized users</li>
@@ -134,31 +134,21 @@ SPRS score postings and annual affirmations.</p>
 CMMC 1.0, which was withdrawn; CMMC 2.0 identifies each practice by its domain,
 level and NIST SP 800-171 Rev 2 requirement number.</p>
 <h3>What AuditKit Checks (Level 1)</h3>
-<p><strong>Queried automatically from your cloud configuration (13 of the 17 on AWS and Azure, 9 of 17 on GCP):</strong></p>
+<p><strong>Reach a PASS or FAIL verdict from your cloud configuration (5 of the 17 on AWS, 4 on Azure and GCP):</strong></p>
 <ul>
-<li>IAM password policy configuration</li>
-<li>MFA enforcement</li>
-<li>Access key rotation</li>
-<li>CloudTrail/logging enabled</li>
-<li>Security group rules</li>
-<li>Public access on storage</li>
-<li>Encryption at rest</li>
-<li>Patch management</li>
+<li>AC.L1-3.1.1 - Limit system access to authorized users (IAM users and stale access keys)</li>
+<li>AC.L1-3.1.2 - Limit access to the transactions and functions authorized users may execute (IAM policies and role assignments)</li>
+<li>IA.L1-3.5.1 - Identify system users, processes and devices (directory and user inventory)</li>
+<li>IA.L1-3.5.2 - Authenticate users, processes and devices (MFA; AWS only)</li>
+<li>SC.L1-3.13.1 - Monitor, control and protect communications at external boundaries (security groups, NSGs, firewall rules)</li>
 </ul>
-<p><strong>No automated check - manual verification required (4 practices):</strong></p>
-<ul>
-<li>AC.L1-3.1.20 - Verify and control connections to external systems</li>
-<li>AC.L1-3.1.22 - Control publicly posted information</li>
-<li>SI.L1-3.14.4 - Update malicious code protection mechanisms</li>
-<li>SI.L1-3.14.5 - Perform periodic and real-time scans</li>
-<li>Physical security measures</li>
-<li>Visitor escort procedures</li>
-<li>Media sanitization procedures</li>
-<li>Network monitoring processes</li>
-<li>Vulnerability scanning schedule</li>
-<li>Security alert response</li>
-<li>System update procedures</li>
-</ul>
+<p><strong>Reported for evidence (the other 12):</strong></p>
+<p>Every other Level 1 practice appears in the report with what an assessor will
+ask to see. Several run a check and report what they found without deciding -
+encryption at rest, public access on storage, logging, patching - because the
+practice asks for a process that configuration alone cannot prove. The rest are
+physical, media and personnel practices no cloud API can see: visitor escort,
+media sanitization, malicious-code protection and its updates, periodic scans.</p>
 <h3>Running Level 1 Scan</h3>
 <div class="code-block"># Scan for CMMC Level 1
 auditkit scan -provider aws -framework cmmc
@@ -298,7 +288,7 @@ auditkit evidence -output cmmc-evidence.html
 <li>Information input validation</li>
 </ul>
 <h3>What AuditKit Checks (Level 2)</h3>
-<p><strong>Queried automatically from your cloud configuration (42 of the 110); the remaining 68 are
+<p><strong>Reach a PASS or FAIL verdict from your cloud configuration (26 of the 110 on AWS); the remaining 84 are
 assessed as structured evidence guidance, telling you what an assessor needs to see:</strong>
 All technical controls across:</p>
 <ul>
@@ -314,7 +304,7 @@ All technical controls across:</p>
 <li>Key rotation</li>
 <li>Public access controls</li>
 </ul>
-<p><strong>Structured evidence guidance (68 practices):</strong>
+<p><strong>Structured evidence guidance (84 practices):</strong>
 Organizational controls:</p>
 <ul>
 <li>Policies and procedures</li>
@@ -389,8 +379,8 @@ auditkit-pro evidence -output cmmc-evidence.html
 </tr>
 <tr>
 <td><strong>Automated Checks</strong></td>
-<td>13 of 17</td>
-<td>42 of 110 query the cloud</td>
+<td>5 of 17 reach a verdict (AWS)</td>
+<td>26 of 110 reach a verdict (AWS)</td>
 </tr>
 <tr>
 <td><strong>Manual Docs</strong></td>
