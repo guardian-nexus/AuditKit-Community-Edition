@@ -116,18 +116,25 @@ func (c *Crosswalk) Get800_53Controls(frameworks map[string]string) []string {
 
 	// Check CMMC mappings
 	if cmmcID, exists := frameworks["CMMC"]; exists {
-		if controls, found := c.CMMCToCIS[cmmcID]; found {
-			for _, ctrl := range controls {
-				controlSet[ctrl] = true
+		// Split like SOC2 and PCI: a check satisfying two practices writes
+		// "AC.L1-3.1.1, AC.L1-3.1.2", and looking the whole string up as one
+		// key resolves to nothing at all.
+		for _, id := range strings.Split(cmmcID, ",") {
+			if controls, found := c.CMMCToCIS[strings.TrimSpace(id)]; found {
+				for _, ctrl := range controls {
+					controlSet[ctrl] = true
+				}
 			}
 		}
 	}
 
 	// Check HIPAA mappings
 	if hipaaID, exists := frameworks["HIPAA"]; exists {
-		if controls, found := c.HIPAAToCIS[hipaaID]; found {
-			for _, ctrl := range controls {
-				controlSet[ctrl] = true
+		for _, id := range strings.Split(hipaaID, ",") {
+			if controls, found := c.HIPAAToCIS[strings.TrimSpace(id)]; found {
+				for _, ctrl := range controls {
+					controlSet[ctrl] = true
+				}
 			}
 		}
 	}

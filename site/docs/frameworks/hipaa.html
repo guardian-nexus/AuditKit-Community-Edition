@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HIPAA Compliance Scanning - AuditKit</title>
-    <meta name="description" content="AuditKit HIPAA Security Rule scanning across AWS, Azure, and GCP - on AWS 27 of the 75 Security Rule safeguards carry automated checks, covering all 12 Technical Safeguards (164.312) and 15 Administrative Safeguards (164.308).">
+    <meta name="description" content="AuditKit HIPAA Security Rule scanning across AWS, Azure, and GCP - on AWS 30 of the 75 Security Rule safeguards carry automated checks, covering all 12 Technical Safeguards (164.312) and 15 Administrative Safeguards (164.308).">
     <link rel="icon" type="image/svg+xml" href="../../auditkit-logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,161 +41,304 @@
     <main id="main">
     <section class="section" style="padding-top: 2rem;">
         <div class="container-prose">
-
-            <div class="callout-warning">
-                <h4>Important</h4>
-                <ul style="margin-bottom: 0; padding-left: 1.25rem;">
-                    <li><strong>Covers:</strong> Technical Safeguards (164.312) and parts of Administrative Safeguards (164.308)</li>
-                    <li><strong>Does not cover:</strong> Physical Safeguards (164.310), organizational requirements (164.314) and policies/documentation (164.316), 16 of the 31 Administrative Safeguards, or BAAs</li>
-                    <li>Use AuditKit as part of a broader HIPAA compliance program, not as a sole assessment</li>
-                </ul>
-            </div>
-
-            <h2>Coverage Summary</h2>
-
-            <p>On AWS, 27 of the 75 HIPAA Security Rule safeguards carry an automated check — all 12 Technical Safeguards (164.312) and 15 of the 31 Administrative Safeguards (164.308). AuditKit maps cloud infrastructure checks to those requirements across three providers:</p>
-
-            <table>
-                <tr>
-                    <th>Cloud Provider</th>
-                    <th>Key Services Checked</th>
-                </tr>
-                <tr>
-                    <td>AWS</td>
-                    <td>IAM, S3, EC2, RDS, CloudTrail, KMS, VPC, Lambda, SageMaker, Redshift</td>
-                </tr>
-                <tr>
-                    <td>Azure</td>
-                    <td>Entra ID, Storage, SQL, Key Vault, NSGs, Defender, Activity Logs</td>
-                </tr>
-                <tr>
-                    <td>GCP</td>
-                    <td>IAM, Cloud Storage, Cloud SQL, KMS, Logging, Compute, VPC</td>
-                </tr>
-            </table>
-
-            <h2>CFR Sections Covered</h2>
-
-            <h3>Technical Safeguards (45 CFR 164.312)</h3>
-            <table>
-                <tr>
-                    <th>Section</th>
-                    <th>Requirement</th>
-                    <th>What AuditKit Checks</th>
-                </tr>
-                <tr>
-                    <td>164.312(a)(1)</td>
-                    <td>Access Control</td>
-                    <td>IAM policies, security groups, public access restrictions</td>
-                </tr>
-                <tr>
-                    <td>164.312(a)(2)(i)</td>
-                    <td>Unique User Identification</td>
-                    <td>MFA enforcement, root account security, individual accounts</td>
-                </tr>
-                <tr>
-                    <td>164.312(a)(2)(iv)</td>
-                    <td>Encryption</td>
-                    <td>Encryption at rest (S3, EBS, RDS, KMS) and in transit (TLS)</td>
-                </tr>
-                <tr>
-                    <td>164.312(b)</td>
-                    <td>Audit Controls</td>
-                    <td>CloudTrail, VPC flow logs, activity logging, metric filters</td>
-                </tr>
-                <tr>
-                    <td>164.312(c)(1)</td>
-                    <td>Integrity Controls</td>
-                    <td>Versioning, backup policies, log validation, PITR</td>
-                </tr>
-                <tr>
-                    <td>164.312(d)</td>
-                    <td>Authentication</td>
-                    <td>Password policies, credential rotation, MFA</td>
-                </tr>
-                <tr>
-                    <td>164.312(e)(1)</td>
-                    <td>Transmission Security</td>
-                    <td>TLS enforcement, network security, VPC configuration</td>
-                </tr>
-            </table>
-
-            <h3>Administrative Safeguards (45 CFR 164.308)</h3>
-            <table>
-                <tr>
-                    <th>Section</th>
-                    <th>Requirement</th>
-                    <th>What AuditKit Checks</th>
-                </tr>
-                <tr>
-                    <td>164.308(a)(1)(ii)(D)</td>
-                    <td>Security Assessment</td>
-                    <td>Security services enabled (GuardDuty, Defender, SCC)</td>
-                </tr>
-                <tr>
-                    <td>164.308(a)(3)(i)</td>
-                    <td>Workforce Access</td>
-                    <td>IAM user management, unused credentials, access keys</td>
-                </tr>
-                <tr>
-                    <td>164.308(a)(4)(ii)</td>
-                    <td>Credential Management</td>
-                    <td>Key rotation, unused credential detection</td>
-                </tr>
-                <tr>
-                    <td>164.308(a)(5)(ii)(B)</td>
-                    <td>Security Updates</td>
-                    <td>Auto-patching, managed instance compliance</td>
-                </tr>
-                <tr>
-                    <td>164.308(a)(5)(ii)(D)</td>
-                    <td>Password Management</td>
-                    <td>Password policies, minimum length, reuse prevention, expiry</td>
-                </tr>
-                <tr>
-                    <td>164.308(a)(6)(i)</td>
-                    <td>Security Incident Procedures</td>
-                    <td>GuardDuty/Defender/SCC alerting configuration</td>
-                </tr>
-                <tr>
-                    <td>164.308(a)(7)(ii)(A)</td>
-                    <td>Contingency Plan</td>
-                    <td>Backup configurations, multi-AZ, disaster recovery</td>
-                </tr>
-            </table>
-
-            <h2>What AuditKit Does NOT Cover</h2>
-            <p>HIPAA compliance requires more than technical infrastructure checks. You still need:</p>
-            <ul>
-                <li><strong>Physical Safeguards (164.310)</strong> — facility access, workstation security, device controls</li>
-                <li><strong>Business Associate Agreements</strong> — contracts with vendors handling PHI</li>
-                <li><strong>Risk Assessment Documentation</strong> — formal written risk analysis</li>
-                <li><strong>Workforce Training</strong> — security awareness training records</li>
-                <li><strong>Incident Response Plan</strong> — breach notification procedures</li>
-                <li><strong>Policies & Procedures</strong> — written, dated, signed organizational policies</li>
-            </ul>
-
-            <h2>Running a HIPAA Scan</h2>
-            <pre class="code-block"><code># AWS HIPAA scan
+<p>Health Insurance Portability and Accountability Act guide.</p>
+<h2>Overview</h2>
+<p><strong>HIPAA</strong> protects Protected Health Information (PHI) in the United States.</p>
+<p><strong>Who needs it:</strong> Healthcare providers, health plans, healthcare clearinghouses, business associates<br />
+<strong>Status in AuditKit:</strong> Production - Technical and part of Administrative Safeguards<br />
+<strong>Coverage:</strong> 30 of the 75 Security Rule safeguards are reached on AWS, Azure and GCP (12 of 12 Technical, 18 of 31 Administrative)<br />
+<strong>What's not covered:</strong> Physical safeguards (164.310), organizational requirements (164.314) and policies/documentation (164.316); 13 of the 31 administrative safeguards</p>
+<h2>Important Disclaimer</h2>
+<p><strong>AuditKit's HIPAA support covers the Technical Safeguards and part of the Administrative Safeguards - NOT sufficient for HIPAA certification.</strong></p>
+<p><strong>What AuditKit covers:</strong></p>
+<ul>
+<li>Technical Safeguards (164.312) - Fully mapped across all cloud providers</li>
+<li>Framework crosswalk to existing SOC2/PCI-DSS controls</li>
+<li>Automated scanning of technical configurations</li>
+</ul>
+<p><strong>What AuditKit does NOT cover:</strong></p>
+<ul>
+<li>Administrative Safeguards (164.308) beyond the 15 covered - risk analysis as a document, workforce training records, sanction policy, BAA management</li>
+<li>Physical Safeguards (164.310) - Facility access, workstation security</li>
+<li>Business Associate Agreements</li>
+<li>Risk assessments and documentation</li>
+</ul>
+<p><strong>Use for:</strong> Technical infrastructure assessment as part of HIPAA compliance program<br />
+<strong>Don't use for:</strong> Sole evidence of HIPAA certification or compliance attestation<br />
+<strong>Hire a consultant for:</strong> Complete HIPAA compliance program including administrative and physical safeguards</p>
+<h2>HIPAA Security Rule</h2>
+<p>The HIPAA Security Rule has 3 types of safeguards:</p>
+<h3>Administrative Safeguards (Not covered by AuditKit)</h3>
+<ul>
+<li>Security management process</li>
+<li>Workforce security</li>
+<li>Information access management</li>
+<li>Security awareness training</li>
+<li>Security incident procedures</li>
+<li>Contingency plans</li>
+<li>Business associate agreements</li>
+<li>Evaluation procedures</li>
+</ul>
+<h3>Physical Safeguards (Not covered by AuditKit)</h3>
+<ul>
+<li>Facility access controls</li>
+<li>Workstation use and security</li>
+<li>Device and media controls</li>
+</ul>
+<h3>Technical Safeguards (Partially covered)</h3>
+<p><strong>164.312(a)(1) - Access Control</strong></p>
+<ul>
+<li>Unique user identification</li>
+<li>Emergency access procedure</li>
+<li>Automatic logoff</li>
+<li>Encryption and decryption</li>
+</ul>
+<p><strong>164.312(b) - Audit Controls</strong></p>
+<ul>
+<li>Hardware, software, and procedural mechanisms to record and examine activity</li>
+</ul>
+<p><strong>164.312(c) - Integrity</strong></p>
+<ul>
+<li>Mechanisms to ensure ePHI is not improperly altered or destroyed</li>
+</ul>
+<p><strong>164.312(d) - Person or Entity Authentication</strong></p>
+<ul>
+<li>Verify person or entity seeking access to ePHI is who/what they claim</li>
+</ul>
+<p><strong>164.312(e) - Transmission Security</strong></p>
+<ul>
+<li>Implement technical security measures to guard against unauthorized access to ePHI transmitted over electronic networks</li>
+</ul>
+<h2>What AuditKit Checks</h2>
+<h3>Access Control (164.312(a))</h3>
+<ul>
+<li>IAM user identification</li>
+<li>MFA enforcement (164.312(a)(2)(i))</li>
+<li>Access key management</li>
+<li>Least privilege access</li>
+</ul>
+<h3>Audit Controls (164.312(b))</h3>
+<ul>
+<li>CloudTrail/Activity Logs enabled</li>
+<li>Log retention (6 years for HIPAA)</li>
+<li>Audit trail integrity</li>
+</ul>
+<h3>Integrity (164.312(c)(1))</h3>
+<ul>
+<li>Encryption at rest (164.312(a)(2)(iv))</li>
+<li>Backup and recovery</li>
+<li>Version control</li>
+</ul>
+<h3>Authentication (164.312(d))</h3>
+<ul>
+<li>Strong password policies</li>
+<li>MFA for authentication</li>
+<li>Service account management</li>
+</ul>
+<h3>Transmission Security (164.312(e))</h3>
+<ul>
+<li>Encryption in transit (164.312(e)(1))</li>
+<li>TLS/SSL enforcement</li>
+<li>Network security</li>
+</ul>
+<h2>Running HIPAA Scan</h2>
+<pre class="code-block"><code># AWS
 auditkit scan -provider aws -framework hipaa
 
-# Azure HIPAA scan
+# Azure
 auditkit scan -provider azure -framework hipaa
 
-# GCP HIPAA scan
+# GCP
 auditkit scan -provider gcp -framework hipaa
 
-# PDF report for compliance team
-auditkit scan -provider aws -framework hipaa -format pdf -output hipaa-report.pdf</code></pre>
-
-            <h2>Recommended Approach</h2>
-            <ol>
-                <li><strong>Run AuditKit</strong> — identify Technical Safeguard gaps across your cloud infrastructure</li>
-                <li><strong>Fix critical issues</strong> — use the remediation commands AuditKit provides</li>
-                <li><strong>Address Administrative Safeguards</strong> — policies, training, risk assessment (manual)</li>
-                <li><strong>Address Physical Safeguards</strong> — facility controls, device management (manual)</li>
-                <li><strong>Engage a HIPAA consultant</strong> — for formal risk assessment and gap analysis</li>
-            </ol>
+# Generate report (for internal use only)
+auditkit scan -provider aws -framework hipaa -format pdf -output hipaa-report.pdf
+</code></pre>
+<p><strong>Warning:</strong> This report is NOT sufficient for HIPAA compliance attestation</p>
+<h2>What's Missing</h2>
+<p>AuditKit does NOT check:</p>
+<p><strong>Administrative Safeguards:</strong></p>
+<ul>
+<li>Risk analysis and management</li>
+<li>Workforce training</li>
+<li>Security policies and procedures</li>
+<li>Business associate agreements</li>
+<li>Incident response plans</li>
+<li>Disaster recovery plans</li>
+<li>Access authorization procedures</li>
+</ul>
+<p><strong>Physical Safeguards:</strong></p>
+<ul>
+<li>Data center physical security</li>
+<li>Workstation security</li>
+<li>Device disposal procedures</li>
+<li>Facility access controls</li>
+<li>Visitor logs</li>
+</ul>
+<p><strong>Additional Technical Requirements:</strong></p>
+<ul>
+<li>Application-level access controls</li>
+<li>ePHI-specific encryption</li>
+<li>De-identification procedures</li>
+<li>Minimum necessary standard</li>
+<li>Emergency access procedures</li>
+</ul>
+<h2>HIPAA vs Other Frameworks</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Coverage</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SOC2</strong></td>
+<td>Security controls</td>
+<td>Production</td>
+</tr>
+<tr>
+<td><strong>HIPAA</strong></td>
+<td>Healthcare-specific Technical Safeguards</td>
+<td>Production</td>
+</tr>
+<tr>
+<td><strong>Overlap</strong></td>
+<td>Significant - most technical controls map across both</td>
+<td>Strong</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Key differences:</strong></p>
+<ul>
+<li>HIPAA is healthcare-specific</li>
+<li>HIPAA requires 6-year log retention (vs 90 days for SOC2)</li>
+<li>HIPAA has specific PHI requirements</li>
+<li>HIPAA requires business associate agreements</li>
+<li>HIPAA requires extensive administrative and physical safeguards</li>
+</ul>
+<p><strong>Recommendation:</strong> Get SOC2 first (covers many technical controls), then add HIPAA-specific requirements (administrative, physical, BAAs)</p>
+<h2>HIPAA Compliance Approach</h2>
+<h3>Phase 1: Infrastructure (Use AuditKit)</h3>
+<ol>
+<li>Run HIPAA scan</li>
+<li>Fix technical controls</li>
+<li>Enable encryption</li>
+<li>Configure logging</li>
+</ol>
+<h3>Phase 2: Administrative (Manual)</h3>
+<ol>
+<li>Conduct risk analysis</li>
+<li>Write policies and procedures</li>
+<li>Implement workforce training</li>
+<li>Create incident response plan</li>
+<li>Sign business associate agreements</li>
+</ol>
+<h3>Phase 3: Physical (Manual)</h3>
+<ol>
+<li>Implement facility access controls</li>
+<li>Secure workstations</li>
+<li>Establish media disposal procedures</li>
+<li>Create visitor logs</li>
+</ol>
+<h3>Phase 4: Assessment (Hire Expert)</h3>
+<ol>
+<li>Hire HIPAA compliance consultant</li>
+<li>Conduct full risk assessment</li>
+<li>Create compliance documentation</li>
+<li>Prepare for OCR audit</li>
+</ol>
+<h2>Cost Breakdown</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Cost (Estimate)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AuditKit Free</td>
+<td>$0</td>
+</tr>
+<tr>
+<td>HIPAA consultant</td>
+<td>$25,000 - $100,000</td>
+</tr>
+<tr>
+<td>Risk assessment</td>
+<td>$10,000 - $30,000</td>
+</tr>
+<tr>
+<td>Policy development</td>
+<td>$5,000 - $20,000</td>
+</tr>
+<tr>
+<td>Training program</td>
+<td>$5,000 - $15,000</td>
+</tr>
+<tr>
+<td>Ongoing compliance</td>
+<td>$10,000 - $50,000/year</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>$55,000 - $215,000</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Timeline:</strong> 6-12 months for initial compliance</p>
+<h2>Common HIPAA Violations</h2>
+<p>Based on OCR enforcement actions:</p>
+<ol>
+<li><strong>Lack of risk analysis</strong> (most common)</li>
+<li>Insufficient access controls</li>
+<li>No encryption of ePHI</li>
+<li>Missing business associate agreements</li>
+<li>No breach notification procedures</li>
+<li>Inadequate workforce training</li>
+<li>No audit controls</li>
+<li>Physical security gaps</li>
+</ol>
+<p><strong>AuditKit helps with #2, #3, #7</strong> - but you need consultants for the rest</p>
+<h2>FAQ</h2>
+<p><strong>Q: Can I use AuditKit for HIPAA compliance?</strong>
+A: Yes, for the Technical Safeguards portion (164.312). You must separately address Administrative Safeguards (164.308) and Physical Safeguards (164.310) with policies, procedures, and a HIPAA consultant.</p>
+<p><strong>Q: Is AuditKit HIPAA-compliant?</strong>
+A: AuditKit is a tool. Your organization must achieve HIPAA compliance through proper policies, procedures, and technical controls. AuditKit helps scan and document the technical controls portion.</p>
+<p><strong>Q: What's a business associate agreement (BAA)?</strong><br />
+A: Legal contract requiring vendors to protect PHI. You need BAAs with:</p>
+<ul>
+<li>Cloud providers (AWS, Azure, GCP)</li>
+<li>SaaS vendors</li>
+<li>Any vendor accessing PHI</li>
+</ul>
+<p><strong>Q: Do I need to encrypt all data?</strong><br />
+A: HIPAA requires either encryption OR equivalent alternative measures. Most organizations choose encryption (easier to prove).</p>
+<p><strong>Q: How long do I need to keep audit logs?</strong><br />
+A: 6 years per HIPAA requirements (much longer than other frameworks).</p>
+<p><strong>Q: What if I have a breach?</strong><br />
+A: Report to OCR within 60 days. Notify affected individuals. May face fines up to $50,000 per violation.</p>
+<h2>Recommended Path</h2>
+<p><strong>For healthcare startups:</strong></p>
+<ol>
+<li><strong>Month 1-2:</strong> Technical controls with AuditKit</li>
+<li><strong>Month 3-4:</strong> Hire HIPAA consultant</li>
+<li><strong>Month 5-8:</strong> Implement policies and procedures</li>
+<li><strong>Month 9-10:</strong> Workforce training</li>
+<li><strong>Month 11-12:</strong> Mock audit and gap remediation</li>
+<li><strong>Ongoing:</strong> Annual risk assessments</li>
+</ol>
+<p><strong>Don't skip the consultant.</strong> HIPAA violations can result in fines up to $1.5 million per violation category per year.</p>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="../getting-started.html">Run HIPAA Technical Safeguards scan →</a></strong></li>
+<li><strong><a href="./soc2.html">Compare to SOC2 →</a></strong></li>
+<li><strong><a href="https://www.hhs.gov/hipaa">Find HIPAA consultant →</a></strong></li>
+<li><strong><a href="https://www.hhs.gov/hipaa/for-professionals/security/index.html">HHS HIPAA guidance →</a></strong></li>
+</ul>
+<p><strong>Remember:</strong> AuditKit covers Technical Safeguards. Hire a HIPAA compliance expert for Administrative and Physical Safeguards required for full compliance.</p>
 
         </div>
     </section>

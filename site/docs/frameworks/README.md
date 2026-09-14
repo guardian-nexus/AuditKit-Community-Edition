@@ -9,16 +9,16 @@ AuditKit supports multiple compliance frameworks for automated technical control
 | Framework | Status | Automated Controls | Cloud Providers |
 |-----------|--------|-------------------|-----------------|
 | **[SOC2 Type II](./soc2.md)** | Production | 38 of 43 criteria | AWS, Azure, GCP |
-| **[PCI-DSS v4.0.1](./pci-dss.md)** | Production | 69 requirements across all 12 groups | AWS, Azure, GCP |
-| **[CMMC Level 1](./cmmc.md)** | Production | 13 of 17 practices | AWS, Azure, GCP |
+| **[PCI-DSS v4.0.1](./pci-dss.md)** | Production | 71 requirements across all 12 groups | AWS, Azure, GCP |
+| **[CMMC Level 1](./cmmc.md)** | Production | 5 of 17 practices | AWS, Azure, GCP |
 | **[CMMC Level 2](./cmmc.md)** | Reported; automated in Pro | 110 practices | AWS, Azure, GCP |
-| **[CIS Benchmarks](./cis-benchmarks.md)** | Production | AWS: 158, Azure: 108, GCP: 71 | AWS, Azure, GCP |
-| **[NIST 800-53 Rev 5](./nist-800-53.md)** | Production | 95 technical controls (covers FedRAMP), derived, of 1,196 in the catalog | AWS, Azure, GCP |
-| **[FedRAMP](./fedramp.md)** | Production | Low 56 of 149, Moderate 77 of 287, High 78 of 370 on AWS | AWS, Azure, GCP |
-| **[ISO 27001:2022](./iso27001.md)** | Production | 46 controls, derived (48 on AWS, of 93 in Annex A) | AWS, Azure, GCP |
-| **[NIST CSF 2.0](./nist-csf.md)** | Production | 63 subcategories, derived (65 AWS, 62 Azure, of 106) | AWS, Azure, GCP |
-| **[GDPR](./gdpr.md)** | Production | 14 articles, derived | AWS, Azure, GCP |
-| **[HIPAA Security Rule](./hipaa.md)** | Production | 18 safeguards, derived | AWS, Azure, GCP |
+| **[CIS Benchmarks](./cis-benchmarks.md)** | Production | AWS: 70, Azure: 127, GCP: 93 | AWS, Azure, GCP |
+| **[NIST 800-53 Rev 5](./nist-800-53.md)** | Production | 149 technical controls (covers FedRAMP), derived, of 1,196 in the catalog | AWS, Azure, GCP |
+| **[FedRAMP](./fedramp.md)** | Production | Low 81 of 149, Moderate 131 of 287, High 133 of 370 on AWS | AWS, Azure, GCP |
+| **[ISO 27001:2022](./iso27001.md)** | Production | 53 controls, derived (53 on every provider, of 93 in Annex A) | AWS, Azure, GCP |
+| **[NIST CSF 2.0](./nist-csf.md)** | Production | 67 subcategories, derived (67 AWS, 65 Azure and GCP, of 106) | AWS, Azure, GCP |
+| **[GDPR](./gdpr.md)** | Production | 16 articles, derived | AWS, Azure, GCP |
+| **[HIPAA Security Rule](./hipaa.md)** | Production | 30 safeguards, derived | AWS, Azure, GCP |
 
 ---
 
@@ -30,17 +30,18 @@ Fully tested, comprehensive coverage, used in production environments:
 - **SOC2 Type II** - For SaaS companies and startups
 - **PCI-DSS v4.0.1** - For payment card processing
 - **CMMC Level 1** - For all DoW contractors
-- **CIS Benchmarks** - For security hardening (AWS: 158 controls, Azure: 108 controls, GCP: 71 controls)
+- **CIS Benchmarks** - For security hardening (AWS: 70 controls, Azure: 127 controls, GCP: 93 controls)
 - **NIST 800-53** - For federal contractors and FedRAMP compliance
 - **ISO 27001** - For international information security compliance
-- **HIPAA Security Rule** - For healthcare (Note: all 12 Technical Safeguards plus 15 of the 31 Administrative Safeguards; does not cover Physical Safeguards)
+- **HIPAA Security Rule** - For healthcare (Note: all 12 Technical Safeguards plus 18 of the 31 Administrative Safeguards; does not cover Physical Safeguards)
 
 ### Automated in Pro
-Community reports all 110 CMMC Level 1 and Level 2 practices and automates Level 1
-(13 of the 17 Level 1 practices carry checks on AWS and Azure, 9 on GCP).
-An AuditKit subscription adds the automated Level 2 checks:
+Community reports all 110 CMMC Level 1 and Level 2 practices - every failing check
+with its fix and the screen to photograph (5 of the 17 Level 1 practices reach a
+verdict on AWS, 4 on Azure and GCP). An AuditKit subscription turns those findings
+into the assessor's evidence package and adds deeper automated coverage:
 
-- **CMMC Level 2** - For DoW contractors handling CUI. Of the 110 practices Pro assesses, 42 query the cloud and 68 are structured evidence guidance.
+- **CMMC Level 2** - For DoW contractors handling CUI. Of the 110 practices Pro assesses, 27 reach a verdict on AWS and 83 are structured evidence guidance.
 
 ---
 
@@ -123,15 +124,15 @@ An AuditKit subscription adds the automated Level 2 checks:
 ### NIST 800-53 Rev 5
 **Purpose:** Security controls for federal information systems  
 **Certification:** Not a certification (used by FedRAMP, FISMA)  
-**Coverage:** 95 automated technical controls  
+**Coverage:** 149 automated technical controls  
 **Timeline:** 6-12 months for full implementation
 
 **[Learn more →](./nist-800-53.md)**
 
 ### HIPAA
 **Purpose:** Healthcare data protection  
-**Status:** Production - 27 of the 75 Security Rule safeguards carry checks on AWS  
-**Note:** Covers all 12 Technical Safeguards (164.312) and 15 of the 31 Administrative Safeguards (164.308). Does not cover Physical Safeguards (164.310), Organizational Requirements (164.314) or Policies and Documentation (164.316)
+**Status:** Production - 30 of the 75 Security Rule safeguards are reached on AWS  
+**Note:** Covers all 12 Technical Safeguards (164.312) and 18 of the 31 Administrative Safeguards (164.308). Does not cover Physical Safeguards (164.310), Organizational Requirements (164.314) or Policies and Documentation (164.316)
 
 **[Learn more →](./hipaa.md)**
 
@@ -150,7 +151,7 @@ auditkit scan -provider aws -framework pci
 # CMMC Level 1
 auditkit scan -provider aws -framework cmmc
 
-# CMMC Level 1 + 2 - all 110 practices (Community automates Level 1, Pro automates Level 2)
+# CMMC Level 1 + 2 - all 110 practices (Community reports all 110; Pro adds the evidence package and deeper automation)
 auditkit-pro scan -provider aws -framework cmmc
 
 # CIS Benchmarks
@@ -175,9 +176,8 @@ AuditKit maps controls across frameworks. For example:
 **AWS IAM MFA enforcement** maps to:
 
 - SOC2: CC6.6
-- PCI-DSS: Requirement 8.3
-- CMMC: IA.L2-3.5.3
-- CIS AWS: 1.5, 1.6
+- PCI-DSS: Requirement 8.4.2
+- CIS AWS: 2.5, 2.6 and 2.10 (v7.0.0 numbering)
 - NIST 800-53: IA-2, IA-2(1)
 - HIPAA: 164.312(a)(2)(i)
 

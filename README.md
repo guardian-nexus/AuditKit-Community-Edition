@@ -4,15 +4,16 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v0.8.7-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
+[![Version](https://img.shields.io/badge/version-v1.0.0-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://guardiannexus.substack.com)
 
-**New in v0.8.7:** `auditkit update` and the provider binaries now report the version they were actually built from.
+**New in v1.0.0:** the first stable release - a correctness and accuracy pass across the scanner and the site. Empty-scope checks and denied API calls no longer count as compliance results, framework scans no longer double-count, and every published number is measured from the code.
 
-**CMMC Level 2 is reported in the Community Edition** - all 110 practices, with
-Level 1 automated (13 of 17 practices) and the remainder listed with evidence-collection guidance.
+**All 110 CMMC practices are reported in the Community Edition** - every failing
+check with its fix and the console screen to photograph. AuditKit turns those
+findings into the assessor's evidence package.
 
-**Need automated Level 2 checks, evidence packages, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
+**Need the assessor's evidence package, deeper automated coverage, or continuous monitoring?** → [auditkit.io](https://auditkit.io)
 
 ---
 
@@ -42,7 +43,7 @@ More in [Example Commands](#example-commands).
 
 AuditKit scans your cloud infrastructure for compliance gaps and security misconfigurations:
 
-- **Broad Control Coverage:** 219 AWS, 174 Azure and 133 GCP controls assessed - some return an automated verdict, the rest are reported with evidence-collection guidance
+- **Broad Control Coverage:** 228 AWS, 277 Azure and 173 GCP controls assessed - some return an automated verdict, the rest are reported with evidence-collection guidance
 - **Full CMMC Scope:** all 110 Level 1 + 2 practices reported, so you see the whole assessment surface
 - **Multi-Cloud Support:** AWS, Azure and GCP scanned directly, Microsoft 365 via ScubaGear import
 - **Audit-Ready Reports:** PDF/HTML/JSON output with evidence
@@ -64,12 +65,12 @@ measured from the checks themselves.
 
 | Framework | AWS | Azure | GCP | Purpose |
 |-----------|-----|-------|-----|---------|
-| **SOC2 Type II** | 38 of 43 | 37 of 43 | 32 of 43 | SaaS customer requirements |
-| **PCI DSS v4.0.1** | 59 | 59 | 49 | Payment card processing |
-| **CMMC Level 1** | 13 of 17 | 13 of 17 | 9 of 17 | DoW contractor compliance (FCI) |
-| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; 8 practices automated on GCP, none on AWS/Azure. Automated Level 2 across all providers in [AuditKit Pro](https://auditkit.io/) |
+| **SOC2 Type II** | 38 of 43 | 38 of 43 | 32 of 43 | SaaS customer requirements |
+| **PCI DSS v4.0.1** | 59 | 63 | 50 | Payment card processing |
+| **CMMC Level 1** | 5 of 17 | 4 of 17 | 4 of 17 | DoW contractor compliance (FCI) |
+| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; 7 practices automated on GCP, 1 each on AWS and Azure. Pro adds deeper automation and the evidence package via [AuditKit Pro](https://auditkit.io/) |
 
-69 distinct PCI DSS v4.0.1 requirements are assessed across the three providers.
+71 distinct PCI DSS v4.0.1 requirements are assessed across the three providers.
 
 ### Derived Frameworks
 
@@ -79,11 +80,11 @@ assessed.
 
 | Framework | AWS | Azure | GCP | Unit |
 |-----------|-----|-------|-----|------|
-| **NIST 800-53 Rev 5** | 88 | 83 | 84 | controls (95 across all providers) |
-| **ISO 27001:2022** | 48 | 46 | 46 | controls |
-| **NIST CSF 2.0** | 65 | 62 | 63 | subcategories |
-| **HIPAA Security Rule** | 18 | 18 | 18 | safeguards |
-| **GDPR** | 14 | 14 | 14 | articles |
+| **NIST 800-53 Rev 5** | 146 | 144 | 141 | controls (149 across all providers) |
+| **ISO 27001:2022** | 53 | 53 | 53 | controls |
+| **NIST CSF 2.0** | 67 | 65 | 65 | subcategories |
+| **HIPAA Security Rule** | 30 | 30 | 30 | safeguards |
+| **GDPR** | 16 | 16 | 16 | articles |
 
 FedRAMP Low, Moderate and High are filtered views of the NIST 800-53 coverage
 above rather than separate control sets.
@@ -92,7 +93,7 @@ above rather than separate control sets.
 
 | Framework | AWS | Azure | GCP | Purpose |
 |-----------|-----|-------|-----|---------|
-| **CIS Benchmarks** | 158 | 108 | 71 | Industry security best practices |
+| **CIS Benchmarks** | 70 | 127 | 93 | Industry security best practices |
 
 **[Framework Details →](./site/docs/frameworks/)** • **[What's the difference? →](./site/docs/frameworks/#compliance-vs-security-hardening)**
 
@@ -111,15 +112,15 @@ scanning, or a desktop interface.
 | | Community Edition (free) | AuditKit Pro ($297/mo) |
 |---|---|---|
 | **Cloud providers** | AWS, Azure, GCP scanned; M365 via ScubaGear import | Same, plus Azure Arc |
-| **Controls assessed** | 219 AWS, 174 Azure, 133 GCP | 317 AWS, 322 Azure, 259 GCP |
-| **SOC2 Type II** | 38, 37, 32 criteria | 38, 38, 36 criteria |
-| **PCI DSS v4.0.1** | 69 requirements | 76 requirements |
-| **CMMC Level 1** | 13 of 17 practices automated | 17 of 17 practices automated |
-| **CMMC Level 2** | All 110 practices reported for evidence | All 110 covered: 42 query the cloud, 68 are evidence guidance |
-| **CIS Benchmarks** | 158 AWS, 108 Azure, 71 GCP | 158 AWS, 122 Azure, 72 GCP |
+| **Controls assessed** | 228 AWS, 277 Azure, 173 GCP | 314 AWS, 400 Azure, 293 GCP |
+| **SOC2 Type II** | 38, 38, 32 criteria | 38, 38, 36 criteria |
+| **PCI DSS v4.0.1** | 71 requirements | 77 requirements |
+| **CMMC Level 1** | 5 of 17 practices automated | 7 of 17 practices automated |
+| **CMMC Level 2** | All 110 practices reported for evidence | All 110 reported: 27 reach a pass or fail, 83 carry evidence guidance |
+| **CIS Benchmarks** | 70 AWS, 127 Azure, 93 GCP | 70 AWS, 127 Azure, 93 GCP |
 | **Derived frameworks** | 800-53, ISO 27001, HIPAA, GDPR, NIST CSF, FedRAMP | Same six, from a larger control set |
-| **NIST 800-53 derived** | 95 controls | 135 controls |
-| **GDPR / NIST CSF derived** | 14 articles, 65 subcategories (AWS) | 16 articles, 67 subcategories (AWS) |
+| **NIST 800-53 derived** | 149 controls | 151 controls |
+| **GDPR / NIST CSF derived** | 16 articles, 67 subcategories (AWS) | 16 articles, 67 subcategories (AWS) |
 | **Reports** | PDF, HTML, CSV, JSON | Same |
 | **Offline / air-gapped scans** | Yes | Yes, plus cache expiry and clearing |
 | **Evidence lifecycle** | Collection tracking | Tracking, plus a packaged audit deliverable |
@@ -140,7 +141,23 @@ Everything in the Community column runs from this repository with no licence key
 
 ---
 
-## Recent Changes (v0.8.7)
+## Recent Changes (v1.0.0)
+
+**September 2026**
+
+First stable release - a correctness and accuracy pass. No framework was dropped; all 110 CMMC practices are still reported.
+
+Fixes:
+- A check with nothing in scope reports INFO, not PASS, so an empty or wrongly scoped account no longer reads as compliant
+- A denied API call reports ERROR, not a compliance FAIL (12 CMMC checks)
+- Framework-filtered scans (`-framework cmmc`, `pci`, ...) ran every suite twice and double-counted each result; each path now runs the suites once
+- `cis-azure` re-listed assessed recommendations as unassessed and never reached the CIS Azure v6 suites; both fixed
+- GCP projects without VM Manager now FAIL the vulnerability-scanning controls instead of dropping them from the score, which can lower a GCP score
+- The single-cloud binaries are gone; one universal binary scans every cloud with `-provider`
+- Every published number is measured from the code, and the site's generated sections are built from the scanner source
+- Lint clean under golangci-lint 2.5; CI gates on lint
+
+### Previous: v0.8.7
 
 **September 2026**
 
@@ -271,7 +288,6 @@ cp ~/Downloads/license.lic ~/.auditkit-pro/license.lic
 # Browser opens automatically to http://localhost:1337
 # Change port if needed: ./auditkit-pro-desktop --port 8080
 
-# Legacy method (deprecated): export AUDITKIT_PRO_LICENSE="AKP-..."
 ```
 
 **[Learn More →](https://auditkit.io/)** • **[Start 14-Day Trial →](https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01)**
@@ -295,27 +311,12 @@ Download from [GitHub Releases](https://github.com/guardian-nexus/AuditKit-Commu
 
 ### From Source
 
-**Option 1: Universal Scanner (All Clouds)**
+**Universal Scanner (All Clouds)**
 ```bash
 git clone https://github.com/guardian-nexus/AuditKit-Community-Edition
 cd AuditKit-Community-Edition/scanner
 go build ./cmd/auditkit
 ./auditkit scan -provider aws -framework soc2
-```
-
-**Option 2: Provider-Specific Scanners (Smaller Binaries)**
-```bash
-# AWS-only scanner (~93% smaller: 22 MB vs 310 MB)
-go build -o auditkit-aws ./cmd/auditkit-aws
-./auditkit-aws scan -framework soc2
-
-# Azure-only scanner
-go build -o auditkit-azure ./cmd/auditkit-azure
-./auditkit-azure scan -framework soc2
-
-# GCP-only scanner
-go build -o auditkit-gcp ./cmd/auditkit-gcp
-./auditkit-gcp scan -framework soc2
 ```
 
 **Requirements:**
@@ -350,9 +351,9 @@ go build -o auditkit-gcp ./cmd/auditkit-gcp
 
 ### Security Hardening (CIS Benchmarks)
 ```bash
-./auditkit scan -provider aws -framework cis-aws      # CIS AWS (158 controls)
-./auditkit scan -provider azure -framework cis-azure  # CIS Azure (108 controls)
-./auditkit scan -provider gcp -framework cis-gcp      # CIS GCP (71 controls)
+./auditkit scan -provider aws -framework cis-aws      # CIS AWS (70 controls)
+./auditkit scan -provider azure -framework cis-azure  # CIS Azure (127 controls)
+./auditkit scan -provider gcp -framework cis-gcp      # CIS GCP (93 controls)
 ```
 
 ### Report Generation
@@ -372,12 +373,11 @@ go build -o auditkit-gcp ./cmd/auditkit-gcp
 ./auditkit scan -provider azure -framework soc2 -format csv -output azure-soc2.csv
 ```
 
-### Provider-Specific Scanners
+### Every Provider, One Binary
 ```bash
-# Using provider-specific binaries (smaller, faster)
-./auditkit-aws scan -framework soc2 -format pdf -output aws-soc2.pdf
-./auditkit-azure scan -framework pci -format html -output azure-pci.html
-./auditkit-gcp scan -framework cmmc -format json -output gcp-cmmc.json
+./auditkit scan -provider aws -framework soc2 -format pdf -output aws-soc2.pdf
+./auditkit scan -provider azure -framework pci -format html -output azure-pci.html
+./auditkit scan -provider gcp -framework cmmc -format json -output gcp-cmmc.json
 ```
 
 ### External Tool Integration

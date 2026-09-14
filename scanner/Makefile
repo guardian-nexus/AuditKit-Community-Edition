@@ -4,16 +4,12 @@
 VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null || echo dev)
 LDFLAGS := -ldflags="-s -w -X main.CurrentVersion=$(VERSION)"
 
-.PHONY: help build build-all build-aws build-gcp build-azure build-full test scan scan-soc2 scan-pci clean sizes
+.PHONY: help build test scan scan-soc2 scan-pci clean sizes fmt lint
 
 help:
 	@echo "AuditKit Build System"
 	@echo ""
 	@echo "Build Commands:"
-	@echo "  make build-all    - Build all variants (multi-cloud + provider-specific)"
-	@echo "  make build-aws    - Build AWS-only binary (~80-100MB)"
-	@echo "  make build-gcp    - Build GCP-only binary (~40-60MB)"
-	@echo "  make build-azure  - Build Azure-only binary (~60-80MB)"
 	@echo "  make build-full   - Build multi-cloud binary (~260MB)"
 	@echo "  make build        - Quick build (AWS-only for testing)"
 	@echo ""
@@ -29,40 +25,11 @@ help:
 	@echo "  make fmt          - Format code"
 	@echo "  make lint         - Run linter"
 
-# Hybrid build: All variants
-build-all: build-full build-aws build-gcp build-azure
-	@echo ""
-	@echo "✅ Hybrid build complete! Binary sizes:"
-	@ls -lh auditkit auditkit-aws auditkit-gcp auditkit-azure 2>/dev/null | awk '{print "  " $$9 ": " $$5}'
-	@echo ""
-	@echo "Usage:"
-	@echo "  ./auditkit        - Multi-cloud scanner (all providers)"
-	@echo "  ./auditkit-aws    - AWS-only scanner (smaller, faster)"
-	@echo "  ./auditkit-gcp    - GCP-only scanner"
-	@echo "  ./auditkit-azure  - Azure-only scanner"
-
-# Multi-cloud binary (full feature set)
-build-full:
-	@echo "Building multi-cloud binary (auditkit)..."
+# One binary, every provider. The single-cloud variants were dropped for
+# v1.0: they printed the scanner's rows raw, with none of the report layer.
+build:
+	@echo "Building auditkit..."
 	@go build $(LDFLAGS) -o auditkit ./cmd/auditkit
-
-# AWS-only binary
-build-aws:
-	@echo "Building AWS-only binary (auditkit-aws)..."
-	@go build $(LDFLAGS) -o auditkit-aws ./cmd/auditkit-aws
-
-# GCP-only binary
-build-gcp:
-	@echo "Building GCP-only binary (auditkit-gcp)..."
-	@go build $(LDFLAGS) -o auditkit-gcp ./cmd/auditkit-gcp
-
-# Azure-only binary
-build-azure:
-	@echo "Building Azure-only binary (auditkit-azure)..."
-	@go build $(LDFLAGS) -o auditkit-azure ./cmd/auditkit-azure
-
-# Quick build (AWS-only for testing)
-build: build-aws
 
 test:
 	@go test ./... -v
@@ -78,12 +45,12 @@ scan-pci: build
 
 clean:
 	@echo "Cleaning build artifacts..."
-	@rm -f auditkit auditkit-aws auditkit-gcp auditkit-azure *.pdf *.html *.json
+	@rm -f auditkit *.pdf *.html *.json
 	@echo "✅ Cleaned"
 
 sizes:
 	@echo "Binary sizes:"
-	@ls -lh auditkit* 2>/dev/null | awk '{print "  " $$9 ": " $$5}' || echo "  No binaries found. Run 'make build-all' first."
+	@ls -lh auditkit* 2>/dev/null | awk '{print "  " $$9 ": " $$5}' || echo "  No binaries found. Run 'make build' first."
 
 fmt:
 	@echo "Formatting code..."

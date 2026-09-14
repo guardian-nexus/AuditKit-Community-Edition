@@ -39,73 +39,69 @@
 
     <section class="section">
         <div class="container-prose">
-            <h2>Prerequisites</h2>
-            <ul>
-                <li>Cloud account access (AWS, Azure, or GCP)</li>
-                <li>Cloud CLI installed and configured</li>
-                <li>5 minutes</li>
-            </ul>
-
-            <h2>Installation</h2>
-
-            <h3>Option 1: Download Binary (Fastest)</h3>
-            <ol>
-                <li>Go to <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/releases">Releases</a></li>
-                <li>Download binary for your OS (Linux, macOS, Windows)</li>
-                <li>Make it executable: <code>chmod +x auditkit</code></li>
-                <li>Run: <code>./auditkit scan</code></li>
-            </ol>
-
-            <h3>Option 2: Build from Source</h3>
-            <pre class="code-block"><code>git clone https://github.com/guardian-nexus/AuditKit-Community-Edition
+<p>Get your first compliance scan running in 5 minutes.</p>
+<h2>Prerequisites</h2>
+<ul>
+<li>Cloud account access (AWS, Azure, or GCP)</li>
+<li>Cloud CLI installed and configured</li>
+<li>5 minutes</li>
+</ul>
+<h2>Installation</h2>
+<h3>Option 1: Download Binary (Fastest)</h3>
+<ol>
+<li>Go to <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/releases">Releases</a></li>
+<li>Download binary for your OS (Linux, macOS, Windows)</li>
+<li>Make it executable: <code>chmod +x auditkit</code></li>
+<li>Run: <code>./auditkit scan</code></li>
+</ol>
+<h3>Option 2: Build from Source</h3>
+<pre class="code-block"><code>git clone https://github.com/guardian-nexus/AuditKit-Community-Edition
 cd AuditKit-Community-Edition/scanner
 go build ./cmd/auditkit
-./auditkit scan</code></pre>
-
-            <h2>Your First Scan</h2>
-
-            <h3>AWS</h3>
-            <pre class="code-block"><code># 1. Configure credentials
+./auditkit scan
+</code></pre>
+<h2>Your First Scan</h2>
+<h3>AWS</h3>
+<pre class="code-block"><code># 1. Configure AWS credentials
 aws configure
 
 # 2. Run scan
 ./auditkit scan -provider aws -framework soc2
 
-# 3. Generate PDF
-./auditkit scan -provider aws -framework soc2 -format pdf -output report.pdf</code></pre>
-            <p><a href="/docs/setup/aws.html">AWS Setup Guide →</a></p>
-
-            <h3>Azure</h3>
-            <pre class="code-block"><code># 1. Login to Azure
+# 3. Generate PDF report
+./auditkit scan -provider aws -framework soc2 -format pdf -output report.pdf
+</code></pre>
+<p><strong>Setup details:</strong> <a href="./setup/aws.html">AWS Authentication →</a></p>
+<h3>Azure</h3>
+<pre class="code-block"><code># 1. Login to Azure
 az login
-export AZURE_SUBSCRIPTION_ID="your-subscription-id"
+export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
 
 # 2. Run scan
 ./auditkit scan -provider azure -framework soc2
 
-# 3. Generate PDF
-./auditkit scan -provider azure -framework soc2 -format pdf -output report.pdf</code></pre>
-            <p><a href="/docs/setup/azure.html">Azure Setup Guide →</a></p>
-
-            <h3>GCP</h3>
-            <pre class="code-block"><code># 1. Login to GCP
+# 3. Generate PDF report
+./auditkit scan -provider azure -framework soc2 -format pdf -output report.pdf
+</code></pre>
+<p><strong>Setup details:</strong> <a href="./setup/azure.html">Azure Authentication →</a></p>
+<h3>GCP</h3>
+<pre class="code-block"><code># 1. Login to GCP
 gcloud auth application-default login
 export GOOGLE_CLOUD_PROJECT=your-project-id
 
 # 2. Run scan
 ./auditkit scan -provider gcp -framework soc2
 
-# 3. Generate PDF
-./auditkit scan -provider gcp -framework soc2 -format pdf -output report.pdf</code></pre>
-            <p><a href="/docs/setup/gcp.html">GCP Setup Guide →</a></p>
-
-            <h2>Understanding Your Results</h2>
-
-            <h3>Terminal Output</h3>
-            <pre class="code-block"><code>AuditKit SOC2 Compliance Scan Results
+# 3. Generate PDF report
+./auditkit scan -provider gcp -framework soc2 -format pdf -output report.pdf
+</code></pre>
+<p><strong>Setup details:</strong> <a href="./setup/gcp.html">GCP Authentication →</a></p>
+<h2>Understanding Your Results</h2>
+<h3>Terminal Output</h3>
+<pre class="code-block"><code>AuditKit SOC2 Compliance Scan Results
 =====================================
 AWS Account: 123456789012
-Scan Time: 2026-02-17 14:30:00
+Scan Time: 2025-10-19 14:30:00
 
 Compliance Score: 72.5%
 Controls Passed: 46/64
@@ -117,139 +113,132 @@ Medium Priority: 4
 CRITICAL - Fix These NOW:
 [FAIL] CC6.6 - User MFA Enforcement
 [FAIL] CC6.2 - S3 Bucket Public Access
-[FAIL] CC6.1 - IAM Key Rotation</code></pre>
-
-            <p><strong>What this means:</strong></p>
-            <ul>
-                <li><strong>Compliance Score:</strong> Percentage of passing controls</li>
-                <li><strong>Critical Issues:</strong> Security gaps requiring immediate attention</li>
-                <li><strong>Each failed control shows:</strong> What's wrong and how to fix it</li>
-            </ul>
-
-            <h3>Report Formats</h3>
-            <p><strong>PDF Report</strong> - For auditors and management</p>
-            <pre class="code-block"><code>./auditkit scan -format pdf -output report.pdf</code></pre>
-
-            <p><strong>HTML Report</strong> - Interactive, great for teams</p>
-            <pre class="code-block"><code>./auditkit scan -format html -output report.html</code></pre>
-
-            <p><strong>JSON Report</strong> - For automation/CI/CD</p>
-            <pre class="code-block"><code>./auditkit scan -format json -output results.json</code></pre>
-
-            <h2>Next Steps</h2>
-
-            <h3>1. Fix Critical Issues</h3>
-            <p>AuditKit shows exact commands to fix each issue:</p>
-            <pre class="code-block"><code># Generate fix script
+[FAIL] CC6.1 - IAM Key Rotation
+</code></pre>
+<p><strong>What this means:</strong>
+- <strong>Compliance Score:</strong> Of the controls that could be automatically checked,
+  the percentage that passed. Controls needing manual evidence, and controls the
+  scanner could not evaluate, are excluded rather than counted as failures. A
+  resource type you do not use is also excluded, not counted as a pass.
+- <strong>Critical Issues:</strong> Security gaps requiring immediate attention
+- <strong>Each failed control shows:</strong> What's wrong and how to fix it</p>
+<h3>Report Types</h3>
+<p><strong>PDF Report</strong> - For auditors and management</p>
+<pre class="code-block"><code>./auditkit scan -format pdf -output report.pdf
+</code></pre>
+<p><strong>HTML Report</strong> - Interactive, great for teams</p>
+<pre class="code-block"><code>./auditkit scan -format html -output report.html
+</code></pre>
+<p><strong>JSON Report</strong> - For automation/CI/CD</p>
+<pre class="code-block"><code>./auditkit scan -format json -output results.json
+</code></pre>
+<h2>Next Steps</h2>
+<h3>1. Fix Critical Issues</h3>
+<p>AuditKit shows exact commands to fix each issue:</p>
+<pre class="code-block"><code># Generate fix script
 ./auditkit fix -output fixes.sh
 
 # Review the script
 cat fixes.sh
 
 # Run fixes (review first!)
-bash fixes.sh</code></pre>
-
-            <h3>2. Track Your Progress</h3>
-            <pre class="code-block"><code># Show improvement over time
+bash fixes.sh
+</code></pre>
+<h3>2. Track Your Progress</h3>
+<pre class="code-block"><code># Show improvement over time
 ./auditkit progress
 
 # Compare last two scans
-./auditkit compare</code></pre>
-
-            <h3>3. Scan Other Frameworks</h3>
-            <pre class="code-block"><code># PCI-DSS
+./auditkit compare
+</code></pre>
+<h3>3. Scan Other Frameworks</h3>
+<pre class="code-block"><code># PCI-DSS
 ./auditkit scan -framework pci
 
-# CMMC Level 1 + 2 (all 110 practices reported; 13 of the 17 Level 1 practices automated)
+# CMMC Level 1 + 2 (all 110 practices reported; 5 of the 17 Level 1 practices reach a verdict on AWS)
 ./auditkit scan -framework cmmc
 
 # NIST 800-53
 ./auditkit scan -framework 800-53
 
 # All frameworks
-./auditkit scan -framework all</code></pre>
+./auditkit scan -framework all
+</code></pre>
+<p><strong>Framework details:</strong> <a href="./frameworks/">Frameworks →</a></p>
+<h2>Common Use Cases</h2>
+<h3>For Startups: SOC2 Preparation</h3>
+<p><strong>Goal:</strong> Pass SOC2 Type II audit without hiring consultants</p>
+<p><strong>Steps:</strong>
+1. Run initial scan: <code>./auditkit scan -framework soc2</code>
+2. Fix critical issues (usually takes 1-2 days)
+3. Re-scan weekly to track progress
+4. Generate final report for auditor
+5. Collect evidence using evidence tracker</p>
+<p><strong>Timeline:</strong> Most startups fix 80%+ of issues in 2-4 weeks</p>
+<h3>For DoW Contractors: CMMC Compliance</h3>
+<p><strong>Goal:</strong> Complete a CMMC Level 1 self-assessment, and see where you stand against Level 2</p>
+<p><strong>Steps:</strong>
+1. Run CMMC scan: <code>./auditkit scan -framework cmmc</code>
+2. Fix automated controls (AC.L1-3.1.1, AC.L1-3.1.2, etc.)
+3. Document manual controls (physical security, training)
+4. Generate assessment report
+5. Schedule C3PAO review with confidence</p>
+<p><strong>Note:</strong> Need automated checks for the 110 CMMC Level 2 practices? <a href="https://auditkit.io/pro/">Try Pro free for 14 days →</a></p>
+<h3>For Multi-Cloud: Unified Compliance</h3>
+<p><strong>Goal:</strong> Single compliance view across AWS + Azure + GCP</p>
+<p><strong>Steps:</strong></p>
+<pre class="code-block"><code># Scan all providers
+./auditkit scan -provider aws -framework soc2 -format json -output aws-results.json
+./auditkit scan -provider azure -framework soc2 -format json -output azure-results.json
+./auditkit scan -provider gcp -framework soc2 -format json -output gcp-results.json
 
-            <h2>Common Use Cases</h2>
-
-            <h3>For Startups: SOC2 Preparation</h3>
-            <p><strong>Goal:</strong> Pass SOC2 Type II audit without hiring consultants</p>
-            <p><strong>Steps:</strong></p>
-            <ol>
-                <li>Run initial scan: <code>./auditkit scan -framework soc2</code></li>
-                <li>Fix critical issues (usually takes 1-2 days)</li>
-                <li>Re-scan weekly to track progress</li>
-                <li>Generate final report for auditor</li>
-                <li>Collect evidence using evidence tracker</li>
-            </ol>
-            <p><strong>Timeline:</strong> Most startups fix 80%+ of issues in 2-4 weeks</p>
-
-            <h3>For DoW Contractors: CMMC Compliance</h3>
-            <p><strong>Goal:</strong> Complete a CMMC Level 1 self-assessment, and see where you stand against Level 2</p>
-            <p><strong>Steps:</strong></p>
-            <ol>
-                <li>Run CMMC scan: <code>./auditkit scan -framework cmmc</code></li>
-                <li>Fix automated controls (AC.L1-3.1.1, AC.L1-3.1.2, etc.)</li>
-                <li>Document manual controls (physical security, training)</li>
-                <li>Generate assessment report</li>
-                <li>Schedule C3PAO review with confidence</li>
-            </ol>
-            <div class="note">
-                <h4>Note</h4>
-                <p>Need automated checks for the 110 CMMC Level 2 practices? <a href="/">Start Free Trial →</a></p>
-            </div>
-
-            <h3>For Multi-Cloud: Unified Compliance</h3>
-            <p><strong>Goal:</strong> Single compliance view across AWS + Azure + GCP</p>
-            <pre class="code-block"><code># Scan all providers
-./auditkit scan -provider aws -framework soc2 -format json -output aws.json
-./auditkit scan -provider azure -framework soc2 -format json -output azure.json
-./auditkit scan -provider gcp -framework soc2 -format json -output gcp.json</code></pre>
-
-            <h2>Troubleshooting</h2>
-
-            <h3>"Error: AWS credentials not configured"</h3>
-            <p><strong>Solution:</strong></p>
-            <pre class="code-block"><code>aws configure
-# Enter your AWS Access Key ID and Secret Access Key</code></pre>
-            <p><a href="/docs/setup/aws.html">AWS Setup Guide →</a></p>
-
-            <h3>"Error: Azure subscription not found"</h3>
-            <p><strong>Solution:</strong></p>
-            <pre class="code-block"><code>az login
+# Compare results
+# Unified multi-cloud reporting is an AuditKit Pro feature
+</code></pre>
+<h2>Troubleshooting</h2>
+<h3>"Error: AWS credentials not configured"</h3>
+<p><strong>Solution:</strong></p>
+<pre class="code-block"><code>aws configure
+# Enter your AWS Access Key ID and Secret Access Key
+</code></pre>
+<p><strong>Details:</strong> <a href="./setup/aws.html">AWS Setup →</a></p>
+<h3>"Error: Azure subscription not found"</h3>
+<p><strong>Solution:</strong></p>
+<pre class="code-block"><code>az login
 az account list  # Find your subscription ID
-export AZURE_SUBSCRIPTION_ID="your-sub-id"</code></pre>
-            <p><a href="/docs/setup/azure.html">Azure Setup Guide →</a></p>
-
-            <h3>"Error: GCP project not found"</h3>
-            <p><strong>Solution:</strong></p>
-            <pre class="code-block"><code>gcloud auth application-default login
+export AZURE_SUBSCRIPTION_ID=&quot;your-sub-id&quot;
+</code></pre>
+<p><strong>Details:</strong> <a href="./setup/azure.html">Azure Setup →</a></p>
+<h3>"Error: GCP project not found"</h3>
+<p><strong>Solution:</strong></p>
+<pre class="code-block"><code>gcloud auth application-default login
 gcloud projects list  # Find your project ID
-export GOOGLE_CLOUD_PROJECT=your-project-id</code></pre>
-            <p><a href="/docs/setup/gcp.html">GCP Setup Guide →</a></p>
-
-            <h3>"Compliance score is very low (< 30%)"</h3>
-            <p><strong>Common cause:</strong> Security services not enabled</p>
-            <p><strong>Solution:</strong> Enable these first:</p>
-            <ul>
-                <li><strong>AWS:</strong> GuardDuty, Config, CloudTrail, Security Hub</li>
-                <li><strong>Azure:</strong> Defender for Cloud, Azure Policy, Activity Logs</li>
-                <li><strong>GCP:</strong> Security Command Center, Cloud Logging, Cloud KMS</li>
-            </ul>
-            <p>Then re-scan.</p>
-
-            <h2>What's Next?</h2>
-
-            <h4>CLI Reference</h4>
-            <p>Complete command documentation with all flags and options</p>
-            <a href="./cli-reference.html" class="btn btn-primary">Read Docs →</a>
-
-            <h4>Cloud Setup</h4>
-            <p>Detailed authentication guides for AWS, Azure, and GCP</p>
-            <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/tree/main/docs/setup" class="btn btn-primary">Read Docs →</a>
-
-            <h4>FAQ</h4>
-            <p>Answers to common questions and troubleshooting tips</p>
-            <a href="./faq.html" class="btn btn-primary">Read FAQ →</a>
+export GOOGLE_CLOUD_PROJECT=your-project-id
+</code></pre>
+<p><strong>Details:</strong> <a href="./setup/gcp.html">GCP Setup →</a></p>
+<h3>"Compliance score is very low (&lt; 30%)"</h3>
+<p><strong>Common cause:</strong> Security services not enabled</p>
+<p><strong>Solution:</strong> Enable these first:
+- <strong>AWS:</strong> GuardDuty, Config, CloudTrail, Security Hub
+- <strong>Azure:</strong> Defender for Cloud, Azure Policy, Activity Logs
+- <strong>GCP:</strong> Security Command Center, Cloud Logging, Cloud KMS</p>
+<p>Then re-scan.</p>
+<h2>Getting Help</h2>
+<ul>
+<li><strong>Documentation:</strong> <a href="../">Full docs →</a></li>
+<li><strong>Examples:</strong> <a href="../examples/">Sample reports →</a></li>
+<li><strong>Issues:</strong> <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/issues">GitHub Issues</a></li>
+<li><strong>FAQ:</strong> <a href="./faq.html">Common questions →</a></li>
+<li><strong>Newsletter:</strong> <a href="https://guardiannexus.substack.com">guardiannexus.substack.com</a></li>
+</ul>
+<h2>What's Next?</h2>
+<ul>
+<li><strong><a href="./cli-reference.html">CLI Reference</a></strong> - All commands and flags</li>
+<li><strong><a href="./frameworks/">Frameworks Guide</a></strong> - Deep dive into SOC2, PCI-DSS, CMMC, etc.</li>
+<li><strong><a href="./setup/">Cloud Setup</a></strong> - Detailed authentication guides</li>
+<li><strong><a href="./faq.html">FAQ</a></strong> - Answers to common questions</li>
+</ul>
+<p><strong>Ready for CMMC Level 2 or advanced GCP features?</strong> <a href="https://auditkit.io/pro/">Try Pro free for 14 days →</a></p>
 
             <div class="cta-block">
                 <h4>Ready for CMMC Level 2 or advanced GCP features?</h4>

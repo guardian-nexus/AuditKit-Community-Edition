@@ -80,7 +80,7 @@ func (c *CC1Checks) CheckCC1_1_IntegrityAndEthics(ctx context.Context) []CheckRe
 				Filter: "SERVICE_CONTROL_POLICY",
 			})
 
-			if policies != nil && policies.Policies != nil && len(policies.Policies) > 0 {
+			if policies != nil && len(policies.Policies) > 0 {
 				results = append(results, CheckResult{
 					Control:   "CC1.1",
 					Name:      "Organizational Governance Structure",
@@ -160,7 +160,7 @@ func (c *CC1Checks) CheckCC1_3_OrganizationalStructure(ctx context.Context) []Ch
 	if c.ssmClient != nil {
 		params, _ := c.ssmClient.DescribeParameters(ctx, &ssm.DescribeParametersInput{})
 
-		if params != nil && params.Parameters != nil && len(params.Parameters) > 0 {
+		if params != nil && len(params.Parameters) > 0 {
 			// Check for hierarchy in parameters (indicates structure)
 			hierarchicalParams := 0
 			for _, param := range params.Parameters {
@@ -201,13 +201,13 @@ func (c *CC1Checks) CheckCC1_4_Competence(ctx context.Context) []CheckResult {
 	// Check 4: IAM users with MFA (demonstrates security competence)
 	users, _ := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
 
-	if users != nil && users.Users != nil && len(users.Users) > 0 {
+	if users != nil && len(users.Users) > 0 {
 		mfaUsers := 0
 		for _, user := range users.Users {
 			mfaDevices, _ := c.iamClient.ListMFADevices(ctx, &iam.ListMFADevicesInput{
 				UserName: user.UserName,
 			})
-			if mfaDevices != nil && mfaDevices.MFADevices != nil && len(mfaDevices.MFADevices) > 0 {
+			if mfaDevices != nil && len(mfaDevices.MFADevices) > 0 {
 				mfaUsers++
 			}
 		}
@@ -325,7 +325,7 @@ func (c *CC2Checks) CheckCC2_1_InformationGeneration(ctx context.Context) []Chec
 	if c.ssmClient != nil {
 		params, _ := c.ssmClient.DescribeParameters(ctx, &ssm.DescribeParametersInput{})
 
-		if params != nil && params.Parameters != nil && len(params.Parameters) > 0 {
+		if params != nil && len(params.Parameters) > 0 {
 			// Check for encrypted parameters (sensitive info handling)
 			encryptedCount := 0
 			for _, param := range params.Parameters {
@@ -368,7 +368,7 @@ func (c *CC2Checks) CheckCC2_2_InternalCommunication(ctx context.Context) []Chec
 	if c.snsClient != nil {
 		topics, err := c.snsClient.ListTopics(ctx, &sns.ListTopicsInput{})
 
-		if err != nil || topics == nil || topics.Topics == nil || len(topics.Topics) == 0 {
+		if err != nil || topics == nil || len(topics.Topics) == 0 {
 			results = append(results, CheckResult{
 				Control:         "CC2.2",
 				Name:            "Internal Alert Communication",

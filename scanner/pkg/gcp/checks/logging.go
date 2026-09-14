@@ -44,8 +44,8 @@ func (c *LoggingChecks) CheckCloudAuditLogs(ctx context.Context) []CheckResult {
 	// This is a manual check because audit log configuration requires
 	// checking IAM audit config at the project level via Resource Manager API
 	results = append(results, CheckResult{
-		Control:     "CIS GCP 2.1",
-		Name:        "[CIS GCP 2.1] Cloud Audit Logs Enabled",
+		Control:     "CIS-GCP-2.1",
+		Name:        "[CIS-GCP-2.1] Cloud Audit Logs Enabled",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
 		Evidence:    "Cloud Audit Logging configuration requires manual verification | Admin Activity logs are enabled by default (cannot be disabled), but Data Access logs must be explicitly enabled",
@@ -77,7 +77,7 @@ gcloud logging read "protoPayload.serviceName=storage.googleapis.com" --limit 10
 	return results
 }
 
-// CheckLogSinks verifies log sinks are configured (CIS 2.2)
+// CheckLogSinks verifies log sinks are configured (CIS 2.3)
 func (c *LoggingChecks) CheckLogSinks(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -96,8 +96,8 @@ func (c *LoggingChecks) CheckLogSinks(ctx context.Context) []CheckResult {
 		}
 		if err != nil {
 			results = append(results, CheckResult{
-				Control:     "CIS GCP 2.2",
-				Name:        "[CIS GCP 2.2] Log Sinks Configured",
+				Control:     "CIS-GCP-2.3",
+				Name:        "[CIS-GCP-2.3] Log Sinks Configured",
 				Status:      "FAIL",
 				Evidence:    fmt.Sprintf("Unable to check log sinks: %v", err),
 				Remediation: "Verify Cloud Logging API is enabled and permissions are correct",
@@ -114,11 +114,11 @@ func (c *LoggingChecks) CheckLogSinks(ctx context.Context) []CheckResult {
 
 	if sinkCount == 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 2.2",
-			Name:        "[CIS GCP 2.2] Log Sinks Configured",
+			Control:     "CIS-GCP-2.3",
+			Name:        "[CIS-GCP-2.3] Log Sinks Configured",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    "CIS 2.2: No log sinks configured | Logs should be exported to long-term storage for security analysis",
+			Evidence:    "CIS 2.3: No log sinks configured | Logs should be exported to long-term storage for security analysis",
 			Remediation: "Configure log sinks to export logs to Cloud Storage, BigQuery, or Pub/Sub",
 			RemediationDetail: `# Create log sink to Cloud Storage
 gcloud logging sinks create security-logs-sink \
@@ -142,10 +142,10 @@ gcloud logging sinks create audit-logs-sink \
 		}
 
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 2.2",
-			Name:       "[CIS GCP 2.2] Log Sinks Configured",
+			Control:    "CIS-GCP-2.3",
+			Name:       "[CIS-GCP-2.3] Log Sinks Configured",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("%d log sinks configured: %v | Meets CIS 2.2", sinkCount, displaySinks),
+			Evidence:   fmt.Sprintf("%d log sinks configured: %v | Meets CIS 2.3", sinkCount, displaySinks),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("LOG_SINKS"),
@@ -155,7 +155,7 @@ gcloud logging sinks create audit-logs-sink \
 	return results
 }
 
-// CheckLogRetention verifies log retention meets requirements (CIS 2.3)
+// CheckLogRetention verifies log retention meets requirements (CIS 2.4)
 func (c *LoggingChecks) CheckLogRetention(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -178,8 +178,8 @@ func (c *LoggingChecks) CheckLogRetention(ctx context.Context) []CheckResult {
 		}
 		if err != nil {
 			results = append(results, CheckResult{
-				Control:     "CIS GCP 2.3",
-				Name:        "[CIS GCP 2.3] Log Retention Period",
+				Control:     "CIS-GCP-2.4",
+				Name:        "[CIS-GCP-2.4] Log Retention Period",
 				Status:      "FAIL",
 				Evidence:    fmt.Sprintf("Unable to check log retention: %v", err),
 				Remediation: "Verify Cloud Logging API is enabled",
@@ -207,11 +207,11 @@ func (c *LoggingChecks) CheckLogRetention(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 2.3",
-			Name:        "[CIS GCP 2.3] Log Retention Period",
+			Control:     "CIS-GCP-2.4",
+			Name:        "[CIS-GCP-2.4] Log Retention Period",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("CIS 2.3: %d log buckets have retention < 90 days: %v | PCI requires 90 days minimum", len(bucketsWithShortRetention), displayBuckets),
+			Evidence:    fmt.Sprintf("CIS 2.4: %d log buckets have retention < 90 days: %v | PCI requires 90 days minimum", len(bucketsWithShortRetention), displayBuckets),
 			Remediation: "Set log retention to at least 90 days (365 days recommended for security analysis)",
 			RemediationDetail: `gcloud logging buckets update BUCKET_ID \
   --location=LOCATION \
@@ -224,18 +224,18 @@ func (c *LoggingChecks) CheckLogRetention(ctx context.Context) []CheckResult {
 		})
 	} else if totalBuckets > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 2.3",
-			Name:       "[CIS GCP 2.3] Log Retention Period",
+			Control:    "CIS-GCP-2.4",
+			Name:       "[CIS-GCP-2.4] Log Retention Period",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d log buckets have retention >= 90 days | Meets CIS 2.3", totalBuckets),
+			Evidence:   fmt.Sprintf("All %d log buckets have retention >= 90 days | Meets CIS 2.4", totalBuckets),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("LOG_RETENTION"),
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:     "CIS GCP 2.3",
-			Name:        "[CIS GCP 2.3] Log Retention Period",
+			Control:     "CIS-GCP-2.4",
+			Name:        "[CIS-GCP-2.4] Log Retention Period",
 			Status:      "INFO",
 			Evidence:    "Default log bucket found. Verify retention settings.",
 			Remediation: "Configure log retention to at least 90 days",
@@ -255,8 +255,8 @@ func (c *LoggingChecks) CheckDNSLogging(ctx context.Context) []CheckResult {
 	// DNS logging configuration is in Cloud DNS, not directly in logging API
 	// Providing manual check with guidance
 	results = append(results, CheckResult{
-		Control:     "CIS GCP 2.13",
-		Name:        "[CIS GCP 2.13] DNS Logging Enabled",
+		Control:     "CIS-GCP-2.13",
+		Name:        "[CIS-GCP-2.13] DNS Logging Enabled",
 		Status:      "MANUAL",
 		Severity:    "MEDIUM",
 		Evidence:    "MANUAL CHECK: Verify DNS query logging is enabled for all VPC networks",

@@ -19,9 +19,6 @@ Complete installation instructions for AuditKit.
 
 **Disk Space:**
 - Universal binary (all clouds): ~64 MB download, ~325 MB installed
-- `auditkit-aws`: ~7 MB download, ~23 MB installed
-- `auditkit-azure`: ~7 MB download, ~28 MB installed
-- `auditkit-gcp`: ~12 MB download, ~45 MB installed
 - Source code: ~50 MB
 - Scan results: ~1-10 MB per scan
 
@@ -33,13 +30,11 @@ Complete installation instructions for AuditKit.
 
 **Fastest and easiest method**
 
-#### Linux
+#### Linux (x86_64)
 
 ```bash
-# Download latest release
+# Download and extract
 curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz
-
-# Extract
 tar -xzf auditkit-linux-amd64.tar.gz
 
 # Move to PATH
@@ -50,24 +45,51 @@ sudo chmod +x /usr/local/bin/auditkit
 auditkit version
 ```
 
-#### macOS
+#### Linux (ARM64)
+
+For AWS Graviton, Raspberry Pi, and Linux VMs on Apple Silicon Macs.
 
 ```bash
-# Download latest release
-curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-arm64.tar.gz   # Apple Silicon
-# curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-amd64.tar.gz  # Intel
-
-# Extract and rename
-tar -xzf auditkit-darwin-*.tar.gz && mv auditkit-darwin-* auditkit
-
-# Make executable
-chmod +x auditkit
+# Download and extract
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-arm64.tar.gz
+tar -xzf auditkit-linux-arm64.tar.gz
 
 # Move to PATH
-sudo mv auditkit /usr/local/bin/
+sudo mv auditkit-linux-arm64 /usr/local/bin/auditkit
+sudo chmod +x /usr/local/bin/auditkit
 
-# If you get security warning on first run:
-# System Preferences > Security & Privacy > Allow
+# Verify installation
+auditkit version
+```
+
+#### macOS (Apple Silicon)
+
+```bash
+# Download and extract
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-arm64.tar.gz
+tar -xzf auditkit-darwin-arm64.tar.gz
+
+# Move to PATH
+sudo mv auditkit-darwin-arm64 /usr/local/bin/auditkit
+sudo chmod +x /usr/local/bin/auditkit
+
+# The binary is unsigned. If macOS blocks it on first run:
+# System Settings -> Privacy and Security -> Open Anyway
+
+# Verify installation
+auditkit version
+```
+
+#### macOS (Intel)
+
+```bash
+# Download and extract
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-amd64.tar.gz
+tar -xzf auditkit-darwin-amd64.tar.gz
+
+# Move to PATH
+sudo mv auditkit-darwin-amd64 /usr/local/bin/auditkit
+sudo chmod +x /usr/local/bin/auditkit
 
 # Verify installation
 auditkit version
@@ -146,7 +168,7 @@ GOOS=windows GOARCH=amd64 go build -o auditkit.exe ./cmd/auditkit
 
 ```bash
 # Install directly from GitHub
-go install github.com/guardian-nexus/auditkit/scanner/cmd/auditkit@latest
+go install github.com/guardian-nexus/AuditKit-Community-Edition/scanner/cmd/auditkit@latest
 
 # Binary installed to: $GOPATH/bin/auditkit
 
@@ -266,7 +288,7 @@ auditkit version
 
 **Expected output:**
 ```
-AuditKit v0.8.6 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
+AuditKit v1.0.0 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
 ```
 
 ### Check Cloud CLI Tools
@@ -358,7 +380,7 @@ sudo mv auditkit /usr/local/bin/
 ### Update Go Install
 
 ```bash
-go install github.com/guardian-nexus/auditkit/scanner/cmd/auditkit@latest
+go install github.com/guardian-nexus/AuditKit-Community-Edition/scanner/cmd/auditkit@latest
 ```
 
 ---
@@ -546,7 +568,6 @@ auditkit-pro scan -provider aws -framework cmmc
 
 **Note:** Pro version uses `auditkit-pro` command, not `auditkit`
 
-**Legacy method (deprecated):** The old `export AUDITKIT_PRO_LICENSE=AKP-...` environment variable still works but is deprecated in favor of the `.lic` file.
 
 **[Pro feature details →](../pricing.md)**
 

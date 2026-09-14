@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community Edition - AuditKit Open Source Compliance Scanner</title>
-    <meta name="description" content="AuditKit Community Edition is a free, open-source multi-cloud compliance scanner. Apache 2.0 licensed. Scan AWS, Azure, GCP, and M365 for SOC2, PCI-DSS, CMMC, HIPAA, and more.">
+    <meta name="description" content="AuditKit Community Edition is a free, open-source multi-cloud compliance scanner. Apache 2.0 licensed. Scan AWS, Azure and GCP - and import Microsoft 365 findings from ScubaGear - for SOC2, PCI-DSS, CMMC, HIPAA, and more.">
     <link rel="icon" type="image/svg+xml" href="./auditkit-logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +41,7 @@
             <div class="flex flex-wrap justify-center gap-1" style="margin-top: 2rem;">
                 <span class="badge badge-outline">SOC2</span>
                 <span class="badge badge-outline">PCI-DSS</span>
-                <span class="badge badge-outline">CMMC L1 automated, L2 reported</span>
+                <span class="badge badge-outline">CMMC L1 + L2 (all 110)</span>
                 <span class="badge badge-outline">HIPAA</span>
                 <span class="badge badge-outline">CIS Benchmarks</span>
                 <span class="badge badge-outline">NIST 800-53</span>
@@ -90,12 +90,12 @@ cd AuditKit-Community-Edition/scanner && go build ./cmd/auditkit
   <span class="label">Screenshot:</span>  IAM &rarr; Users &rarr; Security credentials &rarr; Show MFA enabled
   <span class="label">Console URL:</span> <span class="url">https://console.aws.amazon.com/iam/home#/users</span>
 
-<span class="pass">&#10003; PASS</span> | <span class="framework">CC6.1</span> | CloudTrail Logging Enabled
+<span class="pass">&#10003; PASS</span> | <span class="framework">CC7.1</span> | CloudTrail Logging Enabled
   <span class="label">Evidence:</span>    CloudTrail enabled in all regions, logs encrypted
-  <span class="label">Frameworks:</span>  SOC2 (CC6.1), PCI-DSS (10.2.2), CMMC (AU.L2-3.3.1)
+  <span class="label">Frameworks:</span>  SOC2 (CC7.1), PCI-DSS (10.2.1), HIPAA (164.312(b))
 
 <span class="comment"># Automated Check Score: 27.4% (23/84 passed)</span>
-<span class="comment"># Only 84 of 189 total controls are automated; the rest need evidence you collect</span>
+<span class="comment"># All 189 controls reported: 84 checked automatically (scored above), the rest with evidence-collection guidance</span>
 <span class="comment"># PDF report: compliance-report.pdf</span></div>
 
             <p>Every failed check includes the specific CLI command to fix it, a step-by-step screenshot guide for manual evidence collection, and a direct link to the relevant cloud console page.</p>
@@ -118,7 +118,7 @@ cd AuditKit-Community-Edition/scanner && go build ./cmd/auditkit
     <section class="section section-alt">
         <div class="container text-center">
             <p class="text-muted" style="max-width: 540px; margin: 0 auto;">
-                Need automated Level 2 checks, evidence packages, or continuous monitoring? <a href="/">AuditKit</a> assesses all 110 Level 1 + 2 practices - automated checks where your cloud configuration can prove it, structured evidence guidance where an assessor needs a document - and adds multi-account scanning, drift detection, and more.
+                Need the assessor's evidence package, deeper automated coverage, or continuous monitoring? <a href="/">AuditKit</a> turns your findings into the artifact a C3PAO asks for - and adds multi-account scanning, drift detection, and more.
             </p>
         </div>
     </section>

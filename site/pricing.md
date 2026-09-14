@@ -29,10 +29,10 @@ Free to find your gaps. Paid for the evidence package, multi-account scanning, a
 **What's included:**
 - AWS, Azure and GCP scanning; M365 findings via ScubaGear import
 - SOC2 Type II (38 criteria: all 33 Common Criteria, plus Availability and Confidentiality)
-- PCI-DSS v4.0.1 (69 requirements)
-- CMMC Level 1 automated (13 of 17 practices), and all 110 Level 1 + 2 practices reported for evidence tracking
-- NIST 800-53 Rev 5 (95 technical controls)
-- GCP Core Services (133 controls)
+- PCI-DSS v4.0.1 (71 requirements)
+- All 110 CMMC Level 1 + 2 practices reported for evidence tracking, each gap with its fix and screenshot - automated where your cloud config can prove it, evidence guidance elsewhere
+- NIST 800-53 Rev 5 (149 technical controls)
+- GCP Core Services (173 controls)
 - PDF, HTML, JSON, CSV and terminal reports
 - Evidence collection tracker
 - CLI tool
@@ -108,17 +108,17 @@ Free to find your gaps. Paid for the evidence package, multi-account scanning, a
 | **Cloud Providers** |
 | AWS | Full support | Full support |
 | Azure | Full support | Full support |
-| Total controls assessed | 219 AWS, 174 Azure, 133 GCP | 317 AWS, 322 Azure, 259 GCP |
+| Total controls assessed | 228 AWS, 277 Azure, 173 GCP | 314 AWS, 400 Azure, 293 GCP |
 | GCP Core | Full support | Full support |
-| GCP Advanced | 5 basic GKE checks (CIS GCP 8.1-8.5) | Adds GKE deep security + Vertex AI (20 checks) |
+| GCP Advanced | 5 basic GKE checks (CIS GKE benchmark) | Adds GKE deep security + Vertex AI (20 checks) |
 | M365 (ScubaGear) | Full support | Full support |
 | **Frameworks** |
 | SOC2 Type II | 38 criteria | 38 criteria |
-| PCI-DSS v4.0.1 | 69 requirements | 76 requirements |
-| CMMC Level 1 | 13 of 17 practices automated | 17 of 17 practices automated |
+| PCI-DSS v4.0.1 | 71 requirements | 77 requirements |
+| CMMC Level 1 | All 17 practices reported | All 17 reported; deeper automated coverage |
 | CMMC Level 2 | All 110 L1 + L2 practices reported for evidence tracking | All 110 assessed: automated checks where the cloud configuration can prove it, evidence guidance elsewhere |
-| NIST 800-53 Rev 5 | 95 controls | 135 controls |
-| HIPAA | 18 safeguards, derived | 18 safeguards, derived |
+| NIST 800-53 Rev 5 | 149 controls | 151 controls |
+| HIPAA | 30 safeguards, derived | 30 safeguards, derived |
 | **Scanning** |
 | Single account/project | Yes | Yes |
 | Multi-account (AWS Orgs) | - | Yes |

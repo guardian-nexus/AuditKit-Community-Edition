@@ -69,6 +69,16 @@ func (c *EC2Checks) Run(ctx context.Context) ([]CheckResult, error) {
 		results = append(results, result)
 	}
 
+	// CIS AWS Foundations v7.0.0 6.4
+	if result, err := c.CheckSecurityGroupIPv6AdminPorts(ctx); err == nil {
+		results = append(results, result)
+	}
+
+	// CIS AWS Foundations v7.0.0 6.1.2
+	if result, err := c.CheckSecurityGroupCIFS(ctx); err == nil {
+		results = append(results, result)
+	}
+
 	return results, nil
 }
 
@@ -361,7 +371,7 @@ func (c *EC2Checks) CheckOldAMIs(ctx context.Context) (CheckResult, error) {
 
 // NEW CIS-SPECIFIC CHECKS
 
-// CIS 5.2 - Ensure no security groups allow ingress from 0.0.0.0/0 to port 22
+// CIS 6.3 - Ensure no security groups allow ingress from 0.0.0.0/0 to port 22
 func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, error) {
 	sgs, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
@@ -372,8 +382,10 @@ func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, err
 
 	for _, sg := range sgs.SecurityGroups {
 		for _, rule := range sg.IpPermissions {
-			// Check for SSH (port 22)
-			if rule.FromPort != nil && *rule.FromPort == 22 {
+			// A port range covering 22 exposes SSH just as much as a rule
+			// naming it. The equality test reported SSH closed on a group
+			// opening 0-65535, because its FromPort is 0.
+			if ruleCovers(rule.FromPort, rule.ToPort, 22) {
 				for _, ipRange := range rule.IpRanges {
 					if aws.ToString(ipRange.CidrIp) == "0.0.0.0/0" {
 						sshOpenGroups = append(sshOpenGroups, aws.ToString(sg.GroupId))
@@ -386,7 +398,7 @@ func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, err
 
 	if len(sshOpenGroups) > 0 {
 		return CheckResult{
-			Control:           "CIS-5.2",
+			Control:           "CIS-6.3",
 			Name:              "SSH Access from Internet",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -402,7 +414,7 @@ func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, err
 	}
 
 	return CheckResult{
-		Control:    "CIS-5.2",
+		Control:    "CIS-6.3",
 		Name:       "SSH Access from Internet",
 		Status:     "PASS",
 		Evidence:   "No security groups allow unrestricted SSH access",
@@ -412,7 +424,7 @@ func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, err
 	}, nil
 }
 
-// CIS 5.3 - Ensure no security groups allow ingress from 0.0.0.0/0 to port 3389
+// CIS 6.3 - Ensure no security groups allow ingress from 0.0.0.0/0 to port 3389
 func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, error) {
 	sgs, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
@@ -423,8 +435,8 @@ func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, err
 
 	for _, sg := range sgs.SecurityGroups {
 		for _, rule := range sg.IpPermissions {
-			// Check for RDP (port 3389)
-			if rule.FromPort != nil && *rule.FromPort == 3389 {
+			// As above: a range covering 3389 exposes RDP.
+			if ruleCovers(rule.FromPort, rule.ToPort, 3389) {
 				for _, ipRange := range rule.IpRanges {
 					if aws.ToString(ipRange.CidrIp) == "0.0.0.0/0" {
 						rdpOpenGroups = append(rdpOpenGroups, aws.ToString(sg.GroupId))
@@ -437,7 +449,7 @@ func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, err
 
 	if len(rdpOpenGroups) > 0 {
 		return CheckResult{
-			Control:           "CIS-5.3",
+			Control:           "CIS-6.3",
 			Name:              "RDP Access from Internet",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -453,7 +465,7 @@ func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, err
 	}
 
 	return CheckResult{
-		Control:    "CIS-5.3",
+		Control:    "CIS-6.3",
 		Name:       "RDP Access from Internet",
 		Status:     "PASS",
 		Evidence:   "No security groups allow unrestricted RDP access",
@@ -463,7 +475,7 @@ func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, err
 	}, nil
 }
 
-// CIS 5.4 - Ensure default security group restricts all traffic
+// CIS 6.5 - Ensure default security group restricts all traffic
 func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult, error) {
 	vpcs, err := c.client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
 	if err != nil {
@@ -497,7 +509,7 @@ func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult,
 
 	if len(openDefaultSGs) > 0 {
 		return CheckResult{
-			Control:           "CIS-5.4",
+			Control:           "CIS-6.5",
 			Name:              "Default Security Group",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -513,7 +525,7 @@ func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult,
 	}
 
 	return CheckResult{
-		Control:    "CIS-5.4",
+		Control:    "CIS-6.5",
 		Name:       "Default Security Group",
 		Status:     "PASS",
 		Evidence:   "All default security groups properly restrict traffic",
@@ -523,7 +535,7 @@ func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult,
 	}, nil
 }
 
-// CIS 5.6 - Ensure EC2 instances use IMDSv2
+// CIS 6.7 - Ensure EC2 instances use IMDSv2
 func (c *EC2Checks) CheckIMDSv2(ctx context.Context) (CheckResult, error) {
 	instances, err := c.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{})
 	if err != nil {
@@ -549,7 +561,7 @@ func (c *EC2Checks) CheckIMDSv2(ctx context.Context) (CheckResult, error) {
 
 	if len(imdsV1Instances) > 0 {
 		return CheckResult{
-			Control:           "CIS-5.6",
+			Control:           "CIS-6.7",
 			Name:              "EC2 IMDSv2",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -565,7 +577,7 @@ func (c *EC2Checks) CheckIMDSv2(ctx context.Context) (CheckResult, error) {
 	}
 
 	return CheckResult{
-		Control:    "CIS-5.6",
+		Control:    "CIS-6.7",
 		Name:       "EC2 IMDSv2",
 		Status:     "PASS",
 		Evidence:   "All EC2 instances require IMDSv2",
@@ -575,7 +587,7 @@ func (c *EC2Checks) CheckIMDSv2(ctx context.Context) (CheckResult, error) {
 	}, nil
 }
 
-// CIS 2.2.2 - Ensure EBS volume snapshots are not publicly accessible
+// Ensure EBS volume snapshots are not publicly accessible
 func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, error) {
 	snapshots, err := c.client.DescribeSnapshots(ctx, &ec2.DescribeSnapshotsInput{
 		OwnerIds: []string{"self"},
@@ -604,7 +616,7 @@ func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, e
 
 	if len(publicSnapshots) > 0 {
 		return CheckResult{
-			Control:           "CIS-2.2.2",
+			Control:           "AWS-EC2-01",
 			Name:              "EBS Public Snapshots",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -620,7 +632,7 @@ func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "CIS-2.2.2",
+		Control:    "AWS-EC2-01",
 		Name:       "EBS Public Snapshots",
 		Status:     "PASS",
 		Evidence:   "No EBS snapshots are publicly accessible",
@@ -630,19 +642,19 @@ func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, e
 	}, nil
 }
 
-// CheckInstanceIAMRoles verifies EC2 instances use IAM roles (CIS 1.18)
+// CheckInstanceIAMRoles verifies EC2 instances use IAM roles (CIS 2.16)
 func (c *EC2Checks) CheckInstanceIAMRoles(ctx context.Context) (CheckResult, error) {
 	result, err := c.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-1.18",
+			Control:    "CIS-2.16",
 			Name:       "EC2 Instance IAM Roles",
 			Status:     "FAIL",
 			Evidence:   fmt.Sprintf("Unable to check EC2 instances: %v", err),
 			Severity:   "MEDIUM",
 			Priority:   PriorityMedium,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "1.18", "SOC2": "CC6.1"},
+			Frameworks: map[string]string{"CIS-AWS": "2.16", "SOC2": "CC6.1"},
 		}, nil
 	}
 
@@ -673,11 +685,11 @@ func (c *EC2Checks) CheckInstanceIAMRoles(ctx context.Context) (CheckResult, err
 		}
 
 		return CheckResult{
-			Control:     "CIS-1.18",
+			Control:     "CIS-2.16",
 			Name:        "EC2 Instance IAM Roles",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("%d/%d running EC2 instances do not use IAM roles: %s | Violates CIS 1.18 (may use embedded credentials)", len(instancesWithoutRoles), totalRunningInstances, strings.Join(displayInstances, ", ")),
+			Evidence:    fmt.Sprintf("%d/%d running EC2 instances do not use IAM roles: %s | Violates CIS 2.16 (may use embedded credentials)", len(instancesWithoutRoles), totalRunningInstances, strings.Join(displayInstances, ", ")),
 			Remediation: "Attach IAM instance profiles to EC2 instances",
 			RemediationDetail: fmt.Sprintf(`# Create IAM role for EC2
 aws iam create-role --role-name EC2-App-Role --assume-role-policy-document '{
@@ -706,30 +718,30 @@ aws ec2 associate-iam-instance-profile --instance-id %s --iam-instance-profile N
 			ConsoleURL:      "https://console.aws.amazon.com/ec2/v2/home#Instances",
 			Priority:        PriorityMedium,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "1.18", "SOC2": "CC6.1", "PCI-DSS": "7.2.1"},
+			Frameworks:      map[string]string{"CIS-AWS": "2.16", "SOC2": "CC6.1", "PCI-DSS": "7.2.1"},
 		}, nil
 	}
 
 	if totalRunningInstances == 0 {
 		return CheckResult{
-			Control:    "CIS-1.18",
+			Control:    "CIS-2.16",
 			Name:       "EC2 Instance IAM Roles",
 			Status:     "INFO",
 			Evidence:   "No running EC2 instances found",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "1.18", "SOC2": "CC6.1"},
+			Frameworks: map[string]string{"CIS-AWS": "2.16", "SOC2": "CC6.1"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.18",
+		Control:    "CIS-2.16",
 		Name:       "EC2 Instance IAM Roles",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("All %d running EC2 instances use IAM roles | Meets CIS 1.18", totalRunningInstances),
+		Evidence:   fmt.Sprintf("All %d running EC2 instances use IAM roles | Meets CIS 2.16", totalRunningInstances),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "1.18", "SOC2": "CC6.1", "PCI-DSS": "7.2.1"},
+		Frameworks: map[string]string{"CIS-AWS": "2.16", "SOC2": "CC6.1", "PCI-DSS": "7.2.1"},
 	}, nil
 }
 
@@ -738,4 +750,174 @@ func min(a, b int) int {
 		return a
 	}
 	return b
+}
+
+// adminPorts are the remote server administration ports the benchmark names:
+// SSH and RDP.
+var adminPorts = []int32{22, 3389}
+
+// ruleCovers reports whether an ingress rule reaches the given port. A rule can
+// name a single port or a range, and the existing checks only ever compared
+// FromPort for equality - a rule opening 1-65535 covers 22 without ever having
+// FromPort set to 22.
+func ruleCovers(from, to *int32, port int32) bool {
+	if from == nil && to == nil {
+		return true // all traffic
+	}
+	lo, hi := int32(0), int32(65535)
+	if from != nil {
+		lo = *from
+	}
+	if to != nil {
+		hi = *to
+	} else if from != nil {
+		hi = *from
+	}
+	return lo <= port && port <= hi
+}
+
+// CheckSecurityGroupIPv6AdminPorts answers CIS AWS Foundations v7.0.0 6.4.
+//
+// The IPv4 equivalent has been checked since the beginning; ::/0 was not, so a
+// security group reachable from the whole IPv6 internet on port 22 passed.
+func (c *EC2Checks) CheckSecurityGroupIPv6AdminPorts(ctx context.Context) (CheckResult, error) {
+	sgs, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
+	if err != nil {
+		return CheckResult{
+			Control:    "CIS-6.4",
+			Name:       "Security Groups Open to IPv6 Internet on Admin Ports",
+			Status:     "ERROR",
+			Evidence:   fmt.Sprintf("Unable to read security groups: %v", err),
+			Severity:   "MEDIUM",
+			Priority:   PriorityMedium,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"CIS-AWS": "6.4", "SOC2": "CC6.6"},
+		}, nil
+	}
+
+	open := []string{}
+	for _, sg := range sgs.SecurityGroups {
+		for _, rule := range sg.IpPermissions {
+			hit := false
+			for _, r := range rule.Ipv6Ranges {
+				if aws.ToString(r.CidrIpv6) != "::/0" {
+					continue
+				}
+				for _, p := range adminPorts {
+					if ruleCovers(rule.FromPort, rule.ToPort, p) {
+						hit = true
+						break
+					}
+				}
+				if hit {
+					break
+				}
+			}
+			if hit {
+				open = append(open, aws.ToString(sg.GroupId))
+				break
+			}
+		}
+	}
+
+	if len(open) > 0 {
+		return CheckResult{
+			Control:           "CIS-6.4",
+			Name:              "Security Groups Open to IPv6 Internet on Admin Ports",
+			Status:            "FAIL",
+			Severity:          "CRITICAL",
+			Evidence:          fmt.Sprintf("%d security group(s) allow ingress from ::/0 to port 22 or 3389: %v", len(open), open),
+			Remediation:       "Remove the ::/0 ingress rule, or narrow it to the IPv6 prefixes that need administrative access",
+			RemediationDetail: fmt.Sprintf("aws ec2 revoke-security-group-ingress --group-id %s --ip-permissions 'IpProtocol=tcp,FromPort=22,ToPort=22,Ipv6Ranges=[{CidrIpv6=::/0}]'", open[0]),
+			ScreenshotGuide:   "EC2 -> Security Groups -> Inbound rules -> Screenshot showing no ::/0 rule reaching port 22 or 3389",
+			ConsoleURL:        "https://console.aws.amazon.com/ec2/v2/home#SecurityGroups",
+			Priority:          PriorityCritical,
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"CIS-AWS": "6.4", "SOC2": "CC6.6"},
+		}, nil
+	}
+
+	return CheckResult{
+		Control:    "CIS-6.4",
+		Name:       "Security Groups Open to IPv6 Internet on Admin Ports",
+		Status:     "PASS",
+		Evidence:   fmt.Sprintf("No security group allows ::/0 to port 22 or 3389 (%d groups checked)", len(sgs.SecurityGroups)),
+		Priority:   PriorityInfo,
+		Timestamp:  time.Now(),
+		Frameworks: map[string]string{"CIS-AWS": "6.4", "SOC2": "CC6.6"},
+	}, nil
+}
+
+// CheckSecurityGroupCIFS answers CIS AWS Foundations v7.0.0 6.1.2.
+//
+// CIFS/SMB on port 445 exposed to the internet is how file shares get
+// enumerated and ransomwared; the benchmark asks that it reach only trusted
+// networks.
+func (c *EC2Checks) CheckSecurityGroupCIFS(ctx context.Context) (CheckResult, error) {
+	sgs, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
+	if err != nil {
+		return CheckResult{
+			Control:    "CIS-6.1.2",
+			Name:       "CIFS Access Restricted to Trusted Networks",
+			Status:     "ERROR",
+			Evidence:   fmt.Sprintf("Unable to read security groups: %v", err),
+			Severity:   "MEDIUM",
+			Priority:   PriorityMedium,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"CIS-AWS": "6.1.2", "SOC2": "CC6.6"},
+		}, nil
+	}
+
+	open := []string{}
+	for _, sg := range sgs.SecurityGroups {
+		for _, rule := range sg.IpPermissions {
+			if !ruleCovers(rule.FromPort, rule.ToPort, 445) {
+				continue
+			}
+			exposed := false
+			for _, r := range rule.IpRanges {
+				if aws.ToString(r.CidrIp) == "0.0.0.0/0" {
+					exposed = true
+					break
+				}
+			}
+			for _, r := range rule.Ipv6Ranges {
+				if aws.ToString(r.CidrIpv6) == "::/0" {
+					exposed = true
+					break
+				}
+			}
+			if exposed {
+				open = append(open, aws.ToString(sg.GroupId))
+				break
+			}
+		}
+	}
+
+	if len(open) > 0 {
+		return CheckResult{
+			Control:           "CIS-6.1.2",
+			Name:              "CIFS Access Restricted to Trusted Networks",
+			Status:            "FAIL",
+			Severity:          "HIGH",
+			Evidence:          fmt.Sprintf("%d security group(s) expose CIFS/SMB (port 445) to the internet: %v", len(open), open),
+			Remediation:       "Remove the internet-facing rule for port 445 and allow it only from the networks that mount the share",
+			RemediationDetail: fmt.Sprintf("aws ec2 revoke-security-group-ingress --group-id %s --protocol tcp --port 445 --cidr 0.0.0.0/0", open[0]),
+			ScreenshotGuide:   "EC2 -> Security Groups -> Inbound rules -> Screenshot showing port 445 restricted to internal CIDRs",
+			ConsoleURL:        "https://console.aws.amazon.com/ec2/v2/home#SecurityGroups",
+			Priority:          PriorityHigh,
+			Timestamp:         time.Now(),
+			Frameworks:        map[string]string{"CIS-AWS": "6.1.2", "SOC2": "CC6.6"},
+		}, nil
+	}
+
+	return CheckResult{
+		Control:    "CIS-6.1.2",
+		Name:       "CIFS Access Restricted to Trusted Networks",
+		Status:     "PASS",
+		Evidence:   fmt.Sprintf("No security group exposes port 445 to the internet (%d groups checked)", len(sgs.SecurityGroups)),
+		Priority:   PriorityInfo,
+		Timestamp:  time.Now(),
+		Frameworks: map[string]string{"CIS-AWS": "6.1.2", "SOC2": "CC6.6"},
+	}, nil
 }

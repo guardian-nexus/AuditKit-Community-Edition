@@ -64,9 +64,9 @@ SPRS score postings and annual affirmations.</p>
 <p><strong>Certification:</strong> C3PAO (CMMC Third-Party Assessor Organization) assessment applies from Phase 2, which is currently suspended. Level 2 is self-assessed under Phase 1.</p>
 <h2>CMMC Levels</h2>
 <h3>Level 1: Foundational (17 Practices)</h3>
-<p><strong>Protects:</strong> Federal Contract Information (FCI)<br /><br>
-<strong>Required for:</strong> All DoW contractors<br /><br>
-<strong>Assessment:</strong> Self-assessment allowed<br /><br>
+<p><strong>Protects:</strong> Federal Contract Information (FCI)<br />
+<strong>Required for:</strong> All DoW contractors<br />
+<strong>Assessment:</strong> Self-assessment allowed<br />
 <strong>Cost:</strong> Free with AuditKit</p>
 <p><strong>What is FCI?</strong></p>
 <ul>
@@ -78,9 +78,9 @@ SPRS score postings and annual affirmations.</p>
 </ul>
 <p><strong>Timeline:</strong> Required now for new contracts</p>
 <h3>Level 2: Advanced (110 Practices)</h3>
-<p><strong>Protects:</strong> Controlled Unclassified Information (CUI)<br /><br>
-<strong>Required for:</strong> DoW contractors handling CUI<br /><br>
-<strong>Assessment:</strong> Self-assessment under Phase 1. C3PAO assessment was scheduled for Phase 2, which is suspended.<br /><br>
+<p><strong>Protects:</strong> Controlled Unclassified Information (CUI)<br />
+<strong>Required for:</strong> DoW contractors handling CUI<br />
+<strong>Assessment:</strong> Self-assessment under Phase 1. C3PAO assessment was scheduled for Phase 2, which is suspended.<br />
 <strong>Cost:</strong> $297/month with AuditKit</p>
 <p><strong>What is CUI?</strong></p>
 <ul>
@@ -94,7 +94,7 @@ SPRS score postings and annual affirmations.</p>
 <p><strong>Timeline:</strong> In force since November 10, 2025 (Phase 1)</p>
 <h2>CMMC Level 1 (Free)</h2>
 <h3>The 17 Practices</h3>
-<p>AuditKit reports all 17 practices. 13 carry an automated check on AWS and Azure, 9 on GCP; the rest are reported for evidence tracking:</p>
+<p>AuditKit reports all 17 practices. 5 reach a PASS or FAIL verdict on AWS, 4 on Azure and GCP; the rest are reported for evidence tracking:</p>
 <h4>Access Control (AC)</h4>
 <ol>
 <li><strong>AC.L1-3.1.1</strong> - Limit system access to authorized users</li>
@@ -103,64 +103,54 @@ SPRS score postings and annual affirmations.</p>
 <li><strong>AC.L1-3.1.22</strong> - Control information posted or processed on publicly accessible systems</li>
 </ol>
 <h4>Identification &amp; Authentication (IA)</h4>
-<ol start="5">
+<ol>
 <li><strong>IA.L1-3.5.1</strong> - Identify system users, processes acting on behalf of users, and devices</li>
 <li><strong>IA.L1-3.5.2</strong> - Authenticate the identities of those users, processes and devices</li>
 </ol>
 <h4>Media Protection (MP)</h4>
-<ol start="7">
+<ol>
 <li><strong>MP.L1-3.8.3</strong> - Sanitize or destroy media containing FCI before disposal or reuse</li>
 </ol>
 <h4>Physical Protection (PE)</h4>
-<ol start="8">
+<ol>
 <li><strong>PE.L1-3.10.1</strong> - Limit physical access to systems, equipment and operating environments</li>
 <li><strong>PE.L1-3.10.3</strong> - Escort visitors and monitor visitor activity</li>
 <li><strong>PE.L1-3.10.4</strong> - Maintain audit logs of physical access</li>
 <li><strong>PE.L1-3.10.5</strong> - Control and manage physical access devices</li>
 </ol>
 <h4>System &amp; Communications Protection (SC)</h4>
-<ol start="12">
+<ol>
 <li><strong>SC.L1-3.13.1</strong> - Monitor, control and protect communications at external and key internal boundaries</li>
 <li><strong>SC.L1-3.13.5</strong> - Implement subnetworks for publicly accessible components, separated from internal networks</li>
 </ol>
 <h4>System &amp; Information Integrity (SI)</h4>
-<ol start="14">
+<ol>
 <li><strong>SI.L1-3.14.1</strong> - Identify, report and correct system flaws in a timely manner</li>
 <li><strong>SI.L1-3.14.2</strong> - Provide protection from malicious code at designated locations</li>
 <li><strong>SI.L1-3.14.4</strong> - Update malicious code protection mechanisms when new releases are available</li>
 <li><strong>SI.L1-3.14.5</strong> - Perform periodic scans of the system and real-time scans of files from external sources</li>
 </ol>
-<p>These are the identifiers the scanner emits. The older <code class="code-inline">AC.1.001</code> form belongs to
+<p>These are the identifiers the scanner emits. The older <code>AC.1.001</code> form belongs to
 CMMC 1.0, which was withdrawn; CMMC 2.0 identifies each practice by its domain,
 level and NIST SP 800-171 Rev 2 requirement number.</p>
 <h3>What AuditKit Checks (Level 1)</h3>
-<p><strong>Queried automatically from your cloud configuration (13 of the 17 on AWS and Azure, 9 of 17 on GCP):</strong></p>
+<p><strong>Reach a PASS or FAIL verdict from your cloud configuration (5 of the 17 on AWS, 4 on Azure and GCP):</strong></p>
 <ul>
-<li>IAM password policy configuration</li>
-<li>MFA enforcement</li>
-<li>Access key rotation</li>
-<li>CloudTrail/logging enabled</li>
-<li>Security group rules</li>
-<li>Public access on storage</li>
-<li>Encryption at rest</li>
-<li>Patch management</li>
+<li>AC.L1-3.1.1 - Limit system access to authorized users (IAM users and stale access keys)</li>
+<li>AC.L1-3.1.2 - Limit access to the transactions and functions authorized users may execute (IAM policies and role assignments)</li>
+<li>IA.L1-3.5.1 - Identify system users, processes and devices (directory and user inventory)</li>
+<li>IA.L1-3.5.2 - Authenticate users, processes and devices (MFA; AWS only)</li>
+<li>SC.L1-3.13.1 - Monitor, control and protect communications at external boundaries (security groups, NSGs, firewall rules)</li>
 </ul>
-<p><strong>No automated check - manual verification required (4 practices):</strong></p>
-<ul>
-<li>AC.L1-3.1.20 - Verify and control connections to external systems</li>
-<li>AC.L1-3.1.22 - Control publicly posted information</li>
-<li>SI.L1-3.14.4 - Update malicious code protection mechanisms</li>
-<li>SI.L1-3.14.5 - Perform periodic and real-time scans</li>
-<li>Physical security measures</li>
-<li>Visitor escort procedures</li>
-<li>Media sanitization procedures</li>
-<li>Network monitoring processes</li>
-<li>Vulnerability scanning schedule</li>
-<li>Security alert response</li>
-<li>System update procedures</li>
-</ul>
+<p><strong>Reported for evidence (the other 12):</strong></p>
+<p>Every other Level 1 practice appears in the report with what an assessor will
+ask to see. Several run a check and report what they found without deciding -
+encryption at rest, public access on storage, logging, patching - because the
+practice asks for a process that configuration alone cannot prove. The rest are
+physical, media and personnel practices no cloud API can see: visitor escort,
+media sanitization, malicious-code protection and its updates, periodic scans.</p>
 <h3>Running Level 1 Scan</h3>
-<div class="code-block"># Scan for CMMC Level 1
+<pre class="code-block"><code># Scan for CMMC Level 1
 auditkit scan -provider aws -framework cmmc
 auditkit scan -provider azure -framework cmmc
 auditkit scan -provider gcp -framework cmmc
@@ -171,7 +161,7 @@ auditkit scan -provider aws -framework cmmc -format pdf -output cmmc-l1-report.p
 # Generate evidence tracker for manual practices
 # Evidence tracker (covers every framework; -framework and -format are not honoured here)
 auditkit evidence -output cmmc-evidence.html
-</div>
+</code></pre>
 <h3>Level 1 Timeline</h3>
 <p><strong>Typical preparation:</strong> 2-4 weeks</p>
 <p><strong>Steps:</strong>
@@ -298,7 +288,7 @@ auditkit evidence -output cmmc-evidence.html
 <li>Information input validation</li>
 </ul>
 <h3>What AuditKit Checks (Level 2)</h3>
-<p><strong>Queried automatically from your cloud configuration (42 of the 110); the remaining 68 are
+<p><strong>Reach a PASS or FAIL verdict from your cloud configuration (27 of the 110 on AWS); the remaining 83 are
 assessed as structured evidence guidance, telling you what an assessor needs to see:</strong>
 All technical controls across:</p>
 <ul>
@@ -314,7 +304,7 @@ All technical controls across:</p>
 <li>Key rotation</li>
 <li>Public access controls</li>
 </ul>
-<p><strong>Structured evidence guidance (68 practices):</strong>
+<p><strong>Structured evidence guidance (83 practices):</strong>
 Organizational controls:</p>
 <ul>
 <li>Policies and procedures</li>
@@ -326,7 +316,7 @@ Organizational controls:</p>
 <li>Security assessments</li>
 </ul>
 <h3>Running a Level 2 Scan</h3>
-<div class="code-block"># Scan for CMMC Level 2 (requires Pro license)
+<pre class="code-block"><code># Scan for CMMC Level 2 (requires Pro license)
 auditkit-pro scan -provider aws -framework cmmc
 auditkit-pro scan -provider azure -framework cmmc
 auditkit-pro scan -provider gcp -framework cmmc
@@ -336,7 +326,7 @@ auditkit-pro scan -provider aws -framework cmmc -format pdf -output cmmc-report.
 
 # Generate the evidence tracker (covers every framework; -framework does not scope it)
 auditkit-pro evidence -output cmmc-evidence.html
-</div>
+</code></pre>
 <h3>Level 2 Timeline</h3>
 <p><strong>Typical preparation:</strong> 3-6 months</p>
 <p><strong>Steps:</strong>
@@ -389,8 +379,8 @@ auditkit-pro evidence -output cmmc-evidence.html
 </tr>
 <tr>
 <td><strong>Automated Checks</strong></td>
-<td>13 of 17</td>
-<td>42 of 110 query the cloud</td>
+<td>5 of 17 reach a verdict (AWS)</td>
+<td>27 of 110 reach a verdict (AWS)</td>
 </tr>
 <tr>
 <td><strong>Manual Docs</strong></td>
@@ -411,7 +401,7 @@ auditkit-pro evidence -output cmmc-evidence.html
 </table></div>
 <h2>CMMC &amp; NIST SP 800-171</h2>
 <p><strong>CMMC Level 2 is based on NIST SP 800-171 Rev 2</strong></p>
-<p>AuditKit maps all 110 CMMC Level 2 practices to their corresponding NIST SP 800-171 controls.</p>
+<p>AuditKit maps all 110 CMMC practices to their corresponding NIST SP 800-171 controls.</p>
 <p><strong>Example mapping:</strong></p>
 <ul>
 <li>CMMC AC.L1-3.1.2 → NIST 800-171 3.1.2</li>
@@ -420,11 +410,11 @@ auditkit-pro evidence -output cmmc-evidence.html
 </ul>
 <p>This means passing CMMC Level 2 = compliance with NIST SP 800-171.</p>
 <h2>C3PAO Assessment Process</h2>
-<div class="note">
+<blockquote>
 <p><strong>Note:</strong> C3PAO assessment belongs to Phase 2 of the CMMC rollout, which the
 Department of War suspended on July 13, 2026. The section below describes the
 process for when it resumes. Under Phase 1 today, Level 2 is self-assessed.</p>
-</div>
+</blockquote>
 <h3>Before Assessment</h3>
 <p><strong>6-12 months before:</strong>
 1. Gap assessment with AuditKit

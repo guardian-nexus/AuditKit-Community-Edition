@@ -140,7 +140,7 @@ func contains(str, substr string) bool {
 	return len(str) > 0 && len(substr) > 0 && (str == substr || len(str) > len(substr))
 }
 
-// CheckSecurityHubEnabled verifies AWS Security Hub is enabled (CIS 4.16)
+// CheckSecurityHubEnabled verifies AWS Security Hub is enabled (CIS 5.16)
 func (c *MonitoringChecks) CheckSecurityHubEnabled(ctx context.Context) (CheckResult, error) {
 	// Try to get the Security Hub status
 	hub, err := c.shClient.DescribeHub(ctx, &securityhub.DescribeHubInput{})
@@ -151,7 +151,7 @@ func (c *MonitoringChecks) CheckSecurityHubEnabled(ctx context.Context) (CheckRe
 			strings.Contains(err.Error(), "InvalidAccessException") ||
 			strings.Contains(err.Error(), "ResourceNotFoundException") {
 			return CheckResult{
-				Control:     "CIS-4.16",
+				Control:     "CIS-5.16",
 				Name:        "AWS Security Hub Enabled",
 				Status:      "FAIL",
 				Severity:    "MEDIUM",
@@ -176,7 +176,7 @@ done
 
 IMPORTANT: Security Hub requires AWS Config to be enabled first.
 Also consider enabling:
-- AWS Config (CIS 3.3)
+- AWS Config (CIS 5.16)
 - Amazon GuardDuty
 - AWS Inspector
 - Amazon Macie`,
@@ -195,7 +195,7 @@ Also consider enabling:
 
 		// Other errors (permission issues, etc.)
 		return CheckResult{
-			Control:           "CIS-4.16",
+			Control:           "CIS-5.16",
 			Name:              "AWS Security Hub Enabled",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -211,7 +211,7 @@ Also consider enabling:
 	// Security Hub is enabled - check if it's active
 	if hub.HubArn == nil || *hub.HubArn == "" {
 		return CheckResult{
-			Control:     "CIS-4.16",
+			Control:     "CIS-5.16",
 			Name:        "AWS Security Hub Enabled",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
@@ -230,7 +230,7 @@ Also consider enabling:
 	}
 
 	return CheckResult{
-		Control:    "CIS-4.16",
+		Control:    "CIS-5.16",
 		Name:       "AWS Security Hub Enabled",
 		Status:     "PASS",
 		Evidence:   fmt.Sprintf("AWS Security Hub is enabled | Hub ARN: %s | Subscribed: %s", *hub.HubArn, subscriptionDate),

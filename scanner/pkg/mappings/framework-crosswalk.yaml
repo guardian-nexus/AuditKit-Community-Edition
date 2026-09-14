@@ -75,7 +75,25 @@ pci_to_800_53:
   PCI-1.3.2: [AC-4, SC-7(5)]            # Outbound traffic from CDE restricted
   PCI-1.4.1: [SC-7, SC-7(3)]            # NSCs between trusted and untrusted networks
   PCI-3.2.1: [SI-12, MP-6]              # Account data storage minimised
+  # Ported from Pro, which had these and Community did not. The AKS port made
+  # Community emit 1.4.4 and 3.5.1.2 for the first time, and without an entry
+  # they derived no 800-53 controls at all.
+  PCI-1.4.4: [SC-7, SC-7(3)]            # CHD components not reachable from untrusted networks
+  PCI-11.4.1: [CA-8]                    # Penetration testing methodology
+  PCI-3.5.1.2: [SC-28, SC-28(1)]        # Disk-level encryption
+  PCI-6.5.1: [CM-3, CM-4]               # Change control procedures
+  PCI-6.5.2: [CM-3(2), CM-4]            # Requirements confirmed after significant change
+  PCI-8.3.1: [IA-2]                     # All users authenticated
+  PCI-9.3.1: [PE-2, PE-3]               # Physical access authorisation to the CDE
   PCI-3.7.4: [SC-12, SC-12(1)]          # Key changes at end of cryptoperiod
+  PCI-2.2.7: [AC-17(2), SC-8, SC-8(1)]  # Non-console admin access encrypted
+  PCI-8.2.4: [AC-2, IA-4, IA-5]         # Identifier and authenticator lifecycle
+  # 4.1, 7.1 and 10.1 are the section requirements asking for the process to be
+  # defined and documented, so they derive their family policy control rather
+  # than a technical one.
+  PCI-4.1: [SC-1, SC-8]                 # Transmission protection defined
+  PCI-7.1: [AC-1]                       # Access restriction defined
+  PCI-10.1: [AU-1, AU-2]                # Logging and monitoring defined
   PCI-4.2.1.1: [SC-12, SC-17]           # Inventory of trusted keys and certificates
   PCI-7.2.2: [AC-6, AC-2(7)]            # Least privilege by job function
   PCI-8.2.1: [IA-2, IA-4]               # Unique user IDs
@@ -171,6 +189,21 @@ cmmc_to_800_53:
   AC.L2-3.1.5: [AC-6]                   # Least privilege
   AC.L2-3.1.6: [AC-6(1)]                # Non-privileged account use
   
+  AC.L2-3.1.4: [AC-5]                   # Separation of duties
+  AC.L2-3.1.7: [AC-6(9), AC-6(10)]      # Privileged function use audited
+  AC.L2-3.1.8: [AC-7]                   # Unsuccessful logon attempts limited
+  AC.L2-3.1.9: [AC-8]                   # Privacy and security notices
+  AC.L2-3.1.10: [AC-11, AC-11(1)]       # Session lock with pattern hiding
+  AC.L2-3.1.11: [AC-12]                 # Session termination
+  AC.L2-3.1.12: [AC-17(1)]              # Remote access monitored and controlled
+  AC.L2-3.1.13: [AC-17(2)]              # Remote access cryptographically protected
+  AC.L2-3.1.14: [AC-17(3)]              # Remote access routed through control points
+  AC.L2-3.1.15: [AC-17(4)]              # Privileged remote access authorized
+  AC.L2-3.1.16: [AC-18]                 # Wireless access authorized
+  AC.L2-3.1.17: [AC-18(1)]              # Wireless authentication and encryption
+  AC.L2-3.1.18: [AC-19]                 # Mobile device connection controlled
+  AC.L2-3.1.19: [AC-19(5)]              # CUI encrypted on mobile devices
+  AC.L2-3.1.21: [AC-20(2)]              # Portable storage on external systems limited
   # Awareness and Training (AT)
   AT.L2-3.2.1: [AT-2]                   # Security awareness
   AT.L2-3.2.2: [AT-3]                   # Role-based training
@@ -223,6 +256,7 @@ cmmc_to_800_53:
   MA.L2-3.7.4: [MA-5]                   # Maintenance personnel
   MA.L2-3.7.5: [MA-6]                   # Timely maintenance
   
+  MA.L2-3.7.6: [MA-5]                   # Maintenance personnel supervised
   # Media Protection (MP)
   MP.L1-3.8.3: [MP-6]                   # Media sanitization
   MP.L2-3.8.2: [MP-2]                   # Media access control
@@ -234,6 +268,9 @@ cmmc_to_800_53:
   MP.L2-3.8.8: [MP-4]                   # Media downgrading
   MP.L2-3.8.9: [MP-8]                   # Media accountability
   
+  # Personnel Security (PS)
+  PS.L2-3.9.1: [PS-3]                   # Personnel screening
+  PS.L2-3.9.2: [PS-4, PS-5]             # CUI protected through personnel actions
   # Physical Protection (PE)
   PE.L1-3.10.1: [PE-2]                  # Physical access
   PE.L1-3.10.3: [PE-3]                  # Escort visitors
@@ -277,8 +314,8 @@ cmmc_to_800_53:
   SI.L1-3.14.1: [SI-2]                  # Flaw remediation
   SI.L1-3.14.2: [SI-3]                  # Malicious code protection
   SI.L1-3.14.4: [SI-3(1)]               # Update malicious code
-  SI.L1-3.14.5: [SI-4]                  # System monitoring
-  SI.L2-3.14.3: [SI-3]                  # Malicious code at entry/exit
+  SI.L1-3.14.5: [SI-3]                  # Periodic and real-time malicious-code scanning
+  SI.L2-3.14.3: [SI-5]                  # Security alerts, advisories and directives
   SI.L2-3.14.6: [SI-4]                  # Monitor communications
   SI.L2-3.14.7: [SI-4(2)]               # Automated tools
 
@@ -294,6 +331,10 @@ iso27001_to_800_53:
   A.5.14: [MP-6]                   # Information transfer
   A.5.23: [SI-4]                   # Information security for cloud
   A.5.30: [CP-2, CP-9]             # ICT readiness for business continuity
+
+  A.5.17: [IA-5]                   # Authentication information
+  A.5.18: [AC-2, AC-3]             # Access rights
+  A.6.8: [IR-6]                    # Information security event reporting
 
   # A.6: People Controls
   A.6.1: [PS-3]                    # Screening
@@ -562,6 +603,10 @@ nist_csf_to_800_53:
   PR.PS-04:
     - AU-2
     - AU-12
+  # PR.PS-06 derives only SA-3, the secure development lifecycle, and no
+  # check emits SA-3 because a configuration scanner cannot observe how
+  # software was developed. The subcategory therefore never shows as
+  # covered, which is correct rather than a gap to close.
   PR.PS-06:
     - SA-3
   RC.CO-03:
@@ -595,6 +640,14 @@ hipaa_to_800_53:
   # "164.308(a)(1)" is the paragraph heading, not a citable requirement, so it
   # matched nothing in the Security Rule catalog.
   "164.308(a)(1)(i)": [RA-1, RA-3]      # Security management process
+  "164.308(a)(1)(ii)(A)": [RA-3]         # Risk analysis
+  "164.308(a)(1)(ii)(D)": [AU-6, AU-6(1)] # Information system activity review
+  "164.308(a)(3)(ii)(A)": [AC-2, PS-7]   # Authorization and/or supervision
+  "164.308(a)(4)(ii)(A)": [SC-7, AC-4]   # Isolating clearinghouse functions
+  "164.308(a)(4)(ii)(B)": [AC-2, AC-3, AC-6] # Access authorization
+  "164.308(a)(5)(ii)(B)": [SI-3]         # Protection from malicious software
+  "164.308(a)(5)(ii)(D)": [IA-5, IA-5(1)] # Password management
+  "164.308(a)(6)(ii)": [IR-4, IR-6]      # Response and reporting
   "164.308(a)(3)(i)": [AC-1, AC-2]      # Workforce security
   "164.308(a)(4)(i)": [AC-3, AC-6]      # Information access management
   "164.308(a)(5)(i)": [AT-2, AT-3]      # Security awareness and training
@@ -612,3 +665,8 @@ hipaa_to_800_53:
   "164.312(e)(1)": [SC-8, SC-8(1)]      # Transmission security
   "164.312(e)(2)(i)": [SI-7]            # Integrity controls
   "164.312(e)(2)(ii)": [SC-13, SC-8]    # Encryption
+  "164.308(a)(4)(ii)(C)": [AC-2]        # Access establishment and modification
+  "164.308(a)(7)(ii)(A)": [CP-9]        # Data backup plan
+  "164.308(a)(8)": [CA-2, CA-7]         # Evaluation
+  "164.308(b)(1)": [SA-9, PS-7]         # Business associate contracts
+

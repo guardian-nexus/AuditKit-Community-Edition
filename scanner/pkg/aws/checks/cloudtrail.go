@@ -239,7 +239,7 @@ func (c *CloudTrailChecks) CheckLogFileValidation(ctx context.Context) (CheckRes
 
 // NEW CIS-SPECIFIC CHECKS
 
-// CIS 3.7 - Ensure CloudTrail logs are encrypted at rest using KMS CMKs
+// CIS 4.5 - Ensure CloudTrail logs are encrypted at rest using KMS CMKs
 func (c *CloudTrailChecks) CheckCloudTrailEncryption(ctx context.Context) (CheckResult, error) {
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
 	if err != nil || len(trails.Trails) == 0 {
@@ -260,7 +260,7 @@ func (c *CloudTrailChecks) CheckCloudTrailEncryption(ctx context.Context) (Check
 
 	if len(unencryptedTrails) > 0 {
 		return CheckResult{
-			Control:           "CIS-3.7",
+			Control:           "CIS-4.5",
 			Name:              "CloudTrail Encryption at Rest",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -276,7 +276,7 @@ func (c *CloudTrailChecks) CheckCloudTrailEncryption(ctx context.Context) (Check
 	}
 
 	return CheckResult{
-		Control:    "CIS-3.7",
+		Control:    "CIS-4.5",
 		Name:       "CloudTrail Encryption at Rest",
 		Status:     "PASS",
 		Evidence:   "All CloudTrail logs encrypted with KMS CMKs",
@@ -286,7 +286,7 @@ func (c *CloudTrailChecks) CheckCloudTrailEncryption(ctx context.Context) (Check
 	}, nil
 }
 
-// CIS 3.3 - Ensure CloudWatch Logs integration is enabled
+// Ensure CloudWatch Logs integration is enabled
 func (c *CloudTrailChecks) CheckCloudTrailLogIntegration(ctx context.Context) (CheckResult, error) {
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
 	if err != nil || len(trails.Trails) == 0 {
@@ -307,7 +307,7 @@ func (c *CloudTrailChecks) CheckCloudTrailLogIntegration(ctx context.Context) (C
 
 	if len(trailsWithoutCWL) > 0 {
 		return CheckResult{
-			Control:           "CIS-3.3",
+			Control:           "AWS-CLOUDTRAIL-01",
 			Name:              "CloudTrail CloudWatch Logs Integration",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -323,7 +323,7 @@ func (c *CloudTrailChecks) CheckCloudTrailLogIntegration(ctx context.Context) (C
 	}
 
 	return CheckResult{
-		Control:    "CIS-3.3",
+		Control:    "AWS-CLOUDTRAIL-01",
 		Name:       "CloudTrail CloudWatch Logs Integration",
 		Status:     "PASS",
 		Evidence:   "All CloudTrail logs integrated with CloudWatch Logs",
@@ -333,10 +333,10 @@ func (c *CloudTrailChecks) CheckCloudTrailLogIntegration(ctx context.Context) (C
 	}, nil
 }
 
-// CIS 3.6 - Ensure S3 bucket access logging is enabled on CloudTrail S3 bucket
+// CIS 4.4 - Ensure S3 bucket access logging is enabled on CloudTrail S3 bucket
 func (c *CloudTrailChecks) CheckS3BucketAccessLogging(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control:           "CIS-3.6",
+		Control:           "CIS-4.4",
 		Name:              "CloudTrail S3 Bucket Logging",
 		Status:            "INFO",
 		Evidence:          "MANUAL CHECK: Verify S3 bucket used by CloudTrail has access logging enabled",
@@ -350,7 +350,7 @@ func (c *CloudTrailChecks) CheckS3BucketAccessLogging(ctx context.Context) (Chec
 	}, nil
 }
 
-// CIS 3.2 - Ensure CloudTrail log file validation is enabled (duplicate but with CIS label)
+// CIS 4.2 - Ensure CloudTrail log file validation is enabled (duplicate but with CIS label)
 func (c *CloudTrailChecks) CheckCloudTrailLogValidation(ctx context.Context) (CheckResult, error) {
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
 	if err != nil || len(trails.Trails) == 0 {
@@ -371,7 +371,7 @@ func (c *CloudTrailChecks) CheckCloudTrailLogValidation(ctx context.Context) (Ch
 
 	if len(trailsWithoutValidation) > 0 {
 		return CheckResult{
-			Control:           "CIS-3.2",
+			Control:           "CIS-4.2",
 			Name:              "CloudTrail Log File Validation",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -387,7 +387,7 @@ func (c *CloudTrailChecks) CheckCloudTrailLogValidation(ctx context.Context) (Ch
 	}
 
 	return CheckResult{
-		Control:    "CIS-3.2",
+		Control:    "CIS-4.2",
 		Name:       "CloudTrail Log File Validation",
 		Status:     "PASS",
 		Evidence:   "All CloudTrail logs have file validation enabled",
@@ -397,10 +397,10 @@ func (c *CloudTrailChecks) CheckCloudTrailLogValidation(ctx context.Context) (Ch
 	}, nil
 }
 
-// CIS 3.4 - Ensure CloudTrail S3 bucket policy prevents public access
+// Ensure CloudTrail S3 bucket policy prevents public access
 func (c *CloudTrailChecks) CheckCloudTrailS3BucketPolicy(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control:           "CIS-3.4",
+		Control:           "AWS-CLOUDTRAIL-02",
 		Name:              "CloudTrail S3 Bucket Policy",
 		Status:            "INFO",
 		Evidence:          "MANUAL CHECK: Verify CloudTrail S3 bucket denies public access and has proper policy",
@@ -414,14 +414,18 @@ func (c *CloudTrailChecks) CheckCloudTrailS3BucketPolicy(ctx context.Context) (C
 	}, nil
 }
 
-// CIS 3.8 - Ensure KMS key rotation is enabled for CloudTrail encryption keys
+// Ensure KMS key rotation is enabled for CloudTrail encryption keys
 func (c *CloudTrailChecks) CheckCloudTrailKMSKey(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control:           "CIS-3.8",
-		Name:              "CloudTrail KMS Key Rotation",
-		Status:            "INFO",
-		Evidence:          "MANUAL CHECK: Verify KMS keys used for CloudTrail encryption have automatic rotation enabled",
-		Remediation:       "Enable automatic key rotation for KMS keys",
+		Control: "AWS-CLOUDTRAIL-03",
+		Name:    "Customer-Managed KMS Key Rotation",
+		Status:  "INFO",
+		// v7.0.0 4.6 covers every customer-created symmetric CMK, not only the
+		// key CloudTrail uses. The wording was narrower than the recommendation
+		// it claims, which is an overclaim by omission: a pass here said nothing
+		// about the other keys in the account.
+		Evidence:          "MANUAL CHECK: Verify automatic rotation is enabled on every customer-created symmetric KMS key, including but not limited to the key CloudTrail encrypts with",
+		Remediation:       "Enable automatic annual rotation on each customer-managed symmetric KMS key",
 		RemediationDetail: "1. Go to KMS Console\n2. Find key used by CloudTrail\n3. Enable automatic key rotation\n4. Verify rotation is enabled: aws kms get-key-rotation-status --key-id [KEY_ID]",
 		ScreenshotGuide:   "KMS Console → Customer managed keys → CloudTrail key → Key rotation → Screenshot showing 'Automatically rotate this KMS key every year: Enabled'",
 		ConsoleURL:        "https://console.aws.amazon.com/kms/home#/kms/keys",
@@ -431,28 +435,28 @@ func (c *CloudTrailChecks) CheckCloudTrailKMSKey(ctx context.Context) (CheckResu
 	}, nil
 }
 
-// CheckS3ObjectLevelLoggingWrite verifies S3 object-level logging for write events (CIS 3.10)
+// CheckS3ObjectLevelLoggingWrite verifies S3 object-level logging for write events (CIS 4.8)
 func (c *CloudTrailChecks) CheckS3ObjectLevelLoggingWrite(ctx context.Context) (CheckResult, error) {
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-3.10",
+			Control:    "CIS-4.8",
 			Name:       "S3 Object-Level Logging (Write)",
 			Status:     "FAIL",
 			Evidence:   fmt.Sprintf("Unable to check CloudTrail configuration: %v", err),
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "3.10", "SOC2": "CC7.2"},
+			Frameworks: map[string]string{"CIS-AWS": "4.8", "SOC2": "CC7.2"},
 		}, nil
 	}
 
 	if len(trails.Trails) == 0 {
 		return CheckResult{
-			Control:     "CIS-3.10",
+			Control:     "CIS-4.8",
 			Name:        "S3 Object-Level Logging (Write)",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    "No CloudTrail trails configured | Cannot log S3 object-level events | Violates CIS 3.10",
+			Evidence:    "No CloudTrail trails configured | Cannot log S3 object-level events | Violates CIS 4.8",
 			Remediation: "Configure CloudTrail with S3 data events for write operations",
 			RemediationDetail: `# Create event selector for S3 write events
 aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '[{
@@ -477,7 +481,7 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 			ConsoleURL:      "https://console.aws.amazon.com/cloudtrail/home#/trails",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "3.10", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
+			Frameworks:      map[string]string{"CIS-AWS": "4.8", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 		}, nil
 	}
 
@@ -511,11 +515,11 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 
 	if len(trailsWithS3WriteLogging) == 0 {
 		return CheckResult{
-			Control:     "CIS-3.10",
+			Control:     "CIS-4.8",
 			Name:        "S3 Object-Level Logging (Write)",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("%d CloudTrail trails found, but NONE log S3 write events | Violates CIS 3.10", len(trails.Trails)),
+			Evidence:    fmt.Sprintf("%d CloudTrail trails found, but NONE log S3 write events | Violates CIS 4.8", len(trails.Trails)),
 			Remediation: "Enable S3 data event logging for write operations on at least one trail",
 			RemediationDetail: `aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '[{
   "ReadWriteType": "WriteOnly",
@@ -529,43 +533,43 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 			ConsoleURL:      "https://console.aws.amazon.com/cloudtrail/home#/trails",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "3.10", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
+			Frameworks:      map[string]string{"CIS-AWS": "4.8", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-3.10",
+		Control:    "CIS-4.8",
 		Name:       "S3 Object-Level Logging (Write)",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("%d trail(s) logging S3 write events: %s | Meets CIS 3.10", len(trailsWithS3WriteLogging), trailsWithS3WriteLogging[0]),
+		Evidence:   fmt.Sprintf("%d trail(s) logging S3 write events: %s | Meets CIS 4.8", len(trailsWithS3WriteLogging), trailsWithS3WriteLogging[0]),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "3.10", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
+		Frameworks: map[string]string{"CIS-AWS": "4.8", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 	}, nil
 }
 
-// CheckS3ObjectLevelLoggingRead verifies S3 object-level logging for read events (CIS 3.11)
+// CheckS3ObjectLevelLoggingRead verifies S3 object-level logging for read events (CIS 4.9)
 func (c *CloudTrailChecks) CheckS3ObjectLevelLoggingRead(ctx context.Context) (CheckResult, error) {
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-3.11",
+			Control:    "CIS-4.9",
 			Name:       "S3 Object-Level Logging (Read)",
 			Status:     "FAIL",
 			Evidence:   fmt.Sprintf("Unable to check CloudTrail configuration: %v", err),
 			Priority:   PriorityMedium,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "3.11", "SOC2": "CC7.2"},
+			Frameworks: map[string]string{"CIS-AWS": "4.9", "SOC2": "CC7.2"},
 		}, nil
 	}
 
 	if len(trails.Trails) == 0 {
 		return CheckResult{
-			Control:     "CIS-3.11",
+			Control:     "CIS-4.9",
 			Name:        "S3 Object-Level Logging (Read)",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    "No CloudTrail trails configured | Cannot log S3 object-level events | Violates CIS 3.11",
+			Evidence:    "No CloudTrail trails configured | Cannot log S3 object-level events | Violates CIS 4.9",
 			Remediation: "Configure CloudTrail with S3 data events for read operations",
 			RemediationDetail: `# Create event selector for S3 read events
 aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '[{
@@ -590,7 +594,7 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 			ConsoleURL:      "https://console.aws.amazon.com/cloudtrail/home#/trails",
 			Priority:        PriorityMedium,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "3.11", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
+			Frameworks:      map[string]string{"CIS-AWS": "4.9", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 		}, nil
 	}
 
@@ -624,11 +628,11 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 
 	if len(trailsWithS3ReadLogging) == 0 {
 		return CheckResult{
-			Control:     "CIS-3.11",
+			Control:     "CIS-4.9",
 			Name:        "S3 Object-Level Logging (Read)",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
-			Evidence:    fmt.Sprintf("%d CloudTrail trails found, but NONE log S3 read events | Violates CIS 3.11", len(trails.Trails)),
+			Evidence:    fmt.Sprintf("%d CloudTrail trails found, but NONE log S3 read events | Violates CIS 4.9", len(trails.Trails)),
 			Remediation: "Enable S3 data event logging for read operations on at least one trail",
 			RemediationDetail: `aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '[{
   "ReadWriteType": "ReadOnly",
@@ -642,17 +646,17 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 			ConsoleURL:      "https://console.aws.amazon.com/cloudtrail/home#/trails",
 			Priority:        PriorityMedium,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "3.11", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
+			Frameworks:      map[string]string{"CIS-AWS": "4.9", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-3.11",
+		Control:    "CIS-4.9",
 		Name:       "S3 Object-Level Logging (Read)",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("%d trail(s) logging S3 read events: %s | Meets CIS 3.11", len(trailsWithS3ReadLogging), trailsWithS3ReadLogging[0]),
+		Evidence:   fmt.Sprintf("%d trail(s) logging S3 read events: %s | Meets CIS 4.9", len(trailsWithS3ReadLogging), trailsWithS3ReadLogging[0]),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "3.11", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
+		Frameworks: map[string]string{"CIS-AWS": "4.9", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
 	}, nil
 }

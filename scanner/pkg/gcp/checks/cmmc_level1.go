@@ -68,9 +68,9 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:         "AC.L1-3.1.1",
 			Name:            "[CMMC L1] Limit System Access",
-			Status:          "FAIL",
-			Evidence:        fmt.Sprintf("Unable to verify IAM bindings: %v", err),
-			Remediation:     "Enable GCP IAM and configure role bindings for authorized users",
+			Status:          "ERROR",
+			Evidence:        fmt.Sprintf("Unable to reach Cloud Resource Manager: %v", err),
+			Remediation:     "Enable the Cloud Resource Manager API and grant resourcemanager.projects.getIamPolicy",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Google Cloud Console → IAM & Admin → IAM → Screenshot role assignments",
@@ -84,36 +84,72 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:     "AC.L1-3.1.1",
 			Name:        "[CMMC L1] Limit System Access",
-			Status:      "FAIL",
-			Evidence:    fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
-			Remediation: "Configure GCP IAM with appropriate role assignments",
+			Status:      "ERROR",
+			Evidence:    fmt.Sprintf("Unable to retrieve the project IAM policy: %v", err),
+			Remediation: "Grant resourcemanager.projects.getIamPolicy so access can be measured",
 			Priority:    PriorityCritical,
 			Timestamp:   time.Now(),
 			Frameworks:  map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
 		}
 	}
 
-	if len(policy.Bindings) == 0 {
+	// The practice is that access is limited to authorized users. Counting
+	// bindings, as the previous version did, answered whether anyone had
+	// access at all - a project with no bindings cannot exist, so it always
+	// passed. allUsers and allAuthenticatedUsers are the two members that mean
+	// the opposite of limited: the first is the whole internet, the second
+	// anyone with a Google account.
+	public := map[string][]string{}
+	for _, binding := range policy.Bindings {
+		for _, member := range binding.Members {
+			if member == "allUsers" || member == "allAuthenticatedUsers" {
+				public[member] = append(public[member], binding.Role)
+			}
+		}
+	}
+
+	if len(public) > 0 {
+		parts := []string{}
+		for _, member := range []string{"allUsers", "allAuthenticatedUsers"} {
+			if roles, ok := public[member]; ok {
+				parts = append(parts, fmt.Sprintf("%s holds %s", member, strings.Join(roles, ", ")))
+			}
+		}
 		return CheckResult{
 			Control:         "AC.L1-3.1.1",
 			Name:            "[CMMC L1] Limit System Access",
 			Status:          "FAIL",
-			Evidence:        "No IAM bindings found - access control not configured",
-			Remediation:     "Configure GCP IAM with appropriate role assignments for authorized users",
+			Evidence:        fmt.Sprintf("Project IAM grants roles to unauthenticated or unrestricted members: %s", strings.Join(parts, "; ")),
+			Remediation:     "Remove allUsers and allAuthenticatedUsers from every project role binding",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
-			ScreenshotGuide: "IAM & Admin → IAM → Add members → Screenshot",
+			ScreenshotGuide: "IAM & Admin → IAM → Screenshot showing no allUsers or allAuthenticatedUsers members",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
 			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(policy.Bindings) == 0 {
+		return CheckResult{
+			Control:         "AC.L1-3.1.1",
+			Name:            "[CMMC L1] Limit System Access",
+			Status:          "INFO",
+			Evidence:        "No project role bindings in scope; nothing to assess",
+			Priority:        PriorityInfo,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "IAM & Admin → IAM → Screenshot showing role assignments",
+			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/iam-admin/iam?project=%s", c.projectID),
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "AC.L1-3.1.1",
 		Name:            "[CMMC L1] Limit System Access",
 		Status:          "PASS",
-		Evidence:        fmt.Sprintf("GCP IAM configured with %d role bindings", len(policy.Bindings)),
-		Remediation:     "Continue reviewing IAM bindings regularly for least privilege",
+		Evidence:        fmt.Sprintf("No project role binding grants access to allUsers or allAuthenticatedUsers, across %d bindings", len(policy.Bindings)),
+		Remediation:     "Continue reviewing IAM bindings so access stays limited to named principals",
 		Priority:        PriorityInfo,
 		Timestamp:       time.Now(),
 		ScreenshotGuide: "IAM & Admin → IAM → Screenshot showing role assignments",
@@ -129,7 +165,7 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:    "AC.L1-3.1.2",
 			Name:       "[CMMC L1] Limit Access to Authorized Types",
-			Status:     "FAIL",
+			Status:     "ERROR",
 			Evidence:   "Unable to verify role assignments",
 			Priority:   PriorityCritical,
 			Timestamp:  time.Now(),
@@ -142,7 +178,7 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:    "AC.L1-3.1.2",
 			Name:       "[CMMC L1] Limit Access to Authorized Types",
-			Status:     "FAIL",
+			Status:     "ERROR",
 			Evidence:   "Unable to retrieve IAM policy",
 			Priority:   PriorityCritical,
 			Timestamp:  time.Now(),
@@ -172,6 +208,19 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(policy.Bindings) == 0 {
+		return CheckResult{
+			Control:    "AC.L1-3.1.2",
+			Name:       "[CMMC L1] Limit Access to Authorized Types",
+			Status:     "INFO",
+			Evidence:   "No project role bindings in scope; nothing to assess",
+			Priority:   PriorityInfo,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
+		}
+	}
 	return CheckResult{
 		Control:    "AC.L1-3.1.2",
 		Name:       "[CMMC L1] Limit Access to Authorized Types",
@@ -190,7 +239,7 @@ func (c *GCPCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:    "IA.L1-3.5.1",
 			Name:       "[CMMC L1] Identify Users",
-			Status:     "FAIL",
+			Status:     "ERROR",
 			Evidence:   "Unable to verify user identities",
 			Priority:   PriorityCritical,
 			Timestamp:  time.Now(),
@@ -203,7 +252,7 @@ func (c *GCPCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:    "IA.L1-3.5.1",
 			Name:       "[CMMC L1] Identify Users",
-			Status:     "FAIL",
+			Status:     "ERROR",
 			Evidence:   "Unable to retrieve IAM policy",
 			Priority:   PriorityCritical,
 			Timestamp:  time.Now(),
@@ -236,6 +285,19 @@ func (c *GCPCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(userAccounts) == 0 {
+		return CheckResult{
+			Control:    "IA.L1-3.5.1",
+			Name:       "[CMMC L1] Identify Users",
+			Status:     "INFO",
+			Evidence:   "No user accounts in scope; nothing to assess",
+			Priority:   PriorityInfo,
+			Timestamp:  time.Now(),
+			Frameworks: map[string]string{"CMMC": "IA.L1-3.5.1", "NIST 800-171": "3.5.1"},
+		}
+	}
 	return CheckResult{
 		Control:    "IA.L1-3.5.1",
 		Name:       "[CMMC L1] Identify Users",
@@ -324,7 +386,7 @@ func (c *GCPCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:     "SC.L1-3.13.1",
 			Name:        "[CMMC L1] Monitor Communications",
-			Status:      "FAIL",
+			Status:      "ERROR",
 			Evidence:    "Unable to verify VPC firewall rules",
 			Remediation: "Configure VPC firewall rules",
 			Priority:    PriorityCritical,
@@ -360,6 +422,21 @@ func (c *GCPCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult {
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(firewallList.Items) == 0 {
+		return CheckResult{
+			Control:         "SC.L1-3.13.1",
+			Name:            "[CMMC L1] Monitor Communications",
+			Status:          "INFO",
+			Evidence:        "No VPC firewall rules in scope; nothing to assess",
+			Priority:        PriorityInfo,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "VPC Network → Firewall → Screenshot monitoring controls",
+			ConsoleURL:      "https://console.cloud.google.com/net-security/firewall-manager/firewall-policies/list",
+			Frameworks:      map[string]string{"CMMC": "SC.L1-3.13.1", "NIST 800-171": "3.13.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "SC.L1-3.13.1",
 		Name:            "[CMMC L1] Monitor Communications",

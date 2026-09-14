@@ -70,52 +70,136 @@ func (c *AzureCMMCLevel1Checks) Run(ctx context.Context) ([]CheckResult, error) 
 
 // AC.L1-3.1.1 - AUTOMATED
 func (c *AzureCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
-	scope := fmt.Sprintf("/subscriptions/%s", c.subscriptionID)
-	pager := c.roleClient.NewListForScopePager(scope, nil)
+	// The practice is that access is limited to authorized users. The previous
+	// version counted role assignments on the first page and returned PASS
+	// whatever the count, so it passed on every subscription - a subscription
+	// with no assignments at all cannot exist.
+	//
+	// Azure RBAC has no equivalent of GCP's allUsers, so the measurable form
+	// of "not limited" here is an external identity holding a role on the
+	// subscription. That needs both directories: Graph to learn which
+	// principals are guests, and RBAC to see what they hold.
+	if c.graphClient == nil {
+		return CheckResult{
+			Control:         "AC.L1-3.1.1",
+			Name:            "[CMMC L1] Limit System Access",
+			Status:          "ERROR",
+			Evidence:        "Microsoft Graph credentials were not available, so guest access to the subscription could not be measured",
+			Remediation:     "Grant the scanning principal Directory.Read.All so external identities can be enumerated",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "Azure Portal → Subscription → Access control (IAM) → Role assignments → filter Type = Guest → Screenshot",
+			ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+		}
+	}
 
-	roleCount := 0
-	page, err := pager.NextPage(ctx)
+	directory, err := c.graphClient.Users().Get(ctx, &users.UsersRequestBuilderGetRequestConfiguration{})
 	if err != nil {
 		return CheckResult{
 			Control:         "AC.L1-3.1.1",
 			Name:            "[CMMC L1] Limit System Access",
-			Status:          "FAIL",
-			Evidence:        fmt.Sprintf("Unable to verify RBAC assignments: %v", err),
-			Remediation:     "Enable Azure RBAC and configure role assignments for authorized users",
+			Status:          "ERROR",
+			Evidence:        fmt.Sprintf("Unable to read the directory: %v", err),
+			Remediation:     "Grant Directory.Read.All so external identities can be enumerated",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
-			ScreenshotGuide: "Azure Portal → Subscriptions → Access Control (IAM) → Screenshot role assignments",
-			ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
+			ScreenshotGuide: "Azure Portal → Microsoft Entra ID → Users → Screenshot",
+			ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/UsersManagementMenuBlade/AllUsers",
 			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
 		}
 	}
 
-	roleCount = len(page.Value)
+	guests := map[string]string{}
+	if directory != nil {
+		for _, user := range directory.GetValue() {
+			if user.GetUserType() == nil || !strings.EqualFold(*user.GetUserType(), "Guest") {
+				continue
+			}
+			if id := user.GetId(); id != nil {
+				name := *id
+				if upn := user.GetUserPrincipalName(); upn != nil {
+					name = *upn
+				}
+				guests[*id] = name
+			}
+		}
+	}
 
-	if roleCount == 0 {
+	scope := fmt.Sprintf("/subscriptions/%s", c.subscriptionID)
+	pager := c.roleClient.NewListForScopePager(scope, nil)
+	total := 0
+	guestHolders := []string{}
+	for pager.More() {
+		page, err := pager.NextPage(ctx)
+		if err != nil {
+			return CheckResult{
+				Control:         "AC.L1-3.1.1",
+				Name:            "[CMMC L1] Limit System Access",
+				Status:          "ERROR",
+				Evidence:        fmt.Sprintf("Unable to read role assignments: %v", err),
+				Remediation:     "Grant Microsoft.Authorization/roleAssignments/read so subscription access can be measured",
+				Priority:        PriorityCritical,
+				Timestamp:       time.Now(),
+				ScreenshotGuide: "Azure Portal → Subscriptions → IAM → Screenshot",
+				ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
+				Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+			}
+		}
+		for _, assignment := range page.Value {
+			if assignment.Properties == nil || assignment.Properties.PrincipalID == nil {
+				continue
+			}
+			total++
+			if name, ok := guests[*assignment.Properties.PrincipalID]; ok {
+				guestHolders = append(guestHolders, name)
+			}
+		}
+	}
+
+	if len(guestHolders) > 0 {
+		listed := strings.Join(guestHolders, ", ")
+		if len(guestHolders) > 3 {
+			listed = strings.Join(guestHolders[:3], ", ") + fmt.Sprintf(" +%d more", len(guestHolders)-3)
+		}
 		return CheckResult{
 			Control:         "AC.L1-3.1.1",
 			Name:            "[CMMC L1] Limit System Access",
 			Status:          "FAIL",
-			Evidence:        "No RBAC role assignments found - access control not configured",
-			Remediation:     "Configure Azure RBAC with appropriate role assignments for authorized users",
+			Evidence:        fmt.Sprintf("%d of %d subscription role assignments are held by guest accounts: %s", len(guestHolders), total, listed),
+			Remediation:     "Remove subscription role assignments from external accounts, or record the authorization for each one that must stay",
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
-			ScreenshotGuide: "Azure Portal → Subscriptions → IAM → Add role assignment → Screenshot",
+			ScreenshotGuide: "Azure Portal → Subscription → Access control (IAM) → Role assignments → filter Type = Guest → Screenshot",
 			ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
 			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if total == 0 {
+		return CheckResult{
+			Control:         "AC.L1-3.1.1",
+			Name:            "[CMMC L1] Limit System Access",
+			Status:          "INFO",
+			Evidence:        "No role assignments in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "Azure Portal → Subscription → Access control (IAM) → Role assignments → Screenshot",
+			ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "AC.L1-3.1.1",
 		Name:            "[CMMC L1] Limit System Access",
 		Status:          "PASS",
-		Evidence:        fmt.Sprintf("Azure RBAC configured with %d role assignments", roleCount),
-		Remediation:     "Continue reviewing RBAC assignments regularly for least privilege",
+		Evidence:        fmt.Sprintf("No guest account holds a subscription role, across %d assignments and %d guests in the directory", total, len(guests)),
+		Remediation:     "Continue reviewing who holds subscription roles",
 		Priority:        PriorityCritical,
 		Timestamp:       time.Now(),
-		ScreenshotGuide: "Azure Portal → Subscriptions → IAM → Screenshot showing role assignments",
+		ScreenshotGuide: "Azure Portal → Subscription → Access control (IAM) → Role assignments → Screenshot",
 		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
 		Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
 	}
@@ -131,7 +215,7 @@ func (c *AzureCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult 
 		return CheckResult{
 			Control:         "AC.L1-3.1.2",
 			Name:            "[CMMC L1] Limit System Access to Authorized Types",
-			Status:          "FAIL",
+			Status:          "ERROR",
 			Evidence:        fmt.Sprintf("Unable to verify role assignments: %v", err),
 			Remediation:     "Configure RBAC to limit access to authorized transaction types",
 			Priority:        PriorityCritical,
@@ -140,6 +224,26 @@ func (c *AzureCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult 
 			ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
 			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
 		}
+	}
+	// Every page. A subscription whose resources spanned more than one page
+	// was judged on the first page alone.
+	for pager.More() {
+		next, err := pager.NextPage(ctx)
+		if err != nil {
+			return CheckResult{
+				Control:         "AC.L1-3.1.2",
+				Name:            "[CMMC L1] Limit System Access to Authorized Types",
+				Status:          "ERROR",
+				Evidence:        fmt.Sprintf("Unable to verify role assignments: %v", err),
+				Remediation:     "Configure RBAC to limit access to authorized transaction types",
+				Priority:        PriorityCritical,
+				Timestamp:       time.Now(),
+				ScreenshotGuide: "Azure Portal → Subscriptions → IAM → Role assignments → Screenshot",
+				ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
+				Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
+			}
+		}
+		page.Value = append(page.Value, next.Value...)
 	}
 
 	ownerCount := 0
@@ -167,6 +271,21 @@ func (c *AzureCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult 
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if len(page.Value) == 0 {
+		return CheckResult{
+			Control:         "AC.L1-3.1.2",
+			Name:            "[CMMC L1] Limit System Access to Authorized Types",
+			Status:          "INFO",
+			Evidence:        "No role assignments in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "Azure Portal → Subscriptions → IAM → Screenshot role assignments",
+			ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_Azure_Billing/SubscriptionsBlade",
+			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.2", "NIST 800-171": "3.1.2"},
+		}
+	}
 	return CheckResult{
 		Control:         "AC.L1-3.1.2",
 		Name:            "[CMMC L1] Limit System Access to Authorized Types",
@@ -190,7 +309,7 @@ func (c *AzureCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult 
 		return CheckResult{
 			Control:         "IA.L1-3.5.1",
 			Name:            "[CMMC L1] Identify Users",
-			Status:          "FAIL",
+			Status:          "ERROR",
 			Evidence:        fmt.Sprintf("Unable to verify Azure AD users: %v", err),
 			Remediation:     "Ensure Azure AD is configured with unique user identities",
 			Priority:        PriorityCritical,
@@ -242,6 +361,21 @@ func (c *AzureCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult 
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if userCount == 0 {
+		return CheckResult{
+			Control:         "IA.L1-3.5.1",
+			Name:            "[CMMC L1] Identify Users",
+			Status:          "INFO",
+			Evidence:        "No Entra ID users in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "Azure Portal → Azure AD → Users → Screenshot unique identities",
+			ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/UsersManagementMenuBlade/AllUsers",
+			Frameworks:      map[string]string{"CMMC": "IA.L1-3.5.1", "NIST 800-171": "3.5.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "IA.L1-3.5.1",
 		Name:            "[CMMC L1] Identify Users",
@@ -360,7 +494,7 @@ func (c *AzureCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult 
 		return CheckResult{
 			Control:         "SC.L1-3.13.1",
 			Name:            "[CMMC L1] Monitor Communications",
-			Status:          "FAIL",
+			Status:          "ERROR",
 			Evidence:        fmt.Sprintf("Unable to verify NSGs: %v", err),
 			Remediation:     "Configure Network Security Groups",
 			Priority:        PriorityCritical,
@@ -369,6 +503,26 @@ func (c *AzureCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult 
 			ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FnetworkSecurityGroups",
 			Frameworks:      map[string]string{"CMMC": "SC.L1-3.13.1", "NIST 800-171": "3.13.1"},
 		}
+	}
+	// Every page. A subscription whose resources spanned more than one page
+	// was judged on the first page alone.
+	for pager.More() {
+		next, err := pager.NextPage(ctx)
+		if err != nil {
+			return CheckResult{
+				Control:         "SC.L1-3.13.1",
+				Name:            "[CMMC L1] Monitor Communications",
+				Status:          "ERROR",
+				Evidence:        fmt.Sprintf("Unable to verify NSGs: %v", err),
+				Remediation:     "Configure Network Security Groups",
+				Priority:        PriorityCritical,
+				Timestamp:       time.Now(),
+				ScreenshotGuide: "Azure Portal → NSGs → Screenshot",
+				ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FnetworkSecurityGroups",
+				Frameworks:      map[string]string{"CMMC": "SC.L1-3.13.1", "NIST 800-171": "3.13.1"},
+			}
+		}
+		page.Value = append(page.Value, next.Value...)
 	}
 
 	nsgCount := len(page.Value)
@@ -401,6 +555,21 @@ func (c *AzureCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult 
 		}
 	}
 
+	// Nothing in scope is not a pass: an empty or wrongly scoped account
+	// read as compliant.
+	if nsgCount == 0 {
+		return CheckResult{
+			Control:         "SC.L1-3.13.1",
+			Name:            "[CMMC L1] Monitor Communications",
+			Status:          "INFO",
+			Evidence:        "No network security groups in scope; nothing to assess",
+			Priority:        PriorityCritical,
+			Timestamp:       time.Now(),
+			ScreenshotGuide: "Azure Portal → NSGs → Screenshot monitoring controls",
+			ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FnetworkSecurityGroups",
+			Frameworks:      map[string]string{"CMMC": "SC.L1-3.13.1", "NIST 800-171": "3.13.1"},
+		}
+	}
 	return CheckResult{
 		Control:         "SC.L1-3.13.1",
 		Name:            "[CMMC L1] Monitor Communications",

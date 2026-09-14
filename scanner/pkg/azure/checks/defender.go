@@ -75,14 +75,14 @@ func (c *DefenderChecks) checkDefenderForServers(ctx context.Context) []CheckRes
 
 	if err != nil {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.1",
-			Name:        "[CIS Azure 2.1.1] Microsoft Defender for Servers",
+			Control:     "CIS-8.1.3.1",
+			Name:        "Microsoft Defender for Servers",
 			Status:      "ERROR",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
 			Evidence:    fmt.Sprintf("Unable to check Defender for Servers status: %v", err),
-			Remediation: "Enable Microsoft Defender for Servers per CIS 2.1.1",
-			RemediationDetail: `CIS Azure 2.1.1: Ensure that Microsoft Defender for Servers is set to 'On'
+			Remediation: "Enable Microsoft Defender for Servers per CIS 8.1.3.1",
+			RemediationDetail: `CIS Azure 8.1.3.1: Ensure that Microsoft Defender for Servers is set to 'On'
 
 Microsoft Defender for Servers provides:
 - Threat detection for VMs
@@ -106,14 +106,14 @@ az security pricing create --name VirtualMachines --tier Standard`,
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.1",
-			Name:        "[CIS Azure 2.1.1] Microsoft Defender for Servers",
+			Control:     "CIS-8.1.3.1",
+			Name:        "Microsoft Defender for Servers",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
-			Evidence:    "CIS 2.1.1: Microsoft Defender for Servers is NOT enabled (tier = Free)",
-			Remediation: "Enable Microsoft Defender for Servers per CIS 2.1.1",
-			RemediationDetail: `CIS Azure 2.1.1: Ensure that Microsoft Defender for Servers is set to 'On'
+			Evidence:    "CIS 8.1.3.1: Microsoft Defender for Servers is NOT enabled (tier = Free)",
+			Remediation: "Enable Microsoft Defender for Servers per CIS 8.1.3.1",
+			RemediationDetail: `CIS Azure 8.1.3.1: Ensure that Microsoft Defender for Servers is set to 'On'
 
 Enable comprehensive server protection:
 Azure CLI:
@@ -127,11 +127,11 @@ Cost: Per server/month - provides threat detection, vulnerability scanning, and 
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.1",
-			Name:       "[CIS Azure 2.1.1] Microsoft Defender for Servers",
+			Control:    "CIS-8.1.3.1",
+			Name:       "Microsoft Defender for Servers",
 			Status:     "PASS",
 			Priority:   PriorityInfo,
-			Evidence:   "CIS 2.1.1: Microsoft Defender for Servers is enabled (tier = Standard)",
+			Evidence:   "CIS 8.1.3.1: Microsoft Defender for Servers is enabled (tier = Standard)",
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DEFENDER_SERVERS"),
 		})
@@ -147,8 +147,8 @@ func (c *DefenderChecks) checkDefenderForAppService(ctx context.Context) []Check
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.2",
-			Name:       "[CIS Azure 2.1.2] Microsoft Defender for App Service",
+			Control:    "CIS-8.1.6.1",
+			Name:       "Microsoft Defender for App Service",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for App Service: %v", err),
 			Priority:   PriorityHigh,
@@ -159,14 +159,14 @@ func (c *DefenderChecks) checkDefenderForAppService(ctx context.Context) []Check
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.2",
-			Name:        "[CIS Azure 2.1.2] Microsoft Defender for App Service",
+			Control:     "CIS-8.1.6.1",
+			Name:        "Microsoft Defender for App Service",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
-			Evidence:    "CIS 2.1.2: Microsoft Defender for App Service is NOT enabled",
+			Evidence:    "CIS 8.1.6.1: Microsoft Defender for App Service is NOT enabled",
 			Remediation: "Enable Microsoft Defender for App Service",
-			RemediationDetail: `CIS Azure 2.1.2: Ensure that Microsoft Defender for App Services is set to 'On'
+			RemediationDetail: `CIS Azure 8.1.6.1: Ensure that Microsoft Defender for App Services is set to 'On'
 
 Azure CLI:
 az security pricing create --name AppServices --tier Standard`,
@@ -177,10 +177,10 @@ az security pricing create --name AppServices --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.2",
-			Name:       "[CIS Azure 2.1.2] Microsoft Defender for App Service",
+			Control:    "CIS-8.1.6.1",
+			Name:       "Microsoft Defender for App Service",
 			Status:     "PASS",
-			Evidence:   "CIS 2.1.2: Microsoft Defender for App Service is enabled",
+			Evidence:   "CIS 8.1.6.1: Microsoft Defender for App Service is enabled",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DEFENDER_APPSERVICE"),
@@ -207,8 +207,8 @@ func (c *DefenderChecks) checkDefenderForSQLServers(ctx context.Context) []Check
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.3",
-			Name:       "[CIS Azure 2.1.3] Microsoft Defender for Azure SQL Databases",
+			Control:    "CIS-8.1.7.3",
+			Name:       "Microsoft Defender for Azure SQL Databases",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for SQL Servers: %v", err),
 			Priority:   PriorityHigh,
@@ -219,14 +219,14 @@ func (c *DefenderChecks) checkDefenderForSQLServers(ctx context.Context) []Check
 
 	if !enabled {
 		return []CheckResult{{
-			Control:     "CIS-2.1.3",
-			Name:        "[CIS Azure 2.1.3] Microsoft Defender for Azure SQL Databases",
+			Control:     "CIS-8.1.7.3",
+			Name:        "Microsoft Defender for Azure SQL Databases",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
-			Evidence:    "CIS 2.1.3: Microsoft Defender for Azure SQL Database servers is NOT enabled",
+			Evidence:    "CIS 8.1.7.3: Microsoft Defender for Azure SQL Database servers is NOT enabled",
 			Remediation: "Enable Microsoft Defender for Azure SQL Database servers",
-			RemediationDetail: `CIS Azure 2.1.3: Ensure that Microsoft Defender for Azure SQL Database servers is set to 'On'
+			RemediationDetail: `CIS Azure 8.1.7.3: Ensure that Microsoft Defender for Azure SQL Database servers is set to 'On'
 
 Azure CLI:
 az security pricing create --name SqlServers --tier Standard`,
@@ -238,10 +238,10 @@ az security pricing create --name SqlServers --tier Standard`,
 	}
 
 	return []CheckResult{{
-		Control:    "CIS-2.1.3",
-		Name:       "[CIS Azure 2.1.3] Microsoft Defender for Azure SQL Databases",
+		Control:    "CIS-8.1.7.3",
+		Name:       "Microsoft Defender for Azure SQL Databases",
 		Status:     "PASS",
-		Evidence:   "CIS 2.1.3: Microsoft Defender for Azure SQL Database servers is enabled",
+		Evidence:   "CIS 8.1.7.3: Microsoft Defender for Azure SQL Database servers is enabled",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("DEFENDER_SQL"),
@@ -253,8 +253,8 @@ func (c *DefenderChecks) checkDefenderForSQLVMs(ctx context.Context) []CheckResu
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.4",
-			Name:       "[CIS Azure 2.1.4] Microsoft Defender for SQL Servers on Machines",
+			Control:    "CIS-8.1.7.4",
+			Name:       "Microsoft Defender for SQL Servers on Machines",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for SQL VMs: %v", err),
 			Priority:   PriorityHigh,
@@ -265,14 +265,14 @@ func (c *DefenderChecks) checkDefenderForSQLVMs(ctx context.Context) []CheckResu
 
 	if !enabled {
 		return []CheckResult{{
-			Control:     "CIS-2.1.4",
-			Name:        "[CIS Azure 2.1.4] Microsoft Defender for SQL Servers on Machines",
+			Control:     "CIS-8.1.7.4",
+			Name:        "Microsoft Defender for SQL Servers on Machines",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
-			Evidence:    "CIS 2.1.4: Microsoft Defender for SQL servers on machines is NOT enabled",
+			Evidence:    "CIS 8.1.7.4: Microsoft Defender for SQL servers on machines is NOT enabled",
 			Remediation: "Enable Microsoft Defender for SQL servers on machines",
-			RemediationDetail: `CIS Azure 2.1.4: Ensure that Microsoft Defender for SQL servers on machines is set to 'On'
+			RemediationDetail: `CIS Azure 8.1.7.4: Ensure that Microsoft Defender for SQL servers on machines is set to 'On'
 
 Azure CLI:
 az security pricing create --name SqlServerVirtualMachines --tier Standard`,
@@ -284,10 +284,10 @@ az security pricing create --name SqlServerVirtualMachines --tier Standard`,
 	}
 
 	return []CheckResult{{
-		Control:    "CIS-2.1.4",
-		Name:       "[CIS Azure 2.1.4] Microsoft Defender for SQL Servers on Machines",
+		Control:    "CIS-8.1.7.4",
+		Name:       "Microsoft Defender for SQL Servers on Machines",
 		Status:     "PASS",
-		Evidence:   "CIS 2.1.4: Microsoft Defender for SQL servers on machines is enabled",
+		Evidence:   "CIS 8.1.7.4: Microsoft Defender for SQL servers on machines is enabled",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("DEFENDER_SQL_VM"),
@@ -299,8 +299,8 @@ func (c *DefenderChecks) checkDefenderForOpenSourceDB(ctx context.Context) []Che
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.5",
-			Name:       "[CIS Azure 2.1.5] Microsoft Defender for Open-Source Relational Databases",
+			Control:    "CIS-8.1.7.2",
+			Name:       "Microsoft Defender for Open-Source Relational Databases",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Open-Source DBs: %v", err),
 			Priority:   PriorityHigh,
@@ -311,14 +311,14 @@ func (c *DefenderChecks) checkDefenderForOpenSourceDB(ctx context.Context) []Che
 
 	if !enabled {
 		return []CheckResult{{
-			Control:     "CIS-2.1.5",
-			Name:        "[CIS Azure 2.1.5] Microsoft Defender for Open-Source Relational Databases",
+			Control:     "CIS-8.1.7.2",
+			Name:        "Microsoft Defender for Open-Source Relational Databases",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
-			Evidence:    "CIS 2.1.5: Microsoft Defender for open-source relational databases is NOT enabled",
+			Evidence:    "CIS 8.1.7.2: Microsoft Defender for open-source relational databases is NOT enabled",
 			Remediation: "Enable Microsoft Defender for open-source relational databases",
-			RemediationDetail: `CIS Azure 2.1.5: Ensure that Microsoft Defender for open-source relational databases is set to 'On'
+			RemediationDetail: `CIS Azure 8.1.7.2: Ensure that Microsoft Defender for open-source relational databases is set to 'On'
 
 Covers: PostgreSQL, MySQL, MariaDB
 
@@ -332,10 +332,10 @@ az security pricing create --name OpenSourceRelationalDatabases --tier Standard`
 	}
 
 	return []CheckResult{{
-		Control:    "CIS-2.1.5",
-		Name:       "[CIS Azure 2.1.5] Microsoft Defender for Open-Source Relational Databases",
+		Control:    "CIS-8.1.7.2",
+		Name:       "Microsoft Defender for Open-Source Relational Databases",
 		Status:     "PASS",
-		Evidence:   "CIS 2.1.5: Microsoft Defender for open-source relational databases is enabled",
+		Evidence:   "CIS 8.1.7.2: Microsoft Defender for open-source relational databases is enabled",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("DEFENDER_OPENSOURCE_DB"),
@@ -347,8 +347,8 @@ func (c *DefenderChecks) checkDefenderForCosmosDB(ctx context.Context) []CheckRe
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.6",
-			Name:       "[CIS Azure 2.1.6] Microsoft Defender for Azure Cosmos DB",
+			Control:    "CIS-8.1.7.1",
+			Name:       "Microsoft Defender for Azure Cosmos DB",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Cosmos DB: %v", err),
 			Priority:   PriorityHigh,
@@ -359,14 +359,14 @@ func (c *DefenderChecks) checkDefenderForCosmosDB(ctx context.Context) []CheckRe
 
 	if !enabled {
 		return []CheckResult{{
-			Control:     "CIS-2.1.6",
-			Name:        "[CIS Azure 2.1.6] Microsoft Defender for Azure Cosmos DB",
+			Control:     "CIS-8.1.7.1",
+			Name:        "Microsoft Defender for Azure Cosmos DB",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
-			Evidence:    "CIS 2.1.6: Microsoft Defender for Azure Cosmos DB is NOT enabled",
+			Evidence:    "CIS 8.1.7.1: Microsoft Defender for Azure Cosmos DB is NOT enabled",
 			Remediation: "Enable Microsoft Defender for Azure Cosmos DB",
-			RemediationDetail: `CIS Azure 2.1.6: Ensure that Microsoft Defender for Azure Cosmos DB is set to 'On'
+			RemediationDetail: `CIS Azure 8.1.7.1: Ensure that Microsoft Defender for Azure Cosmos DB is set to 'On'
 
 Azure CLI:
 az security pricing create --name CosmosDbs --tier Standard`,
@@ -378,10 +378,10 @@ az security pricing create --name CosmosDbs --tier Standard`,
 	}
 
 	return []CheckResult{{
-		Control:    "CIS-2.1.6",
-		Name:       "[CIS Azure 2.1.6] Microsoft Defender for Azure Cosmos DB",
+		Control:    "CIS-8.1.7.1",
+		Name:       "Microsoft Defender for Azure Cosmos DB",
 		Status:     "PASS",
-		Evidence:   "CIS 2.1.6: Microsoft Defender for Azure Cosmos DB is enabled",
+		Evidence:   "CIS 8.1.7.1: Microsoft Defender for Azure Cosmos DB is enabled",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("DEFENDER_COSMOSDB"),
@@ -395,8 +395,8 @@ func (c *DefenderChecks) checkDefenderForStorage(ctx context.Context) []CheckRes
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.7",
-			Name:       "[CIS Azure 2.1.7] Microsoft Defender for Storage",
+			Control:    "CIS-8.1.5.1",
+			Name:       "Microsoft Defender for Storage",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Storage: %v", err),
 			Priority:   PriorityHigh,
@@ -407,14 +407,14 @@ func (c *DefenderChecks) checkDefenderForStorage(ctx context.Context) []CheckRes
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.7",
-			Name:        "[CIS Azure 2.1.7] Microsoft Defender for Storage",
+			Control:     "CIS-8.1.5.1",
+			Name:        "Microsoft Defender for Storage",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
-			Evidence:    "CIS 2.1.7: Microsoft Defender for Storage is NOT enabled",
+			Evidence:    "CIS 8.1.5.1: Microsoft Defender for Storage is NOT enabled",
 			Remediation: "Enable Microsoft Defender for Storage",
-			RemediationDetail: `CIS Azure 2.1.7: Ensure that Microsoft Defender for Storage is set to 'On'
+			RemediationDetail: `CIS Azure 8.1.5.1: Ensure that Microsoft Defender for Storage is set to 'On'
 
 Azure CLI:
 az security pricing create --name StorageAccounts --tier Standard --subplan DefenderForStorageV2`,
@@ -425,10 +425,10 @@ az security pricing create --name StorageAccounts --tier Standard --subplan Defe
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.7",
-			Name:       "[CIS Azure 2.1.7] Microsoft Defender for Storage",
+			Control:    "CIS-8.1.5.1",
+			Name:       "Microsoft Defender for Storage",
 			Status:     "PASS",
-			Evidence:   "CIS 2.1.7: Microsoft Defender for Storage is enabled",
+			Evidence:   "CIS 8.1.5.1: Microsoft Defender for Storage is enabled",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DEFENDER_STORAGE"),
@@ -445,8 +445,8 @@ func (c *DefenderChecks) checkDefenderForContainers(ctx context.Context) []Check
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.8",
-			Name:       "[CIS Azure 2.1.8] Microsoft Defender for Containers",
+			Control:    "CIS-8.1.4.1",
+			Name:       "Microsoft Defender for Containers",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Containers: %v", err),
 			Priority:   PriorityHigh,
@@ -457,14 +457,14 @@ func (c *DefenderChecks) checkDefenderForContainers(ctx context.Context) []Check
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.8",
-			Name:        "[CIS Azure 2.1.8] Microsoft Defender for Containers",
+			Control:     "CIS-8.1.4.1",
+			Name:        "Microsoft Defender for Containers",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
-			Evidence:    "CIS 2.1.8: Microsoft Defender for Containers is NOT enabled",
+			Evidence:    "CIS 8.1.4.1: Microsoft Defender for Containers is NOT enabled",
 			Remediation: "Enable Microsoft Defender for Containers",
-			RemediationDetail: `CIS Azure 2.1.8: Ensure that Microsoft Defender for Containers is set to 'On'
+			RemediationDetail: `CIS Azure 8.1.4.1: Ensure that Microsoft Defender for Containers is set to 'On'
 
 Azure CLI:
 az security pricing create --name Containers --tier Standard`,
@@ -475,10 +475,10 @@ az security pricing create --name Containers --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.8",
-			Name:       "[CIS Azure 2.1.8] Microsoft Defender for Containers",
+			Control:    "CIS-8.1.4.1",
+			Name:       "Microsoft Defender for Containers",
 			Status:     "PASS",
-			Evidence:   "CIS 2.1.8: Microsoft Defender for Containers is enabled",
+			Evidence:   "CIS 8.1.4.1: Microsoft Defender for Containers is enabled",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DEFENDER_CONTAINERS"),
@@ -495,8 +495,8 @@ func (c *DefenderChecks) checkDefenderForDNS(ctx context.Context) []CheckResult 
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.9",
-			Name:       "[CIS Azure 2.1.9] Microsoft Defender for DNS",
+			Control:    "AZ-DEFENDER-03",
+			Name:       "Microsoft Defender for DNS",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for DNS: %v", err),
 			Priority:   PriorityMedium,
@@ -507,14 +507,14 @@ func (c *DefenderChecks) checkDefenderForDNS(ctx context.Context) []CheckResult 
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.9",
-			Name:        "[CIS Azure 2.1.9] Microsoft Defender for DNS",
+			Control:     "AZ-DEFENDER-03",
+			Name:        "Microsoft Defender for DNS",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Priority:    PriorityMedium,
-			Evidence:    "CIS 2.1.9: Microsoft Defender for DNS is NOT enabled",
+			Evidence:    "Microsoft Defender for DNS is NOT enabled",
 			Remediation: "Enable Microsoft Defender for DNS",
-			RemediationDetail: `CIS Azure 2.1.9: Ensure that Microsoft Defender for DNS is set to 'On'
+			RemediationDetail: `Ensure that Microsoft Defender for DNS is set to 'On'
 
 Defender for DNS provides threat detection for:
 - DNS layer attacks
@@ -531,10 +531,10 @@ az security pricing create --name Dns --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.9",
-			Name:       "[CIS Azure 2.1.9] Microsoft Defender for DNS",
+			Control:    "AZ-DEFENDER-03",
+			Name:       "Microsoft Defender for DNS",
 			Status:     "PASS",
-			Evidence:   "CIS 2.1.9: Microsoft Defender for DNS is enabled",
+			Evidence:   "Microsoft Defender for DNS is enabled",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DEFENDER_DNS"),
@@ -551,8 +551,8 @@ func (c *DefenderChecks) checkDefenderForKeyVault(ctx context.Context) []CheckRe
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.10",
-			Name:       "[CIS Azure 2.1.10] Microsoft Defender for Key Vault",
+			Control:    "CIS-8.1.8.1",
+			Name:       "Microsoft Defender for Key Vault",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Key Vault: %v", err),
 			Priority:   PriorityMedium,
@@ -563,14 +563,14 @@ func (c *DefenderChecks) checkDefenderForKeyVault(ctx context.Context) []CheckRe
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.10",
-			Name:        "[CIS Azure 2.1.10] Microsoft Defender for Key Vault",
+			Control:     "CIS-8.1.8.1",
+			Name:        "Microsoft Defender for Key Vault",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Priority:    PriorityMedium,
-			Evidence:    "CIS 2.1.10: Microsoft Defender for Key Vault is NOT enabled",
+			Evidence:    "CIS 8.1.8.1: Microsoft Defender for Key Vault is NOT enabled",
 			Remediation: "Enable Microsoft Defender for Key Vault",
-			RemediationDetail: `CIS Azure 2.1.10: Ensure that Microsoft Defender for Key Vault is set to 'On'
+			RemediationDetail: `CIS Azure 8.1.8.1: Ensure that Microsoft Defender for Key Vault is set to 'On'
 
 Azure CLI:
 az security pricing create --name KeyVaults --tier Standard`,
@@ -581,10 +581,10 @@ az security pricing create --name KeyVaults --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.10",
-			Name:       "[CIS Azure 2.1.10] Microsoft Defender for Key Vault",
+			Control:    "CIS-8.1.8.1",
+			Name:       "Microsoft Defender for Key Vault",
 			Status:     "PASS",
-			Evidence:   "CIS 2.1.10: Microsoft Defender for Key Vault is enabled",
+			Evidence:   "CIS 8.1.8.1: Microsoft Defender for Key Vault is enabled",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DEFENDER_KEYVAULT"),
@@ -601,8 +601,8 @@ func (c *DefenderChecks) checkDefenderForAPIs(ctx context.Context) []CheckResult
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.11",
-			Name:       "[CIS Azure 2.1.11] Microsoft Defender for APIs",
+			Control:    "CIS-8.1.2.1",
+			Name:       "Microsoft Defender for APIs",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for APIs: %v", err),
 			Priority:   PriorityMedium,
@@ -613,14 +613,14 @@ func (c *DefenderChecks) checkDefenderForAPIs(ctx context.Context) []CheckResult
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.11",
-			Name:        "[CIS Azure 2.1.11] Microsoft Defender for APIs",
+			Control:     "CIS-8.1.2.1",
+			Name:        "Microsoft Defender for APIs",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Priority:    PriorityMedium,
-			Evidence:    "CIS 2.1.11: Microsoft Defender for APIs is NOT enabled",
+			Evidence:    "CIS 8.1.2.1: Microsoft Defender for APIs is NOT enabled",
 			Remediation: "Enable Microsoft Defender for APIs",
-			RemediationDetail: `CIS Azure 2.1.11: Ensure that Microsoft Defender for APIs is set to 'On'
+			RemediationDetail: `CIS Azure 8.1.2.1: Ensure that Microsoft Defender for APIs is set to 'On'
 
 Defender for APIs provides:
 - API discovery and inventory
@@ -637,10 +637,10 @@ az security pricing create --name Api --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.11",
-			Name:       "[CIS Azure 2.1.11] Microsoft Defender for APIs",
+			Control:    "CIS-8.1.2.1",
+			Name:       "Microsoft Defender for APIs",
 			Status:     "PASS",
-			Evidence:   "CIS 2.1.11: Microsoft Defender for APIs is enabled",
+			Evidence:   "CIS 8.1.2.1: Microsoft Defender for APIs is enabled",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DEFENDER_API"),
@@ -657,8 +657,8 @@ func (c *DefenderChecks) checkDefenderForResourceManager(ctx context.Context) []
 
 	if err != nil {
 		return []CheckResult{{
-			Control:    "CIS-2.1.12",
-			Name:       "[CIS Azure 2.1.12] Microsoft Defender for Resource Manager",
+			Control:    "CIS-8.1.9.1",
+			Name:       "Microsoft Defender for Resource Manager",
 			Status:     "ERROR",
 			Evidence:   fmt.Sprintf("Unable to check Defender for Resource Manager: %v", err),
 			Priority:   PriorityHigh,
@@ -669,14 +669,14 @@ func (c *DefenderChecks) checkDefenderForResourceManager(ctx context.Context) []
 
 	if !enabled {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.12",
-			Name:        "[CIS Azure 2.1.12] Microsoft Defender for Resource Manager",
+			Control:     "CIS-8.1.9.1",
+			Name:        "Microsoft Defender for Resource Manager",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
-			Evidence:    "CIS 2.1.12: Microsoft Defender for Resource Manager is NOT enabled",
+			Evidence:    "CIS 8.1.9.1: Microsoft Defender for Resource Manager is NOT enabled",
 			Remediation: "Enable Microsoft Defender for Resource Manager",
-			RemediationDetail: `CIS Azure 2.1.12: Ensure that Microsoft Defender for Resource Manager is set to 'On'
+			RemediationDetail: `CIS Azure 8.1.9.1: Ensure that Microsoft Defender for Resource Manager is set to 'On'
 
 Azure CLI:
 az security pricing create --name Arm --tier Standard`,
@@ -687,10 +687,10 @@ az security pricing create --name Arm --tier Standard`,
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.12",
-			Name:       "[CIS Azure 2.1.12] Microsoft Defender for Resource Manager",
+			Control:    "CIS-8.1.9.1",
+			Name:       "Microsoft Defender for Resource Manager",
 			Status:     "PASS",
-			Evidence:   "CIS 2.1.12: Microsoft Defender for Resource Manager is enabled",
+			Evidence:   "CIS 8.1.9.1: Microsoft Defender for Resource Manager is enabled",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DEFENDER_ARM"),
@@ -713,8 +713,8 @@ func (c *DefenderChecks) checkDefenderAutoProvisioning(ctx context.Context) []Ch
 		page, err := pager.NextPage(ctx)
 		if err != nil {
 			return []CheckResult{{
-				Control:    "CIS-2.1.17",
-				Name:       "[CIS Azure 2.1.17] Auto-Provisioning of Defender Components",
+				Control:    "AZ-DEFENDER-01",
+				Name:       "Auto-Provisioning of Defender Components",
 				Status:     "ERROR",
 				Evidence:   fmt.Sprintf("Unable to check auto-provisioning: %v", err),
 				Priority:   PriorityMedium,
@@ -737,15 +737,15 @@ func (c *DefenderChecks) checkDefenderAutoProvisioning(ctx context.Context) []Ch
 
 	if len(disabledSettings) > 0 {
 		results = append(results, CheckResult{
-			Control:  "CIS-2.1.17",
-			Name:     "[CIS Azure 2.1.17] Auto-Provisioning of Defender Components",
+			Control:  "AZ-DEFENDER-01",
+			Name:     "Auto-Provisioning of Defender Components",
 			Status:   "FAIL",
 			Severity: "MEDIUM",
 			Priority: PriorityMedium,
-			Evidence: fmt.Sprintf("CIS 2.1.17: %d/%d auto-provisioning settings are disabled: %s",
+			Evidence: fmt.Sprintf("%d/%d auto-provisioning settings are disabled: %s",
 				len(disabledSettings), totalSettings, strings.Join(disabledSettings, ", ")),
 			Remediation: "Enable auto-provisioning for all Defender components",
-			RemediationDetail: `CIS 2.1.17: Ensure auto-provisioning is enabled for Microsoft Defender components
+			RemediationDetail: `Ensure auto-provisioning is enabled for Microsoft Defender components
 
 Configure via:
 Defender for Cloud → Environment settings → Auto provisioning → Enable all agents`,
@@ -756,10 +756,10 @@ Defender for Cloud → Environment settings → Auto provisioning → Enable all
 		})
 	} else if totalSettings > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.17",
-			Name:       "[CIS Azure 2.1.17] Auto-Provisioning of Defender Components",
+			Control:    "AZ-DEFENDER-01",
+			Name:       "Auto-Provisioning of Defender Components",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 2.1.17: All %d auto-provisioning settings are enabled", totalSettings),
+			Evidence:   fmt.Sprintf("All %d auto-provisioning settings are enabled", totalSettings),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DEFENDER_AUTOPROVISION"),
@@ -783,8 +783,8 @@ func (c *DefenderChecks) checkSecurityContacts(ctx context.Context) []CheckResul
 		if err != nil {
 			return []CheckResult{
 				{
-					Control:    "CIS-2.1.19",
-					Name:       "[CIS Azure 2.1.19] Security Contact Email",
+					Control:    "CIS-8.1.13",
+					Name:       "Security Contact Email",
 					Status:     "ERROR",
 					Evidence:   fmt.Sprintf("Unable to check security contacts: %v", err),
 					Priority:   PriorityMedium,
@@ -792,8 +792,8 @@ func (c *DefenderChecks) checkSecurityContacts(ctx context.Context) []CheckResul
 					Frameworks: GetFrameworkMappings("DEFENDER_CONTACTS"),
 				},
 				{
-					Control:    "CIS-2.1.20",
-					Name:       "[CIS Azure 2.1.20] Security Alert Notifications",
+					Control:    "CIS-8.1.14",
+					Name:       "Security Alert Notifications",
 					Status:     "ERROR",
 					Evidence:   fmt.Sprintf("Unable to check alert notifications: %v", err),
 					Priority:   PriorityHigh,
@@ -807,7 +807,7 @@ func (c *DefenderChecks) checkSecurityContacts(ctx context.Context) []CheckResul
 			if contact.Properties != nil {
 				// hasContacts = true
 
-				// Check if email is configured (CIS 2.1.19)
+				// Check if email is configured (CIS 8.1.13)
 				if contact.Properties.Emails != nil && *contact.Properties.Emails != "" {
 					contactEmails = append(contactEmails, *contact.Properties.Emails)
 				}
@@ -822,17 +822,17 @@ func (c *DefenderChecks) checkSecurityContacts(ctx context.Context) []CheckResul
 		}
 	}
 
-	// CIS 2.1.19: Security Contact Email
+	// CIS 8.1.13: Security Contact Email
 	if len(contactEmails) == 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.19",
-			Name:        "[CIS Azure 2.1.19] Security Contact Email",
+			Control:     "CIS-8.1.13",
+			Name:        "Security Contact Email",
 			Status:      "FAIL",
 			Severity:    "MEDIUM",
 			Priority:    PriorityMedium,
-			Evidence:    "CIS 2.1.19: No security contact email addresses configured",
+			Evidence:    "CIS 8.1.13: No security contact email addresses configured",
 			Remediation: "Configure security contact email addresses",
-			RemediationDetail: `CIS Azure 2.1.19: Ensure 'Additional email addresses' is configured with a security contact email
+			RemediationDetail: `CIS Azure 8.1.13: Ensure 'Additional email addresses' is configured with a security contact email
 
 Configure via:
 Defender for Cloud → Environment settings → Email notifications → Add email addresses`,
@@ -843,28 +843,28 @@ Defender for Cloud → Environment settings → Email notifications → Add emai
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.19",
-			Name:       "[CIS Azure 2.1.19] Security Contact Email",
+			Control:    "CIS-8.1.13",
+			Name:       "Security Contact Email",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 2.1.19: %d security contact email(s) configured", len(contactEmails)),
+			Evidence:   fmt.Sprintf("CIS 8.1.13: %d security contact email(s) configured", len(contactEmails)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DEFENDER_CONTACTS"),
 		})
 	}
 
-	// CIS 2.1.20: Security Alert Notifications
+	// CIS 8.1.14: Security Alert Notifications
 	// FIXED: Simplified check - just verify contacts are configured with notifications
 	if !hasAlertNotifications {
 		results = append(results, CheckResult{
-			Control:     "CIS-2.1.20",
-			Name:        "[CIS Azure 2.1.20] Security Alert Notifications",
+			Control:     "CIS-8.1.14",
+			Name:        "Security Alert Notifications",
 			Status:      "FAIL",
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
-			Evidence:    "CIS 2.1.20: Security alert notifications are NOT properly configured",
+			Evidence:    "CIS 8.1.14: Security alert notifications are NOT properly configured",
 			Remediation: "Enable notifications for security alerts",
-			RemediationDetail: `CIS 2.1.20: Ensure that 'Notify about alerts with the following severity' is set to 'High'
+			RemediationDetail: `CIS 8.1.14: Ensure that 'Notify about alerts with the following severity' is set to 'High'
 
 Configure via:
 Defender for Cloud → Environment settings → Email notifications → Alert notifications = On for High severity`,
@@ -875,10 +875,10 @@ Defender for Cloud → Environment settings → Email notifications → Alert no
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS-2.1.20",
-			Name:       "[CIS Azure 2.1.20] Security Alert Notifications",
+			Control:    "CIS-8.1.14",
+			Name:       "Security Alert Notifications",
 			Status:     "PASS",
-			Evidence:   "CIS 2.1.20: Security alert notifications are configured",
+			Evidence:   "CIS 8.1.14: Security alert notifications are configured",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("DEFENDER_ALERTS"),

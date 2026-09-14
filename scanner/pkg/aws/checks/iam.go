@@ -3,7 +3,9 @@ package checks
 import (
 	"context"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -90,7 +92,7 @@ func (c *IAMChecks) Run(ctx context.Context) ([]CheckResult, error) {
 		results = append(results, result)
 	}
 
-	// CIS AWS 1.1, 1.2, 1.18, 1.22 - Final IAM controls for 100%
+	// Final IAM controls for 100%
 	results = append(results, c.CheckAccountContactDetails(ctx))
 	results = append(results, c.CheckSecurityContactInfo(ctx))
 	if result, err := c.CheckIAMRolesSeparation(ctx); err == nil {
@@ -103,6 +105,16 @@ func (c *IAMChecks) Run(ctx context.Context) ([]CheckResult, error) {
 		results = append(results, result)
 	}
 	if result, err := c.CheckIAMPoliciesAttachedToUsers(ctx); err == nil {
+		results = append(results, result)
+	}
+
+	// CIS AWS Foundations v7.0.0 2.14
+	if result, err := c.CheckFullAdminPolicies(ctx); err == nil {
+		results = append(results, result)
+	}
+
+	// CIS AWS Foundations v7.0.0 2.17
+	if result, err := c.CheckExpiredServerCertificates(ctx); err == nil {
 		results = append(results, result)
 	}
 
@@ -272,7 +284,7 @@ func (c *IAMChecks) CheckAccessKeyRotation(ctx context.Context) (CheckResult, er
 		if len(veryOldKeys) > 0 {
 			// Extract just the username from "username (X days old!)"
 			firstUser = veryOldKeys[0]
-			if idx := fmt.Sprintf("%s", firstUser); len(idx) > 0 {
+			if idx := firstUser; len(idx) > 0 {
 				if endIdx := len(firstUser); endIdx > 0 {
 					for i, c := range firstUser {
 						if c == ' ' {
@@ -389,7 +401,6 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 		colIndex[col] = i
 	}
 
-	unusedUsers := []string{}
 	unusedPasswords := []string{}
 	unusedKeys := []string{}
 	now := time.Now()
@@ -456,7 +467,7 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 	}
 
 	// Combine all unused credentials
-	unusedUsers = append(unusedPasswords, unusedKeys...)
+	unusedUsers := append(unusedPasswords, unusedKeys...)
 
 	if len(unusedUsers) > 0 {
 		userList := strings.Join(unusedUsers, ", ")
@@ -496,7 +507,7 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 
 // NEW CIS-SPECIFIC CHECKS
 
-// CIS 1.4 - Ensure no root user access keys exist
+// CIS 2.4 - Ensure no root user access keys exist
 func (c *IAMChecks) CheckRootAccessKeys(ctx context.Context) (CheckResult, error) {
 	summary, err := c.client.GetAccountSummary(ctx, &iam.GetAccountSummaryInput{})
 	if err != nil {
@@ -510,7 +521,7 @@ func (c *IAMChecks) CheckRootAccessKeys(ctx context.Context) (CheckResult, error
 
 	if rootAccessKeysExist {
 		return CheckResult{
-			Control:           "CIS-1.11",
+			Control:           "CIS-2.4",
 			Name:              "Root Account Access Keys",
 			Status:            "FAIL",
 			Severity:          "CRITICAL",
@@ -526,7 +537,7 @@ func (c *IAMChecks) CheckRootAccessKeys(ctx context.Context) (CheckResult, error
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.11",
+		Control:    "CIS-2.4",
 		Name:       "Root Account Access Keys",
 		Status:     "PASS",
 		Evidence:   "No root account access keys exist | Meets CIS-1.11",
@@ -536,11 +547,11 @@ func (c *IAMChecks) CheckRootAccessKeys(ctx context.Context) (CheckResult, error
 	}, nil
 }
 
-// CIS 1.6 - Ensure hardware MFA is enabled for root account
+// CIS 2.6 - Ensure hardware MFA is enabled for root account
 func (c *IAMChecks) CheckHardwareMFARoot(ctx context.Context) (CheckResult, error) {
 	// This is an INFO check since we can't determine if it's hardware vs virtual MFA via API
 	return CheckResult{
-		Control:           "CIS-1.6",
+		Control:           "CIS-2.6",
 		Name:              "Root Hardware MFA",
 		Status:            "INFO",
 		Evidence:          "MANUAL CHECK: Verify root account uses hardware MFA (not virtual)",
@@ -554,7 +565,7 @@ func (c *IAMChecks) CheckHardwareMFARoot(ctx context.Context) (CheckResult, erro
 	}, nil
 }
 
-// CIS 1.10 - Ensure MFA is enabled for all IAM users with console access
+// CIS 2.10 - Ensure MFA is enabled for all IAM users with console access
 func (c *IAMChecks) CheckIAMUsersMFA(ctx context.Context) (CheckResult, error) {
 	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
 	if err != nil {
@@ -583,7 +594,7 @@ func (c *IAMChecks) CheckIAMUsersMFA(ctx context.Context) (CheckResult, error) {
 
 	if len(usersWithoutMFA) > 0 {
 		return CheckResult{
-			Control:           "CIS-1.10",
+			Control:           "CIS-2.10",
 			Name:              "MFA for IAM Users",
 			Status:            "FAIL",
 			Severity:          "HIGH",
@@ -599,7 +610,7 @@ func (c *IAMChecks) CheckIAMUsersMFA(ctx context.Context) (CheckResult, error) {
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.10",
+		Control:    "CIS-2.10",
 		Name:       "MFA for IAM Users",
 		Status:     "PASS",
 		Evidence:   "All IAM users with console access have MFA enabled",
@@ -609,10 +620,10 @@ func (c *IAMChecks) CheckIAMUsersMFA(ctx context.Context) (CheckResult, error) {
 	}, nil
 }
 
-// CIS 1.12 - Ensure credentials unused for 90 days or greater are disabled
+// CIS 2.11 - Ensure credentials unused for 90 days or greater are disabled
 func (c *IAMChecks) CheckCredentialsUnused90Days(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control:           "CIS-1.12",
+		Control:           "CIS-2.11",
 		Name:              "Credentials Unused 90 Days",
 		Status:            "INFO",
 		Evidence:          "MANUAL CHECK: Review IAM credential report for unused credentials",
@@ -626,7 +637,7 @@ func (c *IAMChecks) CheckCredentialsUnused90Days(ctx context.Context) (CheckResu
 	}, nil
 }
 
-// CIS 1.13 - Ensure there is only one active access key per IAM user
+// CIS 2.11 - Ensure there is only one active access key per IAM user
 func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, error) {
 	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
 	if err != nil {
@@ -656,7 +667,7 @@ func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, e
 
 	if len(usersWithMultipleKeys) > 0 {
 		return CheckResult{
-			Control:           "CIS-1.13",
+			Control:           "AWS-IAM-05",
 			Name:              "One Active Access Key Per User",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -672,7 +683,7 @@ func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, e
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.13",
+		Control:    "AWS-IAM-05",
 		Name:       "One Active Access Key Per User",
 		Status:     "PASS",
 		Evidence:   "All IAM users have at most one active access key",
@@ -682,7 +693,7 @@ func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, e
 	}, nil
 }
 
-// CIS 1.15 - Ensure IAM users receive permissions only through groups
+// CIS 2.13 - Ensure IAM users receive permissions only through groups
 func (c *IAMChecks) CheckIAMPoliciesAttached(ctx context.Context) (CheckResult, error) {
 	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
 	if err != nil {
@@ -711,7 +722,7 @@ func (c *IAMChecks) CheckIAMPoliciesAttached(ctx context.Context) (CheckResult, 
 
 	if len(usersWithDirectPolicies) > 0 {
 		return CheckResult{
-			Control:           "CIS-1.15",
+			Control:           "CIS-2.13",
 			Name:              "IAM Policies via Groups Only",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -727,7 +738,7 @@ func (c *IAMChecks) CheckIAMPoliciesAttached(ctx context.Context) (CheckResult, 
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.15",
+		Control:    "CIS-2.13",
 		Name:       "IAM Policies via Groups Only",
 		Status:     "PASS",
 		Evidence:   "All IAM users receive permissions through groups",
@@ -737,7 +748,7 @@ func (c *IAMChecks) CheckIAMPoliciesAttached(ctx context.Context) (CheckResult, 
 	}, nil
 }
 
-// CIS 1.17 - Ensure a support role has been created for incident management
+// CIS 2.15 - Ensure a support role has been created for incident management
 func (c *IAMChecks) CheckSupportRole(ctx context.Context) (CheckResult, error) {
 	roles, err := c.client.ListRoles(ctx, &iam.ListRolesInput{})
 	if err != nil {
@@ -765,7 +776,7 @@ func (c *IAMChecks) CheckSupportRole(ctx context.Context) (CheckResult, error) {
 
 	if !hasSupportRole {
 		return CheckResult{
-			Control:           "CIS-1.17",
+			Control:           "CIS-2.15",
 			Name:              "IAM Support Role",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -781,7 +792,7 @@ func (c *IAMChecks) CheckSupportRole(ctx context.Context) (CheckResult, error) {
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.17",
+		Control:    "CIS-2.15",
 		Name:       "IAM Support Role",
 		Status:     "PASS",
 		Evidence:   "IAM role with AWSSupportAccess policy exists",
@@ -791,10 +802,10 @@ func (c *IAMChecks) CheckSupportRole(ctx context.Context) (CheckResult, error) {
 	}, nil
 }
 
-// CIS 1.19 - Ensure IAM instance roles are used for AWS resource access
+// CIS 2.16 - Ensure IAM instance roles are used for AWS resource access
 func (c *IAMChecks) CheckIAMInstanceRoles(ctx context.Context) (CheckResult, error) {
 	return CheckResult{
-		Control:           "CIS-1.19",
+		Control:           "CIS-2.16",
 		Name:              "IAM Instance Roles",
 		Status:            "INFO",
 		Evidence:          "MANUAL CHECK: Verify EC2 instances use IAM roles instead of access keys",
@@ -808,19 +819,19 @@ func (c *IAMChecks) CheckIAMInstanceRoles(ctx context.Context) (CheckResult, err
 	}, nil
 }
 
-// CIS 1.22 - Ensure IAM policies are attached only to groups or roles
+// CIS 2.13 - Ensure IAM policies are attached only to groups or roles
 func (c *IAMChecks) CheckIAMPoliciesOnGroupsOnly(ctx context.Context) (CheckResult, error) {
 	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
 	if err != nil {
 		return CheckResult{
-			Control:    "CIS-1.22",
+			Control:    "CIS-2.13",
 			Name:       "IAM Policies Attached to Groups Only",
 			Status:     "FAIL",
 			Evidence:   "Unable to check IAM user policies",
 			Severity:   "HIGH",
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.3"},
+			Frameworks: map[string]string{"CIS-AWS": "2.13", "SOC2": "CC6.3"},
 		}, err
 	}
 
@@ -873,11 +884,11 @@ func (c *IAMChecks) CheckIAMPoliciesOnGroupsOnly(ctx context.Context) (CheckResu
 		}
 
 		return CheckResult{
-			Control:     "CIS-1.22",
+			Control:     "CIS-2.13",
 			Name:        "IAM Policies Attached to Groups Only",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("%d users have policies attached directly (violates CIS 1.22): %v | Should use groups/roles instead", len(usersWithPolicies), displayUsers),
+			Evidence:    fmt.Sprintf("%d users have policies attached directly (violates CIS 2.13): %v | Should use groups/roles instead", len(usersWithPolicies), displayUsers),
 			Remediation: fmt.Sprintf("Remove policies from user '%s' and attach to groups instead", firstUser),
 			RemediationDetail: fmt.Sprintf(`# Create or use existing IAM group
 aws iam create-group --group-name Developers
@@ -895,38 +906,38 @@ aws iam delete-user-policy --user-name %s --policy-name INLINE_POLICY_NAME`, fir
 			ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
+			Frameworks:      map[string]string{"CIS-AWS": "2.13", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.22",
+		Control:    "CIS-2.13",
 		Name:       "IAM Policies Attached to Groups Only",
 		Status:     "PASS",
-		Evidence:   "No IAM policies attached directly to users | Meets CIS 1.22 (centralized permissions via groups/roles)",
+		Evidence:   "No IAM policies attached directly to users | Meets CIS 2.13 (centralized permissions via groups/roles)",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
+		Frameworks: map[string]string{"CIS-AWS": "2.13", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
 	}, nil
 }
 
-// CheckPasswordExpiration verifies password expiration is 90 days or less (CIS 1.20)
+// CheckPasswordExpiration verifies password expiration is 90 days or less
 func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, error) {
 	policy, err := c.client.GetAccountPasswordPolicy(ctx, &iam.GetAccountPasswordPolicyInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "CIS-1.20",
+			Control:           "AWS-IAM-06",
 			Name:              "Password Expiration Policy",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
-			Evidence:          "No password policy configured | Violates CIS 1.20 (password expiration required)",
+			Evidence:          "No password policy configured (password expiration required)",
 			Remediation:       "Configure password policy with max age of 90 days or less",
 			RemediationDetail: "aws iam update-account-password-policy --max-password-age 90 --minimum-password-length 14 --require-symbols --require-numbers --require-uppercase-characters --require-lowercase-characters --password-reuse-prevention 24",
 			ScreenshotGuide:   "IAM → Account settings → Password policy → Screenshot showing 'Password expiration period' set to 90 days or less",
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
+			Frameworks:        map[string]string{"SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
 		}, nil
 	}
 
@@ -934,66 +945,66 @@ func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, e
 
 	if maxAge == 0 {
 		return CheckResult{
-			Control:           "CIS-1.20",
+			Control:           "AWS-IAM-06",
 			Name:              "Password Expiration Policy",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
-			Evidence:          "Password expiration is not enabled | Violates CIS 1.20 (passwords never expire)",
+			Evidence:          "Password expiration is not enabled (passwords never expire)",
 			Remediation:       "Set password max age to 90 days or less",
 			RemediationDetail: "aws iam update-account-password-policy --max-password-age 90",
 			ScreenshotGuide:   "IAM → Account settings → Password policy → Screenshot showing 'Password expiration period' enabled and ≤ 90 days",
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
+			Frameworks:        map[string]string{"SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
 		}, nil
 	}
 
 	if maxAge > 90 {
 		return CheckResult{
-			Control:           "CIS-1.20",
+			Control:           "AWS-IAM-06",
 			Name:              "Password Expiration Policy",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
-			Evidence:          fmt.Sprintf("Password max age is %d days (exceeds 90 days) | Violates CIS 1.20", maxAge),
+			Evidence:          fmt.Sprintf("Password max age is %d days (exceeds 90 days)", maxAge),
 			Remediation:       "Reduce password max age to 90 days or less",
 			RemediationDetail: "aws iam update-account-password-policy --max-password-age 90",
 			ScreenshotGuide:   "IAM → Account settings → Password policy → Screenshot showing 'Password expiration period' ≤ 90 days",
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
+			Frameworks:        map[string]string{"SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.20",
+		Control:    "AWS-IAM-06",
 		Name:       "Password Expiration Policy",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("Password max age is %d days (≤ 90) | Meets CIS 1.20", maxAge),
+		Evidence:   fmt.Sprintf("Password max age is %d days (≤ 90)", maxAge),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "1.20", "SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
+		Frameworks: map[string]string{"SOC2": "CC6.1", "PCI-DSS": "8.3.9"},
 	}, nil
 }
 
-// CheckPasswordReusePrevention verifies password reuse prevention is configured (CIS 1.21)
+// CheckPasswordReusePrevention verifies password reuse prevention is configured (CIS 2.9)
 func (c *IAMChecks) CheckPasswordReusePrevention(ctx context.Context) (CheckResult, error) {
 	policy, err := c.client.GetAccountPasswordPolicy(ctx, &iam.GetAccountPasswordPolicyInput{})
 	if err != nil {
 		return CheckResult{
-			Control:           "CIS-1.21",
+			Control:           "CIS-2.9",
 			Name:              "Password Reuse Prevention",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
-			Evidence:          "No password policy configured | Violates CIS 1.21 (password reuse prevention required)",
+			Evidence:          "No password policy configured | Violates CIS 2.9 (password reuse prevention required)",
 			Remediation:       "Configure password policy to prevent reuse of last 24 passwords",
 			RemediationDetail: "aws iam update-account-password-policy --password-reuse-prevention 24 --max-password-age 90 --minimum-password-length 14 --require-symbols --require-numbers --require-uppercase-characters --require-lowercase-characters",
 			ScreenshotGuide:   "IAM → Account settings → Password policy → Screenshot showing 'Password reuse prevention' set to 24",
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
+			Frameworks:        map[string]string{"CIS-AWS": "2.9", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
 		}, nil
 	}
 
@@ -1001,53 +1012,53 @@ func (c *IAMChecks) CheckPasswordReusePrevention(ctx context.Context) (CheckResu
 
 	if reusePrevent == 0 {
 		return CheckResult{
-			Control:           "CIS-1.21",
+			Control:           "CIS-2.9",
 			Name:              "Password Reuse Prevention",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
-			Evidence:          "Password reuse prevention is not enabled | Violates CIS 1.21 (users can reuse old passwords)",
+			Evidence:          "Password reuse prevention is not enabled | Violates CIS 2.9 (users can reuse old passwords)",
 			Remediation:       "Enable password reuse prevention for last 24 passwords",
 			RemediationDetail: "aws iam update-account-password-policy --password-reuse-prevention 24",
 			ScreenshotGuide:   "IAM → Account settings → Password policy → Screenshot showing 'Password reuse prevention' = 24",
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
+			Frameworks:        map[string]string{"CIS-AWS": "2.9", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
 		}, nil
 	}
 
 	if reusePrevent < 24 {
 		return CheckResult{
-			Control:           "CIS-1.21",
+			Control:           "CIS-2.9",
 			Name:              "Password Reuse Prevention",
 			Status:            "FAIL",
 			Severity:          "LOW",
-			Evidence:          fmt.Sprintf("Password reuse prevention is %d (CIS recommends 24) | Partially meets CIS 1.21", reusePrevent),
+			Evidence:          fmt.Sprintf("Password reuse prevention is %d (CIS recommends 24) | Partially meets CIS 2.9", reusePrevent),
 			Remediation:       "Increase password reuse prevention to 24 passwords",
 			RemediationDetail: "aws iam update-account-password-policy --password-reuse-prevention 24",
 			ScreenshotGuide:   "IAM → Account settings → Password policy → Screenshot showing 'Password reuse prevention' = 24",
 			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/account_settings",
 			Priority:          PriorityLow,
 			Timestamp:         time.Now(),
-			Frameworks:        map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
+			Frameworks:        map[string]string{"CIS-AWS": "2.9", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.21",
+		Control:    "CIS-2.9",
 		Name:       "Password Reuse Prevention",
 		Status:     "PASS",
-		Evidence:   fmt.Sprintf("Password reuse prevention is %d (≥ 24) | Meets CIS 1.21", reusePrevent),
+		Evidence:   fmt.Sprintf("Password reuse prevention is %d (≥ 24) | Meets CIS 2.9", reusePrevent),
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "1.21", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
+		Frameworks: map[string]string{"CIS-AWS": "2.9", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"},
 	}, nil
 }
 
-// CIS 1.1 - Maintain current contact details
+// CIS 2.2 - Maintain current contact details
 func (c *IAMChecks) CheckAccountContactDetails(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:     "CIS-1.1",
+		Control:     "CIS-2.2",
 		Name:        "Account Contact Details",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Verify account contact details are current and monitored",
@@ -1064,14 +1075,14 @@ func (c *IAMChecks) CheckAccountContactDetails(ctx context.Context) CheckResult 
 		ConsoleURL:      "https://console.aws.amazon.com/billing/home#/account",
 		Priority:        PriorityMedium,
 		Timestamp:       time.Now(),
-		Frameworks:      map[string]string{"CIS-AWS": "1.1"},
+		Frameworks:      map[string]string{"CIS-AWS": "2.2"},
 	}
 }
 
-// CIS 1.2 - Ensure security contact information is registered
+// CIS 2.3 - Ensure security contact information is registered
 func (c *IAMChecks) CheckSecurityContactInfo(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:     "CIS-1.2",
+		Control:     "CIS-2.3",
 		Name:        "Security Contact Information",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Verify security contact information is registered and monitored",
@@ -1088,11 +1099,11 @@ func (c *IAMChecks) CheckSecurityContactInfo(ctx context.Context) CheckResult {
 		ConsoleURL:      "https://console.aws.amazon.com/billing/home#/account",
 		Priority:        PriorityHigh,
 		Timestamp:       time.Now(),
-		Frameworks:      map[string]string{"CIS-AWS": "1.2", "SOC2": "CC6.1"},
+		Frameworks:      map[string]string{"CIS-AWS": "2.3", "SOC2": "CC6.1"},
 	}
 }
 
-// CIS 1.18 - Ensure IAM Master and IAM Manager roles are in use
+// Ensure IAM Master and IAM Manager roles are in use
 func (c *IAMChecks) CheckIAMRolesSeparation(ctx context.Context) (CheckResult, error) {
 	// List all roles
 	rolesOutput, err := c.client.ListRoles(ctx, &iam.ListRolesInput{})
@@ -1117,11 +1128,11 @@ func (c *IAMChecks) CheckIAMRolesSeparation(ctx context.Context) (CheckResult, e
 
 	if !hasIAMAdminRole || !hasIAMLimitedRole {
 		return CheckResult{
-			Control:     "CIS-1.18",
+			Control:     "AWS-IAM-01",
 			Name:        "IAM Master and Manager Roles",
 			Status:      "INFO",
 			Severity:    "MEDIUM",
-			Evidence:    "MANUAL CHECK: Verify IAM Master (full admin) and IAM Manager (limited) roles exist for separation of duties | CIS 1.18",
+			Evidence:    "MANUAL CHECK: Verify IAM Master (full admin) and IAM Manager (limited) roles exist for separation of duties",
 			Remediation: "Create separate IAM roles for full IAM administration vs limited IAM management",
 			RemediationDetail: `# Create IAM Master role (full IAM admin)
 aws iam create-role --role-name IAMMasterRole --assume-role-policy-document file://trust-policy.json
@@ -1136,25 +1147,28 @@ aws iam put-role-policy --role-name IAMManagerRole --policy-name IAMLimitedAcces
 			ConsoleURL:      "https://console.aws.amazon.com/iam/home#/roles",
 			Priority:        PriorityMedium,
 			Timestamp:       time.Now(),
-			Frameworks:      map[string]string{"CIS-AWS": "1.18", "SOC2": "CC6.3"},
+			// No CIS claim: this is the v1.2-era "IAM Master and IAM Manager
+			// roles" recommendation, which CIS removed in v1.4. It is not
+			// 2.16, which is instance roles.
+			Frameworks: map[string]string{"SOC2": "CC6.3"},
 		}, nil
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.18",
+		Control:    "AWS-IAM-01",
 		Name:       "IAM Master and Manager Roles",
 		Status:     "PASS",
-		Evidence:   "IAM management roles detected | Meets CIS 1.18",
+		Evidence:   "IAM management roles detected",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
-		Frameworks: map[string]string{"CIS-AWS": "1.18", "SOC2": "CC6.3"},
+		Frameworks: map[string]string{"SOC2": "CC6.3"},
 	}, nil
 }
 
-// CIS 1.22 - Ensure IAM user access is reviewed periodically
+// CIS 2.13 - Ensure IAM user access is reviewed periodically
 func (c *IAMChecks) CheckIAMUserAccessReview(ctx context.Context) CheckResult {
 	return CheckResult{
-		Control:     "CIS-1.22",
+		Control:     "AWS-IAM-04",
 		Name:        "IAM User Access Review",
 		Status:      "MANUAL",
 		Evidence:    "MANUAL CHECK: Verify IAM user access is reviewed at least every 90 days",
@@ -1180,7 +1194,7 @@ func (c *IAMChecks) CheckIAMUserAccessReview(ctx context.Context) CheckResult {
 		ConsoleURL:      "https://console.aws.amazon.com/iam/home#/credential_report",
 		Priority:        PriorityMedium,
 		Timestamp:       time.Now(),
-		Frameworks:      map[string]string{"CIS-AWS": "1.22", "SOC2": "CC6.2", "PCI-DSS": "8.2.6"},
+		Frameworks:      map[string]string{"CIS-AWS": "2.13", "SOC2": "CC6.2", "PCI-DSS": "8.2.6"},
 	}
 }
 
@@ -1229,7 +1243,7 @@ func (c *IAMChecks) CheckCredentialsUnused45Days(ctx context.Context) (CheckResu
 
 	if len(unusedCredentials) > 0 {
 		return CheckResult{
-			Control:           "CIS-1.3",
+			Control:           "CIS-2.11",
 			Name:              "Credentials Unused 45+ Days",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -1245,7 +1259,7 @@ func (c *IAMChecks) CheckCredentialsUnused45Days(ctx context.Context) (CheckResu
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.3",
+		Control:    "CIS-2.11",
 		Name:       "Credentials Unused 45+ Days",
 		Status:     "PASS",
 		Evidence:   "No credentials unused for 45+ days | Meets CIS-1.3",
@@ -1284,7 +1298,7 @@ func (c *IAMChecks) CheckIAMPoliciesAttachedToUsers(ctx context.Context) (CheckR
 
 	if len(usersWithDirectPolicies) > 0 {
 		return CheckResult{
-			Control:           "CIS-1.16",
+			Control:           "CIS-2.13",
 			Name:              "IAM Policies on Groups/Roles Only",
 			Status:            "FAIL",
 			Severity:          "MEDIUM",
@@ -1300,12 +1314,211 @@ func (c *IAMChecks) CheckIAMPoliciesAttachedToUsers(ctx context.Context) (CheckR
 	}
 
 	return CheckResult{
-		Control:    "CIS-1.16",
+		Control:    "CIS-2.13",
 		Name:       "IAM Policies on Groups/Roles Only",
 		Status:     "PASS",
 		Evidence:   "All IAM policies attached to groups/roles (not users) | Meets CIS-1.16",
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("IAM_POLICIES_GROUPS_ONLY"),
+	}, nil
+}
+
+// CheckFullAdminPolicies answers CIS AWS Foundations v7.0.0 2.14.
+//
+// Customer-managed policies granting Action "*" on Resource "*" are the
+// broadest grant IAM can express. The benchmark asks that none be attached; an
+// unattached one is a latent risk but not a finding.
+func (c *IAMChecks) CheckFullAdminPolicies(ctx context.Context) (CheckResult, error) {
+	const control, name = "CIS-2.14", "IAM Policies Granting Full Administrative Privileges"
+	frameworks := map[string]string{"CIS-AWS": "2.14", "SOC2": "CC6.3"}
+
+	errResult := func(err error) CheckResult {
+		return CheckResult{
+			Control: control, Name: name, Status: "ERROR",
+			Evidence:   fmt.Sprintf("Unable to read IAM policies: %v", err),
+			Severity:   "HIGH",
+			Priority:   PriorityHigh,
+			Timestamp:  time.Now(),
+			Frameworks: frameworks,
+		}
+	}
+
+	offenders := []string{}
+	scanned := 0
+	var marker *string
+	for page := 0; page < 20; page++ {
+		// OnlyAttached narrows this to what the benchmark actually asks about,
+		// and keeps the walk small: an account can hold hundreds of unattached
+		// policies.
+		out, err := c.client.ListPolicies(ctx, &iam.ListPoliciesInput{
+			Scope:        types.PolicyScopeTypeLocal,
+			OnlyAttached: true,
+			Marker:       marker,
+		})
+		if err != nil {
+			return errResult(err), nil
+		}
+		for _, p := range out.Policies {
+			scanned++
+			if p.DefaultVersionId == nil || p.Arn == nil {
+				continue
+			}
+			ver, err := c.client.GetPolicyVersion(ctx, &iam.GetPolicyVersionInput{
+				PolicyArn: p.Arn,
+				VersionId: p.DefaultVersionId,
+			})
+			if err != nil || ver.PolicyVersion == nil || ver.PolicyVersion.Document == nil {
+				// One unreadable policy must not decide the control either way.
+				continue
+			}
+			if grantsFullAdmin(aws.ToString(ver.PolicyVersion.Document)) {
+				offenders = append(offenders, aws.ToString(p.PolicyName))
+			}
+		}
+		if !out.IsTruncated || out.Marker == nil {
+			break
+		}
+		marker = out.Marker
+	}
+
+	if len(offenders) > 0 {
+		return CheckResult{
+			Control: control, Name: name, Status: "FAIL",
+			Severity:          "CRITICAL",
+			Evidence:          fmt.Sprintf("%d attached customer-managed policy/policies grant Action \"*\" on Resource \"*\": %v", len(offenders), offenders),
+			Remediation:       "Replace the wildcard grant with the specific actions and resources each principal needs, then detach the policy",
+			RemediationDetail: fmt.Sprintf("aws iam list-entities-for-policy --policy-arn <arn of %s>\n# then detach and replace with a least-privilege policy", offenders[0]),
+			ScreenshotGuide:   "IAM -> Policies -> filter Customer managed -> Screenshot showing no attached policy with Action * on Resource *",
+			ConsoleURL:        "https://console.aws.amazon.com/iam/home#/policies",
+			Priority:          PriorityCritical,
+			Timestamp:         time.Now(),
+			Frameworks:        frameworks,
+		}, nil
+	}
+
+	return CheckResult{
+		Control: control, Name: name, Status: "PASS",
+		Evidence:   fmt.Sprintf("No attached customer-managed policy grants full administrative privileges (%d checked)", scanned),
+		Priority:   PriorityInfo,
+		Timestamp:  time.Now(),
+		Frameworks: frameworks,
+	}, nil
+}
+
+// grantsFullAdmin reports whether a policy document contains an Allow statement
+// with Action "*" and Resource "*".
+//
+// The document arrives URL-encoded. It is decoded and parsed rather than
+// substring-matched: "Action": "*" appears inside a Deny statement too, and
+// treating that as a full-admin grant would fail an account for a guardrail.
+func grantsFullAdmin(document string) bool {
+	decoded, err := url.QueryUnescape(document)
+	if err != nil {
+		decoded = document
+	}
+	var doc struct {
+		Statement json.RawMessage `json:"Statement"`
+	}
+	if err := json.Unmarshal([]byte(decoded), &doc); err != nil {
+		return false
+	}
+	// Statement is an object when there is one, an array when there are several.
+	var list []map[string]any
+	if err := json.Unmarshal(doc.Statement, &list); err != nil {
+		var one map[string]any
+		if err := json.Unmarshal(doc.Statement, &one); err != nil {
+			return false
+		}
+		list = []map[string]any{one}
+	}
+	for _, st := range list {
+		if effect, _ := st["Effect"].(string); !strings.EqualFold(effect, "Allow") {
+			continue
+		}
+		// A statement carrying a Condition is bounded by it, so the wildcard is
+		// not unrestricted.
+		if _, conditional := st["Condition"]; conditional {
+			continue
+		}
+		if hasWildcard(st["Action"]) && hasWildcard(st["Resource"]) {
+			return true
+		}
+	}
+	return false
+}
+
+// hasWildcard reports whether a policy field is "*", or a list containing "*".
+func hasWildcard(field any) bool {
+	switch v := field.(type) {
+	case string:
+		return v == "*"
+	case []any:
+		for _, item := range v {
+			if s, ok := item.(string); ok && s == "*" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// CheckExpiredServerCertificates answers CIS AWS Foundations v7.0.0 2.17.
+//
+// These are the certificates stored in IAM rather than ACM, which is why the
+// ACM checks do not cover it: an expired one left in IAM can still be attached
+// to a classic load balancer.
+func (c *IAMChecks) CheckExpiredServerCertificates(ctx context.Context) (CheckResult, error) {
+	const control, name = "CIS-2.17", "Expired SSL/TLS Certificates Removed from IAM"
+	frameworks := map[string]string{"CIS-AWS": "2.17", "SOC2": "CC6.1"}
+
+	out, err := c.client.ListServerCertificates(ctx, &iam.ListServerCertificatesInput{})
+	if err != nil {
+		return CheckResult{
+			Control: control, Name: name, Status: "ERROR",
+			Evidence:   fmt.Sprintf("Unable to list IAM server certificates: %v", err),
+			Severity:   "MEDIUM",
+			Priority:   PriorityMedium,
+			Timestamp:  time.Now(),
+			Frameworks: frameworks,
+		}, nil
+	}
+
+	now := time.Now()
+	expired := []string{}
+	for _, cert := range out.ServerCertificateMetadataList {
+		if cert.Expiration != nil && cert.Expiration.Before(now) {
+			expired = append(expired, fmt.Sprintf("%s (expired %s)",
+				aws.ToString(cert.ServerCertificateName), cert.Expiration.Format("2006-01-02")))
+		}
+	}
+
+	if len(expired) > 0 {
+		return CheckResult{
+			Control: control, Name: name, Status: "FAIL",
+			Severity:          "MEDIUM",
+			Evidence:          fmt.Sprintf("%d expired certificate(s) are still stored in IAM: %v", len(expired), expired),
+			Remediation:       "Delete the expired certificates from IAM once nothing references them",
+			RemediationDetail: "aws iam delete-server-certificate --server-certificate-name <name>",
+			ScreenshotGuide:   "IAM -> no console list for server certificates; capture `aws iam list-server-certificates` output showing no expired entries",
+			ConsoleURL:        "https://console.aws.amazon.com/iam/home",
+			Priority:          PriorityMedium,
+			Timestamp:         time.Now(),
+			Frameworks:        frameworks,
+		}, nil
+	}
+
+	// No certificates at all satisfies the recommendation, and the evidence
+	// should say which of the two situations it is.
+	evidence := fmt.Sprintf("None of the %d certificate(s) stored in IAM has expired", len(out.ServerCertificateMetadataList))
+	if len(out.ServerCertificateMetadataList) == 0 {
+		evidence = "No server certificates are stored in IAM"
+	}
+	return CheckResult{
+		Control: control, Name: name, Status: "PASS",
+		Evidence:   evidence,
+		Priority:   PriorityInfo,
+		Timestamp:  time.Now(),
+		Frameworks: frameworks,
 	}, nil
 }

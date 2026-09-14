@@ -31,11 +31,6 @@ func (c *AzureCISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	// Section 5: Logging and Monitoring - Azure Monitor Alert Configuration
 	// These require manual verification as Azure Monitor alert rules are complex
 	results = append(results, c.checkMonitorAlertAuthChanges())
-	results = append(results, c.checkMonitorAlertPolicyChanges())
-	results = append(results, c.checkMonitorAlertNSGChanges())
-	results = append(results, c.checkMonitorAlertSecurityGroupChanges())
-	results = append(results, c.checkMonitorAlertSecuritySolutions())
-	results = append(results, c.checkMonitorAlertSQLFirewall())
 	results = append(results, c.checkMonitorAlertKeyVaultDeletion())
 	results = append(results, c.checkMonitorAlertStorageAccountDeletion())
 
@@ -57,8 +52,8 @@ func (c *AzureCISManualChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *AzureCISManualChecks) checkMonitorAlertAuthChanges() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.2.1",
-		Name:        "[CIS Azure 5.2.1] Create Alert for Authorization Changes",
+		Control:     "AZ-CIS-18",
+		Name:        "Create Alert for Authorization Changes",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
@@ -85,175 +80,16 @@ az monitor activity-log alert create \
 		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Alert Rules → Screenshot showing alert rule for Microsoft.Authorization operations",
 		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.1",
-			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.1.2",
-		},
-	}
-}
-
-func (c *AzureCISManualChecks) checkMonitorAlertPolicyChanges() CheckResult {
-	return CheckResult{
-		Control:     "CIS-5.2.2",
-		Name:        "[CIS Azure 5.2.2] Create Alert for Policy Assignment Changes",
-		Status:      "INFO",
-		Severity:    "MEDIUM",
-		Priority:    PriorityMedium,
-		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for policy assignment changes",
-		Remediation: "Create Azure Monitor alert for policy operations",
-		RemediationDetail: `Create an alert rule for policy changes:
-
-Azure CLI:
-az monitor activity-log alert create \
-  --name "Policy-Changes-Alert" \
-  --resource-group "monitoring-rg" \
-  --scope /subscriptions/<subscription-id> \
-  --condition category=Administrative and operationName=Microsoft.Authorization/policyAssignments/write \
-  --action-group <action-group-id>
-
-Operations to monitor:
-- Microsoft.Authorization/policyAssignments/write
-- Microsoft.Authorization/policyAssignments/delete
-- Microsoft.Authorization/policyDefinitions/write
-- Microsoft.Authorization/policyDefinitions/delete`,
-		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for policy assignment operations",
-		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
-		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.2",
-			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.1.2",
-		},
-	}
-}
-
-func (c *AzureCISManualChecks) checkMonitorAlertNSGChanges() CheckResult {
-	return CheckResult{
-		Control:     "CIS-5.2.3",
-		Name:        "[CIS Azure 5.2.3] Create Alert for NSG Changes",
-		Status:      "INFO",
-		Severity:    "HIGH",
-		Priority:    PriorityHigh,
-		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for Network Security Group changes",
-		Remediation: "Create Azure Monitor alert for NSG operations",
-		RemediationDetail: `Create an alert rule for NSG changes:
-
-Azure CLI:
-az monitor activity-log alert create \
-  --name "NSG-Changes-Alert" \
-  --resource-group "monitoring-rg" \
-  --scope /subscriptions/<subscription-id> \
-  --condition category=Administrative and operationName=Microsoft.Network/networkSecurityGroups/write \
-  --action-group <action-group-id>
-
-Also monitor:
-- Microsoft.Network/networkSecurityGroups/delete
-- Microsoft.Network/networkSecurityGroups/securityRules/write
-- Microsoft.Network/networkSecurityGroups/securityRules/delete`,
-		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for NSG write/delete operations",
-		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
-		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.3",
-			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.1.7",
-		},
-	}
-}
-
-func (c *AzureCISManualChecks) checkMonitorAlertSecurityGroupChanges() CheckResult {
-	return CheckResult{
-		Control:     "CIS-5.2.4",
-		Name:        "[CIS Azure 5.2.4] Create Alert for Security Group Changes",
-		Status:      "INFO",
-		Severity:    "HIGH",
-		Priority:    PriorityHigh,
-		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for security group modifications",
-		Remediation: "Create Azure Monitor alert for security group operations",
-		RemediationDetail: `Create an alert rule for security group changes:
-
-Azure CLI:
-az monitor activity-log alert create \
-  --name "Security-Group-Changes-Alert" \
-  --resource-group "monitoring-rg" \
-  --scope /subscriptions/<subscription-id> \
-  --condition category=Security and operationName=Microsoft.Security/securityGroups/write \
-  --action-group <action-group-id>`,
-		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for security group operations",
-		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
-		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.4",
-			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.1.1",
-		},
-	}
-}
-
-func (c *AzureCISManualChecks) checkMonitorAlertSecuritySolutions() CheckResult {
-	return CheckResult{
-		Control:     "CIS-5.2.5",
-		Name:        "[CIS Azure 5.2.5] Create Alert for Security Solutions Changes",
-		Status:      "INFO",
-		Severity:    "MEDIUM",
-		Priority:    PriorityMedium,
-		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for security solution changes",
-		Remediation: "Create Azure Monitor alert for security solution operations",
-		RemediationDetail: `Create an alert rule for security solution changes:
-
-Azure CLI:
-az monitor activity-log alert create \
-  --name "Security-Solutions-Alert" \
-  --resource-group "monitoring-rg" \
-  --scope /subscriptions/<subscription-id> \
-  --condition category=Security and operationName=Microsoft.Security/securitySolutions/write \
-  --action-group <action-group-id>
-
-Monitor operations:
-- Microsoft.Security/securitySolutions/write
-- Microsoft.Security/securitySolutions/delete`,
-		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for security solutions",
-		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
-		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.5",
-			"SOC2":      "CC7.2",
-		},
-	}
-}
-
-func (c *AzureCISManualChecks) checkMonitorAlertSQLFirewall() CheckResult {
-	return CheckResult{
-		Control:     "CIS-5.2.6",
-		Name:        "[CIS Azure 5.2.6] Create Alert for SQL Firewall Changes",
-		Status:      "INFO",
-		Severity:    "HIGH",
-		Priority:    PriorityHigh,
-		Evidence:    "MANUAL CHECK REQUIRED: Verify Azure Monitor alert exists for SQL firewall rule changes",
-		Remediation: "Create Azure Monitor alert for SQL firewall operations",
-		RemediationDetail: `Create an alert rule for SQL firewall changes:
-
-Azure CLI:
-az monitor activity-log alert create \
-  --name "SQL-Firewall-Changes-Alert" \
-  --resource-group "monitoring-rg" \
-  --scope /subscriptions/<subscription-id> \
-  --condition category=Administrative and operationName=Microsoft.Sql/servers/firewallRules/write \
-  --action-group <action-group-id>
-
-Monitor operations:
-- Microsoft.Sql/servers/firewallRules/write
-- Microsoft.Sql/servers/firewallRules/delete`,
-		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for SQL firewall operations",
-		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
-		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.6",
-			"SOC2":      "CC7.2",
-			"PCI-DSS":   "10.2.1.7",
+			"SOC2":    "CC7.2",
+			"PCI-DSS": "10.2.1.2",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkMonitorAlertKeyVaultDeletion() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.2.7",
-		Name:        "[CIS Azure 5.2.7] Create Alert for Key Vault Deletion",
+		Control:     "AZ-CIS-21",
+		Name:        "Create Alert for Key Vault Deletion",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
 		Priority:    PriorityCritical,
@@ -271,17 +107,16 @@ az monitor activity-log alert create \
 		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for Key Vault deletion",
 		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.7",
-			"SOC2":      "CC6.3",
-			"PCI-DSS":   "10.2.1.7",
+			"SOC2":    "CC6.3",
+			"PCI-DSS": "10.2.1.7",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkMonitorAlertStorageAccountDeletion() CheckResult {
 	return CheckResult{
-		Control:     "CIS-5.2.8",
-		Name:        "[CIS Azure 5.2.8] Create Alert for Storage Account Deletion",
+		Control:     "AZ-CIS-22",
+		Name:        "Create Alert for Storage Account Deletion",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
@@ -299,9 +134,8 @@ az monitor activity-log alert create \
 		ScreenshotGuide: "Azure Portal → Monitor → Alerts → Screenshot showing alert rule for Storage Account deletion",
 		ConsoleURL:      fmt.Sprintf("https://portal.azure.com/#blade/Microsoft_Azure_Monitoring/AzureMonitoringBrowseBlade/alertsV2/subscriptionId/%s", c.subscriptionID),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.8",
-			"SOC2":      "CC9.1",
-			"PCI-DSS":   "10.2.1.7",
+			"SOC2":    "CC9.1",
+			"PCI-DSS": "10.2.1.7",
 		},
 	}
 }
@@ -310,14 +144,14 @@ az monitor activity-log alert create \
 
 func (c *AzureCISManualChecks) checkAppRegistrationOwnership() CheckResult {
 	return CheckResult{
-		Control:     "CIS-1.5",
-		Name:        "[CIS Azure 1.5] App Registration Owner Requirements",
+		Control:     "AZ-CIS-04",
+		Name:        "App Registration Owner Requirements",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify all App Registrations have at least one owner assigned",
 		Remediation: "Ensure every App Registration has assigned owners",
-		RemediationDetail: `CIS Azure 1.5: Ensure that 'Owners' are defined for each registered application
+		RemediationDetail: `Ensure that 'Owners' are defined for each registered application
 
 App Registrations without owners cannot be managed if the creator leaves.
 
@@ -335,22 +169,21 @@ az ad app list --query "[].{DisplayName:displayName, AppId:appId}" -o table
 		ScreenshotGuide: "Azure AD → App registrations → For each app → Owners → Screenshot showing owner assignments",
 		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade",
 		Frameworks: map[string]string{
-			"CIS-Azure": "1.5",
-			"SOC2":      "CC6.1",
+			"SOC2": "CC6.1",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkGuestInviteSettings() CheckResult {
 	return CheckResult{
-		Control:     "CIS-1.11",
-		Name:        "[CIS Azure 1.11] Guest Invite Restrictions",
+		Control:     "AZ-ENTRA-92",
+		Name:        "Guest Invite Restrictions",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify guest invite settings are restricted per CIS requirements",
 		Remediation: "Configure guest user access and invitation settings",
-		RemediationDetail: `CIS Azure 1.11: Ensure that 'Guest invite restrictions' is set to 'Only users assigned to specific admin roles can invite guest users'
+		RemediationDetail: `Ensure that 'Guest invite restrictions' is set to 'Only users assigned to specific admin roles can invite guest users'
 
 Verification:
 1. Azure Portal → Azure AD → External identities → External collaboration settings
@@ -360,23 +193,22 @@ This prevents regular users from inviting external guests.`,
 		ScreenshotGuide: "Azure AD → External identities → External collaboration settings → Screenshot showing restricted invite settings",
 		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/CompanyRelationshipsMenuBlade/Settings",
 		Frameworks: map[string]string{
-			"CIS-Azure": "1.11",
-			"SOC2":      "CC6.1",
-			"PCI-DSS":   "7.2.1",
+			"SOC2":    "CC6.1",
+			"PCI-DSS": "7.2.1",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkSecurityDefaults() CheckResult {
 	return CheckResult{
-		Control:     "CIS-1.12",
-		Name:        "[CIS Azure 1.12] Security Defaults or Conditional Access",
+		Control:     "CIS-5.1.1",
+		Name:        "Security Defaults or Conditional Access",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
 		Priority:    PriorityCritical,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify Security Defaults OR Conditional Access policies are enabled",
 		Remediation: "Enable Security Defaults or implement Conditional Access policies",
-		RemediationDetail: `CIS Azure 1.12: Ensure Either Security Defaults is Enabled OR Conditional Access Policies are Configured
+		RemediationDetail: `CIS Azure 5.1.1: Ensure Either Security Defaults is Enabled OR Conditional Access Policies are Configured
 
 You must have ONE of these enabled:
 1. Security Defaults (simple, automatic protection)
@@ -395,7 +227,7 @@ az rest --method GET --url https://graph.microsoft.com/v1.0/policies/identitySec
 		ScreenshotGuide: "Azure AD → Properties → Security defaults = Enabled, OR Azure AD → Conditional Access → Active policies screenshot",
 		ConsoleURL:      "https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/Properties",
 		Frameworks: map[string]string{
-			"CIS-Azure": "1.12",
+			"CIS-Azure": "5.1.1",
 			"SOC2":      "CC6.6",
 			"PCI-DSS":   "8.4.2",
 			"HIPAA":     "164.312(a)(2)(i)",
@@ -407,14 +239,14 @@ az rest --method GET --url https://graph.microsoft.com/v1.0/policies/identitySec
 
 func (c *AzureCISManualChecks) checkRDPRestricted() CheckResult {
 	return CheckResult{
-		Control:     "CIS-6.2",
-		Name:        "[CIS Azure 6.2] RDP Access from Internet Restricted",
+		Control:     "CIS-7.1",
+		Name:        "RDP Access from Internet Restricted",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
 		Priority:    PriorityCritical,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify NO Network Security Groups allow RDP (port 3389) from Internet (0.0.0.0/0)",
 		Remediation: "Remove any NSG rules allowing RDP from 0.0.0.0/0",
-		RemediationDetail: `CIS Azure 6.2: Ensure that RDP access from the Internet is evaluated and restricted
+		RemediationDetail: `CIS Azure 7.1: Ensure that RDP access from the Internet is evaluated and restricted
 
 Check all NSGs for rules allowing:
 - Source: Any/Internet/0.0.0.0/0
@@ -430,7 +262,7 @@ az network nsg rule delete --name <rule-name> --nsg-name <nsg-name> --resource-g
 		ScreenshotGuide: "Network security groups → Inbound security rules → Screenshot showing NO rules with 3389 from Internet",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.2",
+			"CIS-Azure": "7.1",
 			"SOC2":      "CC6.1",
 			"PCI-DSS":   "1.4.2",
 			"HIPAA":     "164.312(a)(1)",
@@ -440,14 +272,14 @@ az network nsg rule delete --name <rule-name> --nsg-name <nsg-name> --resource-g
 
 func (c *AzureCISManualChecks) checkSSHRestricted() CheckResult {
 	return CheckResult{
-		Control:     "CIS-6.3",
-		Name:        "[CIS Azure 6.3] SSH Access from Internet Restricted",
+		Control:     "CIS-7.2",
+		Name:        "SSH Access from Internet Restricted",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
 		Priority:    PriorityCritical,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify NO Network Security Groups allow SSH (port 22) from Internet",
 		Remediation: "Remove any NSG rules allowing SSH from 0.0.0.0/0",
-		RemediationDetail: `CIS Azure 6.3: Ensure that SSH access from the Internet is evaluated and restricted
+		RemediationDetail: `CIS Azure 7.2: Ensure that SSH access from the Internet is evaluated and restricted
 
 Check all NSGs for rules allowing:
 - Source: Any/Internet/0.0.0.0/0
@@ -459,7 +291,7 @@ az network nsg rule list --nsg-name <nsg-name> --resource-group <rg> --query "[?
 		ScreenshotGuide: "Network security groups → Inbound security rules → Screenshot showing NO rules with port 22 from Internet",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.3",
+			"CIS-Azure": "7.2",
 			"SOC2":      "CC6.1",
 			"PCI-DSS":   "1.4.2",
 		},
@@ -468,14 +300,14 @@ az network nsg rule list --nsg-name <nsg-name> --resource-group <rg> --query "[?
 
 func (c *AzureCISManualChecks) checkSQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:     "CIS-6.4",
-		Name:        "[CIS Azure 6.4] SQL Server Port Access Restricted",
+		Control:     "AZ-CIS-26",
+		Name:        "SQL Server Port Access Restricted",
 		Status:      "INFO",
 		Severity:    "CRITICAL",
 		Priority:    PriorityCritical,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify NO NSGs allow SQL Server port (1433) from Internet",
 		Remediation: "Remove any NSG rules allowing port 1433 from 0.0.0.0/0",
-		RemediationDetail: `CIS Azure 6.4: Ensure that SQL Server port (1433) access from the Internet is restricted
+		RemediationDetail: `Ensure that SQL Server port (1433) access from the Internet is restricted
 
 Check all NSGs for rules allowing:
 - Source: Any/Internet/0.0.0.0/0
@@ -484,49 +316,46 @@ Check all NSGs for rules allowing:
 		ScreenshotGuide: "Network security groups → Inbound rules → NO rules allowing 1433 from Internet",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.4",
-			"SOC2":      "CC6.1",
-			"PCI-DSS":   "1.2.1, 2.2.2",
+			"SOC2":    "CC6.1",
+			"PCI-DSS": "1.2.1, 2.2.2",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkPostgreSQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:           "CIS-6.5",
-		Name:              "[CIS Azure 6.5] PostgreSQL Port Access Restricted",
+		Control:           "AZ-CIS-27",
+		Name:              "PostgreSQL Port Access Restricted",
 		Status:            "INFO",
 		Severity:          "HIGH",
 		Priority:          PriorityHigh,
 		Evidence:          "MANUAL CHECK REQUIRED: Verify NO NSGs allow PostgreSQL port (5432) from Internet",
 		Remediation:       "Remove any NSG rules allowing port 5432 from 0.0.0.0/0",
-		RemediationDetail: `CIS Azure 6.5: Ensure that PostgreSQL port (5432) access from the Internet is restricted`,
+		RemediationDetail: `Ensure that PostgreSQL port (5432) access from the Internet is restricted`,
 		ScreenshotGuide:   "Network security groups → Inbound rules → NO rules allowing 5432 from Internet",
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.5",
-			"SOC2":      "CC6.1",
-			"PCI-DSS":   "1.4.2",
+			"SOC2":    "CC6.1",
+			"PCI-DSS": "1.4.2",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 	return CheckResult{
-		Control:           "CIS-6.6",
-		Name:              "[CIS Azure 6.6] MySQL Port Access Restricted",
+		Control:           "AZ-CIS-28",
+		Name:              "MySQL Port Access Restricted",
 		Status:            "INFO",
 		Severity:          "HIGH",
 		Priority:          PriorityHigh,
 		Evidence:          "MANUAL CHECK REQUIRED: Verify NO NSGs allow MySQL port (3306) from Internet",
 		Remediation:       "Remove any NSG rules allowing port 3306 from 0.0.0.0/0",
-		RemediationDetail: `CIS Azure 6.6: Ensure that MySQL port (3306) access from the Internet is restricted`,
+		RemediationDetail: `Ensure that MySQL port (3306) access from the Internet is restricted`,
 		ScreenshotGuide:   "Network security groups → Inbound rules → NO rules allowing 3306 from Internet",
 		ConsoleURL:        "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Network%2FNetworkSecurityGroups",
 		Frameworks: map[string]string{
-			"CIS-Azure": "6.6",
-			"SOC2":      "CC6.1",
-			"PCI-DSS":   "1.4.2",
+			"SOC2":    "CC6.1",
+			"PCI-DSS": "1.4.2",
 		},
 	}
 }
@@ -535,14 +364,14 @@ func (c *AzureCISManualChecks) checkMySQLPortRestricted() CheckResult {
 
 func (c *AzureCISManualChecks) checkKeyVaultRecoveryLevel() CheckResult {
 	return CheckResult{
-		Control:     "CIS-8.1",
-		Name:        "[CIS Azure 8.1] Key Vault Recoverable",
+		Control:     "AZ-CIS-32",
+		Name:        "Key Vault Recoverable",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify all Key Vaults have soft-delete and purge protection enabled",
 		Remediation: "Enable soft-delete and purge protection for all Key Vaults",
-		RemediationDetail: `CIS Azure 8.1: Ensure that the key vault is recoverable
+		RemediationDetail: `Ensure that the key vault is recoverable
 
 All Key Vaults must have:
 1. Soft Delete enabled (90+ day retention)
@@ -558,23 +387,22 @@ az keyvault update --name <vault-name> --enable-purge-protection true`,
 		ScreenshotGuide: "Key Vault → Properties → Screenshot showing Soft-delete (90 days) and Purge protection both enabled",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
 		Frameworks: map[string]string{
-			"CIS-Azure": "8.1",
-			"SOC2":      "CC9.1",
-			"PCI-DSS":   "3.6.1",
+			"SOC2":    "CC9.1",
+			"PCI-DSS": "3.6.1",
 		},
 	}
 }
 
 func (c *AzureCISManualChecks) checkKeyVaultKeyExpiration() CheckResult {
 	return CheckResult{
-		Control:     "CIS-8.2",
-		Name:        "[CIS Azure 8.2] Key Vault Keys Have Expiration Dates",
+		Control:     "CIS-8.3.1",
+		Name:        "Key Vault Keys Have Expiration Dates",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify all cryptographic keys have expiration dates set",
 		Remediation: "Set expiration dates for all keys in Key Vaults",
-		RemediationDetail: `CIS Azure 8.2: Ensure that key vault keys have an expiration date set
+		RemediationDetail: `CIS Azure 8.3.1: Ensure that key vault keys have an expiration date set
 
 Azure CLI:
 az keyvault key list --vault-name <vault-name> --query "[?attributes.expires == null].{Name:name, Enabled:attributes.enabled}" -o table
@@ -584,7 +412,7 @@ az keyvault key set-attributes --vault-name <vault-name> --name <key-name> --exp
 		ScreenshotGuide: "Key Vault → Keys → Each key → Properties → Screenshot showing expiration date configured",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
 		Frameworks: map[string]string{
-			"CIS-Azure": "8.2",
+			"CIS-Azure": "8.3.1",
 			"SOC2":      "CC6.8",
 			"PCI-DSS":   "3.7.4",
 		},
@@ -593,14 +421,14 @@ az keyvault key set-attributes --vault-name <vault-name> --name <key-name> --exp
 
 func (c *AzureCISManualChecks) checkKeyVaultSecretExpiration() CheckResult {
 	return CheckResult{
-		Control:     "CIS-8.4",
-		Name:        "[CIS Azure 8.4] Key Vault Secrets Have Expiration Dates",
+		Control:     "CIS-8.3.3",
+		Name:        "Key Vault Secrets Have Expiration Dates",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify all secrets have expiration dates set",
 		Remediation: "Set expiration dates for all secrets in Key Vaults",
-		RemediationDetail: `CIS Azure 8.4: Ensure that secrets in Azure Key Vault have an expiration date set
+		RemediationDetail: `CIS Azure 8.3.3: Ensure that secrets in Azure Key Vault have an expiration date set
 
 Azure CLI:
 az keyvault secret list --vault-name <vault-name> --query "[?attributes.expires == null].{Name:name, Enabled:attributes.enabled}" -o table
@@ -610,7 +438,7 @@ az keyvault secret set-attributes --vault-name <vault-name> --name <secret-name>
 		ScreenshotGuide: "Key Vault → Secrets → Each secret → Properties → Screenshot showing expiration date",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
 		Frameworks: map[string]string{
-			"CIS-Azure": "8.4",
+			"CIS-Azure": "8.3.3",
 			"SOC2":      "CC6.7",
 			"PCI-DSS":   "8.3.9",
 		},
@@ -619,14 +447,14 @@ az keyvault secret set-attributes --vault-name <vault-name> --name <secret-name>
 
 func (c *AzureCISManualChecks) checkKeyVaultCertificateExpiration() CheckResult {
 	return CheckResult{
-		Control:     "CIS-8.6",
-		Name:        "[CIS Azure 8.6] Key Vault Certificates Auto-Renew",
+		Control:     "AZ-CIS-36",
+		Name:        "Key Vault Certificates Auto-Renew",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
 		Evidence:    "MANUAL CHECK REQUIRED: Verify certificates have auto-renewal configured",
 		Remediation: "Configure auto-renewal for certificates in Key Vaults",
-		RemediationDetail: `CIS Azure 8.6: Ensure that certificate auto-renewal is enabled for certificates stored in Azure Key Vault
+		RemediationDetail: `Ensure that certificate auto-renewal is enabled for certificates stored in Azure Key Vault
 
 Azure CLI:
 az keyvault certificate list --vault-name <vault-name> --query "[].{Name:name, AutoRenew:policy.lifetimeActions}" -o table
@@ -637,8 +465,7 @@ Verify each certificate has:
 		ScreenshotGuide: "Key Vault → Certificates → Each cert → Policy → Screenshot showing auto-renewal enabled",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.KeyVault%2Fvaults",
 		Frameworks: map[string]string{
-			"CIS-Azure": "8.6",
-			"SOC2":      "CC6.7",
+			"SOC2": "CC6.7",
 		},
 	}
 }

@@ -39,46 +39,26 @@
 
     <section class="section">
         <div class="container-prose">
-            <h2>System Requirements</h2>
-
-            <p><strong>Operating Systems:</strong></p>
-            <ul>
-                <li>Linux (any modern distribution)</li>
-                <li>macOS (10.15 Catalina or newer)</li>
-                <li>Windows (10/11 or Server 2016+)</li>
-            </ul>
-
-            <p><strong>Requirements:</strong></p>
-            <ul>
-                <li>Go 1.24 or newer (for building from source)</li>
-                <li>Cloud CLI tools (AWS CLI, Azure CLI, or gcloud CLI)</li>
-                <li>Read-only cloud credentials</li>
-                <li>Internet connection (for downloading and scanning)</li>
-            </ul>
-
-            <p><strong>Disk Space:</strong></p>
-            <ul>
-                <li>Universal binary (all clouds): ~64 MB download, ~325 MB installed</li>
-                <li><code>auditkit-aws</code>: ~7 MB download, ~23 MB installed</li>
-                <li><code>auditkit-azure</code>: ~7 MB download, ~28 MB installed</li>
-                <li><code>auditkit-gcp</code>: ~12 MB download, ~45 MB installed</li>
-                <li>Source code: ~50 MB</li>
-                <li>Scan results: ~1-10 MB per scan</li>
-            </ul>
-
-            <h2>Installation Methods</h2>
-
-            <h3>Option 1: Download Pre-Built Binary (Recommended)</h3>
-            <p>Fastest and easiest method</p>
-
-            <p>Releases ship a universal binary (all clouds) plus smaller single-cloud
-            builds: <code class="code-inline">auditkit-aws</code>,
-            <code class="code-inline">auditkit-azure</code>,
-            <code class="code-inline">auditkit-gcp</code>. Swap the name in any command below
-            if you only scan one provider.</p>
-
-            <h4>Linux (x86_64)</h4>
-            <pre class="code-block"><code># Download and extract
+<p>Complete installation instructions for AuditKit.</p>
+<h2>System Requirements</h2>
+<p><strong>Operating Systems:</strong>
+- Linux (any modern distribution)
+- macOS (10.15 Catalina or newer)
+- Windows (10/11 or Server 2016+)</p>
+<p><strong>Requirements:</strong>
+- Go 1.24 or newer (for building from source)
+- Cloud CLI tools (AWS CLI, Azure CLI, or gcloud CLI)
+- Read-only cloud credentials
+- Internet connection (for downloading and scanning)</p>
+<p><strong>Disk Space:</strong>
+- Universal binary (all clouds): ~64 MB download, ~325 MB installed
+- Source code: ~50 MB
+- Scan results: ~1-10 MB per scan</p>
+<h2>Installation Methods</h2>
+<h3>Option 1: Download Pre-Built Binary (Recommended)</h3>
+<p><strong>Fastest and easiest method</strong></p>
+<h4>Linux (x86_64)</h4>
+<pre class="code-block"><code># Download and extract
 curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz
 tar -xzf auditkit-linux-amd64.tar.gz
 
@@ -87,11 +67,11 @@ sudo mv auditkit-linux-amd64 /usr/local/bin/auditkit
 sudo chmod +x /usr/local/bin/auditkit
 
 # Verify installation
-auditkit version</code></pre>
-
-            <h4>Linux (ARM64)</h4>
-            <p>For AWS Graviton, Raspberry Pi, and Linux VMs on Apple Silicon Macs.</p>
-            <pre class="code-block"><code># Download and extract
+auditkit version
+</code></pre>
+<h4>Linux (ARM64)</h4>
+<p>For AWS Graviton, Raspberry Pi, and Linux VMs on Apple Silicon Macs.</p>
+<pre class="code-block"><code># Download and extract
 curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-arm64.tar.gz
 tar -xzf auditkit-linux-arm64.tar.gz
 
@@ -100,10 +80,10 @@ sudo mv auditkit-linux-arm64 /usr/local/bin/auditkit
 sudo chmod +x /usr/local/bin/auditkit
 
 # Verify installation
-auditkit version</code></pre>
-
-            <h4>macOS (Apple Silicon)</h4>
-            <pre class="code-block"><code># Download and extract
+auditkit version
+</code></pre>
+<h4>macOS (Apple Silicon)</h4>
+<pre class="code-block"><code># Download and extract
 curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-arm64.tar.gz
 tar -xzf auditkit-darwin-arm64.tar.gz
 
@@ -112,13 +92,13 @@ sudo mv auditkit-darwin-arm64 /usr/local/bin/auditkit
 sudo chmod +x /usr/local/bin/auditkit
 
 # The binary is unsigned. If macOS blocks it on first run:
-# System Settings -> Privacy and Security -> Open Anyway
+# System Settings -&gt; Privacy and Security -&gt; Open Anyway
 
 # Verify installation
-auditkit version</code></pre>
-
-            <h4>macOS (Intel)</h4>
-            <pre class="code-block"><code># Download and extract
+auditkit version
+</code></pre>
+<h4>macOS (Intel)</h4>
+<pre class="code-block"><code># Download and extract
 curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-darwin-amd64.tar.gz
 tar -xzf auditkit-darwin-amd64.tar.gz
 
@@ -127,35 +107,30 @@ sudo mv auditkit-darwin-amd64 /usr/local/bin/auditkit
 sudo chmod +x /usr/local/bin/auditkit
 
 # Verify installation
-auditkit version</code></pre>
-
-            <h4>Windows</h4>
-            <p>Run these in PowerShell.</p>
-            <pre class="code-block"><code># Download and extract
+auditkit version
+</code></pre>
+<h4>Windows</h4>
+<pre class="code-block"><code># Download and extract
 curl.exe -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-windows-amd64.zip
-Expand-Archive auditkit-windows-amd64.zip -DestinationPath .
+Expand-Archive -Path auditkit-windows-amd64.zip -DestinationPath .
 
 # Rename to auditkit.exe
 Rename-Item auditkit-windows-amd64.exe auditkit.exe
 
-# The binary is unsigned. If SmartScreen blocks it:
-# "More info" -> "Run anyway"
-
 # Add to PATH or run from current directory
-.\auditkit.exe version</code></pre>
-
-            <h3>Option 2: Build from Source</h3>
-            <p>For developers or custom builds</p>
-
-            <h4>Prerequisites</h4>
-            <pre class="code-block"><code># Install Go 1.24 or newer
+.\auditkit.exe version
+</code></pre>
+<h3>Option 2: Build from Source</h3>
+<p><strong>For developers or custom builds</strong></p>
+<h4>Prerequisites</h4>
+<pre class="code-block"><code># Install Go 1.24 or newer
 # Download from: https://go.dev/dl/
 
 # Verify Go installation
-go version  # Should show 1.24 or higher</code></pre>
-
-            <h4>Clone and Build</h4>
-            <pre class="code-block"><code># Clone repository
+go version  # Should show 1.24 or higher
+</code></pre>
+<h4>Clone and Build</h4>
+<pre class="code-block"><code># Clone repository
 git clone https://github.com/guardian-nexus/AuditKit-Community-Edition
 cd AuditKit-Community-Edition/scanner
 
@@ -168,10 +143,10 @@ go build ./cmd/auditkit
 sudo mv auditkit /usr/local/bin/
 
 # Verify installation
-auditkit version</code></pre>
-
-            <h4>Build for Different Platforms</h4>
-            <pre class="code-block"><code># Linux (amd64)
+auditkit version
+</code></pre>
+<h4>Build for Different Platforms</h4>
+<pre class="code-block"><code># Linux (amd64)
 GOOS=linux GOARCH=amd64 go build -o auditkit-linux ./cmd/auditkit
 
 # macOS (amd64)
@@ -181,12 +156,12 @@ GOOS=darwin GOARCH=amd64 go build -o auditkit-macos ./cmd/auditkit
 GOOS=darwin GOARCH=arm64 go build -o auditkit-macos-arm64 ./cmd/auditkit
 
 # Windows (amd64)
-GOOS=windows GOARCH=amd64 go build -o auditkit.exe ./cmd/auditkit</code></pre>
-
-            <h3>Option 3: Go Install</h3>
-            <p>For Go users</p>
-            <pre class="code-block"><code># Install directly from GitHub
-go install github.com/guardian-nexus/auditkit/scanner/cmd/auditkit@latest
+GOOS=windows GOARCH=amd64 go build -o auditkit.exe ./cmd/auditkit
+</code></pre>
+<h3>Option 3: Go Install</h3>
+<p><strong>For Go users</strong></p>
+<pre class="code-block"><code># Install directly from GitHub
+go install github.com/guardian-nexus/AuditKit-Community-Edition/scanner/cmd/auditkit@latest
 
 # Binary installed to: $GOPATH/bin/auditkit
 
@@ -194,204 +169,292 @@ go install github.com/guardian-nexus/auditkit/scanner/cmd/auditkit@latest
 export PATH=$PATH:$(go env GOPATH)/bin
 
 # Verify installation
-auditkit version</code></pre>
-
-            <h2>Installing Cloud CLI Tools</h2>
-            <p>AuditKit requires cloud CLI tools for authentication.</p>
-
-            <h4>AWS CLI</h4>
-            <p><strong>Linux/macOS:</strong></p>
-            <pre class="code-block"><code># macOS
+auditkit version
+</code></pre>
+<h2>Installing Cloud CLI Tools</h2>
+<p>AuditKit requires cloud CLI tools for authentication.</p>
+<h3>AWS CLI</h3>
+<p><strong>Linux/macOS:</strong></p>
+<pre class="code-block"><code># Option 1: Using package manager
+# macOS
 brew install awscli
 
 # Ubuntu/Debian
 sudo apt-get install awscli
 
-# Or using pip
+# Option 2: Using pip
 pip3 install awscli
 
 # Verify installation
-aws --version</code></pre>
-
-            <p><strong>Windows:</strong></p>
-            <pre class="code-block"><code># Download installer from:
+aws --version
+</code></pre>
+<p><strong>Windows:</strong></p>
+<pre class="code-block"><code># Download installer from:
 # https://aws.amazon.com/cli/
 
 # Or using Chocolatey
 choco install awscli
 
 # Verify installation
-aws --version</code></pre>
-            <p><a href="/docs/setup/aws.html">AWS Setup Guide →</a></p>
-
-            <h4>Azure CLI</h4>
-            <p><strong>Linux/macOS:</strong></p>
-            <pre class="code-block"><code># macOS
+aws --version
+</code></pre>
+<p><strong><a href="./setup/aws.html">AWS Setup Guide →</a></strong></p>
+<h3>Azure CLI</h3>
+<p><strong>Linux/macOS:</strong></p>
+<pre class="code-block"><code># macOS
 brew install azure-cli
 
 # Ubuntu/Debian
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 # Verify installation
-az --version</code></pre>
-
-            <p><strong>Windows:</strong></p>
-            <pre class="code-block"><code># Download installer from:
+az --version
+</code></pre>
+<p><strong>Windows:</strong></p>
+<pre class="code-block"><code># Download installer from:
 # https://docs.microsoft.com/cli/azure/install-azure-cli-windows
 
 # Or using Chocolatey
 choco install azure-cli
 
 # Verify installation
-az --version</code></pre>
-            <p><a href="/docs/setup/azure.html">Azure Setup Guide →</a></p>
-
-            <h4>Google Cloud SDK</h4>
-            <p><strong>Linux/macOS:</strong></p>
-            <pre class="code-block"><code># macOS
+az --version
+</code></pre>
+<p><strong><a href="./setup/azure.html">Azure Setup Guide →</a></strong></p>
+<h3>Google Cloud SDK</h3>
+<p><strong>Linux/macOS:</strong></p>
+<pre class="code-block"><code># macOS
 brew install google-cloud-sdk
 
 # Linux - using snap
 sudo snap install google-cloud-cli --classic
 
-# Verify installation
-gcloud --version</code></pre>
+# Or download from:
+# https://cloud.google.com/sdk/docs/install
 
-            <p><strong>Windows:</strong></p>
-            <pre class="code-block"><code># Download installer from:
+# Verify installation
+gcloud --version
+</code></pre>
+<p><strong>Windows:</strong></p>
+<pre class="code-block"><code># Download installer from:
 # https://cloud.google.com/sdk/docs/install
 
 # Or using Chocolatey
 choco install gcloudsdk
 
 # Verify installation
-gcloud --version</code></pre>
-            <p><a href="/docs/setup/gcp.html">GCP Setup Guide →</a></p>
-
-            <h2>Verifying Installation</h2>
-
-            <h3>Check AuditKit Version</h3>
-            <pre class="code-block"><code>auditkit version</code></pre>
-
-            <p><strong>Expected output:</strong></p>
-            <pre class="code-block"><code>AuditKit v0.8.6 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)</code></pre>
-
-            <h3>Check Cloud CLI Tools</h3>
-            <pre class="code-block"><code># AWS
+gcloud --version
+</code></pre>
+<p><strong><a href="./setup/gcp.html">GCP Setup Guide →</a></strong></p>
+<h2>Verifying Installation</h2>
+<h3>Check AuditKit Version</h3>
+<pre class="code-block"><code>auditkit version
+</code></pre>
+<p><strong>Expected output:</strong></p>
+<pre class="code-block"><code>AuditKit v1.0.0 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
+</code></pre>
+<h3>Check Cloud CLI Tools</h3>
+<pre class="code-block"><code># AWS
 aws --version
 
 # Azure
 az --version
 
 # GCP
-gcloud --version</code></pre>
-
-            <h3>Run Test Scan</h3>
-            <pre class="code-block"><code># Test AWS (requires configured credentials)
+gcloud --version
+</code></pre>
+<h3>Run Test Scan</h3>
+<pre class="code-block"><code># Test AWS (requires configured credentials)
 auditkit scan -provider aws -framework soc2
 
 # Test Azure (requires login)
 auditkit scan -provider azure -framework soc2
 
 # Test GCP (requires auth)
-auditkit scan -provider gcp -framework soc2</code></pre>
+auditkit scan -provider gcp -framework soc2
+</code></pre>
+<h2>Configuration</h2>
+<h3>Setting Up Cloud Credentials</h3>
+<p><strong>AWS:</strong></p>
+<pre class="code-block"><code>aws configure
+# Enter: Access Key ID, Secret Access Key, Region
+</code></pre>
+<p><strong>Azure:</strong></p>
+<pre class="code-block"><code>az login
+export AZURE_SUBSCRIPTION_ID=&quot;your-subscription-id&quot;
+</code></pre>
+<p><strong>GCP:</strong></p>
+<pre class="code-block"><code>gcloud auth application-default login
+export GOOGLE_CLOUD_PROJECT=your-project-id
+</code></pre>
+<p><strong><a href="./setup/">Detailed setup guides →</a></strong></p>
+<h2>Updating AuditKit</h2>
+<h3>Check for Updates</h3>
+<pre class="code-block"><code>auditkit update
+</code></pre>
+<h3>Update Binary Installation</h3>
+<pre class="code-block"><code># Download new version
+curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz
 
-            <h2>Configuration</h2>
+# Replace old binary
+chmod +x auditkit-linux-amd64
+sudo mv auditkit-linux-amd64 /usr/local/bin/auditkit
 
-            <h3>Setting Up Cloud Credentials</h3>
-            <p><strong>AWS:</strong></p>
-            <pre class="code-block"><code>aws configure
-# Enter: Access Key ID, Secret Access Key, Region</code></pre>
-
-            <p><strong>Azure:</strong></p>
-            <pre class="code-block"><code>az login
-export AZURE_SUBSCRIPTION_ID="your-subscription-id"</code></pre>
-
-            <p><strong>GCP:</strong></p>
-            <pre class="code-block"><code>gcloud auth application-default login
-export GOOGLE_CLOUD_PROJECT=your-project-id</code></pre>
-
-            <p><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/tree/main/docs/setup">Detailed setup guides →</a></p>
-
-            <h2>Troubleshooting Installation</h2>
-
-            <h3>"Command not found: auditkit"</h3>
-            <p><strong>Cause:</strong> Binary not in PATH</p>
-            <pre class="code-block"><code># Find where binary is located
+# Verify new version
+auditkit version
+</code></pre>
+<h3>Update Source Installation</h3>
+<pre class="code-block"><code>cd AuditKit-Community-Edition
+git pull origin main
+cd scanner
+go build ./cmd/auditkit
+sudo mv auditkit /usr/local/bin/
+</code></pre>
+<h3>Update Go Install</h3>
+<pre class="code-block"><code>go install github.com/guardian-nexus/AuditKit-Community-Edition/scanner/cmd/auditkit@latest
+</code></pre>
+<h2>Troubleshooting Installation</h2>
+<h3>"Command not found: auditkit"</h3>
+<p><strong>Cause:</strong> Binary not in PATH</p>
+<p><strong>Solution:</strong></p>
+<pre class="code-block"><code># Find where binary is located
 which auditkit
 
 # If not found, add to PATH
 export PATH=$PATH:/path/to/auditkit/directory
 
 # Or move to standard location
-sudo mv auditkit /usr/local/bin/</code></pre>
-
-            <h3>"Permission denied" when running auditkit</h3>
-            <p><strong>Cause:</strong> Binary not executable</p>
-            <pre class="code-block"><code>chmod +x auditkit</code></pre>
-
-            <h3>macOS "cannot be opened because the developer cannot be verified"</h3>
-            <p><strong>Cause:</strong> macOS Gatekeeper security</p>
-            <pre class="code-block"><code># Remove quarantine attribute
+sudo mv auditkit /usr/local/bin/
+</code></pre>
+<h3>"Permission denied" when running auditkit</h3>
+<p><strong>Cause:</strong> Binary not executable</p>
+<p><strong>Solution:</strong></p>
+<pre class="code-block"><code>chmod +x auditkit
+</code></pre>
+<h3>macOS "cannot be opened because the developer cannot be verified"</h3>
+<p><strong>Cause:</strong> macOS Gatekeeper security</p>
+<p><strong>Solution:</strong></p>
+<pre class="code-block"><code># Remove quarantine attribute
 xattr -d com.apple.quarantine auditkit
 
-# Or: System Preferences > Security & Privacy > Allow</code></pre>
-
-            <h3>Build errors with Go</h3>
-            <p><strong>Cause:</strong> Go version too old or dependencies missing</p>
-            <pre class="code-block"><code># Update Go to 1.24 or newer
+# Or: System Preferences &gt; Security &amp; Privacy &gt; Allow
+</code></pre>
+<h3>Build errors with Go</h3>
+<p><strong>Cause:</strong> Go version too old or dependencies missing</p>
+<p><strong>Solution:</strong></p>
+<pre class="code-block"><code># Update Go to 1.24 or newer
 go version
 
 # Clean build cache
 go clean -cache -modcache
 
 # Rebuild
-go build ./cmd/auditkit</code></pre>
+go build ./cmd/auditkit
+</code></pre>
+<h3>"Cannot connect to AWS/Azure/GCP"</h3>
+<p><strong>Cause:</strong> Cloud CLI not installed or not configured</p>
+<p><strong>Solution:</strong></p>
+<pre class="code-block"><code># Install cloud CLI tools (see above)
+# Configure credentials (see setup guides)
 
-            <h2>AuditKit Installation</h2>
-            <p>For AuditKit customers:</p>
+# Test cloud CLI directly
+aws sts get-caller-identity  # AWS
+az account show              # Azure
+gcloud projects list         # GCP
+</code></pre>
+<h2>Uninstalling AuditKit</h2>
+<h3>Remove Binary</h3>
+<pre class="code-block"><code># Find installation location
+which auditkit
 
-            <ol>
-                <li><a href="/">Sign up for trial →</a></li>
-                <li>Receive <code>.lic</code> license file via email</li>
-                <li>Download Pro binary from customer portal</li>
-                <li>Save license file to <code>~/.auditkit-pro/license.lic</code></li>
-            </ol>
+# Remove binary
+sudo rm /usr/local/bin/auditkit
+</code></pre>
+<h3>Remove Source Installation</h3>
+<pre class="code-block"><code># Remove cloned repository
+rm -rf ~/auditkit
 
-            <pre class="code-block"><code># Install Pro binary
+# Remove Go binary (if installed via go install)
+rm $(go env GOPATH)/bin/auditkit
+</code></pre>
+<h3>Clean Up Scan Results</h3>
+<pre class="code-block"><code># Remove scan history (if you want to)
+rm -rf ~/.auditkit/
+</code></pre>
+<h2>Advanced Installation</h2>
+<h3>Installing in Air-Gapped Environment</h3>
+<p><strong>For environments without internet access:</strong></p>
+<p>AuditKit can scan on a connected machine and report on a disconnected one. Every scan is cached under <code>~/.auditkit/cache</code>; <code>auditkit cache</code> lists what is stored, and <code>auditkit scan -offline</code> (optionally <code>-cache-file &lt;path&gt;</code>) rebuilds a report with no cloud API calls.</p>
+<ol>
+<li>Download binary on internet-connected machine:</li>
+</ol>
+<pre class="code-block"><code>curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz
+</code></pre>
+<ol>
+<li>
+<p>Transfer to air-gapped machine via USB/secure transfer</p>
+</li>
+<li>
+<p>Install normally:</p>
+</li>
+</ol>
+<pre class="code-block"><code>chmod +x auditkit-linux-amd64
+sudo mv auditkit-linux-amd64 /usr/local/bin/auditkit
+</code></pre>
+<p><strong>Note:</strong> Cloud CLI tools must also be installed offline</p>
+<h3>Installing for Multiple Users</h3>
+<p><strong>System-wide installation:</strong></p>
+<pre class="code-block"><code># Install to /usr/local/bin (all users can access)
+sudo cp auditkit /usr/local/bin/
+sudo chmod 755 /usr/local/bin/auditkit
+
+# Verify all users can run
+su - otheruser -c &quot;auditkit version&quot;
+</code></pre>
+<h3>Custom Installation Directory</h3>
+<pre class="code-block"><code># Install to custom location
+mkdir -p ~/tools
+cp auditkit ~/tools/
+
+# Add to PATH in shell profile
+echo 'export PATH=$PATH:$HOME/tools' &gt;&gt; ~/.bashrc
+source ~/.bashrc
+
+# Verify
+auditkit version
+</code></pre>
+<h2>Pro Version Installation</h2>
+<p><strong>For AuditKit customers:</strong></p>
+<ol>
+<li><strong><a href="https://auditkit.io/pro/">Sign up for trial →</a></strong></li>
+<li>Receive <code>.lic</code> license file via email</li>
+<li>Download Pro binary from customer portal</li>
+<li>Save your license file and run:</li>
+</ol>
+<pre class="code-block"><code># Install Pro binary (note: different binary name)
 chmod +x auditkit-pro
 sudo mv auditkit-pro /usr/local/bin/auditkit-pro
 
-# Save license file (attached to your welcome email)
+# Save license file (received after purchase/trial signup)
 mkdir -p ~/.auditkit-pro
-cp license.lic ~/.auditkit-pro/license.lic
+cp ~/Downloads/license.lic ~/.auditkit-pro/license.lic
 
-# Verify Pro features enabled
-auditkit-pro version  # Shows "Pro" edition
+# Activation is automatic on first run — no separate command needed
+auditkit-pro version  # Shows &quot;Pro&quot; edition
 
 # Run Pro scans
-auditkit-pro scan -provider aws -framework cmmc</code></pre>
+auditkit-pro scan -provider aws -framework cmmc
+</code></pre>
+<p><strong>Note:</strong> Pro version uses <code>auditkit-pro</code> command, not <code>auditkit</code></p>
+<p><strong><a href="../pricing.html">Pro feature details →</a></strong></p>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="./getting-started.html">Run your first scan →</a></strong></li>
+<li><strong><a href="./setup/">Setup cloud credentials →</a></strong></li>
+<li><strong><a href="./cli-reference.html">CLI Reference →</a></strong></li>
+<li><strong><a href="../examples/">Examples →</a></strong></li>
+</ul>
 
-            <div class="note">
-                <h4>Note</h4>
-                <p>Pro version uses <code>auditkit-pro</code> command, not <code>auditkit</code></p>
-            </div>
-
-            <p><a href="/pricing.html">Feature details →</a></p>
-
-            <h2>Next Steps</h2>
-
-            <h4>Run Your First Scan</h4>
-            <p>Get your first compliance scan running in 5 minutes</p>
-            <a href="./getting-started.html" class="btn btn-primary">Get Started →</a>
-
-            <h4>Setup Cloud Credentials</h4>
-            <p>Detailed authentication guides for AWS, Azure, and GCP</p>
-            <a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/tree/main/docs/setup" class="btn btn-primary">Setup Guide →</a>
-
-            <h4>CLI Reference</h4>
-            <p>Complete command documentation</p>
-            <a href="./cli-reference.html" class="btn btn-primary">Read Docs →</a>
         </div>
     </section>
 

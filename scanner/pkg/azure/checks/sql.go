@@ -29,17 +29,17 @@ func (c *SQLChecks) Name() string {
 func (c *SQLChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	// SQL Server checks (CIS 5.1.x)
+	// SQL Server checks
 	results = append(results, c.CheckSQLTDE(ctx)...)
 	results = append(results, c.CheckSQLAuditing(ctx)...)
 	results = append(results, c.CheckSQLFirewall(ctx)...)
 	results = append(results, c.CheckSQLEntraID(ctx)...)
 	results = append(results, c.CheckSQLDefender(ctx)...)
 
-	// PostgreSQL checks (CIS 5.2.x) - Manual for now
+	// PostgreSQL checks - Manual for now
 	results = append(results, c.CheckPostgreSQLConfig()...)
 
-	// MySQL checks (CIS 5.3.x) - Manual for now
+	// MySQL checks - Manual for now
 	results = append(results, c.CheckMySQLConfig()...)
 
 	return results, nil
@@ -50,10 +50,10 @@ func (c *SQLChecks) CheckSQLTDE(ctx context.Context) []CheckResult {
 
 	if c.serverClient == nil {
 		return append(results, CheckResult{
-			Control:    "CIS-5.1.3",
-			Name:       "[CIS Azure 5.1.3] SQL TDE Encryption",
+			Control:    "AZ-SQL-05",
+			Name:       "SQL TDE Encryption",
 			Status:     "INFO",
-			Evidence:   "CIS 5.1.3: Server client not available - manual check required",
+			Evidence:   "Server client not available - manual check required",
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SQL_TDE"),
@@ -69,8 +69,8 @@ func (c *SQLChecks) CheckSQLTDE(ctx context.Context) []CheckResult {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
 			return append(results, CheckResult{
-				Control:    "CIS-5.1.3",
-				Name:       "[CIS Azure 5.1.3] SQL TDE Check",
+				Control:    "AZ-SQL-04",
+				Name:       "SQL TDE Check",
 				Status:     "ERROR",
 				Evidence:   fmt.Sprintf("Unable to check SQL servers: %v", err),
 				Priority:   PriorityHigh,
@@ -84,16 +84,16 @@ func (c *SQLChecks) CheckSQLTDE(ctx context.Context) []CheckResult {
 
 	if totalServers > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-5.1.3",
-			Name:        "[CIS Azure 5.1.3, 5.1.5] SQL Transparent Data Encryption",
+			Control:     "AZ-SQL-03",
+			Name:        "SQL Transparent Data Encryption",
 			Status:      "INFO",
-			Evidence:    fmt.Sprintf("CIS 5.1.3, 5.1.5: Found %d SQL servers - MANUAL CHECK required to verify TDE on all databases", totalServers),
+			Evidence:    fmt.Sprintf("Found %d SQL servers - MANUAL CHECK required to verify TDE on all databases", totalServers),
 			Remediation: "Verify TDE is enabled on all SQL databases",
-			RemediationDetail: `CIS Azure 5.1.3: Ensure SQL server's TDE protector is encrypted with Customer-managed key
-CIS Azure 5.1.5: Ensure that 'Data encryption' is set to 'On' on a SQL Database
+			RemediationDetail: `Ensure SQL server's TDE protector is encrypted with Customer-managed key
+Ensure that 'Data encryption' is set to 'On' on a SQL Database
 
 TDE is enabled by default on Azure SQL Database (since 2017).
-For enhanced security (CIS 5.1.3), use customer-managed keys (CMK) in Key Vault.
+For enhanced security, use customer-managed keys (CMK) in Key Vault.
 
 Azure CLI (verify TDE):
 az sql db tde show --database <db> --server <server> --resource-group <rg>
@@ -119,10 +119,10 @@ func (c *SQLChecks) CheckSQLAuditing(ctx context.Context) []CheckResult {
 
 	if c.serverClient == nil {
 		return append(results, CheckResult{
-			Control:    "CIS-5.1.1",
-			Name:       "[CIS Azure 5.1.1] SQL Auditing",
+			Control:    "AZ-SQL-02",
+			Name:       "SQL Auditing",
 			Status:     "INFO",
-			Evidence:   "CIS 5.1.1: Server client not available - manual check required",
+			Evidence:   "Server client not available - manual check required",
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SQL_AUDITING"),
@@ -144,13 +144,13 @@ func (c *SQLChecks) CheckSQLAuditing(ctx context.Context) []CheckResult {
 
 	if totalServers > 0 {
 		results = append(results, CheckResult{
-			Control:     "CIS-5.1.1",
-			Name:        "[CIS Azure 5.1.1, 5.1.6] SQL Server Auditing",
+			Control:     "AZ-SQL-01",
+			Name:        "SQL Server Auditing",
 			Status:      "INFO",
-			Evidence:    fmt.Sprintf("CIS 5.1.1, 5.1.6: MANUAL CHECK - Verify auditing is enabled for %d SQL servers with 90+ day retention", totalServers),
+			Evidence:    fmt.Sprintf("MANUAL CHECK - Verify auditing is enabled for %d SQL servers with 90+ day retention", totalServers),
 			Remediation: "Enable SQL auditing with 90+ day retention",
-			RemediationDetail: `CIS Azure 5.1.1: Ensure that 'Auditing' is set to 'On' for SQL servers
-CIS Azure 5.1.6: Ensure that 'Auditing' Retention is 'greater than 90 days'
+			RemediationDetail: `Ensure that 'Auditing' is set to 'On' for SQL servers
+Ensure that 'Auditing' Retention is 'greater than 90 days'
 
 Requirements:
 1. Enable auditing at SQL Server level (applies to all databases)
@@ -183,10 +183,10 @@ func (c *SQLChecks) CheckSQLFirewall(ctx context.Context) []CheckResult {
 
 	if c.serverClient == nil {
 		return append(results, CheckResult{
-			Control:    "CIS-5.1.2",
-			Name:       "[CIS Azure 5.1.2] SQL Firewall Rules",
+			Control:    "AZ-SQL-13",
+			Name:       "SQL Server Firewall and Public Access",
 			Status:     "INFO",
-			Evidence:   "CIS 5.1.2: Server client not available - manual check required",
+			Evidence:   "Server client not available - manual check required",
 			Priority:   PriorityCritical,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SQL_FIREWALL"),
@@ -233,14 +233,14 @@ func (c *SQLChecks) CheckSQLFirewall(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-5.1.2",
-			Name:        "[CIS Azure 5.1.2, 5.1.7] SQL Server Firewall & Public Access",
+			Control:     "AZ-SQL-13",
+			Name:        "SQL Server Firewall and Public Access",
 			Status:      "FAIL",
 			Severity:    "CRITICAL",
-			Evidence:    fmt.Sprintf("CIS 5.1.2, 5.1.7: %d SQL servers allow public network access: %s", len(serversWithOpenFirewall), strings.Join(displayServers, ", ")),
+			Evidence:    fmt.Sprintf("%d SQL servers allow public network access: %s", len(serversWithOpenFirewall), strings.Join(displayServers, ", ")),
 			Remediation: "Disable public network access and use Private Link",
-			RemediationDetail: fmt.Sprintf(`CIS Azure 5.1.2: Ensure no Azure SQL Databases allow ingress from 0.0.0.0/0 (ANY IP)
-CIS Azure 5.1.7: Ensure Public Network Access is Disabled for SQL servers
+			RemediationDetail: fmt.Sprintf(`Ensure no Azure SQL Databases allow ingress from 0.0.0.0/0 (ANY IP)
+Ensure Public Network Access is Disabled for SQL servers
 
 CRITICAL: SQL servers with public network access are exposed to internet attacks.
 
@@ -264,10 +264,10 @@ If public access is required, ensure NO firewall rules allow:
 		})
 	} else if totalServers > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-5.1.2",
-			Name:       "[CIS Azure 5.1.2] SQL Server Public Access",
+			Control:    "AZ-SQL-13",
+			Name:       "SQL Server Firewall and Public Access",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 5.1.2, 5.1.7: All %d SQL servers have public network access disabled", totalServers),
+			Evidence:   fmt.Sprintf("All %d SQL servers have public network access disabled", totalServers),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SQL_FIREWALL"),
@@ -282,10 +282,10 @@ func (c *SQLChecks) CheckSQLEntraID(ctx context.Context) []CheckResult {
 
 	if c.serverClient == nil {
 		return append(results, CheckResult{
-			Control:    "CIS-5.1.4",
-			Name:       "[CIS Azure 5.1.4] SQL Entra ID Authentication",
+			Control:    "AZ-SQL-06",
+			Name:       "SQL Entra ID Authentication",
 			Status:     "INFO",
-			Evidence:   "CIS 5.1.4: Server client not available - manual check required",
+			Evidence:   "Server client not available - manual check required",
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SQL_ENTRA_AUTH"),
@@ -325,13 +325,13 @@ func (c *SQLChecks) CheckSQLEntraID(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:     "CIS-5.1.4",
-			Name:        "[CIS Azure 5.1.4] SQL Entra ID Authentication",
+			Control:     "AZ-SQL-06",
+			Name:        "SQL Entra ID Authentication",
 			Status:      "FAIL",
 			Severity:    "HIGH",
-			Evidence:    fmt.Sprintf("CIS 5.1.4: %d SQL servers lack Entra ID authentication: %s", len(serversWithoutEntraID), strings.Join(displayServers, ", ")),
+			Evidence:    fmt.Sprintf("%d SQL servers lack Entra ID authentication: %s", len(serversWithoutEntraID), strings.Join(displayServers, ", ")),
 			Remediation: "Configure Entra ID (Azure AD) authentication for SQL",
-			RemediationDetail: fmt.Sprintf(`CIS Azure 5.1.4: Ensure that Microsoft Entra authentication is Configured for SQL Servers
+			RemediationDetail: fmt.Sprintf(`Ensure that Microsoft Entra authentication is Configured for SQL Servers
 
 Entra ID (formerly Azure AD) authentication provides:
 - Centralized identity management
@@ -355,10 +355,10 @@ Best practice: Use Entra ID authentication exclusively and disable SQL authentic
 		})
 	} else if totalServers > 0 {
 		results = append(results, CheckResult{
-			Control:    "CIS-5.1.4",
-			Name:       "[CIS Azure 5.1.4] SQL Entra ID Authentication",
+			Control:    "AZ-SQL-06",
+			Name:       "SQL Entra ID Authentication",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("CIS 5.1.4: All %d SQL servers have Entra ID authentication configured", totalServers),
+			Evidence:   fmt.Sprintf("All %d SQL servers have Entra ID authentication configured", totalServers),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SQL_ENTRA_AUTH"),
@@ -375,13 +375,13 @@ func (c *SQLChecks) CheckSQLDefender(ctx context.Context) []CheckResult {
 	// This is a subscription-level setting checked via Defender API
 
 	results = append(results, CheckResult{
-		Control:     "CIS-3.1.7.3",
-		Name:        "[CIS Azure 3.1.7.3, 3.1.7.4] Microsoft Defender for SQL",
+		Control:     "CIS-8.1.7.3",
+		Name:        "Microsoft Defender for SQL",
 		Status:      "INFO",
-		Evidence:    "CIS 3.1.7.3, 3.1.7.4: MANUAL CHECK - Verify Microsoft Defender for SQL is enabled at subscription level",
+		Evidence:    "CIS 8.1.7.3: MANUAL CHECK - Verify Microsoft Defender for SQL is enabled at subscription level",
 		Remediation: "Enable Microsoft Defender for SQL Databases",
-		RemediationDetail: `CIS Azure 3.1.7.3: Ensure That Microsoft Defender for (Managed Instance) Azure SQL Databases Is Set To 'On'
-CIS Azure 3.1.7.4: Ensure That Microsoft Defender for SQL Servers on Machines Is Set To 'On'
+		RemediationDetail: `CIS Azure 8.1.7.3: Ensure That Microsoft Defender for (Managed Instance) Azure SQL Databases Is Set To 'On'
+CIS Azure 8.1.7.3: Ensure That Microsoft Defender for SQL Servers on Machines Is Set To 'On'
 
 Microsoft Defender for SQL provides:
 - Vulnerability assessment and recommendations
@@ -406,14 +406,14 @@ This is a subscription-level setting that protects all SQL resources.`,
 func (c *SQLChecks) CheckPostgreSQLConfig() []CheckResult {
 	results := []CheckResult{}
 
-	// CIS 5.2.1: PostgreSQL SSL
+	// PostgreSQL SSL
 	results = append(results, CheckResult{
-		Control:     "CIS-5.2.1",
-		Name:        "[CIS Azure 5.2.1] PostgreSQL Require Secure Transport",
+		Control:     "AZ-SQL-07",
+		Name:        "PostgreSQL Require Secure Transport",
 		Status:      "INFO",
-		Evidence:    "CIS 5.2.1: MANUAL CHECK - Verify 'require_secure_transport' is ON for PostgreSQL flexible servers",
+		Evidence:    "MANUAL CHECK - Verify 'require_secure_transport' is ON for PostgreSQL flexible servers",
 		Remediation: "Enable require_secure_transport for PostgreSQL",
-		RemediationDetail: `CIS Azure 5.2.1: Ensure server parameter 'require_secure_transport' is set to 'ON' for PostgreSQL flexible server
+		RemediationDetail: `Ensure server parameter 'require_secure_transport' is set to 'ON' for PostgreSQL flexible server
 
 Azure CLI:
 az postgres flexible-server parameter set \
@@ -428,21 +428,20 @@ This forces all connections to use SSL/TLS encryption.`,
 		Priority:        PriorityHigh,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.1",
-			"PCI-DSS":   "4.2.1",
+			"PCI-DSS": "4.2.1",
 		},
 	})
 
-	// CIS 5.2.2-5.2.4: PostgreSQL logging
+	// PostgreSQL logging
 	results = append(results, CheckResult{
-		Control:     "CIS-5.2.2",
-		Name:        "[CIS Azure 5.2.2-5.2.4] PostgreSQL Logging Configuration",
+		Control:     "AZ-SQL-08",
+		Name:        "PostgreSQL Logging Configuration",
 		Status:      "INFO",
-		Evidence:    "CIS 5.2.2-5.2.4: MANUAL CHECK - Verify PostgreSQL logging parameters are properly configured",
+		Evidence:    "MANUAL CHECK - Verify PostgreSQL logging parameters are properly configured",
 		Remediation: "Configure PostgreSQL logging parameters",
-		RemediationDetail: `CIS Azure 5.2.2: Ensure server parameter 'log_checkpoints' is set to 'ON' for PostgreSQL flexible server
-CIS Azure 5.2.3: Ensure server parameter 'connection_throttle.enable' is set to 'ON' for PostgreSQL flexible server
-CIS Azure 5.2.4: Ensure server parameter 'logfiles.retention_days' is greater than 3 days for PostgreSQL flexible server
+		RemediationDetail: `Ensure server parameter 'log_checkpoints' is set to 'ON' for PostgreSQL flexible server
+Ensure server parameter 'connection_throttle.enable' is set to 'ON' for PostgreSQL flexible server
+Ensure server parameter 'logfiles.retention_days' is greater than 3 days for PostgreSQL flexible server
 
 Required settings:
 - log_checkpoints = ON (logs checkpoint operations)
@@ -455,19 +454,18 @@ Configure via: PostgreSQL flexible server → Server parameters`,
 		Priority:        PriorityMedium,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.2, 5.2.3, 5.2.4",
-			"SOC2":      "CC7.1",
+			"SOC2": "CC7.1",
 		},
 	})
 
-	// CIS 5.2.5: PostgreSQL public access
+	// PostgreSQL public access
 	results = append(results, CheckResult{
-		Control:     "CIS-5.2.5",
-		Name:        "[CIS Azure 5.2.5] PostgreSQL Public Network Access",
+		Control:     "AZ-SQL-14",
+		Name:        "PostgreSQL Public Network Access",
 		Status:      "INFO",
-		Evidence:    "CIS 5.2.5: MANUAL CHECK - Verify 'Allow public access from any Azure service' is disabled for PostgreSQL",
+		Evidence:    "MANUAL CHECK - Verify 'Allow public access from any Azure service' is disabled for PostgreSQL",
 		Remediation: "Disable public network access for PostgreSQL",
-		RemediationDetail: `CIS Azure 5.2.5: Ensure 'Allow public access from any Azure service within Azure to this server' for PostgreSQL flexible server is disabled
+		RemediationDetail: `Ensure 'Allow public access from any Azure service within Azure to this server' for PostgreSQL flexible server is disabled
 
 Azure CLI:
 az postgres flexible-server update \
@@ -481,21 +479,20 @@ Use Private Link or VNet integration for secure connectivity.`,
 		Priority:        PriorityHigh,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.5",
-			"PCI-DSS":   "1.4.2",
+			"PCI-DSS": "1.4.2",
 		},
 	})
 
 	// Legacy PostgreSQL checks (5.2.6-5.2.8)
 	results = append(results, CheckResult{
-		Control:     "CIS-5.2.6",
-		Name:        "[CIS Azure 5.2.6-5.2.8] PostgreSQL Single Server (Legacy)",
+		Control:     "AZ-SQL-09",
+		Name:        "PostgreSQL Single Server (Legacy)",
 		Status:      "INFO",
-		Evidence:    "CIS 5.2.6-5.2.8: LEGACY - If using PostgreSQL Single Server, verify log_connections, log_disconnections, and infrastructure encryption",
+		Evidence:    "LEGACY - If using PostgreSQL Single Server, verify log_connections, log_disconnections, and infrastructure encryption",
 		Remediation: "Migrate to PostgreSQL Flexible Server (Single Server is deprecated)",
-		RemediationDetail: `CIS Azure 5.2.6: [LEGACY] Ensure server parameter 'log_connections' is set to 'ON' for PostgreSQL single server
-CIS Azure 5.2.7: [LEGACY] Ensure server parameter 'log_disconnections' is set to 'ON' for PostgreSQL single server
-CIS Azure 5.2.8: [LEGACY] Ensure 'Infrastructure double encryption' for PostgreSQL single server is 'Enabled'
+		RemediationDetail: `[LEGACY] Ensure server parameter 'log_connections' is set to 'ON' for PostgreSQL single server
+[LEGACY] Ensure server parameter 'log_disconnections' is set to 'ON' for PostgreSQL single server
+[LEGACY] Ensure 'Infrastructure double encryption' for PostgreSQL single server is 'Enabled'
 
 IMPORTANT: PostgreSQL Single Server is deprecated. Migrate to Flexible Server.
 
@@ -504,9 +501,7 @@ For existing Single Servers, configure these parameters via Server parameters pa
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.DBforPostgreSQL%2Fservers",
 		Priority:        PriorityMedium,
 		Timestamp:       time.Now(),
-		Frameworks: map[string]string{
-			"CIS-Azure": "5.2.6, 5.2.7, 5.2.8",
-		},
+		Frameworks:      map[string]string{"SOC2": "CC6.1"},
 	})
 
 	return results
@@ -515,14 +510,14 @@ For existing Single Servers, configure these parameters via Server parameters pa
 func (c *SQLChecks) CheckMySQLConfig() []CheckResult {
 	results := []CheckResult{}
 
-	// CIS 5.3.1: MySQL SSL
+	// MySQL SSL
 	results = append(results, CheckResult{
-		Control:     "CIS-5.3.1",
-		Name:        "[CIS Azure 5.3.1] MySQL Require Secure Transport",
+		Control:     "AZ-SQL-10",
+		Name:        "MySQL Require Secure Transport",
 		Status:      "INFO",
-		Evidence:    "CIS 5.3.1: MANUAL CHECK - Verify 'require_secure_transport' is ON for MySQL flexible servers",
+		Evidence:    "MANUAL CHECK - Verify 'require_secure_transport' is ON for MySQL flexible servers",
 		Remediation: "Enable require_secure_transport for MySQL",
-		RemediationDetail: `CIS Azure 5.3.1: Ensure server parameter 'require_secure_transport' is set to 'ON' for MySQL flexible server
+		RemediationDetail: `Ensure server parameter 'require_secure_transport' is set to 'ON' for MySQL flexible server
 
 Azure CLI:
 az mysql flexible-server parameter set \
@@ -537,19 +532,18 @@ Ensures all client connections use SSL/TLS encryption.`,
 		Priority:        PriorityHigh,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.3.1",
-			"PCI-DSS":   "4.2.1",
+			"PCI-DSS": "4.2.1",
 		},
 	})
 
-	// CIS 5.3.2: MySQL TLS version
+	// MySQL TLS version
 	results = append(results, CheckResult{
-		Control:     "CIS-5.3.2",
-		Name:        "[CIS Azure 5.3.2] MySQL TLS Version",
+		Control:     "AZ-SQL-11",
+		Name:        "MySQL TLS Version",
 		Status:      "INFO",
-		Evidence:    "CIS 5.3.2: MANUAL CHECK - Verify 'tls_version' is set to 'TLSv1.2' or higher for MySQL",
+		Evidence:    "MANUAL CHECK - Verify 'tls_version' is set to 'TLSv1.2' or higher for MySQL",
 		Remediation: "Set minimum TLS version to 1.2",
-		RemediationDetail: `CIS Azure 5.3.2: Ensure server parameter 'tls_version' is set to 'TLSv1.2' (or higher) for MySQL flexible server
+		RemediationDetail: `Ensure server parameter 'tls_version' is set to 'TLSv1.2' (or higher) for MySQL flexible server
 
 Azure CLI:
 az mysql flexible-server parameter set \
@@ -564,20 +558,19 @@ Disables weak TLS 1.0 and 1.1 protocols.`,
 		Priority:        PriorityHigh,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.3.2",
-			"PCI-DSS":   "4.2.1",
+			"PCI-DSS": "4.2.1",
 		},
 	})
 
-	// CIS 5.3.3, 5.3.4: MySQL audit logging
+	// MySQL audit logging
 	results = append(results, CheckResult{
-		Control:     "CIS-5.3.3",
-		Name:        "[CIS Azure 5.3.3, 5.3.4] MySQL Audit Logging",
+		Control:     "AZ-SQL-12",
+		Name:        "MySQL Audit Logging",
 		Status:      "INFO",
-		Evidence:    "CIS 5.3.3, 5.3.4: MANUAL CHECK - Verify audit logging is enabled with CONNECTION events",
+		Evidence:    "MANUAL CHECK - Verify audit logging is enabled with CONNECTION events",
 		Remediation: "Enable MySQL audit logging",
-		RemediationDetail: `CIS Azure 5.3.3: Ensure server parameter 'audit_log_enabled' is set to 'ON' for MySQL flexible server
-CIS Azure 5.3.4: Ensure server parameter 'audit_log_events' has 'CONNECTION' set for MySQL flexible server
+		RemediationDetail: `Ensure server parameter 'audit_log_enabled' is set to 'ON' for MySQL flexible server
+Ensure server parameter 'audit_log_events' has 'CONNECTION' set for MySQL flexible server
 
 Required settings:
 - audit_log_enabled = ON
@@ -589,8 +582,7 @@ Configure via: MySQL flexible server → Server parameters`,
 		Priority:        PriorityMedium,
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "5.3.3, 5.3.4",
-			"SOC2":      "CC7.1",
+			"SOC2": "CC7.1",
 		},
 	})
 

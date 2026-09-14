@@ -32,7 +32,6 @@ AuditKit can run in CI/CD pipelines to:
 A completed scan exits 0 whatever the compliance score; a non-zero exit means
 the scan itself could not run. Gate the build on the score, not the exit code.
 - Lightweight binaries (~50-80MB) run in Docker containers
-- Provider-specific scanners for faster CI/CD builds
 
 ---
 
@@ -108,9 +107,9 @@ jobs:
           aws-region: us-east-1
       - name: Run AWS scan
         run: |
-          curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-aws-linux-amd64.tar.gz && tar -xzf auditkit-aws-linux-amd64.tar.gz && mv auditkit-aws-linux-amd64 auditkit-aws
-          chmod +x auditkit-aws
-          ./auditkit-aws scan -framework soc2 -format json -output aws-soc2.json
+          curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 auditkit
+          chmod +x auditkit
+          ./auditkit scan -provider aws -framework soc2 -format json -output aws-soc2.json
       - uses: actions/upload-artifact@v3
         with:
           name: aws-compliance
@@ -125,10 +124,10 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Run Azure scan
         run: |
-          curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-azure-linux-amd64.tar.gz && tar -xzf auditkit-azure-linux-amd64.tar.gz && mv auditkit-azure-linux-amd64 auditkit-azure
-          chmod +x auditkit-azure
+          curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 auditkit
+          chmod +x auditkit
           export AZURE_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
-          ./auditkit-azure scan -framework soc2 -format json -output azure-soc2.json
+          ./auditkit scan -provider azure -framework soc2 -format json -output azure-soc2.json
       - uses: actions/upload-artifact@v3
         with:
           name: azure-compliance
@@ -143,9 +142,9 @@ jobs:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
       - name: Run GCP scan
         run: |
-          curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-gcp-linux-amd64.tar.gz && tar -xzf auditkit-gcp-linux-amd64.tar.gz && mv auditkit-gcp-linux-amd64 auditkit-gcp
-          chmod +x auditkit-gcp
-          ./auditkit-gcp scan -framework soc2 -format json -output gcp-soc2.json
+          curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 auditkit
+          chmod +x auditkit
+          ./auditkit scan -provider gcp -framework soc2 -format json -output gcp-soc2.json
       - uses: actions/upload-artifact@v3
         with:
           name: gcp-compliance
@@ -196,11 +195,11 @@ azure-cmmc-scan:
   image: mcr.microsoft.com/azure-cli
   before_script:
     - az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-    - curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-azure-linux-amd64.tar.gz && tar -xzf auditkit-azure-linux-amd64.tar.gz && mv auditkit-azure-linux-amd64 auditkit-azure
-    - chmod +x auditkit-azure
+    - curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 auditkit
+    - chmod +x auditkit
   script:
     - export AZURE_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
-    - ./auditkit-azure scan -framework cmmc -format json -output cmmc-results.json
+    - ./auditkit scan -provider azure -framework cmmc -format json -output cmmc-results.json
   artifacts:
     paths:
       - cmmc-results.json
@@ -227,8 +226,8 @@ pipeline {
         stage('Download AuditKit') {
             steps {
                 sh '''
-                    curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-aws-linux-amd64.tar.gz && tar -xzf auditkit-aws-linux-amd64.tar.gz && mv auditkit-aws-linux-amd64 auditkit-aws
-                    chmod +x auditkit-aws
+                    curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 auditkit
+                    chmod +x auditkit
                 '''
             }
         }
@@ -239,7 +238,7 @@ pipeline {
                     string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
                     string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
-                    sh './auditkit-aws scan -framework soc2 -format json -output soc2-results.json'
+                    sh './auditkit scan -provider aws -framework soc2 -format json -output soc2-results.json'
                 }
             }
         }
@@ -294,9 +293,9 @@ pipeline {
                 stage('AWS') {
                     steps {
                         sh '''
-                            curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-aws-linux-amd64.tar.gz && tar -xzf auditkit-aws-linux-amd64.tar.gz && mv auditkit-aws-linux-amd64 auditkit-aws
-                            chmod +x auditkit-aws
-                            ./auditkit-aws scan -framework soc2 -format json -output aws-soc2.json
+                            curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 auditkit
+                            chmod +x auditkit
+                            ./auditkit scan -provider aws -framework soc2 -format json -output aws-soc2.json
                         '''
                     }
                 }
@@ -304,11 +303,11 @@ pipeline {
                 stage('Azure') {
                     steps {
                         sh '''
-                            curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-azure-linux-amd64.tar.gz && tar -xzf auditkit-azure-linux-amd64.tar.gz && mv auditkit-azure-linux-amd64 auditkit-azure
-                            chmod +x auditkit-azure
+                            curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 auditkit
+                            chmod +x auditkit
                             az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
                             export AZURE_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
-                            ./auditkit-azure scan -framework soc2 -format json -output azure-soc2.json
+                            ./auditkit scan -provider azure -framework soc2 -format json -output azure-soc2.json
                         '''
                     }
                 }
@@ -316,10 +315,10 @@ pipeline {
                 stage('GCP') {
                     steps {
                         sh '''
-                            curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-gcp-linux-amd64.tar.gz && tar -xzf auditkit-gcp-linux-amd64.tar.gz && mv auditkit-gcp-linux-amd64 auditkit-gcp
-                            chmod +x auditkit-gcp
+                            curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 auditkit
+                            chmod +x auditkit
                             gcloud auth activate-service-account --key-file=$GCP_CREDENTIALS
-                            ./auditkit-gcp scan -framework soc2 -format json -output gcp-soc2.json
+                            ./auditkit scan -provider gcp -framework soc2 -format json -output gcp-soc2.json
                         '''
                     }
                 }
@@ -364,13 +363,12 @@ phases:
   install:
     commands:
       - echo "Installing AuditKit..."
-      - curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-aws-linux-amd64.tar.gz && tar -xzf auditkit-aws-linux-amd64.tar.gz && mv auditkit-aws-linux-amd64 auditkit-aws
-      - chmod +x auditkit-aws
-
+      - curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 auditkit
+      - chmod +x auditkit
   build:
     commands:
       - echo "Running SOC2 compliance scan..."
-      - ./auditkit-aws scan -framework soc2 -format json -output soc2-results.json
+      - ./auditkit scan -provider aws -framework soc2 -format json -output soc2-results.json
 
   post_build:
     commands:
@@ -418,13 +416,13 @@ steps:
       inlineScript: 'az account show'
 
   - script: |
-      curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-azure-linux-amd64.tar.gz && tar -xzf auditkit-azure-linux-amd64.tar.gz && mv auditkit-azure-linux-amd64 auditkit-azure
-      chmod +x auditkit-azure
+      curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 auditkit
+      chmod +x auditkit
     displayName: 'Download AuditKit'
 
   - script: |
       export AZURE_SUBSCRIPTION_ID="$(az account show --query id -o tsv)"
-      ./auditkit-azure scan -framework soc2 -format json -output soc2-results.json
+      ./auditkit scan -provider azure -framework soc2 -format json -output soc2-results.json
     displayName: 'Run SOC2 Compliance Scan'
 
   - task: PublishBuildArtifacts@1
@@ -458,9 +456,8 @@ steps:
       - 'bash'
       - '-c'
       - |
-        curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-gcp-linux-amd64.tar.gz && tar -xzf auditkit-gcp-linux-amd64.tar.gz && mv auditkit-gcp-linux-amd64 auditkit-gcp
-        chmod +x auditkit-gcp
-
+        curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 auditkit
+        chmod +x auditkit
   # Run GCP SOC2 scan
   - name: 'ubuntu'
     env:
@@ -468,7 +465,7 @@ steps:
     args:
       - 'bash'
       - '-c'
-      - './auditkit-gcp scan -framework soc2 -format json -output soc2-results.json'
+      - './auditkit scan -provider gcp -framework soc2 -format json -output soc2-results.json'
 
   # Check compliance score
   - name: 'gcr.io/cloud-builders/jq'
@@ -618,15 +615,11 @@ RUN apt-get update && apt-get install -y \
     bc \
     && rm -rf /var/lib/apt/lists/*
 
-# Download AuditKit (choose provider-specific or universal)
+# Download AuditKit (one binary for all clouds)
 RUN curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-linux-amd64.tar.gz && \
     tar -xzf auditkit-linux-amd64.tar.gz && mv auditkit-linux-amd64 /usr/local/bin/auditkit && \
     chmod +x /usr/local/bin/auditkit
 
-# Optionally download provider-specific scanners
-RUN curl -LO https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/latest/download/auditkit-aws-linux-amd64.tar.gz && \
-    tar -xzf auditkit-aws-linux-amd64.tar.gz && mv auditkit-aws-linux-amd64 /usr/local/bin/auditkit-aws && \
-    chmod +x /usr/local/bin/auditkit-aws
 
 WORKDIR /workspace
 
@@ -651,7 +644,7 @@ docker run --rm \
 
 ## Best Practices
 
-1. **Use provider-specific scanners** - 30% smaller binaries = faster CI/CD builds
+1. **Pin a release** - download a versioned asset rather than `latest`, so a new release cannot change a passing pipeline
 2. **Cache binaries** - Download once, reuse across pipeline steps
 3. **Run scans in parallel** - Scan AWS, Azure, GCP simultaneously
 4. **Store JSON artifacts** - Archive compliance reports for audit trails

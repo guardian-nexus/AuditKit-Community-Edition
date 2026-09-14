@@ -11,22 +11,22 @@ import (
 	"strings"
 	"time"
 
-	awsScanner "github.com/guardian-nexus/auditkit/scanner/pkg/aws"
-	azureScanner "github.com/guardian-nexus/auditkit/scanner/pkg/azure"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/cli"
-	gcpScanner "github.com/guardian-nexus/auditkit/scanner/pkg/gcp"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/integrations"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/integrations/prowler"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/integrations/scubagear"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/mappings"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/offline"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/remediation"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/report"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/tracker"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/updater"
+	awsScanner "github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/aws"
+	azureScanner "github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/azure"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/cli"
+	gcpScanner "github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/gcp"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/integrations"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/integrations/prowler"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/integrations/scubagear"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/mappings"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/offline"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/remediation"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/report"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/tracker"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/updater"
 )
 
-var CurrentVersion = "v0.8.7"
+var CurrentVersion = "v1.0.0"
 
 type ComplianceResult struct {
 	Timestamp       time.Time       `json:"timestamp"`
@@ -94,7 +94,7 @@ func main() {
 	}
 
 	command := os.Args[1]
-	flag.CommandLine.Parse(os.Args[2:])
+	_ = flag.CommandLine.Parse(os.Args[2:]) // ExitOnError: a bad flag has already exited
 
 	switch command {
 	case "scan":
@@ -208,7 +208,7 @@ Examples:
   # Show all controls (not truncated)
   auditkit scan -provider aws -framework cmmc --full
 
-For more information: https://github.com/guardian-nexus/auditkit`)
+For more information: https://github.com/guardian-nexus/AuditKit-Community-Edition`)
 }
 
 func runIntegration(source, file, format, output, framework string, verbose bool) {
@@ -264,7 +264,10 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 		case "json":
 			data, _ := json.MarshalIndent(integrationResult, "", "  ")
 			if output != "" {
-				os.WriteFile(output, data, 0644)
+				if err := os.WriteFile(output, data, 0644); err != nil {
+					fmt.Fprintf(os.Stderr, "Error writing %s: %v\n", output, err)
+					os.Exit(1)
+				}
 				fmt.Printf("Results saved to %s\n", output)
 			} else {
 				fmt.Println(string(data))
@@ -339,7 +342,10 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 		case "json":
 			data, _ := json.MarshalIndent(integrationResult, "", "  ")
 			if output != "" {
-				os.WriteFile(output, data, 0644)
+				if err := os.WriteFile(output, data, 0644); err != nil {
+					fmt.Fprintf(os.Stderr, "Error writing %s: %v\n", output, err)
+					os.Exit(1)
+				}
 				fmt.Printf("Results saved to %s\n", output)
 			} else {
 				fmt.Println(string(data))
@@ -374,6 +380,7 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown integration source: %s\n", source)
 		fmt.Fprintf(os.Stderr, "Supported sources: scubagear, prowler\n")
+		fmt.Fprintf(os.Stderr, "Nessus, Trivy and Grype import is available in AuditKit Pro.\n")
 		os.Exit(1)
 	}
 }
@@ -421,6 +428,7 @@ func convertIntegrationResults(results []integrations.IntegrationResult, provide
 		score = float64(passed) / float64(automatedChecks) * 100
 	}
 
+	controls = completeFramework(controls, framework)
 	return ComplianceResult{
 		Timestamp:       time.Now(),
 		Provider:        provider,
@@ -810,7 +818,9 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 
 	result := performScan(provider, profile, framework, verbose, services)
 
-	saveProgress(result.AccountID, result.Score, result.Controls, framework)
+	if err := saveProgress(result.AccountID, result.Score, result.Controls, framework); err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: progress not saved: %v\n", err)
+	}
 
 	// Save to offline cache for later offline use
 	if err := saveScanToCache(result, CurrentVersion); err != nil {
@@ -922,6 +932,84 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 		fmt.Fprintf(os.Stderr, "Unknown format: %s\n", format)
 		os.Exit(1)
 	}
+}
+
+// completeFramework reports on every control the framework defines. Anything
+// the scan could not evaluate is emitted as MANUAL rather than omitted, so the
+// control count is the framework's real denominator instead of "whatever we
+// happened to check". Every path that produces a framework-labelled report
+// comes through here: the single-account scan and an imported ScubaGear
+// or Prowler run. Only the single-account
+// scan used to, so the others showed a denominator of what was checked.
+func completeFramework(controls []ControlResult, framework string) []ControlResult {
+	if strings.EqualFold(framework, "cmmc") {
+		controls = collapsePractices(controls)
+	}
+	if framework != "all" {
+		missing := mappings.MissingControls(framework, reportedControlIDs(framework, controls))
+
+		// 800-53 and its FedRAMP baselines report the uncovered set as one
+		// count. Listing it adds about a thousand rows to a scan that found
+		// roughly 150 things, and a reader looking for the findings would have
+		// to page past every one. The rule lives in pkg/mappings so both
+		// editions draw the same line.
+		if mappings.ShouldSummariseUncovered(framework) && len(missing) > 0 {
+			// The catalog is the denominator; what the scan reached is the rest.
+			// Counting rows put INFO and ERROR rows, and every row of a control
+			// reported more than once, into the assessed figure and pushed the
+			// total past the catalog.
+			total := len(mappings.CatalogFor(framework))
+			assessed := total - len(missing)
+			controls = append(controls, ControlResult{
+				ID:       strings.ToUpper(framework) + "-UNCOVERED",
+				Name:     "Controls not assessed by this scan",
+				Category: "Manual Documentation",
+				Severity: "MEDIUM",
+				Status:   "MANUAL",
+				Evidence: fmt.Sprintf(
+					"MANUAL: %d of %d controls were assessed. The remaining %d are largely policy, "+
+						"process and personnel controls that a configuration scan cannot evidence; "+
+						"they are enumerated in the framework catalog rather than listed here.",
+					assessed, total, len(missing)),
+				Remediation: "Collect the policy, procedure and personnel evidence for the controls " +
+					"this scan does not reach, and store it with the audit package.",
+				Priority:   "MEDIUM",
+				Frameworks: map[string]string{strings.ToUpper(framework): "coverage"},
+			})
+			missing = nil
+		}
+
+		missingIDs := make([]string, 0, len(missing))
+		for id := range missing {
+			missingIDs = append(missingIDs, id)
+		}
+		// Map iteration order is randomised, which made two identical scans emit
+		// rows (and evidence folders) in a different order every run.
+		sort.Strings(missingIDs)
+		for _, id := range missingIDs {
+			title := missing[id]
+			// The CIS catalogs carry an assessment type where the others
+			// carry a title, because CIS titles are their content and are
+			// deliberately not shipped. Using the value as a name would
+			// label the row "Automated".
+			if title == "Automated" || title == "Manual" {
+				title = "Benchmark recommendation not assessed (" + title + ")"
+			}
+			controls = append(controls, ControlResult{
+				ID:              id,
+				Name:            title,
+				Category:        "Manual Documentation",
+				Severity:        "MEDIUM",
+				Status:          "MANUAL",
+				Evidence:        "MANUAL: No automated check covers this control. Document how it is satisfied and retain the evidence.",
+				Remediation:     "Collect the policy, procedure or configuration evidence that demonstrates this control, and store it with the audit package.",
+				Priority:        "MEDIUM",
+				ScreenshotGuide: "Capture the document or console view that demonstrates this control is implemented.",
+				Frameworks:      map[string]string{strings.ToUpper(framework): id},
+			})
+		}
+	}
+	return controls
 }
 
 func performScan(provider, profile, framework string, verbose bool, services string) ComplianceResult {
@@ -1359,6 +1447,18 @@ func performScan(provider, profile, framework string, verbose bool, services str
 						fmt.Fprintf(os.Stderr, "Mapped %s -> %s (NIST CSF 2.0)\n", originalID, subcategories)
 					}
 				}
+			} else if requestedUpper == "CMMC" && !isPracticeID(control.ID) {
+				// A SOC2 or CIS check that also answers a practice carries it in
+				// its Frameworks map. A CMMC report files the row under the
+				// practice, not the check's own id: an assessor reading CC9.1
+				// where they expect IR.L2-3.6.1 cannot use it.
+				if ids := practiceIDs(frameworkTagValue(control.Frameworks, "CMMC")); len(ids) > 0 {
+					hasRequestedFramework = true
+					originalID := control.ID
+					control.ID = strings.Join(ids, ", ")
+					crosswalkIDs = ids
+					control.Name = crosswalkName(control.Name, fmt.Sprintf("(via %s, CMMC)", originalID))
+				}
 			} else if requestedUpper == "PCI" || requestedUpper == "PCI-DSS" {
 				// A PCI scan must report PCI-DSS requirement numbers. Checks record
 				// the requirement they satisfy in their Frameworks map but kept
@@ -1422,7 +1522,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 						break
 					}
 				}
-			} else if control.Frameworks != nil && len(control.Frameworks) > 0 {
+			} else if len(control.Frameworks) > 0 {
 				// Standard framework matching for other frameworks (only if Frameworks exists)
 				for fw := range control.Frameworks {
 					fwUpper := strings.ToUpper(fw)
@@ -1502,48 +1602,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 		}
 	}
 
-	// Report on every control the framework defines. Anything the scan could not
-	// evaluate is emitted as MANUAL rather than omitted, so the control count is
-	// the framework's real denominator instead of "whatever we happened to check".
-	if framework != "all" {
-		reported := make([]string, 0, len(controls))
-		for _, control := range controls {
-			reported = append(reported, control.ID)
-			// A check often reports under its own id while carrying the framework's
-			// id in its tags (a CIS-numbered check tagged SOC2 CC6.1). Without the
-			// tag the control was counted as unevaluated and re-emitted as MANUAL
-			// next to the very result that covers it.
-			for _, key := range []string{framework, strings.ToUpper(framework)} {
-				if value, ok := control.Frameworks[key]; ok && value != "" {
-					reported = append(reported, splitControlIDs(value)...)
-				}
-			}
-		}
-		missing := mappings.MissingControls(framework, reported)
-		missingIDs := make([]string, 0, len(missing))
-		for id := range missing {
-			missingIDs = append(missingIDs, id)
-		}
-		// Map iteration order is randomised, which made two identical scans emit
-		// rows (and evidence folders) in a different order every run.
-		sort.Strings(missingIDs)
-		for _, id := range missingIDs {
-			title := missing[id]
-			controls = append(controls, ControlResult{
-				ID:              id,
-				Name:            title,
-				Category:        "Manual Documentation",
-				Severity:        "MEDIUM",
-				Status:          "MANUAL",
-				Evidence:        "MANUAL: No automated check covers this control. Document how it is satisfied and retain the evidence.",
-				Remediation:     "Collect the policy, procedure or configuration evidence that demonstrates this control, and store it with the audit package.",
-				Priority:        "MEDIUM",
-				ScreenshotGuide: "Capture the document or console view that demonstrates this control is implemented.",
-				Frameworks:      map[string]string{strings.ToUpper(framework): id},
-			})
-		}
-	}
-
+	controls = completeFramework(controls, framework)
 	score := 0.0
 	automatedChecks := passed + failed
 	if automatedChecks > 0 {
@@ -1568,11 +1627,12 @@ func saveProgress(accountID string, score float64, controls []ControlResult, fra
 	homeDir, _ := os.UserHomeDir()
 	dataPath := filepath.Join(homeDir, ".auditkit", accountID+".json")
 
-	os.MkdirAll(filepath.Dir(dataPath), 0755)
+	_ = os.MkdirAll(filepath.Dir(dataPath), 0755) // the write below reports a missing directory
 
 	var progress ProgressData
 	if data, err := os.ReadFile(dataPath); err == nil {
-		json.Unmarshal(data, &progress)
+		// A corrupt file starts the history over rather than aborting the scan.
+		_ = json.Unmarshal(data, &progress)
 	} else {
 		progress = ProgressData{
 			AccountID:    accountID,
@@ -1651,7 +1711,10 @@ func showProgress(provider, profile string) {
 	}
 
 	var progress ProgressData
-	json.Unmarshal(data, &progress)
+	if err := json.Unmarshal(data, &progress); err != nil {
+		fmt.Fprintf(os.Stderr, "Progress file %s is unreadable: %v\n", dataPath, err)
+		os.Exit(1)
+	}
 
 	fmt.Println("\nYour Compliance Journey Progress")
 	fmt.Println("===================================")
@@ -1743,7 +1806,10 @@ func compareScan(provider, profile string) {
 	}
 
 	var progress ProgressData
-	json.Unmarshal(data, &progress)
+	if err := json.Unmarshal(data, &progress); err != nil {
+		fmt.Fprintf(os.Stderr, "Progress file %s is unreadable: %v\n", dataPath, err)
+		os.Exit(1)
+	}
 
 	if len(progress.ScoreHistory) < 2 {
 		fmt.Println("Need at least 2 scans to compare.")
@@ -3303,6 +3369,30 @@ func frameworkTagValue(frameworks map[string]string, keys ...string) string {
 	return ""
 }
 
+// reportedControlIDs returns the identifiers the scan answered in the requested
+// framework's catalog, for MissingControls to subtract. A control counts under
+// its own id and under whatever the check recorded in the framework's tag: a
+// check often reports under its own id while carrying the framework's id in
+// its tags (a CIS-numbered check tagged SOC2 CC6.1), and without the tag the
+// control was counted as unevaluated and re-emitted as MANUAL next to the very
+// result that covers it.
+//
+// The tag lookup is case-insensitive. The CIS catalogs are keyed by bare
+// recommendation number and only the tag carries that shape - the CIS branch
+// rewrites the control id to CIS-<PROVIDER>-<n>, which the catalog never
+// matches. An exact lookup of the upper-cased framework name found "CIS-AWS"
+// and "CIS-GCP" only because those tags happen to be upper-case; it missed the
+// Azure checks' "CIS-Azure" tag, so a cis-azure scan re-listed every assessed
+// recommendation as an unassessed fill.
+func reportedControlIDs(framework string, controls []ControlResult) []string {
+	reported := make([]string, 0, len(controls))
+	for _, control := range controls {
+		reported = append(reported, control.ID)
+		reported = append(reported, splitControlIDs(frameworkTagValue(control.Frameworks, framework))...)
+	}
+	return reported
+}
+
 // nativeFrameworkIDs turns a check's framework tag into the identifiers that
 // framework's catalog is keyed by, adding the catalog's prefix when the tag
 // carries a bare requirement number.
@@ -3316,6 +3406,87 @@ func nativeFrameworkIDs(value, prefix string) []string {
 		ids[i] = id
 	}
 	return ids
+}
+
+// isPracticeID reports whether an identifier is a CMMC practice (AC.L2-3.1.5).
+func isPracticeID(id string) bool {
+	id = strings.TrimSpace(id)
+	return len(id) > 8 && id[2] == '.' && id[3] == 'L' && (id[4] == '1' || id[4] == '2') && id[5] == '-' && strings.HasPrefix(id[6:], "3.")
+}
+
+// practiceIDs keeps the practice identifiers in a CMMC tag value. Older tags
+// carried a level ("L2") rather than a practice; those name nothing to file
+// under.
+func practiceIDs(value string) []string {
+	out := []string{}
+	for _, id := range splitControlIDs(value) {
+		if isPracticeID(id) {
+			out = append(out, strings.TrimSpace(id))
+		}
+	}
+	return out
+}
+
+// practiceRank orders statuses from most to least serious, so a practice
+// answered by several rows keeps the outcome an assessor must see.
+func practiceRank(status string) int {
+	switch status {
+	case "FAIL":
+		return 4
+	case "ERROR":
+		return 3
+	case "INFO", "MANUAL":
+		return 2
+	case "PASS":
+		return 1
+	}
+	return 0
+}
+
+// collapsePractices keeps one row per CMMC practice. The scanner already
+// collapses the rows its CMMC suites emit, but a SOC2 or CIS check that also
+// answers a practice is filed under the practice here, after that, and so
+// arrived beside the practice's own row - three rows for IR.L2-3.6.1 in one
+// report. The most serious status wins and every row's evidence is kept.
+func collapsePractices(controls []ControlResult) []ControlResult {
+	index := make(map[string]int, len(controls))
+	out := make([]ControlResult, 0, len(controls))
+	for _, c := range controls {
+		if !isPracticeID(c.ID) {
+			out = append(out, c)
+			continue
+		}
+		pos, seen := index[c.ID]
+		if !seen {
+			index[c.ID] = len(out)
+			out = append(out, c)
+			continue
+		}
+		kept := &out[pos]
+		if practiceRank(c.Status) > practiceRank(kept.Status) {
+			merged := c
+			merged.Evidence = joinEvidence(c.Evidence, kept.Evidence)
+			merged.Remediation = joinEvidence(c.Remediation, kept.Remediation)
+			merged.ScreenshotGuide = joinEvidence(c.ScreenshotGuide, kept.ScreenshotGuide)
+			*kept = merged
+			continue
+		}
+		kept.Evidence = joinEvidence(kept.Evidence, c.Evidence)
+		kept.Remediation = joinEvidence(kept.Remediation, c.Remediation)
+		kept.ScreenshotGuide = joinEvidence(kept.ScreenshotGuide, c.ScreenshotGuide)
+	}
+	return out
+}
+
+func joinEvidence(a, b string) string {
+	b = strings.TrimSpace(b)
+	if b == "" || strings.Contains(a, b) {
+		return a
+	}
+	if strings.TrimSpace(a) == "" {
+		return b
+	}
+	return a + " | " + b
 }
 
 // splitControlIDs turns a crosswalk's comma-joined control list into atomic IDs.

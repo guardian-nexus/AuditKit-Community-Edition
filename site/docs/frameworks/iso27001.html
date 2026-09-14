@@ -49,9 +49,9 @@
 <p>International information security management standard guide.</p>
 <h2>Overview</h2>
 <p><strong>ISO/IEC 27001</strong> is the international standard for information security management systems (ISMS).</p>
-<p><strong>Who needs it:</strong> Organizations worldwide seeking information security certification<br>
-<strong>Status in AuditKit:</strong> Production<br>
-<strong>Coverage:</strong> 46 controls, derived via the NIST 800-53 crosswalk - 48 on AWS, out of the 93 controls in Annex A<br>
+<p><strong>Who needs it:</strong> Organizations worldwide seeking information security certification<br />
+<strong>Status in AuditKit:</strong> Production<br />
+<strong>Coverage:</strong> 53 controls, derived via the NIST 800-53 crosswalk - 53 on AWS, Azure and GCP alike, out of the 93 controls in Annex A<br />
 <strong>What's covered:</strong> Technical controls (A.8), organizational (A.5), people (A.6), physical (A.7)</p>
 <h2>Important Disclaimer</h2>
 <p><strong>AuditKit's ISO 27001 support covers technical controls only - NOT sufficient for ISO 27001 certification.</strong></p>
@@ -71,8 +71,8 @@
 <li>Continual improvement processes</li>
 <li>Organizational controls requiring human processes</li>
 </ul>
-<p><strong>Use for:</strong> Technical control assessment as part of ISO 27001 compliance program<br>
-<strong>Don't use for:</strong> Sole evidence of ISO 27001 certification<br>
+<p><strong>Use for:</strong> Technical control assessment as part of ISO 27001 compliance program<br />
+<strong>Don't use for:</strong> Sole evidence of ISO 27001 certification<br />
 <strong>Hire a consultant for:</strong> Complete ISMS implementation and certification audit</p>
 <h2>ISO 27001:2022 Changes</h2>
 <p>The 2022 version reduced controls from 114 to 93 and reorganized into 4 themes:</p>
@@ -166,7 +166,7 @@
 <li>A.8.25: Secure development life cycle</li>
 </ul>
 <h2>Running ISO 27001 Scans</h2>
-<div class="code-block"># ISO 27001 scan
+<pre class="code-block"><code># ISO 27001 scan
 auditkit scan -provider aws -framework iso27001
 
 # Azure
@@ -180,50 +180,54 @@ auditkit scan -provider aws -framework iso27001 -format pdf -output iso27001-rep
 
 # CSV for control tracking
 auditkit scan -provider aws -framework iso27001 -format csv -output iso27001-controls.csv
-</div>
+</code></pre>
 <h2>ISO 27001 Certification Process</h2>
 <h3>Stage 1: Planning (Months 1-6)</h3>
 <ol>
+<li><strong>Gap Analysis</strong></li>
+<li>Run AuditKit to assess technical controls</li>
+<li>Identify missing organizational controls</li>
 <li>
-<p><strong>Gap Analysis</strong>
-   - Run AuditKit to assess technical controls
-   - Identify missing organizational controls
-   - Document current state</p>
+<p>Document current state</p>
 </li>
 <li>
-<p><strong>ISMS Design</strong>
-   - Define ISMS scope
-   - Establish security policy
-   - Conduct risk assessment
-   - Create Statement of Applicability (SoA)</p>
+<p><strong>ISMS Design</strong></p>
+</li>
+<li>Define ISMS scope</li>
+<li>Establish security policy</li>
+<li>Conduct risk assessment</li>
+<li>
+<p>Create Statement of Applicability (SoA)</p>
 </li>
 <li>
-<p><strong>Implementation Plan</strong>
-   - Prioritize control implementation
-   - Assign responsibilities
-   - Set timelines</p>
+<p><strong>Implementation Plan</strong></p>
 </li>
+<li>Prioritize control implementation</li>
+<li>Assign responsibilities</li>
+<li>Set timelines</li>
 </ol>
 <h3>Stage 2: Implementation (Months 7-12)</h3>
 <ol>
+<li><strong>Technical Controls</strong></li>
+<li>Remediate gaps found by AuditKit</li>
+<li>Implement security configurations</li>
 <li>
-<p><strong>Technical Controls</strong>
-   - Remediate gaps found by AuditKit
-   - Implement security configurations
-   - Deploy monitoring and logging</p>
+<p>Deploy monitoring and logging</p>
 </li>
 <li>
-<p><strong>Documentation</strong>
-   - Develop policies and procedures
-   - Create work instructions
-   - Document control implementation</p>
+<p><strong>Documentation</strong></p>
+</li>
+<li>Develop policies and procedures</li>
+<li>Create work instructions</li>
+<li>
+<p>Document control implementation</p>
 </li>
 <li>
-<p><strong>Training</strong>
-   - Security awareness for all staff
-   - Role-specific training
-   - ISMS process training</p>
+<p><strong>Training</strong></p>
 </li>
+<li>Security awareness for all staff</li>
+<li>Role-specific training</li>
+<li>ISMS process training</li>
 </ol>
 <h3>Stage 3: Internal Audit (Month 13)</h3>
 <ul>
@@ -240,25 +244,27 @@ auditkit scan -provider aws -framework iso27001 -format csv -output iso27001-con
 </ul>
 <h3>Stage 5: Certification Audit (Months 15-16)</h3>
 <ol>
+<li><strong>Stage 1 Audit</strong> (Documentation review)</li>
+<li>Certifying body reviews ISMS documentation</li>
+<li>Checks scope definition</li>
+<li>Reviews SoA</li>
 <li>
-<p><strong>Stage 1 Audit</strong> (Documentation review)
-   - Certifying body reviews ISMS documentation
-   - Checks scope definition
-   - Reviews SoA
-   - Identifies major gaps</p>
+<p>Identifies major gaps</p>
 </li>
 <li>
-<p><strong>Stage 2 Audit</strong> (On-site assessment)
-   - Certifying body assesses control implementation
-   - Interviews staff
-   - Reviews evidence
-   - Tests control effectiveness</p>
+<p><strong>Stage 2 Audit</strong> (On-site assessment)</p>
+</li>
+<li>Certifying body assesses control implementation</li>
+<li>Interviews staff</li>
+<li>Reviews evidence</li>
+<li>
+<p>Tests control effectiveness</p>
 </li>
 <li>
-<p><strong>Certification Decision</strong>
-   - Address any non-conformities
-   - Receive ISO 27001 certificate (valid 3 years)</p>
+<p><strong>Certification Decision</strong></p>
 </li>
+<li>Address any non-conformities</li>
+<li>Receive ISO 27001 certificate (valid 3 years)</li>
 </ol>
 <h3>Stage 6: Surveillance (Ongoing)</h3>
 <ul>

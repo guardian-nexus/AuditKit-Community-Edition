@@ -302,7 +302,7 @@ auditkit version
 
 **Output:**
 ```
-AuditKit v0.8.6 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
+AuditKit v1.0.0 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
 ```
 
 ---
@@ -362,7 +362,7 @@ auditkit scan -format json -output results.json
 
 ### html
 
-Interactive HTML report with search and filtering.
+HTML report with Failed, Passed and Manual tabs.
 
 ```bash
 auditkit scan -format html -output report.html
@@ -419,7 +419,8 @@ GCP_PROJECT                     # Alternative project ID variable
 ## Exit Codes
 
 - `0` - Success
-- `1` - Any error (bad arguments, missing credentials, permission denied, or a failed scan)
+- `1` - Any error the scanner reports (missing credentials, permission denied, or a failed scan)
+- `2` - A flag the binary does not recognise, or a malformed one; the flag parser exits before the scanner runs
 
 AuditKit does not currently distinguish error classes by exit code. To branch on the result in CI, parse the JSON report rather than the exit status.
 
@@ -543,10 +544,10 @@ auditkit-pro scan -provider aws -framework cmmc -format pdf -output cmmc-l2-repo
 
 ```bash
 # Scan GKE clusters (Pro only)
-auditkit scan -provider gcp -framework soc2  # Includes GKE checks
+auditkit-pro scan -provider gcp -framework soc2  # Includes GKE checks
 
 # Scan Vertex AI (Pro only)
-auditkit scan -provider gcp -framework soc2  # Includes Vertex AI checks
+auditkit-pro scan -provider gcp -framework soc2  # Includes Vertex AI checks
 ```
 
 ---

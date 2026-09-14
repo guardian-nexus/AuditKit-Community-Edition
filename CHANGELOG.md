@@ -2,6 +2,93 @@
 
 All notable changes to AuditKit will be documented in this file.
 
+## [1.0.0] - 2026-09-14
+
+### Removed
+- The single-cloud binaries `auditkit-aws`, `auditkit-azure` and `auditkit-gcp`.
+  They were built from separate, much simpler code that printed the scanner's
+  rows raw: no framework filter, no requirement counting, no PDF or HTML, and
+  a `total_controls` of "whatever passed or failed". The one binary scans every
+  cloud with `-provider`, correctly; the download is ~62 MB.
+
+### Fixed
+- A check with nothing in scope reported PASS - "all 0 NSGs have restricted
+  access rules" - so an empty or wrongly scoped account read as mostly
+  compliant. Zero resources in scope is INFO, excluded from the score, with
+  "nothing to assess" as the evidence.
+- Lint clean under golangci-lint 2.5: a report that fails to write, an
+  unreadable progress file and an unreadable release feed are reported
+  rather than ignored; the rest are explicit discards with the reason beside
+  them. Two dead accumulators and a first-only loop written as an
+  unconditional break are gone. CI gates on lint.
+- coverage-counts.py could not see a control id assigned after the literal
+  or a verdict assigned in a helper; GCP emits 173 controls where 168 was
+  published and the vulnerability-scanning practice reaches a verdict. The
+  figures are re-measured and written.
+- The GCP PCI checks filed six rows under a section heading (PCI-1.2.1)
+  while their evidence named the requirement measured (1.4.2); they are
+  filed under the requirement.
+- Two Azure CMMC checks read only the first page of role assignments or
+  NSGs and judged the subscription on that page.
+- A CMMC report files a SOC2 or CIS check that also answers a practice
+  under the practice, not the check's own id.
+- The site's numbers and claims were corrected against the code: control,
+  CIS, PCI, HIPAA, NIST 800-53, ISO, CSF, GDPR and FedRAMP figures, the
+  CMMC "automated" counts (a practice is automated when the check reaches a
+  PASS or FAIL: 5 of 17 Level 1 on AWS, not 13), the homepage's "350+
+  automated checks" (675 controls, measured), and a long list of smaller
+  claims. The html doc pages are rendered from their markdown; the provider
+  pages' control lists, the M365 rule lists and the CIS section breakdowns
+  are generated from the scanner's source and the shipped catalogs, so they
+  cannot drift again.
+- A GDPR or FedRAMP report said nothing about its catalog being a subset;
+  the CLI printed that caveat beside the score and the PDF and HTML, which
+  are what reach an assessor, did not. Both now carry the scope note and
+  that the report is not legal advice. The GDPR page describes coverage the
+  way the automation peers do: Articles 25, 30 and 32, automated where the
+  cloud can show it, the remaining security-relevant obligations listed to
+  document.
+- An imported ScubaGear or Prowler run reported only the controls the
+  mapping file knew, so a SOC2 report from it had a denominator of a few
+  findings instead of 43. It carries the whole catalog, as a scan does. The
+  800-53 and FedRAMP summary row counts the catalog rather than rows.
+- 12 CMMC checks reported FAIL when the API call was denied, so a missing
+  IAM permission scored as a compliance failure. They report ERROR, which
+  is excluded from the score, as the rest of the scanner does.
+- The usage footer linked the old repository.
+- A framework-filtered scan (`-framework cmmc`, `pci`, `cis-aws`, ...) ran
+  every suite twice and reported every row twice, counting each FAIL twice
+  in the score: 123 rows for 110 CMMC practices. Each path now runs the
+  suites once and adds only its own reporters. Two suites that were
+  only ever run by their own path (the Azure and GCP PCI suites) are now in
+  the shared suite list, so they also run on every other scan. Severity is
+  read from whichever field a suite filled.
+- A `cis-azure` scan re-listed every assessed recommendation as an
+  unassessed MANUAL fill (162 rows for a 127-entry benchmark): the
+  reported-id lookup missed the mixed-case `CIS-Azure` tag. The `cis-azure` path also never reached the CIS Azure v6 suites, so 90 recommendations with automated checks were reported as not assessed; it does now.
+- GCP: a project with VM Manager not enabled now FAILs `RA.L2-3.11.2` and
+  `PCI-11.3.1` instead of reporting an error. **This lowers the reported score
+  for GCP projects without VM Manager.** The score is
+  `passed / (passed + failed)`, so an error was counted in neither half and the
+  control dropped out entirely - a project with no vulnerability scanning at all
+  scored better than one being scanned badly, and better than an AWS or Azure
+  account in the identical state. "Nothing is scanning these instances" is the
+  finding the control exists to report, so it is now scored as one. A genuine
+  permission denial is unchanged and still reports an error, because a call that
+  did not complete proves nothing about posture.
+
+## [0.8.7] - 2026-09-07
+
+### Fixed
+- `auditkit update` reported every install as v0.3.0; it now takes its version
+  from the binary it is part of, and compares release numbers numerically so
+  v0.10.0 is correctly newer than v0.9.0.
+- The AWS, Azure and GCP binaries reported v0.8.5 while the universal one
+  reported v0.8.6; all four now agree, and `make build` injects the version
+  instead of leaving it unset.
+
+No scanner, catalog or report changes - coverage is identical to v0.8.6.
+
 ## [0.8.6] - 2026-09-07
 
 ### Changed

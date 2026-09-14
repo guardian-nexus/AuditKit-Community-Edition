@@ -6,376 +6,337 @@ What AuditKit scans in Amazon Web Services.
 
 ## Overview
 
-**Coverage:** 219 controls across AWS services  
+**Coverage:** 228 controls across AWS services  
 **Supported in:** Free and Pro versions
 
 **Supported frameworks:**
 - SOC2 Type II (38 criteria)
-- PCI-DSS v4.0.1 (69 requirements)
-- CMMC Level 1 and Level 2: all 110 practices reported; 13 of the 17 Level 1 practices automated, Level 2 automated in Pro
-- NIST 800-53 Rev 5 (95 controls, derived via crosswalk)
-- HIPAA (18 safeguards, derived via crosswalk)
+- PCI-DSS v4.0.1 (71 requirements)
+- CMMC Level 1 and Level 2: all 110 practices reported; 6 reach a verdict on AWS (5 of the 17 Level 1, plus 1 Level 2); Pro adds deeper automation and the evidence package
+- NIST 800-53 Rev 5 (149 controls, derived via crosswalk)
+- HIPAA (30 safeguards, derived via crosswalk)
 
 ---
 
 ## Covered Services
 
-### S3 (Simple Storage Service)
+Every control the service checks emit, read from the scanner's source. The
+identifier is the one the report carries; the framework pages say which
+requirement each maps to.
 
-**Controls checked:** 9
+### IAM
 
-- **CC6.2** - S3 Public Access Block
-- **CC6.3** - S3 Encryption at Rest
-- **CC7.1** - S3 Access Logging
-- **A1.2** - S3 Versioning for Backup
-- **A1.2** - S3 Lifecycle Policies
-- **CIS-2.1.2** - S3 MFA Delete
-- **CIS-2.1.4** - S3 Server Access Logging
-- **CIS-2.1.6** - S3 Object Lock
-- **CIS-2.1.7** - S3 Account Public Access Block
+**Controls checked:** 22
 
-**Example fixes:**
-```bash
-# Block public access
-aws s3api put-public-access-block \
-  --bucket BUCKET_NAME \
-  --public-access-block-configuration \
-  BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
-
-# Enable encryption
-aws s3api put-bucket-encryption \
-  --bucket BUCKET_NAME \
-  --server-side-encryption-configuration \
-  '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
-
-# Enable versioning
-aws s3api put-bucket-versioning \
-  --bucket BUCKET_NAME \
-  --versioning-configuration Status=Enabled
-```
-
----
-
-### IAM (Identity & Access Management)
-
-**Controls checked:** 30
-
-- **CC6.4** - Zombie IAM Users
-- **CC6.4** - Inactive IAM Users
-- **CC6.4** - User Access Reviews
-- **CC6.5** - Excessive Admin Users
-- **CC6.5** - Least Privilege Access
-- **CC6.5** - Service Account Security
 - **CC6.6** - Root Account MFA
-- **CC6.6** - Root Account Usage
 - **CC6.7** - Password Policy
-- **CC6.7** - Unused Credentials
 - **CC6.8** - Access Key Rotation
-- **CIS-1.1** - Account Contact Details
-- **CIS-1.2** - Security Contact Information
-- **CIS-1.3** - Credentials Unused 45+ Days
-- **CIS-1.6** - Root Hardware MFA
-- **CIS-1.10** - MFA for IAM Users
-- **CIS-1.11** - Root Account Access Keys
-- **CIS-1.12** - Credentials Unused 90 Days
-- **CIS-1.13** - One Active Access Key Per User
-- **CIS-1.15** - IAM Policies via Groups Only
-- **CIS-1.16** - IAM Policies on Groups/Roles Only
-- **CIS-1.17** - IAM Support Role
-- **CIS-1.18** - IAM Master and Manager Roles
-- **CIS-1.19** - IAM Instance Roles
-- **CIS-1.20** - Password Expiration Policy
-- **CIS-1.21** - Password Reuse Prevention
-- **CIS-1.22** - IAM Policies Attached to Groups Only
-- **CIS-1.22** - IAM User Access Review
-- **CIS-17.1** - IAM Service-Linked Roles Configured
-- **CIS-17.2** - IAM Permission Boundaries Configured
+- **CIS-2.4** - Root Account Access Keys
+- **CIS-2.6** - Root Hardware MFA
+- **CIS-2.10** - MFA for IAM Users
+- **CIS-2.11** - Credentials Unused 90 Days
+- **AWS-IAM-05** - One Active Access Key Per User
+- **CIS-2.13** - IAM Policies via Groups Only
+- **CIS-2.15** - IAM Support Role
+- **CIS-2.16** - IAM Instance Roles
+- **AWS-IAM-06** - Password Expiration Policy
+- **CIS-2.9** - Password Reuse Prevention
+- **CIS-2.2** - Account Contact Details
+- **CIS-2.3** - Security Contact Information
+- **AWS-IAM-01** - IAM Master and Manager Roles
+- **AWS-IAM-04** - IAM User Access Review
+- **CC6.4** - Zombie IAM Users
+- **CC6.5** - Excessive Admin Users
+- **CC6.6** - Root Account Usage
+- **AWS-IAM-03** - IAM Service-Linked Roles Configured
+- **AWS-IAM-02** - IAM Permission Boundaries Configured
 
-**Example fixes:**
-```bash
-# Enforce password policy
-aws iam update-account-password-policy \
-  --minimum-password-length 14 \
-  --require-symbols \
-  --require-numbers \
-  --require-uppercase-characters \
-  --require-lowercase-characters \
-  --max-password-age 90 \
-  --password-reuse-prevention 24
+### EC2
 
-# Enable MFA for user
-aws iam enable-mfa-device \
-  --user-name USERNAME \
-  --serial-number arn:aws:iam::ACCOUNT:mfa/USERNAME \
-  --authentication-code-1 CODE1 \
-  --authentication-code-2 CODE2
-
-# Rotate access key
-aws iam create-access-key --user-name USERNAME
-aws iam delete-access-key --user-name USERNAME --access-key-id OLD_KEY_ID
-```
-
----
-
-### EC2 (Elastic Compute Cloud)
-
-**Controls checked:** 11
+**Controls checked:** 10
 
 - **CC6.1** - Open Security Groups
-- **CC6.1** - Network Security - Open Ports
-- **CC6.1** - Public EC2 Instances
 - **CC6.3** - EBS Volume Encryption
 - **CC7.2** - AMI Age and Patching
-- **CIS-1.18** - EC2 Instance IAM Roles
-- **CIS-2.2.2** - EBS Public Snapshots
-- **CIS-5.2** - SSH Access from Internet
-- **CIS-5.3** - RDP Access from Internet
-- **CIS-5.4** - Default Security Group
-- **CIS-5.6** - EC2 IMDSv2
+- **CIS-6.3** - SSH Access from Internet
+- **CIS-6.5** - Default Security Group
+- **CIS-6.7** - EC2 IMDSv2
+- **AWS-EC2-01** - EBS Public Snapshots
+- **CIS-2.16** - EC2 Instance IAM Roles
+- **CIS-6.4** - Security Groups Open to IPv6 Internet on Admin Ports
+- **CIS-6.1.2** - CIFS Access Restricted to Trusted Networks
 
-**Example fixes:**
-```bash
-# Restrict security group
-aws ec2 revoke-security-group-ingress \
-  --group-id sg-XXXXXXXX \
-  --ip-permissions IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges='[{CidrIp=0.0.0.0/0}]'
+### VPC
 
-aws ec2 authorize-security-group-ingress \
-  --group-id sg-XXXXXXXX \
-  --ip-permissions IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges='[{CidrIp=YOUR_IP/32}]'
+**Controls checked:** 10
 
-# Enable EBS encryption by default
-aws ec2 enable-ebs-encryption-by-default --region us-east-1
-
-# Enforce IMDSv2
-aws ec2 modify-instance-metadata-options \
-  --instance-id i-XXXXXXXX \
-  --http-tokens required \
-  --http-put-response-hop-limit 1
-```
-
----
+- **CC7.1** - VPC Flow Logs
+- **AWS-VPC-01** - Default VPC in Use
+- **CIS-6.6** - VPC Peering Routing
+- **CIS-6.8** - VPC Endpoints for AWS Services
+- **CIS-6.2** - NACL Restricts SSH from Internet
+- **AWS-VPC-04** - NACL Restricts SSH from Internet (IPv6)
+- **AWS-VPC-03** - NACL Restricts RDP from Internet (IPv6)
+- **CIS-6.3** - Security Groups Restrict Admin Ports
+- **AWS-VPC-02** - EC2 Instances in Custom VPC
+- **AWS-VPC-05** - Unused Security Groups Removed
 
 ### CloudTrail
 
-**Controls checked:** 11
+**Controls checked:** 9
 
 - **CC7.1** - CloudTrail Logging Enabled
-- **CC7.1** - Multi-Region CloudTrail
-- **CC7.1** - CloudTrail Log Integrity
-- **CIS-3.2** - CloudTrail Log File Validation
-- **CIS-3.3** - CloudTrail CloudWatch Logs Integration
-- **CIS-3.4** - CloudTrail S3 Bucket Policy
-- **CIS-3.6** - CloudTrail S3 Bucket Logging
-- **CIS-3.7** - CloudTrail Encryption at Rest
-- **CIS-3.8** - CloudTrail KMS Key Rotation
-- **CIS-3.10** - S3 Object-Level Logging (Write)
-- **CIS-3.11** - S3 Object-Level Logging (Read)
+- **CIS-4.5** - CloudTrail Encryption at Rest
+- **AWS-CLOUDTRAIL-01** - CloudTrail CloudWatch Logs Integration
+- **CIS-4.4** - CloudTrail S3 Bucket Logging
+- **CIS-4.2** - CloudTrail Log File Validation
+- **AWS-CLOUDTRAIL-02** - CloudTrail S3 Bucket Policy
+- **AWS-CLOUDTRAIL-03** - Customer-Managed KMS Key Rotation
+- **CIS-4.8** - S3 Object-Level Logging (Write)
+- **CIS-4.9** - S3 Object-Level Logging (Read)
 
-**Example fixes:**
-```bash
-# Enable CloudTrail in all regions
-aws cloudtrail create-trail \
-  --name my-trail \
-  --s3-bucket-name my-cloudtrail-bucket \
-  --is-multi-region-trail \
-  --enable-log-file-validation
+### S3
 
-aws cloudtrail start-logging --name my-trail
+**Controls checked:** 8
 
-# Enable log file encryption
-aws cloudtrail update-trail \
-  --name my-trail \
-  --kms-key-id arn:aws:kms:REGION:ACCOUNT:key/KEY_ID
-```
+- **CC6.2** - S3 Public Access Block
+- **CC6.3** - S3 Encryption at Rest
+- **A1.2** - S3 Versioning for Backup
+- **CC7.1** - S3 Access Logging
+- **CIS-3.1.2** - S3 MFA Delete
+- **AWS-S3-02** - S3 Server Access Logging
+- **AWS-S3-01** - S3 Object Lock
+- **CIS-3.1.4** - S3 Account Public Access Block
 
----
+### EKS
 
-### RDS (Relational Database Service)
+**Controls checked:** 7
+
+- **AWS-EKS-03** - EKS Cluster Endpoint Access
+- **AWS-EKS-04** - EKS Cluster Logging
+- **AWS-EKS-02** - EKS Cluster Encryption
+- **AWS-EKS-05** - EKS Network Policy
+- **AWS-EKS-06** - EKS Pod Security Policy
+- **AWS-EKS-07** - EKS RBAC Configuration
+- **AWS-EKS-01** - EKS Audit Logging
+
+### RDS
 
 **Controls checked:** 6
 
-- **CC6.1** - RDS Public Access
 - **CC6.3** - RDS Encryption at Rest
+- **CC6.1** - RDS Public Access
 - **A1.2** - RDS Backup Retention
-- **CIS-2.3.2** - RDS Automatic Minor Version Upgrade
-- **CIS-2.3.4** - RDS Multi-AZ Deployment
-- **CIS-2.3.5** - RDS Deletion Protection
+- **CIS-3.2.2** - RDS Automatic Minor Version Upgrade
+- **CIS-3.2.4** - RDS Multi-AZ Deployment
+- **AWS-RDS-01** - RDS Deletion Protection
 
-**Example fixes:**
-```bash
-# Enable encryption (must be done at creation)
-aws rds create-db-instance \
-  --db-instance-identifier mydb \
-  --storage-encrypted \
-  --kms-key-id arn:aws:kms:REGION:ACCOUNT:key/KEY_ID
+### Redshift
 
-# Disable public access
-aws rds modify-db-instance \
-  --db-instance-identifier mydb \
-  --no-publicly-accessible
+**Controls checked:** 6
 
-# Enable automated backups
-aws rds modify-db-instance \
-  --db-instance-identifier mydb \
-  --backup-retention-period 7 \
-  --preferred-backup-window "03:00-04:00"
-```
+- **CC6.3** - Redshift Cluster Encryption
+- **CC6.1** - Redshift Public Access
+- **CC7.1** - Redshift Audit Logging
+- **CC6.4** - Redshift SSL Required
+- **CC7.5** - Redshift Auto Version Upgrade
+- **A1.2** - Redshift Backup Retention
 
----
+### ElastiCache
 
-### VPC (Virtual Private Cloud)
+**Controls checked:** 5
 
-**Controls checked:** 13
+- **CC6.3** - ElastiCache Encryption at Rest
+- **CC6.4** - ElastiCache Encryption in Transit
+- **CC7.5** - ElastiCache Auto Minor Version Upgrade
+- **CC6.6** - ElastiCache Redis AUTH Token
+- **A1.2** - ElastiCache Backup Retention
 
-- **CC7.1** - VPC Flow Logs
-- **CIS-5.1** - Default VPC in Use
-- **CIS-5.5** - VPC Peering Routing
-- **CIS-5.7** - VPC Endpoints for AWS Services
-- **CIS-5.8** - VPC Peering Routing Least Access
-- **CIS-5.9** - NACL Restricts SSH from Internet
-- **CIS-5.10** - NACL Restricts RDP from Internet
-- **CIS-5.11** - NACL Restricts SSH from Internet (IPv6)
-- **CIS-5.12** - NACL Restricts RDP from Internet (IPv6)
-- **CIS-5.13** - Security Groups Restrict Admin Ports
-- **CIS-5.14** - EC2 Instances in Custom VPC
-- **CIS-5.18** - Unused Security Groups Removed
-- **CIS-5.20** - VPC Endpoints for S3
+### Lambda
 
-**Example fixes:**
-```bash
-# Enable VPC Flow Logs
-aws ec2 create-flow-logs \
-  --resource-type VPC \
-  --resource-ids vpc-XXXXXXXX \
-  --traffic-type ALL \
-  --log-destination-type cloud-watch-logs \
-  --log-group-name /aws/vpc/flowlogs
+**Controls checked:** 5
 
-# Restrict default security group
-aws ec2 revoke-security-group-ingress \
-  --group-id sg-default \
-  --ip-permissions IpProtocol=-1,IpRanges='[{CidrIp=0.0.0.0/0}]'
+- **AWS-LAMBDA-04** - Lambda Functions in VPC
+- **AWS-LAMBDA-01** - Lambda Environment Encryption
+- **AWS-LAMBDA-02** - Lambda Execution Role Permissions
+- **AWS-LAMBDA-03** - Lambda Functions Not Public
+- **AWS-LAMBDA-05** - Lambda X-Ray Tracing Enabled
 
-aws ec2 revoke-security-group-egress \
-  --group-id sg-default \
-  --ip-permissions IpProtocol=-1,IpRanges='[{CidrIp=0.0.0.0/0}]'
-```
+### OpenSearch
 
----
+**Controls checked:** 5
 
-### KMS (Key Management Service)
+- **CC6.3** - OpenSearch Encryption at Rest
+- **CC6.4** - OpenSearch Node-to-Node Encryption
+- **CC6.1** - OpenSearch VPC Deployment
+- **CC7.1** - OpenSearch Audit Logs
+- **CC6.6** - OpenSearch Fine-Grained Access Control
 
-**Controls checked:** 1
+### ECS
 
-- **CC5.2** - Encryption Key Management
+**Controls checked:** 4
 
-There is no dedicated KMS check set. The KMS-adjacent checks live with the
-service that uses the key: `CIS-3.7` and `CIS-3.8` under CloudTrail, `CIS-12.2`
-under Secrets Manager, and `CIS-4.7` (a metric filter for key disable and delete
-events) under CloudWatch monitoring.
+- **AWS-ECS-03** - ECS Task Definition Logging
+- **AWS-ECS-02** - ECS Secrets Management
+- **AWS-ECS-01** - ECS Container Insights
+- **AWS-ECS-04** - ECS Task Role Permissions
 
-**Example fixes:**
-```bash
-# Enable automatic key rotation
-aws kms enable-key-rotation --key-id KEY_ID
+### GuardDuty, Security Hub and Inspector
 
-# Update key policy for least privilege
-aws kms put-key-policy \
-  --key-id KEY_ID \
-  --policy-name default \
-  --policy file://policy.json
-```
+**Controls checked:** 4
 
----
+- **AWS-SECSVC-01** - GuardDuty Enabled
+- **AWS-SECSVC-03** - Macie Enabled
+- **CIS-5.16** - Security Hub Enabled
+- **AWS-SECSVC-02** - Inspector Enabled
 
-### GuardDuty
+### API Gateway
 
-**Controls checked:** 2
+**Controls checked:** 3
 
-- **CC7.2** - GuardDuty Threat Detection
-- **CIS-9.1** - GuardDuty Enabled
+- **AWS-APIGW-02** - API Gateway Logging Enabled
+- **AWS-APIGW-01** - API Gateway Authorization Enabled
+- **AWS-APIGW-03** - API Gateway TLS 1.2+
 
-**Example fixes:**
-```bash
-# Enable GuardDuty
-aws guardduty create-detector --enable
+### AWS Backup
 
-# List findings
-aws guardduty list-findings --detector-id DETECTOR_ID
-```
+**Controls checked:** 3
 
----
+- **AWS-BACKUP-02** - AWS Backup Vault Encryption
+- **AWS-BACKUP-01** - AWS Backup Plan Configured
+- **AWS-BACKUP-03** - AWS Backup Vault Lock Enabled
 
-### Config
+### Elastic Beanstalk
 
-**Controls checked:** 2
+**Controls checked:** 3
+
+- **AWS-BEANSTALK-01** - Elastic Beanstalk Enhanced Health Reporting
+- **AWS-BEANSTALK-03** - Elastic Beanstalk Managed Platform Updates
+- **AWS-BEANSTALK-02** - Elastic Beanstalk Log Streaming
+
+### AWS Config
+
+**Controls checked:** 3
 
 - **CC7.1** - AWS Config Recording
-- **CIS-3.5** - AWS Config Recording Status
+- **CIS-4.3** - AWS Config Recording Status
+- **CC7.2** - GuardDuty Threat Detection
 
-**Example fixes:**
-```bash
-# Enable AWS Config
-aws configservice put-configuration-recorder \
-  --configuration-recorder name=default,roleARN=arn:aws:iam::ACCOUNT:role/ConfigRole
+### DynamoDB
 
-aws configservice put-delivery-channel \
-  --delivery-channel name=default,s3BucketName=my-config-bucket
+**Controls checked:** 3
 
-aws configservice start-configuration-recorder --configuration-recorder-name default
-```
+- **AWS-DYNAMODB-03** - DynamoDB Point-in-Time Recovery
+- **AWS-DYNAMODB-02** - DynamoDB Encryption at Rest
+- **AWS-DYNAMODB-01** - DynamoDB Auto Scaling Enabled
 
----
+### ECR
 
-### Security Hub
+**Controls checked:** 3
 
-**Controls checked:** 2
+- **AWS-ECR-02** - ECR Image Scanning Enabled
+- **AWS-ECR-03** - ECR Immutable Tags
+- **AWS-ECR-01** - ECR Encryption at Rest
 
-- **CIS-4.16** - AWS Security Hub Enabled
-- **CIS-9.3** - Security Hub Enabled
+### SNS and SQS
 
-**Example fixes:**
-```bash
-# Enable Security Hub
-aws securityhub enable-security-hub
+**Controls checked:** 3
 
-# Enable CIS standard
-aws securityhub batch-enable-standards \
-  --standards-subscription-requests StandardsArn=arn:aws:securityhub:REGION::standards/cis-aws-foundations-benchmark/v/1.2.0
-```
+- **AWS-MESSAGING-02** - SNS Topic Encryption
+- **AWS-MESSAGING-03** - SQS Queue Encryption
+- **AWS-MESSAGING-01** - Messaging Access Policies
 
----
+### CloudWatch
+
+**Controls checked:** 3
+
+- **CC7.3** - Security Event Monitoring
+- **CC7.4** - Alert Notifications
+- **CIS-5.16** - AWS Security Hub Enabled
+
+### Network Firewall
+
+**Controls checked:** 3
+
+- **AWS-NETFW-01** - Network Firewall AZ Deployment
+- **AWS-NETFW-03** - Network Firewall Policy Rules
+- **AWS-NETFW-02** - Network Firewall Logging
+
+### Organizations
+
+**Controls checked:** 3
+
+- **CIS-2.1.2** - AWS Organizations SCPs Enabled
+- **AWS-ORG-01** - Multi-Account Structure
+- **CIS-4.1** - Organization-wide CloudTrail
+
+### SageMaker
+
+**Controls checked:** 3
+
+- **CC6.3** - SageMaker Notebook Encryption
+- **CC6.1** - SageMaker Direct Internet Access
+- **CC6.6** - SageMaker Root Access
+
+### Secrets Manager
+
+**Controls checked:** 3
+
+- **AWS-SECRETS-02** - Secrets Manager Rotation Enabled
+- **AWS-SECRETS-01** - Secrets Manager KMS Encryption
+- **AWS-SECRETS-03** - Unused Secrets Removed
 
 ### Systems Manager
 
-**Controls checked:** 6
+**Controls checked:** 3
+
+- **AWS-SSM-01** - SSM Parameter Store Encryption
+- **AWS-SSM-03** - SSM Session Manager Logging
+- **AWS-SSM-02** - SSM Patch Compliance
+
+### Certificate Manager
+
+**Controls checked:** 2
+
+- **AWS-ACM-01** - ACM Certificate Auto-Renewal
+- **AWS-ACM-02** - ACM Certificate In Use
+
+### CloudFormation
+
+**Controls checked:** 2
+
+- **AWS-CFN-02** - CloudFormation Stack Policy Configured
+- **AWS-CFN-01** - CloudFormation Drift Detection
+
+### Systems
+
+**Controls checked:** 2
 
 - **CC7.1** - Patch Management
 - **A1.1** - Processing Capacity Management
-- **A1.1** - High Availability
-- **CIS-10.1** - SSM Parameter Store Encryption
-- **CIS-10.2** - SSM Session Manager Logging
-- **CIS-10.3** - SSM Patch Compliance
 
-**Example fixes:**
-```bash
-# Create patch baseline
-aws ssm create-patch-baseline \
-  --name "Production-Baseline" \
-  --operating-system AMAZON_LINUX_2 \
-  --approval-rules "PatchRules=[{PatchFilterGroup={PatchFilters=[{Key=CLASSIFICATION,Values=[Security,Bugfix]}]},ApprovalRules={ApproveAfterDays=7}}]"
+### IAM Access Analyzer
 
-# Create maintenance window
-aws ssm create-maintenance-window \
-  --name "Production-Patching" \
-  --schedule "cron(0 2 ? * SUN *)" \
-  --duration 4 \
-  --cutoff 1 \
-  --allow-unassociated-targets
-```
+**Controls checked:** 1
 
----
+- **CIS-2.18** - IAM Access Analyzer Enabled
+
+### Aurora
+
+**Controls checked:** 1
+
+- **AWS-AURORA-01** - Aurora Backtrack Enabled
+
+### Route 53
+
+**Controls checked:** 1
+
+- **AWS-ROUTE53-01** - Route53 DNSSEC Enabled
+
+### Framework suites
+
+The framework suites add their own identifiers on top of the service checks: CIS (25), CMMC (13), PCI DSS (43), SOC 2 (35), vulnerability coverage (2). Those are described on the framework pages rather than here.
+
 
 ## Controls by Framework
 
@@ -411,7 +372,7 @@ Automated AWS checks map into all twelve requirement families (1 through 12). Re
 
 ### CMMC Level 2 (110 practices - reported free, automated in Pro)
 
-All Level 1 practices plus 93 additional practices across 14 domains. The Community Edition reports all 110 for evidence tracking and marks the ones it cannot check automatically; automated Level 2 checks are an AuditKit Pro feature.
+All Level 1 practices plus 93 additional practices across 14 domains. The Community Edition reports all 110 for evidence tracking and marks the ones it cannot check automatically; deeper automated coverage and the assessor's evidence package are AuditKit Pro features.
 
 **[View CMMC details →](../frameworks/cmmc.md)**
 

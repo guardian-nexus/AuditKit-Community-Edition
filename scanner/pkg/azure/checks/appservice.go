@@ -40,14 +40,14 @@ func (c *AppServiceChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *AppServiceChecks) checkAuthentication() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.1",
-		Name:        "[CIS Azure 9.1] App Service Authentication",
+		Control:     "AZ-APPSVC-02",
+		Name:        "App Service Authentication",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
-		Evidence:    "CIS 9.1: MANUAL CHECK - Verify App Service Authentication is enabled for all apps",
-		Remediation: "Enable authentication for App Service apps per CIS 9.1",
-		RemediationDetail: `CIS Azure 9.1: Ensure App Service Authentication is set up for apps in Azure App Service
+		Evidence:    "MANUAL CHECK - Verify App Service Authentication is enabled for all apps",
+		Remediation: "Enable authentication for App Service apps",
+		RemediationDetail: `Ensure App Service Authentication is set up for apps in Azure App Service
 
 Configure authentication via:
 1. App Service → Settings → Authentication
@@ -70,23 +70,22 @@ This ensures only authenticated users can access the application.`,
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "9.1",
-			"SOC2":      "CC6.1",
-			"PCI-DSS":   "8.2.1",
+			"SOC2":    "CC6.1",
+			"PCI-DSS": "8.2.1",
 		},
 	}
 }
 
 func (c *AppServiceChecks) checkHTTPSRedirect() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.2",
-		Name:        "[CIS Azure 9.2] HTTPS Only Redirect",
+		Control:     "AZ-APPSVC-03",
+		Name:        "HTTPS Only Redirect",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
-		Evidence:    "CIS 9.2: MANUAL CHECK - Verify all App Service apps redirect HTTP to HTTPS",
-		Remediation: "Enable HTTPS-only mode per CIS 9.2",
-		RemediationDetail: `CIS Azure 9.2: Ensure Web App Redirects All HTTP traffic to HTTPS in Azure App Service
+		Evidence:    "MANUAL CHECK - Verify all App Service apps redirect HTTP to HTTPS",
+		Remediation: "Enable HTTPS-only mode",
+		RemediationDetail: `Ensure Web App Redirects All HTTP traffic to HTTPS in Azure App Service
 
 Azure CLI:
 az webapp update \
@@ -102,23 +101,22 @@ This forces all traffic to use encrypted connections.`,
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "9.2",
-			"PCI-DSS":   "4.2.1",
-			"HIPAA":     "164.312(e)(1)",
+			"PCI-DSS": "4.2.1",
+			"HIPAA":   "164.312(e)(1)",
 		},
 	}
 }
 
 func (c *AppServiceChecks) checkTLSVersion() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.3",
-		Name:        "[CIS Azure 9.3] TLS Version",
+		Control:     "AZ-APPSVC-04",
+		Name:        "TLS Version",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
-		Evidence:    "CIS 9.3: MANUAL CHECK - Verify App Service is using TLS 1.2 or higher",
-		Remediation: "Set minimum TLS version to 1.2 per CIS 9.3",
-		RemediationDetail: `CIS Azure 9.3: Ensure Web App is using the latest version of TLS encryption
+		Evidence:    "MANUAL CHECK - Verify App Service is using TLS 1.2 or higher",
+		Remediation: "Set minimum TLS version to 1.2",
+		RemediationDetail: `Ensure Web App is using the latest version of TLS encryption
 
 Configure minimum TLS version:
 App Service → Configuration → General settings → Minimum TLS version = 1.2 (or 1.3)
@@ -134,22 +132,21 @@ az webapp config set \
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "9.3",
-			"PCI-DSS":   "4.2.1",
+			"PCI-DSS": "4.2.1",
 		},
 	}
 }
 
 func (c *AppServiceChecks) checkClientCertificates() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.4",
-		Name:        "[CIS Azure 9.4] Client Certificates",
+		Control:     "AZ-APPSVC-05",
+		Name:        "Client Certificates",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
-		Evidence:    "CIS 9.4: MANUAL CHECK - Verify client certificates are enabled where appropriate",
+		Evidence:    "MANUAL CHECK - Verify client certificates are enabled where appropriate",
 		Remediation: "Enable client certificates for mutual TLS authentication",
-		RemediationDetail: `CIS Azure 9.4: Ensure the web app has 'Client Certificates (Incoming client certificates)' set to 'On'
+		RemediationDetail: `Ensure the web app has 'Client Certificates (Incoming client certificates)' set to 'On'
 
 Client certificates provide mutual TLS authentication - both client and server verify each other's identity.
 
@@ -160,22 +157,20 @@ Note: Only enable if your application is designed to validate client certificate
 		ScreenshotGuide: "App Service → Configuration → General settings → Screenshot 'Incoming client certificates' setting",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
-		Frameworks: map[string]string{
-			"CIS-Azure": "9.4",
-		},
+		Frameworks:      map[string]string{"SOC2": "CC6.1"},
 	}
 }
 
 func (c *AppServiceChecks) checkManagedIdentity() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.5",
-		Name:        "[CIS Azure 9.5] Managed Identity",
+		Control:     "AZ-APPSVC-06",
+		Name:        "Managed Identity",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
-		Evidence:    "CIS 9.5: MANUAL CHECK - Verify App Service apps use managed identities",
-		Remediation: "Enable managed identity per CIS 9.5",
-		RemediationDetail: `CIS Azure 9.5: Ensure that 'Register with Azure Active Directory' is enabled on App Service
+		Evidence:    "MANUAL CHECK - Verify App Service apps use managed identities",
+		Remediation: "Enable managed identity",
+		RemediationDetail: `Ensure that 'Register with Azure Active Directory' is enabled on App Service
 
 Managed identities eliminate the need for credentials in code:
 - System-assigned: Tied to app lifecycle
@@ -197,24 +192,23 @@ az webapp identity assign \
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "9.5",
-			"SOC2":      "CC6.1",
+			"SOC2": "CC6.1",
 		},
 	}
 }
 
 func (c *AppServiceChecks) checkRuntimeVersions() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.6",
-		Name:        "[CIS Azure 9.6, 9.7, 9.8] Runtime Versions",
+		Control:     "AZ-APPSVC-07",
+		Name:        "Runtime Versions",
 		Status:      "INFO",
 		Severity:    "MEDIUM",
 		Priority:    PriorityMedium,
-		Evidence:    "CIS 9.6-9.8: MANUAL CHECK - Verify PHP, Python, and Java versions are current",
+		Evidence:    "MANUAL CHECK - Verify PHP, Python, and Java versions are current",
 		Remediation: "Use latest stable runtime versions",
-		RemediationDetail: `CIS Azure 9.6: Ensure 'PHP version' is the latest, if used
-CIS Azure 9.7: Ensure 'Python version' is the latest stable version, if used
-CIS Azure 9.8: Ensure 'Java version' is the latest, if used
+		RemediationDetail: `Ensure 'PHP version' is the latest, if used
+Ensure 'Python version' is the latest stable version, if used
+Ensure 'Java version' is the latest, if used
 
 Check current runtime versions:
 App Service → Configuration → General settings → Stack settings
@@ -230,22 +224,20 @@ Older versions may have unpatched security vulnerabilities.`,
 		ScreenshotGuide: "App Service → Configuration → General settings → Stack settings → Screenshot showing current runtime version",
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
-		Frameworks: map[string]string{
-			"CIS-Azure": "9.6, 9.7, 9.8",
-		},
+		Frameworks:      map[string]string{"SOC2": "CC6.1"},
 	}
 }
 
 func (c *AppServiceChecks) checkFTPDeployment() CheckResult {
 	return CheckResult{
-		Control:     "CIS-9.10",
-		Name:        "[CIS Azure 9.10] FTP Deployment Disabled",
+		Control:     "AZ-APPSVC-01",
+		Name:        "FTP Deployment Disabled",
 		Status:      "INFO",
 		Severity:    "HIGH",
 		Priority:    PriorityHigh,
-		Evidence:    "CIS 9.10: MANUAL CHECK - Verify FTP deployments are disabled",
-		Remediation: "Disable FTP and require FTPS per CIS 9.10",
-		RemediationDetail: `CIS Azure 9.10: Ensure FTP deployments are Disabled
+		Evidence:    "MANUAL CHECK - Verify FTP deployments are disabled",
+		Remediation: "Disable FTP and require FTPS",
+		RemediationDetail: `Ensure FTP deployments are Disabled
 
 FTP transmits credentials and data in plaintext.
 
@@ -265,8 +257,7 @@ Use modern deployment methods instead:
 		ConsoleURL:      "https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.Web%2Fsites",
 		Timestamp:       time.Now(),
 		Frameworks: map[string]string{
-			"CIS-Azure": "9.10",
-			"PCI-DSS":   "4.2.1",
+			"PCI-DSS": "4.2.1",
 		},
 	}
 }

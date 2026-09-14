@@ -20,74 +20,58 @@ Unlike compliance frameworks (SOC2, PCI), CIS Benchmarks focus specifically on *
 ## Supported Benchmarks
 
 ### AWS Foundations Benchmark
-**Status:** Production (v0.8.6)  
-**Controls:** 158 unique AWS controls implemented  
+**Status:** Production (v1.0.0)
+**Recommendations:** 70 in CIS AWS Foundations v7.0.0
 **Command:** `./auditkit scan -provider aws -framework cis-aws`
 
-**What's Covered:**
+**What's covered** (from the benchmark catalog and the scanner's source):
 
-- **Section 1:** Identity and Access Management (IAM) - 21/22 automated controls (only 1.7 is not automated)
-  - CIS-1.3: Credentials unused 45+ days (NEW)
-  - CIS-1.5: Root account MFA enabled (LABELED)
-  - CIS-1.11: No root access keys (LABELED)
-  - CIS-1.14: Access key rotation (90 days) (LABELED)
-  - CIS-1.16: IAM policies on groups/roles only (NEW)
-- **Section 2:** Storage (S3, EBS, RDS) - Multiple automated controls
-  - CIS-2.1.x: S3 encryption, versioning, logging
-- **Section 3:** Logging (CloudTrail, CloudWatch) - 11/11 automated controls (100% coverage)
-  - CIS-3.1: CloudTrail enabled in all regions (LABELED)
-  - CIS-3.9: VPC Flow Logs enabled (LABELED)
-- **Section 4:** Monitoring (Metric Filters & Alarms) - 16/16 controls (100% coverage)
-- **Section 5:** Networking (VPC, Security Groups) - 20/20 automated controls (100% coverage)
-  - CIS-5.8: VPC peering routing least access (NEW)
-  - CIS-5.20: VPC endpoints for S3 (NEW)
-- **Sections 6-22:** Service-specific controls across EC2, RDS, Lambda, and more
-- **Total Coverage:** AWS 158, Azure 108, GCP 71 benchmark controls
+- **Section 2** (identity and access management): 26 recommendations, 13 marked Automated by CIS; AuditKit assesses 22 and reports 4 to document
+- **Section 3** (storage): 9 recommendations, 6 marked Automated by CIS; AuditKit assesses 6 and reports 3 to document
+- **Section 4** (logging): 10 recommendations, 7 marked Automated by CIS; AuditKit assesses 9 and reports 1 to document
+- **Section 5** (monitoring): 16 recommendations, 1 marked Automated by CIS; AuditKit assesses 16 and reports 0 to document
+- **Section 6** (networking): 9 recommendations, 7 marked Automated by CIS; AuditKit assesses 8 and reports 1 to document
+- **Total:** 70 recommendations; 61 assessed, 9 reported to document
+
 
 ---
 
 ### Azure Foundations Benchmark
-**Status:** Production  
-**Automated Controls:** 108 checks (CIS Microsoft Azure Foundations Benchmark v3.0)  
+**Status:** Production
+**Recommendations:** 127 in CIS Microsoft Azure Foundations v6.0.0
 **Command:** `./auditkit scan -provider azure -framework cis-azure`
 
-**Current Coverage:**
+**What's covered** (from the benchmark catalog and the scanner's source):
 
-- Identity and Access Management (Azure AD)
-- Storage Accounts
-- SQL Databases
-- Virtual Machines
-- Networking (NSGs, VNets)
-- Monitoring and Logging
-- Security Center
+- **Section 2** (Databricks): 12 recommendations, 6 marked Automated by CIS; AuditKit assesses 12 and reports 0 to document
+- **Section 3**: 1 recommendations, 0 marked Automated by CIS; AuditKit assesses 1 and reports 0 to document
+- **Section 5** (identity and access management): 15 recommendations, 5 marked Automated by CIS; AuditKit assesses 15 and reports 0 to document
+- **Section 6** (logging and monitoring): 24 recommendations, 15 marked Automated by CIS; AuditKit assesses 23 and reports 1 to document
+- **Section 7** (networking): 16 recommendations, 14 marked Automated by CIS; AuditKit assesses 15 and reports 1 to document
+- **Section 8** (Defender for Cloud): 38 recommendations, 30 marked Automated by CIS; AuditKit assesses 35 and reports 3 to document
+- **Section 9** (storage): 21 recommendations, 19 marked Automated by CIS; AuditKit assesses 21 and reports 0 to document
+- **Total:** 127 recommendations; 122 assessed, 5 reported to document
+
 
 ---
 
 ### GCP Foundations Benchmark
-**Status:** Production - **NEAR-COMPLETE COVERAGE**  
-**Controls:** 71 GCP benchmark controls  
+**Status:** Production
+**Recommendations:** 93 in CIS GCP Foundations v5.0.0
 **Command:** `./auditkit scan -provider gcp -framework cis-gcp`
 
-**What's Covered:**
+**What's covered** (from the benchmark catalog and the scanner's source):
 
-- **Section 1:** Identity and Access Management - 9 automated controls
-  - CIS-1.1, 1.4, 1.5, 1.7: Corporate login, service accounts, key rotation
-  - NEW: CIS-1.9, 1.10: KMS separation of duties and key rotation
-- **Section 2:** Logging and Monitoring - 8 automated + 9 manual = 17 controls
-  - NEW: CIS-2.2, 2.3, 2.13: Log sinks, retention, DNS logging
-  - Manual: CIS-2.4-2.12: Log metric filters and alerts
-- **Section 3:** Networking - 6 automated controls
-  - CIS-3.1, 3.3, 3.6-3.10: VPC, DNSSEC, firewall, flow logs
-- **Section 4:** Compute Engine - 11 automated controls
-  - CIS-4.1, 4.3-4.6, 4.8-4.9: Disk encryption, OS login, Shielded VM
-- **Section 5:** Cloud Storage - 4 automated controls
-  - CIS-5.1-5.3: Uniform access, encryption, versioning
-- **Section 6:** Cloud SQL - 7 automated controls
-  - CIS-6.1-6.3: Public IP, backups, SSL
-  - NEW: CIS-6.1.1, 6.2.1, 6.2.2: Database security flags
-- **Section 7:** BigQuery - 3 automated controls
-  - NEW: CIS-7.1, 7.2, 7.3: Public access, CMEK encryption
-- **Total Coverage:** 71 CIS GCP Foundations controls
+- **Section 1** (identity and access management): 21 recommendations, 12 marked Automated by CIS; AuditKit assesses 15 and reports 6 to document
+- **Section 2** (logging and monitoring): 17 recommendations, 14 marked Automated by CIS; AuditKit assesses 17 and reports 0 to document
+- **Section 3** (networking): 12 recommendations, 8 marked Automated by CIS; AuditKit assesses 10 and reports 2 to document
+- **Section 4** (virtual machines): 12 recommendations, 10 marked Automated by CIS; AuditKit assesses 10 and reports 2 to document
+- **Section 5** (storage): 2 recommendations, 2 marked Automated by CIS; AuditKit assesses 1 and reports 1 to document
+- **Section 6** (databases): 24 recommendations, 21 marked Automated by CIS; AuditKit assesses 22 and reports 2 to document
+- **Section 7** (BigQuery): 4 recommendations, 3 marked Automated by CIS; AuditKit assesses 4 and reports 0 to document
+- **Section 8**: 1 recommendations, 1 marked Automated by CIS; AuditKit assesses 1 and reports 0 to document
+- **Total:** 93 recommendations; 80 assessed, 13 reported to document
+
 
 ---
 
@@ -302,8 +286,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
 ### Q: Does AuditKit replace tools like Prowler or AWS Security Hub?
 **A:** No, AuditKit complements them. We focus on compliance frameworks and provide auditor-friendly reports. For comprehensive AWS-specific security scanning, use both AuditKit (for compliance reporting) and Prowler (for deep AWS security checks).
 
-### Q: Which CIS version should I use - v1.4 or v3.0?
-**A:** AuditKit combines both! v3.0 is newer and consolidated, but v1.4 has some additional checks that are still valuable. Our implementation gives you the best of both versions (158 unique controls).
+### Q: Which CIS benchmark versions does AuditKit implement?
+**A:** CIS AWS Foundations v7.0.0, CIS Microsoft Azure Foundations v6.0.0 and CIS GCP Foundations v5.0.0. Report identifiers use those versions' numbering, so they match the benchmark PDF you are hardening against.
 
 ### Q: Can I export results to my SIEM or ticketing system?
 **A:** Yes! Use JSON output:
@@ -317,8 +301,7 @@ Then parse the JSON in your automation workflows.
 ## Official CIS Resources
 
 - **CIS Benchmarks:** https://www.cisecurity.org/cis-benchmarks
-- **CIS AWS Benchmark v1.4:** Available from CIS website
-- **CIS AWS Benchmark v3.0:** Available from CIS website
+- **CIS Benchmarks:** the AWS, Azure and GCP Foundations benchmarks are available from the CIS website
 - **CIS Controls v8:** https://www.cisecurity.org/controls/v8
 
 ---
@@ -327,8 +310,6 @@ Then parse the JSON in your automation workflows.
 
 Help us expand CIS coverage:
 
-- Add Azure CIS checks
-- Add GCP CIS checks
 - Improve remediation guidance
 - Add Terraform/CloudFormation templates
 

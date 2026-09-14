@@ -34,12 +34,13 @@ func SaveProgress(accountID string, score float64, controls []ControlResult) err
 	dataPath := filepath.Join(homeDir, ".auditkit", accountID+".json")
 
 	// Create directory
-	os.MkdirAll(filepath.Dir(dataPath), 0755)
+	_ = os.MkdirAll(filepath.Dir(dataPath), 0755) // the write below reports a missing directory
 
 	// Load existing or create new
 	var progress ProgressData
 	if data, err := os.ReadFile(dataPath); err == nil {
-		json.Unmarshal(data, &progress)
+		// A corrupt file starts the history over rather than aborting the scan.
+		_ = json.Unmarshal(data, &progress)
 	} else {
 		progress = ProgressData{
 			AccountID:    accountID,
@@ -80,7 +81,10 @@ func ShowProgress(accountID string) {
 	}
 
 	var progress ProgressData
-	json.Unmarshal(data, &progress)
+	if err := json.Unmarshal(data, &progress); err != nil {
+		fmt.Fprintf(os.Stderr, "Progress file %s is unreadable: %v\n", dataPath, err)
+		return
+	}
 
 	fmt.Println("\nYour SOC2 Journey Progress")
 	fmt.Println("==============================")

@@ -37,7 +37,7 @@ func (c *GKEChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	return results, nil
 }
 
-// CheckBinaryAuthorization verifies Binary Authorization is enabled (CIS 8.1)
+// CheckBinaryAuthorization verifies Binary Authorization is enabled (CIS GKE 5.1.3)
 func (c *GKEChecks) CheckBinaryAuthorization(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -55,15 +55,15 @@ func (c *GKEChecks) CheckBinaryAuthorization(ctx context.Context) []CheckResult 
 			zones, zErr := c.listAllZones(ctx)
 			if zErr != nil {
 				return []CheckResult{{
-					Control:     "CIS GCP 8.1",
-					Name:        "[CIS GCP 8.1] GKE Binary Authorization",
+					Control:     "CIS-GKE-5.1.3",
+					Name:        "[CIS-GKE-5.1.3] GKE Binary Authorization",
 					Status:      "FAIL",
 					Severity:    "HIGH",
 					Evidence:    fmt.Sprintf("Unable to list GKE clusters: %v", err),
 					Remediation: "Verify Kubernetes Engine API is enabled",
 					Priority:    PriorityHigh,
 					Timestamp:   time.Now(),
-					Frameworks:  map[string]string{"CIS-GCP": "8.1", "SOC2": "CC8.1"},
+					Frameworks:  map[string]string{"CIS-GKE": "5.1.3", "SOC2": "CC8.1"},
 				}}
 			}
 
@@ -87,13 +87,13 @@ func (c *GKEChecks) CheckBinaryAuthorization(ctx context.Context) []CheckResult 
 
 	if totalClusters == 0 {
 		return []CheckResult{{
-			Control:    "CIS GCP 8.1",
-			Name:       "[CIS GCP 8.1] GKE Binary Authorization",
+			Control:    "CIS-GKE-5.1.3",
+			Name:       "[CIS-GKE-5.1.3] GKE Binary Authorization",
 			Status:     "INFO",
-			Evidence:   "No GKE clusters found in project | CIS 8.1 not applicable",
+			Evidence:   "No GKE clusters found in project | CIS GKE 5.1.3 not applicable",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.1", "SOC2": "CC8.1"},
+			Frameworks: map[string]string{"CIS-GKE": "5.1.3", "SOC2": "CC8.1"},
 		}}
 	}
 
@@ -113,11 +113,11 @@ func (c *GKEChecks) CheckBinaryAuthorization(ctx context.Context) []CheckResult 
 		}
 
 		results = append(results, CheckResult{
-			Control:  "CIS GCP 8.1",
-			Name:     "[CIS GCP 8.1] GKE Binary Authorization",
+			Control:  "CIS-GKE-5.1.3",
+			Name:     "[CIS-GKE-5.1.3] GKE Binary Authorization",
 			Status:   "FAIL",
 			Severity: "HIGH",
-			Evidence: fmt.Sprintf("CIS 8.1: %d/%d GKE clusters do not have Binary Authorization enabled: %s | Binary Authorization ensures only trusted container images run",
+			Evidence: fmt.Sprintf("CIS GKE 5.1.3: %d/%d GKE clusters do not have Binary Authorization enabled: %s | Binary Authorization ensures only trusted container images run",
 				len(clustersWithoutBinAuthz), totalClusters, strings.Join(displayClusters, ", ")),
 			Remediation: "Enable Binary Authorization on all GKE clusters to ensure only verified images are deployed",
 			RemediationDetail: `# Enable Binary Authorization on existing cluster
@@ -138,24 +138,24 @@ gcloud container binauthz policy import policy.yaml`,
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Kubernetes Engine → Clusters → Security → Screenshot showing Binary Authorization: Enabled",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/kubernetes/list?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "8.1", "SOC2": "CC8.1", "PCI-DSS": "2.2.1"},
+			Frameworks:      map[string]string{"CIS-GKE": "5.1.3", "SOC2": "CC8.1", "PCI-DSS": "2.2.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 8.1",
-			Name:       "[CIS GCP 8.1] GKE Binary Authorization",
+			Control:    "CIS-GKE-5.1.3",
+			Name:       "[CIS-GKE-5.1.3] GKE Binary Authorization",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d GKE clusters have Binary Authorization enabled | Meets CIS 8.1", totalClusters),
+			Evidence:   fmt.Sprintf("All %d GKE clusters have Binary Authorization enabled | Meets CIS GKE 5.1.3", totalClusters),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.1", "SOC2": "CC8.1", "PCI-DSS": "2.2.1"},
+			Frameworks: map[string]string{"CIS-GKE": "5.1.3", "SOC2": "CC8.1", "PCI-DSS": "2.2.1"},
 		})
 	}
 
 	return results
 }
 
-// CheckNetworkPolicies verifies Network Policy is enabled (CIS 8.2)
+// CheckNetworkPolicies verifies Network Policy is enabled (CIS GKE 4.3.1)
 func (c *GKEChecks) CheckNetworkPolicies(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -163,13 +163,13 @@ func (c *GKEChecks) CheckNetworkPolicies(ctx context.Context) []CheckResult {
 
 	if len(clusters) == 0 {
 		return []CheckResult{{
-			Control:    "CIS GCP 8.2",
-			Name:       "[CIS GCP 8.2] GKE Network Policies",
+			Control:    "CIS-GKE-4.3.1",
+			Name:       "[CIS-GKE-4.3.1] GKE Network Policies",
 			Status:     "INFO",
-			Evidence:   "No GKE clusters found in project | CIS 8.2 not applicable",
+			Evidence:   "No GKE clusters found in project | CIS GKE 4.3.1 not applicable",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.2", "SOC2": "CC6.6"},
+			Frameworks: map[string]string{"CIS-GKE": "4.3.1", "SOC2": "CC6.6"},
 		}}
 	}
 
@@ -192,11 +192,11 @@ func (c *GKEChecks) CheckNetworkPolicies(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:  "CIS GCP 8.2",
-			Name:     "[CIS GCP 8.2] GKE Network Policies",
+			Control:  "CIS-GKE-4.3.1",
+			Name:     "[CIS-GKE-4.3.1] GKE Network Policies",
 			Status:   "FAIL",
 			Severity: "HIGH",
-			Evidence: fmt.Sprintf("CIS 8.2: %d/%d GKE clusters do not have Network Policy enabled: %s | Network policies provide pod-level firewall rules",
+			Evidence: fmt.Sprintf("CIS GKE 4.3.1: %d/%d GKE clusters do not have Network Policy enabled: %s | Network policies provide pod-level firewall rules",
 				len(clustersWithoutNetworkPolicy), len(clusters), strings.Join(displayClusters, ", ")),
 			Remediation: "Enable Network Policy on all GKE clusters to control pod-to-pod communication",
 			RemediationDetail: `# Enable Network Policy on existing cluster
@@ -217,24 +217,24 @@ kubectl apply -f network-policy.yaml`,
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Kubernetes Engine → Clusters → Networking → Screenshot showing Network policy: Enabled",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/kubernetes/list?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "8.2", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
+			Frameworks:      map[string]string{"CIS-GKE": "4.3.1", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 8.2",
-			Name:       "[CIS GCP 8.2] GKE Network Policies",
+			Control:    "CIS-GKE-4.3.1",
+			Name:       "[CIS-GKE-4.3.1] GKE Network Policies",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d GKE clusters have Network Policy enabled | Meets CIS 8.2", len(clusters)),
+			Evidence:   fmt.Sprintf("All %d GKE clusters have Network Policy enabled | Meets CIS GKE 4.3.1", len(clusters)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.2", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
+			Frameworks: map[string]string{"CIS-GKE": "4.3.1", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"},
 		})
 	}
 
 	return results
 }
 
-// CheckKubernetesDashboard verifies Kubernetes Dashboard is disabled (CIS 8.3)
+// CheckKubernetesDashboard verifies Kubernetes Dashboard is disabled
 func (c *GKEChecks) CheckKubernetesDashboard(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -242,13 +242,13 @@ func (c *GKEChecks) CheckKubernetesDashboard(ctx context.Context) []CheckResult 
 
 	if len(clusters) == 0 {
 		return []CheckResult{{
-			Control:    "CIS GCP 8.3",
-			Name:       "[CIS GCP 8.3] Kubernetes Dashboard Disabled",
+			Control:    "GCP-GKE-02",
+			Name:       "[GCP-GKE-02] Kubernetes Dashboard Disabled",
 			Status:     "INFO",
-			Evidence:   "No GKE clusters found in project | CIS 8.3 not applicable",
+			Evidence:   "No GKE clusters found in project not applicable",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.3", "SOC2": "CC6.1"},
+			Frameworks: map[string]string{"SOC2": "CC6.1"},
 		}}
 	}
 
@@ -271,11 +271,11 @@ func (c *GKEChecks) CheckKubernetesDashboard(ctx context.Context) []CheckResult 
 		}
 
 		results = append(results, CheckResult{
-			Control:  "CIS GCP 8.3",
-			Name:     "[CIS GCP 8.3] Kubernetes Dashboard Disabled",
+			Control:  "GCP-GKE-02",
+			Name:     "[GCP-GKE-02] Kubernetes Dashboard Disabled",
 			Status:   "FAIL",
 			Severity: "MEDIUM",
-			Evidence: fmt.Sprintf("CIS 8.3: %d/%d GKE clusters have Kubernetes Dashboard enabled: %s | Dashboard has known security vulnerabilities",
+			Evidence: fmt.Sprintf("%d/%d GKE clusters have Kubernetes Dashboard enabled: %s | Dashboard has known security vulnerabilities",
 				len(clustersWithDashboard), len(clusters), strings.Join(displayClusters, ", ")),
 			Remediation: "Disable Kubernetes Dashboard and use Cloud Console or kubectl for cluster management",
 			RemediationDetail: `# Disable Kubernetes Dashboard on existing cluster
@@ -290,24 +290,24 @@ gcloud container clusters update CLUSTER_NAME \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Kubernetes Engine → Clusters → Add-ons → Screenshot showing Kubernetes Dashboard: Disabled",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/kubernetes/list?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "8.3", "SOC2": "CC6.1", "PCI-DSS": "2.2.4"},
+			Frameworks:      map[string]string{"SOC2": "CC6.1", "PCI-DSS": "2.2.4"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 8.3",
-			Name:       "[CIS GCP 8.3] Kubernetes Dashboard Disabled",
+			Control:    "GCP-GKE-02",
+			Name:       "[GCP-GKE-02] Kubernetes Dashboard Disabled",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d GKE clusters have Kubernetes Dashboard disabled | Meets CIS 8.3", len(clusters)),
+			Evidence:   fmt.Sprintf("All %d GKE clusters have Kubernetes Dashboard disabled", len(clusters)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.3", "SOC2": "CC6.1", "PCI-DSS": "2.2.4"},
+			Frameworks: map[string]string{"SOC2": "CC6.1", "PCI-DSS": "2.2.4"},
 		})
 	}
 
 	return results
 }
 
-// CheckPodSecurityPolicy verifies Pod Security Policy is enabled (CIS 8.4)
+// CheckPodSecurityPolicy verifies Pod Security Policy is enabled (CIS GKE 4.2.1)
 func (c *GKEChecks) CheckPodSecurityPolicy(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -315,13 +315,13 @@ func (c *GKEChecks) CheckPodSecurityPolicy(ctx context.Context) []CheckResult {
 
 	if len(clusters) == 0 {
 		return []CheckResult{{
-			Control:    "CIS GCP 8.4",
-			Name:       "[CIS GCP 8.4] Pod Security Policy",
+			Control:    "CIS-GKE-4.2.1",
+			Name:       "[CIS-GKE-4.2.1] Pod Security Policy",
 			Status:     "INFO",
-			Evidence:   "No GKE clusters found in project | CIS 8.4 not applicable",
+			Evidence:   "No GKE clusters found in project | CIS GKE 4.2.1 not applicable",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.4", "SOC2": "CC6.1"},
+			Frameworks: map[string]string{"CIS-GKE": "4.2.1", "SOC2": "CC6.1"},
 		}}
 	}
 
@@ -361,11 +361,11 @@ func (c *GKEChecks) CheckPodSecurityPolicy(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:  "CIS GCP 8.4",
-			Name:     "[CIS GCP 8.4] Pod Security Policy",
+			Control:  "CIS-GKE-4.2.1",
+			Name:     "[CIS-GKE-4.2.1] Pod Security Policy",
 			Status:   "FAIL",
 			Severity: "HIGH",
-			Evidence: fmt.Sprintf("CIS 8.4: %d/%d GKE clusters do not have Pod Security Policy enabled: %s | PSP prevents insecure pod configurations",
+			Evidence: fmt.Sprintf("CIS GKE 4.2.1: %d/%d GKE clusters do not have Pod Security Policy enabled: %s | PSP prevents insecure pod configurations",
 				len(clustersWithoutPSP), len(clusters), strings.Join(displayClusters, ", ")),
 			Remediation: "Enable Pod Security Policy (legacy K8s <1.25) or use GKE Autopilot / Pod Security Standards (K8s 1.25+)",
 			RemediationDetail: `# For clusters < K8s 1.25: Enable Pod Security Policy
@@ -387,24 +387,24 @@ gcloud container clusters create-auto CLUSTER_NAME \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Kubernetes Engine → Clusters → Security → Screenshot showing Pod Security Policy: Enabled or Autopilot mode",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/kubernetes/list?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "8.4", "SOC2": "CC6.1", "PCI-DSS": "2.2.1"},
+			Frameworks:      map[string]string{"CIS-GKE": "4.2.1", "SOC2": "CC6.1", "PCI-DSS": "2.2.1"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 8.4",
-			Name:       "[CIS GCP 8.4] Pod Security Policy",
+			Control:    "CIS-GKE-4.2.1",
+			Name:       "[CIS-GKE-4.2.1] Pod Security Policy",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d GKE clusters have Pod Security Policy or Autopilot enabled | Meets CIS 8.4", len(clusters)),
+			Evidence:   fmt.Sprintf("All %d GKE clusters have Pod Security Policy or Autopilot enabled | Meets CIS GKE 4.2.1", len(clusters)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.4", "SOC2": "CC6.1", "PCI-DSS": "2.2.1"},
+			Frameworks: map[string]string{"CIS-GKE": "4.2.1", "SOC2": "CC6.1", "PCI-DSS": "2.2.1"},
 		})
 	}
 
 	return results
 }
 
-// CheckWorkloadIdentity verifies Workload Identity is enabled (CIS 8.5)
+// CheckWorkloadIdentity verifies Workload Identity is enabled (CIS GKE 5.2.2)
 func (c *GKEChecks) CheckWorkloadIdentity(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
@@ -412,13 +412,13 @@ func (c *GKEChecks) CheckWorkloadIdentity(ctx context.Context) []CheckResult {
 
 	if len(clusters) == 0 {
 		return []CheckResult{{
-			Control:    "CIS GCP 8.5",
-			Name:       "[CIS GCP 8.5] GKE Workload Identity",
+			Control:    "CIS-GKE-5.2.2",
+			Name:       "[CIS-GKE-5.2.2] GKE Workload Identity",
 			Status:     "INFO",
-			Evidence:   "No GKE clusters found in project | CIS 8.5 not applicable",
+			Evidence:   "No GKE clusters found in project | CIS GKE 5.2.2 not applicable",
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.5", "SOC2": "CC6.1"},
+			Frameworks: map[string]string{"CIS-GKE": "5.2.2", "SOC2": "CC6.1"},
 		}}
 	}
 
@@ -450,11 +450,11 @@ func (c *GKEChecks) CheckWorkloadIdentity(ctx context.Context) []CheckResult {
 		}
 
 		results = append(results, CheckResult{
-			Control:  "CIS GCP 8.5",
-			Name:     "[CIS GCP 8.5] GKE Workload Identity",
+			Control:  "CIS-GKE-5.2.2",
+			Name:     "[CIS-GKE-5.2.2] GKE Workload Identity",
 			Status:   "FAIL",
 			Severity: "HIGH",
-			Evidence: fmt.Sprintf("CIS 8.5: %d/%d GKE clusters do not have Workload Identity enabled: %s | Workload Identity prevents node SA credential exposure",
+			Evidence: fmt.Sprintf("CIS GKE 5.2.2: %d/%d GKE clusters do not have Workload Identity enabled: %s | Workload Identity prevents node SA credential exposure",
 				len(clustersWithoutWI), len(clusters), strings.Join(displayClusters, ", ")),
 			Remediation: "Enable Workload Identity on all GKE clusters to securely access Google Cloud services from pods",
 			RemediationDetail: `# Enable Workload Identity on existing cluster
@@ -479,17 +479,17 @@ gcloud container clusters create CLUSTER_NAME \
 			Timestamp:       time.Now(),
 			ScreenshotGuide: "Kubernetes Engine → Clusters → Security → Screenshot showing Workload Identity: Enabled",
 			ConsoleURL:      fmt.Sprintf("https://console.cloud.google.com/kubernetes/list?project=%s", c.projectID),
-			Frameworks:      map[string]string{"CIS-GCP": "8.5", "SOC2": "CC6.1", "PCI-DSS": "8.2.2"},
+			Frameworks:      map[string]string{"CIS-GKE": "5.2.2", "SOC2": "CC6.1", "PCI-DSS": "8.2.2"},
 		})
 	} else {
 		results = append(results, CheckResult{
-			Control:    "CIS GCP 8.5",
-			Name:       "[CIS GCP 8.5] GKE Workload Identity",
+			Control:    "CIS-GKE-5.2.2",
+			Name:       "[CIS-GKE-5.2.2] GKE Workload Identity",
 			Status:     "PASS",
-			Evidence:   fmt.Sprintf("All %d GKE clusters have Workload Identity enabled | Meets CIS 8.5", len(clusters)),
+			Evidence:   fmt.Sprintf("All %d GKE clusters have Workload Identity enabled | Meets CIS GKE 5.2.2", len(clusters)),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"CIS-GCP": "8.5", "SOC2": "CC6.1", "PCI-DSS": "8.2.2"},
+			Frameworks: map[string]string{"CIS-GKE": "5.2.2", "SOC2": "CC6.1", "PCI-DSS": "8.2.2"},
 		})
 	}
 

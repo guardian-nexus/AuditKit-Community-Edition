@@ -39,50 +39,272 @@
 
     <section class="section">
         <div class="container-prose">
-            <h2>Assessed directly</h2>
-            <p>These are checked against your cloud configuration. Counts are
-            distinct criteria, requirements or practices per provider.</p>
-            <div style="overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr><th>Framework</th><th>AWS</th><th>Azure</th><th>GCP</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td><a href="/docs/frameworks/soc2.html">SOC 2 Type II</a></td><td>38 of 43</td><td>37 of 43</td><td>32 of 43</td></tr>
-                    <tr><td><a href="/docs/frameworks/pci-dss.html">PCI DSS v4.0.1</a></td><td>59</td><td>59</td><td>49</td></tr>
-                    <tr><td><a href="/docs/frameworks/cmmc.html">CMMC Level 1</a></td><td>13 of 17</td><td>13 of 17</td><td>9 of 17</td></tr>
-                    <tr><td><a href="/docs/frameworks/cmmc.html">CMMC Level 2</a></td><td colspan="3">All 110 practices reported in Community; Pro adds automated Level 2 checks - 42 of the 110 query the cloud, 68 are structured evidence guidance</td></tr>
-                    <tr><td><a href="/docs/frameworks/cis-benchmarks.html">CIS Benchmarks</a></td><td>158</td><td>108</td><td>71</td></tr>
-                </tbody>
-            </table>
-            </div>
-            <p>Community reports all 110 CMMC Level 1 and Level 2 practices and automates Level 1 (13 of the 17 carry checks on AWS and Azure, 9 on GCP). AuditKit Pro adds the automated Level 2 checks: of the 110 practices Pro assesses, 42 query the cloud and 68 are structured evidence guidance.</p>
+<p>AuditKit supports multiple compliance frameworks for automated technical control scanning.</p>
+<h2>Supported Frameworks</h2>
+<div style="overflow-x:auto;"><table>
+<thead>
+<tr>
+<th>Framework</th>
+<th>Status</th>
+<th>Automated Controls</th>
+<th>Cloud Providers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><a href="./soc2.html">SOC2 Type II</a></strong></td>
+<td>Production</td>
+<td>38 of 43 criteria</td>
+<td>AWS, Azure, GCP</td>
+</tr>
+<tr>
+<td><strong><a href="./pci-dss.html">PCI-DSS v4.0.1</a></strong></td>
+<td>Production</td>
+<td>71 requirements across all 12 groups</td>
+<td>AWS, Azure, GCP</td>
+</tr>
+<tr>
+<td><strong><a href="./cmmc.html">CMMC Level 1</a></strong></td>
+<td>Production</td>
+<td>5 of 17 practices</td>
+<td>AWS, Azure, GCP</td>
+</tr>
+<tr>
+<td><strong><a href="./cmmc.html">CMMC Level 2</a></strong></td>
+<td>Reported; automated in Pro</td>
+<td>110 practices</td>
+<td>AWS, Azure, GCP</td>
+</tr>
+<tr>
+<td><strong><a href="./cis-benchmarks.html">CIS Benchmarks</a></strong></td>
+<td>Production</td>
+<td>AWS: 70, Azure: 127, GCP: 93</td>
+<td>AWS, Azure, GCP</td>
+</tr>
+<tr>
+<td><strong><a href="./nist-800-53.html">NIST 800-53 Rev 5</a></strong></td>
+<td>Production</td>
+<td>149 technical controls (covers FedRAMP), derived, of 1,196 in the catalog</td>
+<td>AWS, Azure, GCP</td>
+</tr>
+<tr>
+<td><strong><a href="./fedramp.html">FedRAMP</a></strong></td>
+<td>Production</td>
+<td>Low 81 of 149, Moderate 131 of 287, High 133 of 370 on AWS</td>
+<td>AWS, Azure, GCP</td>
+</tr>
+<tr>
+<td><strong><a href="./iso27001.html">ISO 27001:2022</a></strong></td>
+<td>Production</td>
+<td>53 controls, derived (53 on every provider, of 93 in Annex A)</td>
+<td>AWS, Azure, GCP</td>
+</tr>
+<tr>
+<td><strong><a href="./nist-csf.html">NIST CSF 2.0</a></strong></td>
+<td>Production</td>
+<td>67 subcategories, derived (67 AWS, 65 Azure and GCP, of 106)</td>
+<td>AWS, Azure, GCP</td>
+</tr>
+<tr>
+<td><strong><a href="./gdpr.html">GDPR</a></strong></td>
+<td>Production</td>
+<td>16 articles, derived</td>
+<td>AWS, Azure, GCP</td>
+</tr>
+<tr>
+<td><strong><a href="./hipaa.html">HIPAA Security Rule</a></strong></td>
+<td>Production</td>
+<td>30 safeguards, derived</td>
+<td>AWS, Azure, GCP</td>
+</tr>
+</tbody>
+</table></div>
+<h2>Framework Categories</h2>
+<h3>Production Ready</h3>
+<p>Fully tested, comprehensive coverage, used in production environments:</p>
+<ul>
+<li><strong>SOC2 Type II</strong> - For SaaS companies and startups</li>
+<li><strong>PCI-DSS v4.0.1</strong> - For payment card processing</li>
+<li><strong>CMMC Level 1</strong> - For all DoW contractors</li>
+<li><strong>CIS Benchmarks</strong> - For security hardening (AWS: 70 controls, Azure: 127 controls, GCP: 93 controls)</li>
+<li><strong>NIST 800-53</strong> - For federal contractors and FedRAMP compliance</li>
+<li><strong>ISO 27001</strong> - For international information security compliance</li>
+<li><strong>HIPAA Security Rule</strong> - For healthcare (Note: all 12 Technical Safeguards plus 18 of the 31 Administrative Safeguards; does not cover Physical Safeguards)</li>
+</ul>
+<h3>Automated in Pro</h3>
+<p>Community reports all 110 CMMC Level 1 and Level 2 practices - every failing check
+with its fix and the screen to photograph (5 of the 17 Level 1 practices reach a
+verdict on AWS, 4 on Azure and GCP). An AuditKit subscription turns those findings
+into the assessor's evidence package and adds deeper automated coverage:</p>
+<ul>
+<li><strong>CMMC Level 2</strong> - For DoW contractors handling CUI. Of the 110 practices Pro assesses, 27 reach a verdict on AWS and 83 are structured evidence guidance.</li>
+</ul>
+<h2>Quick Comparison</h2>
+<h3>By Industry</h3>
+<p><strong>SaaS/Startups:</strong> SOC2 Type II<br />
+<strong>E-commerce/Payment Processing:</strong> PCI-DSS v4.0.1<br />
+<strong>DoW Contractors (FCI):</strong> CMMC Level 1<br />
+<strong>DoW Contractors (CUI):</strong> CMMC Level 2 (reported free, automated in Pro)<br />
+<strong>Federal Contractors:</strong> NIST 800-53 Rev 5<br />
+<strong>Healthcare:</strong> HIPAA (18 safeguards, derived via crosswalk)<br />
+<strong>Security Hardening:</strong> CIS Benchmarks</p>
+<h3>By Requirements</h3>
+<p><strong>Customer demands compliance:</strong> SOC2<br />
+<strong>Processing credit cards:</strong> PCI-DSS<br />
+<strong>DoW contract requires it:</strong> CMMC<br />
+<strong>Federal agency requires it:</strong> NIST 800-53<br />
+<strong>Handling PHI:</strong> HIPAA<br />
+<strong>Security best practices:</strong> CIS Benchmarks</p>
+<h3>By Timeline</h3>
+<p><strong>2-4 weeks:</strong> CMMC Level 1, Basic SOC2 prep, CIS hardening<br />
+<strong>2-3 months:</strong> SOC2 Type II certification<br />
+<strong>3-6 months:</strong> CMMC Level 2, PCI-DSS<br />
+<strong>6-12 months:</strong> NIST 800-53, HIPAA</p>
+<h2>Framework Details</h2>
+<h3>SOC2 Type II</h3>
+<p><strong>Purpose:</strong> Trust Services Criteria for service organizations<br />
+<strong>Certification:</strong> Requires CPA firm audit<br />
+<strong>Cost:</strong> $15,000 - $30,000 for audit<br />
+<strong>Timeline:</strong> 3-6 months preparation + 3-12 month observation period</p>
+<p><strong><a href="./soc2.html">Learn more →</a></strong></p>
+<h3>PCI-DSS v4.0.1</h3>
+<p><strong>Purpose:</strong> Payment Card Industry Data Security Standard<br />
+<strong>Certification:</strong> Requires QSA assessment<br />
+<strong>Cost:</strong> $15,000 - $50,000 for assessment<br />
+<strong>Timeline:</strong> 3-6 months preparation</p>
+<p><strong><a href="./pci-dss.html">Learn more →</a></strong></p>
+<h3>CMMC</h3>
+<p><strong>Purpose:</strong> Cybersecurity Maturity Model Certification for DoW<br />
+<strong>Certification:</strong>  </p>
+<ul>
+<li>Level 1: Self-assessment  </li>
+<li>Level 2: Self-assessment under Phase 1. C3PAO ($25,000 - $150,000) applies only if Phase 2 resumes, suspended since July 13, 2026</li>
+</ul>
+<p><strong>Timeline:</strong>  </p>
+<ul>
+<li>Level 1: 2-4 weeks  </li>
+<li>Level 2: 3-6 months</li>
+</ul>
+<p><strong><a href="./cmmc.html">Learn more →</a></strong></p>
+<h3>CIS Benchmarks</h3>
+<p><strong>Purpose:</strong> Security configuration best practices<br />
+<strong>Certification:</strong> Not a certification - industry-recognized hardening standards<br />
+<strong>Cost:</strong> Free to implement<br />
+<strong>Timeline:</strong> 2-4 weeks for basic hardening (IG1)</p>
+<p><strong>Current Coverage:</strong></p>
+<ul>
+<li>AWS: 158 automated controls (Production)</li>
+<li>Azure: 108 automated controls (Production)</li>
+<li>GCP: 71 automated controls (Production)</li>
+</ul>
+<p><strong><a href="./cis-benchmarks.html">Learn more →</a></strong></p>
+<h3>NIST 800-53 Rev 5</h3>
+<p><strong>Purpose:</strong> Security controls for federal information systems<br />
+<strong>Certification:</strong> Not a certification (used by FedRAMP, FISMA)<br />
+<strong>Coverage:</strong> 149 automated technical controls<br />
+<strong>Timeline:</strong> 6-12 months for full implementation</p>
+<p><strong><a href="./nist-800-53.html">Learn more →</a></strong></p>
+<h3>HIPAA</h3>
+<p><strong>Purpose:</strong> Healthcare data protection<br />
+<strong>Status:</strong> Production - 30 of the 75 Security Rule safeguards are reached on AWS<br />
+<strong>Note:</strong> Covers all 12 Technical Safeguards (164.312) and 18 of the 31 Administrative Safeguards (164.308). Does not cover Physical Safeguards (164.310), Organizational Requirements (164.314) or Policies and Documentation (164.316)</p>
+<p><strong><a href="./hipaa.html">Learn more →</a></strong></p>
+<h2>Scanning Frameworks</h2>
+<h3>Single Framework</h3>
+<pre class="code-block"><code># SOC2
+auditkit scan -provider aws -framework soc2
 
-            <h2>Derived through the crosswalk</h2>
-            <p>These are not separate checks. Each is derived from the frameworks
-            above through NIST 800-53, so coverage follows from what the scanner
-            already assessed.</p>
-            <div style="overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr><th>Framework</th><th>AWS</th><th>Azure</th><th>GCP</th><th>Unit</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td><a href="/docs/frameworks/nist-800-53.html">NIST 800-53 Rev 5</a></td><td>88</td><td>83</td><td>84</td><td>controls (95 across all providers, of 1,196 in the catalog)</td></tr>
-                    <tr><td><a href="/docs/frameworks/iso27001.html">ISO 27001:2022</a></td><td>48</td><td>46</td><td>46</td><td>of 93 Annex A controls</td></tr>
-                    <tr><td><a href="/docs/frameworks/nist-csf.html">NIST CSF 2.0</a></td><td>65</td><td>62</td><td>63</td><td>of 106 subcategories</td></tr>
-                    <tr><td><a href="/docs/frameworks/hipaa.html">HIPAA Security Rule</a></td><td>18</td><td>18</td><td>18</td><td>of 75 safeguards</td></tr>
-                    <tr><td><a href="/docs/frameworks/gdpr.html">GDPR</a></td><td>14</td><td>14</td><td>14</td><td>articles</td></tr>
-                    <tr><td><a href="/docs/frameworks/fedramp.html">FedRAMP</a></td><td colspan="3">Low, Moderate and High baselines</td><td>filtered views of NIST 800-53</td></tr>
-                </tbody>
-            </table>
-            </div>
+# PCI-DSS
+auditkit scan -provider aws -framework pci
 
-            <div class="note">
-                <p><strong>Compliance versus hardening:</strong> the first table is
-                what an auditor asks for. CIS Benchmarks are security hardening,
-                which improves your posture but is not itself a certification.</p>
-            </div>
+# CMMC Level 1
+auditkit scan -provider aws -framework cmmc
+
+# CMMC Level 1 + 2 - all 110 practices (Community reports all 110; Pro adds the evidence package and deeper automation)
+auditkit-pro scan -provider aws -framework cmmc
+
+# CIS Benchmarks
+auditkit scan -provider aws -framework cis-aws
+
+# NIST 800-53
+auditkit scan -provider aws -framework 800-53
+</code></pre>
+<h3>All Frameworks</h3>
+<pre class="code-block"><code># Scan all frameworks at once
+auditkit scan -provider aws -framework all
+</code></pre>
+<h2>Framework Crosswalks</h2>
+<p>AuditKit maps controls across frameworks. For example:</p>
+<p><strong>AWS IAM MFA enforcement</strong> maps to:</p>
+<ul>
+<li>SOC2: CC6.6</li>
+<li>PCI-DSS: Requirement 8.4.2</li>
+<li>CIS AWS: 2.5, 2.6 and 2.10 (v7.0.0 numbering)</li>
+<li>NIST 800-53: IA-2, IA-2(1)</li>
+<li>HIPAA: 164.312(a)(2)(i)</li>
+</ul>
+<p>This means fixing one control improves compliance across multiple frameworks.</p>
+<h2>Compliance vs Security Hardening</h2>
+<h3>Compliance Frameworks (SOC2, PCI, CMMC, NIST 800-53)</h3>
+<ul>
+<li><strong>Purpose:</strong> Meet audit/certification requirements</li>
+<li><strong>Focus:</strong> Business controls + technical controls</li>
+<li><strong>Output:</strong> Pass/fail for specific requirements</li>
+<li><strong>Outcome:</strong> Certification or authorization</li>
+</ul>
+<h3>Security Hardening (CIS Benchmarks)</h3>
+<ul>
+<li><strong>Purpose:</strong> Reduce attack surface</li>
+<li><strong>Focus:</strong> Technical configuration only</li>
+<li><strong>Output:</strong> Detailed hardening guidance</li>
+<li><strong>Outcome:</strong> Improved security posture</li>
+</ul>
+<p><strong>Best Practice:</strong> Use CIS Benchmarks alongside compliance frameworks. CIS provides technical depth that complements compliance requirements.</p>
+<h2>Choosing the Right Framework</h2>
+<h3>Multiple Frameworks Required?</h3>
+<p>Many organizations need multiple frameworks:</p>
+<p><strong>Common combinations:</strong></p>
+<ul>
+<li>SOC2 + PCI-DSS (SaaS with payment processing)</li>
+<li>SOC2 + CIS Benchmarks (SaaS with strong security posture)</li>
+<li>CMMC + NIST 800-53 (DoW + federal work)</li>
+<li>CMMC + CIS Benchmarks (DoW with hardening requirements)</li>
+<li>SOC2 + HIPAA (Healthcare SaaS)</li>
+</ul>
+<p><strong>Good news:</strong> AuditKit scans once, reports on all frameworks</p>
+<h3>Framework Priorities</h3>
+<p><strong>If you need multiple frameworks:</strong>
+1. Start with broadest: SOC2 or NIST 800-53
+2. Add security hardening: CIS Benchmarks
+3. Add specific: PCI-DSS for payments, CMMC for DoW
+4. Last: HIPAA (most organizational policies)</p>
+<p><strong>Security-first approach:</strong>
+1. Start with CIS Benchmarks (security foundation)
+2. Add compliance: SOC2, PCI, or CMMC as needed
+3. Maintain both: CIS for ongoing hardening, compliance for audits</p>
+<h2>Getting Help</h2>
+<p><strong>Framework-specific questions:</strong></p>
+<ul>
+<li><a href="./soc2.html#faq">SOC2 FAQ</a></li>
+<li><a href="./pci-dss.html#faq">PCI-DSS FAQ</a></li>
+<li><a href="./cmmc.html#faq">CMMC FAQ</a></li>
+<li><a href="./cis-benchmarks.html#frequently-asked-questions">CIS Benchmarks FAQ</a></li>
+<li><a href="./nist-800-53.html#faq">NIST 800-53 FAQ</a></li>
+</ul>
+<p><strong>General support:</strong></p>
+<ul>
+<li><a href="../faq.html">Main FAQ</a></li>
+<li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition/issues">GitHub Issues</a></li>
+<li>Email: info@auditkit.io</li>
+</ul>
+<h2>Next Steps</h2>
+<ul>
+<li><strong><a href="#framework-details">Choose your framework →</a></strong></li>
+<li><strong><a href="../getting-started.html">Run your first scan →</a></strong></li>
+<li><strong><a href="../providers/">View provider coverage →</a></strong></li>
+<li><strong><a href="../../pricing.html">Compare Free vs Pro →</a></strong></li>
+</ul>
+
         </div>
     </section>
 

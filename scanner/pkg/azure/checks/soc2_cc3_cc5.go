@@ -197,7 +197,7 @@ func (c *AzureCC4Checks) CheckCC4_1_PerformanceMonitoring(ctx context.Context) C
 		}
 	}
 
-	if page.Value != nil && len(page.Value) > 0 {
+	if len(page.Value) > 0 {
 		return CheckResult{
 			Control:         "CC4.1",
 			Name:            "Performance Monitoring",

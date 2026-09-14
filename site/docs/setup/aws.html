@@ -48,7 +48,7 @@
         <div class="container-prose">
 <p>How to configure AWS credentials for AuditKit scanning.</p>
 <h2>Quick Start</h2>
-<div class="code-block"># Option 1: AWS CLI (easiest)
+<pre class="code-block"><code># Option 1: AWS CLI (easiest)
 aws configure
 
 # Test it works
@@ -56,51 +56,51 @@ aws sts get-caller-identity
 
 # Run scan
 ./auditkit scan -provider aws -framework soc2
-</div>
+</code></pre>
 <h2>Authentication Methods</h2>
 <p>AuditKit supports three authentication methods for AWS:</p>
 <h3>Option 1: AWS CLI Credentials (Recommended)</h3>
 <p><strong>Best for:</strong> Local scanning, development</p>
-<div class="code-block"># Install AWS CLI
+<pre class="code-block"><code># Install AWS CLI
 # macOS: brew install awscli
 # Linux: apt-get install awscli
 # Windows: Download from aws.amazon.com/cli
 
 # Configure credentials
 aws configure
-</div>
+</code></pre>
 <p>You'll be prompted for:
 - AWS Access Key ID
 - AWS Secret Access Key<br />
 - Default region (e.g., us-east-1)
 - Default output format (json recommended)</p>
-<p><strong>Credentials stored at:</strong> <code class="code-inline">~/.aws/credentials</code></p>
+<p><strong>Credentials stored at:</strong> <code>~/.aws/credentials</code></p>
 <h3>Option 2: Environment Variables</h3>
 <p><strong>Best for:</strong> CI/CD pipelines, automation</p>
-<div class="code-block">export AWS_ACCESS_KEY_ID=&quot;AKIAIOSFODNN7EXAMPLE&quot;
+<pre class="code-block"><code>export AWS_ACCESS_KEY_ID=&quot;AKIAIOSFODNN7EXAMPLE&quot;
 export AWS_SECRET_ACCESS_KEY=&quot;wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&quot;
 export AWS_DEFAULT_REGION=&quot;us-east-1&quot;
 
 # Run scan
 ./auditkit scan -provider aws -framework soc2
-</div>
+</code></pre>
 <h3>Option 3: IAM Role (EC2/ECS/Lambda)</h3>
 <p><strong>Best for:</strong> Running AuditKit on AWS infrastructure</p>
 <p>No configuration needed - automatically detected if running on:
 - EC2 instance with IAM role attached
 - ECS task with task role
 - Lambda function with execution role</p>
-<div class="code-block"># Just run scan - credentials auto-detected
+<pre class="code-block"><code># Just run scan - credentials auto-detected
 ./auditkit scan -provider aws -framework soc2
-</div>
+</code></pre>
 <h2>Required IAM Permissions</h2>
 <p>AuditKit needs <strong>read-only</strong> access to scan your AWS account.</p>
 <h3>Minimum Permissions (ReadOnlyAccess)</h3>
 <p>The easiest approach is to use AWS managed policy:</p>
-<p><strong>Policy ARN:</strong> <code class="code-inline">arn:aws:iam::aws:policy/ReadOnlyAccess</code></p>
+<p><strong>Policy ARN:</strong> <code>arn:aws:iam::aws:policy/ReadOnlyAccess</code></p>
 <h3>Custom Policy (Least Privilege)</h3>
-<p>If you need tighter control, note first that AuditKit calls 38 AWS services, so a hand-built policy will silently reduce coverage — controls it cannot evaluate are reported as ERROR. <code class="code-inline">ReadOnlyAccess</code> is strongly recommended. The policy below covers only the core S3/IAM/EC2/RDS/CloudTrail/KMS/GuardDuty/Config/Security Hub checks; add read permissions for Lambda, ECS, EKS, Macie, Network Firewall, Route 53, IAM Access Analyzer, SQS, API Gateway, Elastic Beanstalk, Secrets Manager, ECR, DynamoDB, CloudFormation, ACM, SageMaker, Redshift, ElastiCache, OpenSearch, Inspector, Backup, SSM, SNS, CloudWatch, Auto Scaling and Organizations for full coverage:</p>
-<div class="code-block">{
+<p>If you need tighter control, note first that AuditKit calls 39 AWS services, so a hand-built policy will silently reduce coverage — controls it cannot evaluate are reported as ERROR. <code>ReadOnlyAccess</code> is strongly recommended. The policy below covers only the core S3/IAM/EC2/RDS/CloudTrail/KMS/GuardDuty/Config/Security Hub checks; add read permissions for Lambda, ECS, EKS, Macie, Network Firewall, Route 53, IAM Access Analyzer, SQS, API Gateway, Elastic Beanstalk, Secrets Manager, ECR, DynamoDB, CloudFormation, ACM, SageMaker, Redshift, ElastiCache, OpenSearch, Inspector, Backup, SSM, SNS, CloudWatch, Auto Scaling and Organizations for full coverage:</p>
+<pre class="code-block"><code>{
   &quot;Version&quot;: &quot;2012-10-17&quot;,
   &quot;Statement&quot;: [
     {
@@ -138,39 +138,39 @@ export AWS_DEFAULT_REGION=&quot;us-east-1&quot;
     }
   ]
 }
-</div>
+</code></pre>
 <h2>Creating an IAM User for AuditKit</h2>
 <h3>Step 1: Create IAM User</h3>
-<div class="code-block"># Via AWS CLI
+<pre class="code-block"><code># Via AWS CLI
 aws iam create-user --user-name auditkit-scanner
 
 # Via Console
 # Go to IAM &gt; Users &gt; Add User &gt; &quot;auditkit-scanner&quot;
-</div>
+</code></pre>
 <h3>Step 2: Attach ReadOnlyAccess Policy</h3>
-<div class="code-block"># Via AWS CLI
+<pre class="code-block"><code># Via AWS CLI
 aws iam attach-user-policy \
   --user-name auditkit-scanner \
   --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess
 
 # Via Console
 # IAM &gt; Users &gt; auditkit-scanner &gt; Permissions &gt; Attach policies &gt; ReadOnlyAccess
-</div>
+</code></pre>
 <h3>Step 3: Create Access Keys</h3>
-<div class="code-block"># Via AWS CLI
+<pre class="code-block"><code># Via AWS CLI
 aws iam create-access-key --user-name auditkit-scanner
 
 # Save the output - you'll need AccessKeyId and SecretAccessKey
-</div>
+</code></pre>
 <h3>Step 4: Configure AuditKit</h3>
-<div class="code-block">aws configure
+<pre class="code-block"><code>aws configure
 # Enter the AccessKeyId and SecretAccessKey from step 3
-</div>
+</code></pre>
 <h2>Multi-Account Scanning</h2>
 <p><strong>Free version:</strong> Scan one account at a time by switching profiles</p>
 <p><strong>Pro version:</strong> Scan entire AWS Organization automatically</p>
 <h3>Community Edition - Using Profiles</h3>
-<div class="code-block"># Configure multiple profiles
+<pre class="code-block"><code># Configure multiple profiles
 aws configure --profile production
 aws configure --profile staging
 aws configure --profile development
@@ -179,9 +179,9 @@ aws configure --profile development
 ./auditkit scan -provider aws -framework soc2 --profile production
 ./auditkit scan -provider aws -framework soc2 --profile staging
 ./auditkit scan -provider aws -framework soc2 --profile development
-</div>
+</code></pre>
 <h3>Pro Version - Organization Scanning</h3>
-<div class="code-block"># Scan entire AWS Organization (Pro only)
+<pre class="code-block"><code># Scan entire AWS Organization (Pro only)
 ./auditkit-pro scan -provider aws -framework soc2 --scan-all
 
 # Limit concurrency
@@ -189,53 +189,53 @@ aws configure --profile development
 
 # Generate consolidated report
 ./auditkit-pro scan -provider aws --scan-all -format pdf -output org-report.pdf
-</div>
+</code></pre>
 <p><strong><a href="https://auditkit.io/pro/">Upgrade to Pro →</a></strong></p>
 <h2>Troubleshooting</h2>
 <h3>"Error: AWS credentials not configured"</h3>
 <p><strong>Cause:</strong> No credentials found</p>
 <p><strong>Solution:</strong></p>
-<div class="code-block">aws configure
+<pre class="code-block"><code>aws configure
 # Enter your credentials when prompted
-</div>
+</code></pre>
 <h3>"Error: Access Denied"</h3>
 <p><strong>Cause:</strong> IAM user lacks required permissions</p>
-<p><strong>Solution:</strong> Attach <code class="code-inline">ReadOnlyAccess</code> policy:</p>
-<div class="code-block">aws iam attach-user-policy \
+<p><strong>Solution:</strong> Attach <code>ReadOnlyAccess</code> policy:</p>
+<pre class="code-block"><code>aws iam attach-user-policy \
   --user-name auditkit-scanner \
   --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess
-</div>
+</code></pre>
 <h3>"Error: Region not found"</h3>
 <p><strong>Cause:</strong> Default region not set</p>
 <p><strong>Solution:</strong></p>
-<div class="code-block">export AWS_DEFAULT_REGION=&quot;us-east-1&quot;
+<pre class="code-block"><code>export AWS_DEFAULT_REGION=&quot;us-east-1&quot;
 # Or run: aws configure
-</div>
+</code></pre>
 <h3>"Error: MFA required"</h3>
 <p><strong>Cause:</strong> Account requires MFA for API access</p>
 <p><strong>Solution:</strong> Use temporary credentials:</p>
-<div class="code-block">aws sts get-session-token --serial-number arn:aws:iam::ACCOUNT:mfa/USER --token-code 123456
+<pre class="code-block"><code>aws sts get-session-token --serial-number arn:aws:iam::ACCOUNT:mfa/USER --token-code 123456
 
 # Use the temporary credentials returned
 export AWS_ACCESS_KEY_ID=&quot;temp-key&quot;
 export AWS_SECRET_ACCESS_KEY=&quot;temp-secret&quot;
 export AWS_SESSION_TOKEN=&quot;temp-token&quot;
-</div>
+</code></pre>
 <h2>Security Best Practices</h2>
 <h3>1. Use Dedicated IAM User</h3>
 <p>Don't use your personal credentials or root account.</p>
-<div class="code-block">aws iam create-user --user-name auditkit-scanner
-</div>
+<pre class="code-block"><code>aws iam create-user --user-name auditkit-scanner
+</code></pre>
 <h3>2. Rotate Access Keys Regularly</h3>
-<div class="code-block"># Every 90 days
+<pre class="code-block"><code># Every 90 days
 aws iam create-access-key --user-name auditkit-scanner
 aws iam delete-access-key --user-name auditkit-scanner --access-key-id OLD_KEY_ID
-</div>
+</code></pre>
 <h3>3. Enable CloudTrail Logging</h3>
 <p>Monitor what AuditKit accesses:</p>
-<div class="code-block"># CloudTrail logs all API calls made by AuditKit
+<pre class="code-block"><code># CloudTrail logs all API calls made by AuditKit
 aws cloudtrail lookup-events --lookup-attributes AttributeKey=Username,AttributeValue=auditkit-scanner
-</div>
+</code></pre>
 <h3>4. Use Read-Only Access</h3>
 <p>AuditKit only needs read permissions - never grant write access.</p>
 <h2>Next Steps</h2>

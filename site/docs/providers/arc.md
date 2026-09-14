@@ -6,9 +6,9 @@ Scan your on-premises servers connected via Azure Arc.
 
 ## Overview
 
-**Status:** Pro only  
-**Coverage:** Defender for Cloud assessments + Guest Configuration compliance  
-**Supported in:** AuditKit Pro v0.8.2-pro and later (current release v0.9.9-pro)
+**Status:** Pro only
+**Coverage:** Defender for Cloud assessments + Guest Configuration compliance
+**Supported in:** AuditKit Pro v0.8.2-pro and later (current release v1.0.0-pro)
 
 Azure Arc extends Azure management to your on-premises servers. AuditKit can scan Arc-enabled machines for compliance by pulling:
 
@@ -129,7 +129,7 @@ Checks connectivity status of all Arc-enabled servers:
 - **PASS** - Agent connected and reporting
 - **FAIL** - Agent disconnected or expired
 
-**Frameworks:** PCI 10.2.1, SOC2 CC7.1, ISO 27001 A.12.4, CMMC AU.L2-3.3.1
+**Frameworks:** PCI 10.1, SOC2 CC7.1, ISO 27001 A.12.4, CMMC AU.L2-3.3.1
 
 ### 2. Defender for Cloud Assessments
 

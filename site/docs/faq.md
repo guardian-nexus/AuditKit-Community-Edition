@@ -37,9 +37,9 @@ AuditKit can import Prowler results to broaden NIST 800-53 coverage.
 |---------|------|---------------|
 | AWS/Azure/GCP/M365 | Full support | Full support |
 | SOC2, PCI-DSS, NIST 800-53 | All frameworks | All frameworks |
-| CMMC Level 1 | 13 of 17 practices automated | 17 of 17 practices automated |
-| CMMC Level 2 | All 110 practices reported for evidence | All 110 practices automated (CUI) |
-| Controls assessed | 219 AWS, 174 Azure, 133 GCP | 317 AWS, 322 Azure, 259 GCP |
+| CMMC Level 1 | 5 of 17 practices reach a verdict on AWS | 7 of 17 practices reach a verdict on AWS |
+| CMMC Level 2 | All 110 practices reported for evidence | All 110 practices reported; 27 reach a verdict on AWS, 83 carry evidence guidance |
+| Controls assessed | 228 AWS, 277 Azure, 173 GCP | 314 AWS, 400 Azure, 293 GCP |
 | GCP Advanced | 5 GKE controls | Deep GKE scanning (15) + Vertex AI (10) |
 | Multi-Account | One at a time | AWS Orgs, Azure Mgmt, GCP Folders |
 | Support | Community | Priority + 14-day trial |
@@ -71,14 +71,14 @@ Compare to traditional costs:
 - M365 (Microsoft 365) via ScubaGear integration
 
 **Coverage:**
-- AWS: 219 controls - 38 SOC2 criteria, 59 PCI-DSS requirements, 13 of 17 CMMC Level 1 practices automated; all 110 Level 1 + 2 practices reported
-- Azure: 174 controls - 37 SOC2 criteria, 59 PCI-DSS requirements, CMMC Level 1 automated; Level 2 practices reported
-- GCP: 133 controls - 32 SOC2 criteria, 49 PCI-DSS requirements, 5 GKE controls; deep GKE scanning and Vertex AI are Pro
+- AWS: 228 controls - 38 SOC2 criteria, 59 PCI-DSS requirements, 5 of 17 CMMC Level 1 practices automated; all 110 Level 1 + 2 practices reported
+- Azure: 277 controls - 38 SOC2 criteria, 63 PCI-DSS requirements, 4 of 17 CMMC Level 1 practices automated; Level 2 practices reported
+- GCP: 173 controls - 32 SOC2 criteria, 50 PCI-DSS requirements, 5 GKE controls; deep GKE scanning and Vertex AI are Pro
 - M365: 29+ Entra ID rules via ScubaGear
 
 ### Which GCP services are scanned?
 
-**Free version (219 AWS, 174 Azure, 133 GCP controls):**
+**Free version (228 AWS, 277 Azure, 173 GCP controls):**
 - Cloud Storage (GCS)
 - Cloud IAM
 - Compute Engine
@@ -97,17 +97,17 @@ Compare to traditional costs:
 
 | Framework | Status | Coverage |
 |-----------|--------|----------|
-| CIS Benchmarks | Production | 158 AWS, 108 Azure, 71 GCP |
+| CIS Benchmarks | Production | 70 AWS, 127 Azure, 93 GCP |
 | FedRAMP | Production | Low / Moderate / High baselines (149 / 287 / 370 controls reported) |
 | SOC2 Type II | Production | 38 criteria |
-| PCI-DSS v4.0.1 | Production | 69 requirements |
-| CMMC Level 1 | Production | 13 of 17 automated |
+| PCI-DSS v4.0.1 | Production | 71 requirements |
+| CMMC Level 1 | Production | 5 of 17 reach a verdict on AWS |
 | CMMC Level 2 | Reported free; automated in Pro | 110 practices |
-| NIST 800-53 Rev 5 | Production | 95 technical controls |
-| ISO 27001:2022 | Production | 46 controls, derived via crosswalk |
-| NIST CSF 2.0 | Production | 63 subcategories, derived via crosswalk |
-| GDPR | Production | 14 articles, derived via crosswalk |
-| HIPAA | Production | 18 safeguards, derived via crosswalk |
+| NIST 800-53 Rev 5 | Production | 149 technical controls |
+| ISO 27001:2022 | Production | 53 controls, derived via crosswalk |
+| NIST CSF 2.0 | Production | 65 subcategories, derived via crosswalk |
+| GDPR | Production | 16 articles, derived via crosswalk |
+| HIPAA | Production | 30 safeguards, derived via crosswalk |
 
 **[Framework details →](./frameworks/)**
 
@@ -195,7 +195,7 @@ All read-only, no write permissions required.
 
 ### What's the difference between CMMC Level 1 and Level 2?
 
-**CMMC Level 1 (17 practices) - 13 of the 17 automated in the free Community Edition**
+**CMMC Level 1 (17 practices) - 5 of the 17 reach a verdict on AWS in the free Community Edition; all 17 are reported**
 - Protects Federal Contract Information (FCI)
 - Basic cybersecurity hygiene
 - Required for all DoW contractors
@@ -322,7 +322,7 @@ auditkit scan
 auditkit scan -format pdf -output report.pdf
 ```
 
-**HTML** - Interactive, searchable
+**HTML** - Tabbed: failed, passed and manual controls
 ```bash
 auditkit scan -format html -output report.html
 ```

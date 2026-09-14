@@ -48,8 +48,8 @@
         <div class="container-prose">
 <p>What AuditKit scans in Microsoft 365 via ScubaGear integration.</p>
 <h2>Overview</h2>
-<p><strong>Coverage:</strong> 100+ rules via CISA ScubaGear integration<br /><br>
-<strong>Supported in:</strong> Free and Pro versions<br /><br>
+<p><strong>Coverage:</strong> 100+ rules via CISA ScubaGear integration<br />
+<strong>Supported in:</strong> Free and Pro versions<br />
 <strong>Method:</strong> Import ScubaGear scan results into AuditKit</p>
 <p><strong>Supported frameworks:</strong>
 - SOC2 Type II
@@ -61,259 +61,177 @@
 - Comprehensive security baseline
 - Regular updates from CISA</p>
 <h2>How It Works</h2>
-<div class="code-block">1. Run ScubaGear (Windows PowerShell)
+<pre class="code-block"><code>1. Run ScubaGear (Windows PowerShell)
    ↓
 2. Generate ScubaResults_&lt;uuid&gt;.json
    ↓
 3. Import to AuditKit
    ↓
 4. Get compliance-mapped report
-</div>
+</code></pre>
 <p><strong><a href="../setup/m365.html">Setup guide →</a></strong></p>
 <h2>Covered Domains</h2>
-<h3>Entra ID (Azure AD) - 30 Rules</h3>
-<h4>Authentication &amp; Access</h4>
+<p>134 ScubaGear rules, each mapped to SOC 2 criteria and PCI DSS requirements, read from the
+mapping files the scanner ships. Identifiers are ScubaGear's own; the parser matches them with
+or without the version suffix (<code>MS.AAD.1.1</code> and <code>MS.AAD.1.1v1</code> are the same rule).</p>
+<h3>Entra ID - 30 rules</h3>
 <ul>
-<li><strong>MS.AAD.1.1v1</strong> - MFA enforcement for all users</li>
-<li><strong>MS.AAD.2.1v1</strong> - Conditional Access policies required</li>
-<li><strong>MS.AAD.2.2v1</strong> - Block legacy authentication</li>
-<li><strong>MS.AAD.2.3v1</strong> - Risk-based sign-in policies</li>
-<li><strong>MS.AAD.2.4v1</strong> - User risk policies</li>
-<li><strong>MS.AAD.3.1v1</strong> - Privileged Identity Management</li>
-<li><strong>MS.AAD.3.2v1</strong> - Admin MFA requirements</li>
-<li><strong>MS.AAD.3.3v1</strong> - Emergency access accounts</li>
+<li><strong>MS.AAD.1.1</strong> - Legacy authentication blocked</li>
+<li><strong>MS.AAD.2.1</strong> - Block high-risk users</li>
+<li><strong>MS.AAD.2.2</strong> - Notify admins on high-risk users</li>
+<li><strong>MS.AAD.2.3</strong> - Block high-risk sign-ins</li>
+<li><strong>MS.AAD.3.1</strong> - Phishing-resistant MFA for all users</li>
+<li><strong>MS.AAD.3.2</strong> - Enforce MFA (any approved method) for all users</li>
+<li><strong>MS.AAD.3.3</strong> - Authenticator shows app/location context</li>
+<li><strong>MS.AAD.3.4</strong> - Authentication methods migration completed/managed</li>
+<li><strong>MS.AAD.3.5</strong> - Disable SMS/Voice/Email OTP</li>
+<li><strong>MS.AAD.3.6</strong> - Phishing-resistant MFA for privileged roles</li>
+<li><strong>MS.AAD.3.7</strong> - Require managed devices for authentication</li>
+<li><strong>MS.AAD.3.8</strong> - Require managed device to register MFA</li>
+<li><strong>MS.AAD.3.9</strong> - Block device-code authentication flow</li>
+<li><strong>MS.AAD.4.1</strong> - Send security logs to SIEM/SOC</li>
+<li><strong>MS.AAD.5.1</strong> - Only admins may register applications</li>
+<li><strong>MS.AAD.5.2</strong> - Only admins may consent to applications</li>
+<li><strong>MS.AAD.5.3</strong> - Admin consent workflow configured</li>
+<li><strong>MS.AAD.6.1</strong> - User passwords do not expire (policy-based)</li>
+<li><strong>MS.AAD.7.1</strong> - Limit Global Admins (2–8)</li>
+<li><strong>MS.AAD.7.2</strong> - Use finer-grained roles instead of Global Admin</li>
+<li><strong>MS.AAD.7.3</strong> - Privileged users use cloud-only accounts</li>
+<li><strong>MS.AAD.7.4</strong> - No permanent active privileged assignments</li>
+<li><strong>MS.AAD.7.5</strong> - Provision privileged roles via PIM/PAM</li>
+<li><strong>MS.AAD.7.6</strong> - Global Administrator activation requires approval</li>
+<li><strong>MS.AAD.7.7</strong> - Alert on eligible or active privileged role assignment</li>
+<li><strong>MS.AAD.7.8</strong> - Alert on Global Administrator activation</li>
+<li><strong>MS.AAD.7.9</strong> - Alert on other privileged role activations</li>
+<li><strong>MS.AAD.8.1</strong> - Limit guest access to directory objects</li>
+<li><strong>MS.AAD.8.2</strong> - Only Guest Inviter role can invite guests</li>
+<li><strong>MS.AAD.8.3</strong> - Restrict guest invitations to approved domains</li>
 </ul>
-<h4>Identity Protection</h4>
+<h3>Exchange Online - 40 rules</h3>
 <ul>
-<li><strong>MS.AAD.4.1v1</strong> - Identity Protection enabled</li>
-<li><strong>MS.AAD.4.2v1</strong> - High-risk user policy</li>
-<li><strong>MS.AAD.4.3v1</strong> - High-risk sign-in policy</li>
-<li><strong>MS.AAD.4.4v1</strong> - Password protection</li>
+<li><strong>MS.EXO.1.1</strong> - Disable automatic email forwarding to external domains</li>
+<li><strong>MS.EXO.2.2</strong> - Publish an SPF record for all domains and enforce hard fail for non-approved senders</li>
+<li><strong>MS.EXO.3.1</strong> - Enable DKIM for all custom domains</li>
+<li><strong>MS.EXO.4.1</strong> - Publish a DMARC policy for all second-level domains</li>
+<li><strong>MS.EXO.4.2</strong> - Set DMARC policy enforcement to p=reject</li>
+<li><strong>MS.EXO.4.3</strong> - Include reports@dmarc.cyber.dhs.gov in DMARC aggregate reports</li>
+<li><strong>MS.EXO.4.4</strong> - Include agency-specific contact addresses in DMARC aggregate and failure reports</li>
+<li><strong>MS.EXO.5.1</strong> - Disable SMTP AUTH for the organization</li>
+<li><strong>MS.EXO.6.1</strong> - Restrict contact folder sharing with all domains</li>
+<li><strong>MS.EXO.6.2</strong> - Restrict calendar detail sharing with all domains</li>
+<li><strong>MS.EXO.7.1</strong> - Implement external sender warnings in Exchange Online</li>
+<li><strong>MS.EXO.8.1</strong> - Implement a Data Loss Prevention (DLP) solution for Exchange Online</li>
+<li><strong>MS.EXO.8.2</strong> - Ensure DLP policies protect personally identifiable and sensitive information</li>
+<li><strong>MS.EXO.8.3</strong> - If using third-party DLP, ensure feature parity with Microsoft native capabilities</li>
+<li><strong>MS.EXO.8.4</strong> - Restrict sharing of PII including credit card numbers, SSNs, and ITINs via email</li>
+<li><strong>MS.EXO.9.1</strong> - Enable attachment file type filtering in Exchange Online</li>
+<li><strong>MS.EXO.9.2</strong> - Ensure the attachment filter verifies true file type and file extension consistency</li>
+<li><strong>MS.EXO.9.3</strong> - Determine and enforce list of disallowed email attachment file types</li>
+<li><strong>MS.EXO.9.4</strong> - Ensure third-party attachment filtering matches Microsoft Defender baseline</li>
+<li><strong>MS.EXO.9.5</strong> - Block common click-to-run file types (e.g., .exe, .cmd, .vbe)</li>
+<li><strong>MS.EXO.10.1</strong> - Enable malware scanning for all inbound and outbound emails</li>
+<li><strong>MS.EXO.10.2</strong> - Quarantine or drop emails detected as containing malware</li>
+<li><strong>MS.EXO.10.3</strong> - Enable post-delivery scanning to detect and remove malware from delivered messages</li>
+<li><strong>MS.EXO.11.1</strong> - Enable impersonation protection checks in Exchange Online</li>
+<li><strong>MS.EXO.11.2</strong> - Display user warnings and safety tips for suspected phishing emails</li>
+<li><strong>MS.EXO.11.3</strong> - Enable AI-based phishing detection using Mailbox Intelligence</li>
+<li><strong>MS.EXO.12.1</strong> - Avoid use of IP allow lists that bypass spam and authentication checks</li>
+<li><strong>MS.EXO.12.2</strong> - Disable global safe lists to prevent bypassing security mechanisms</li>
+<li><strong>MS.EXO.13.1</strong> - Enable mailbox auditing for all Exchange Online users</li>
+<li><strong>MS.EXO.14.1</strong> - Enable spam filtering for inbound email in Exchange Online</li>
+<li><strong>MS.EXO.14.2</strong> - Quarantine or move spam and high-confidence spam to junk folders</li>
+<li><strong>MS.EXO.14.3</strong> - Prohibit adding entire domains to inbound allow lists in spam policies</li>
+<li><strong>MS.EXO.14.4</strong> - Validate third-party spam filtering is equivalent to Microsoft Defender baseline</li>
+<li><strong>MS.EXO.15.1</strong> - Enable Safe Links URL scanning and block-list comparison for incoming email</li>
+<li><strong>MS.EXO.15.2</strong> - Enable real-time malware scanning for direct download links in emails</li>
+<li><strong>MS.EXO.15.3</strong> - Enable user click tracking for Safe Links-protected emails</li>
+<li><strong>MS.EXO.16.1</strong> - Enable alert policies for suspicious and service-impacting activities in Exchange Online</li>
+<li><strong>MS.EXO.16.2</strong> - Send alerts to monitored mailbox or integrate with SIEM for central review</li>
+<li><strong>MS.EXO.17.1</strong> - Enable Unified Audit Logging in Microsoft 365 for Exchange Online</li>
+<li><strong>MS.EXO.17.3</strong> - Retain Unified Audit Logs for minimum 12 months active and 18 months cold storage</li>
 </ul>
-<h4>Guest Access</h4>
+<h3>SharePoint Online - 8 rules</h3>
 <ul>
-<li><strong>MS.AAD.5.1v1</strong> - Guest access restrictions</li>
-<li><strong>MS.AAD.5.2v1</strong> - Guest invite settings</li>
-<li><strong>MS.AAD.5.3v1</strong> - Guest user permissions</li>
+<li><strong>MS.SHAREPOINT.1.1</strong> - Limit external sharing for SharePoint to existing guests or internal users only</li>
+<li><strong>MS.SHAREPOINT.1.2</strong> - Limit external sharing for OneDrive to existing guests or internal users only</li>
+<li><strong>MS.SHAREPOINT.1.3</strong> - Restrict external sharing to approved domains or security groups</li>
+<li><strong>MS.SHAREPOINT.2.1</strong> - Set default file and folder sharing scope to Specific people</li>
+<li><strong>MS.SHAREPOINT.2.2</strong> - Set default file and folder sharing permission to View only</li>
+<li><strong>MS.SHAREPOINT.3.1</strong> - Set expiration for Anyone links to 30 days or less</li>
+<li><strong>MS.SHAREPOINT.3.2</strong> - Set permissions for Anyone links to View only</li>
+<li><strong>MS.SHAREPOINT.3.3</strong> - Require reauthentication for verification code users every 30 days or less</li>
 </ul>
-<h4>Password Policies</h4>
+<h3>Teams - 21 rules</h3>
 <ul>
-<li><strong>MS.AAD.6.1v1</strong> - Password expiration policy</li>
-<li><strong>MS.AAD.6.2v1</strong> - Password complexity</li>
-<li><strong>MS.AAD.6.3v1</strong> - Self-service password reset</li>
+<li><strong>MS.TEAMS.1.1</strong> - Disable external participants from requesting control of shared screens in Teams meetings</li>
+<li><strong>MS.TEAMS.1.2</strong> - Prevent anonymous users from starting Microsoft Teams meetings</li>
+<li><strong>MS.TEAMS.1.3</strong> - Require lobby admission for anonymous and dial-in users in Teams meetings</li>
+<li><strong>MS.TEAMS.1.4</strong> - Allow internal users to bypass the lobby automatically in Teams meetings</li>
+<li><strong>MS.TEAMS.1.5</strong> - Require dial-in users to wait in the lobby before joining Teams meetings</li>
+<li><strong>MS.TEAMS.1.6</strong> - Disable default meeting recording in Teams to prevent unauthorized data exposure</li>
+<li><strong>MS.TEAMS.1.7</strong> - Disable 'Always record' for Teams Live Events and restrict to organizer discretion</li>
+<li><strong>MS.TEAMS.2.1</strong> - Restrict external access in Teams to specific approved domains only</li>
+<li><strong>MS.TEAMS.2.2</strong> - Block unmanaged Teams users from initiating contact with internal users</li>
+<li><strong>MS.TEAMS.2.3</strong> - Prevent internal users from initiating chats with unmanaged Teams users</li>
+<li><strong>MS.TEAMS.4.1</strong> - Disable Teams channel email integration to prevent external message routing</li>
+<li><strong>MS.TEAMS.5.1</strong> - Restrict Teams integration to approved Microsoft apps only</li>
+<li><strong>MS.TEAMS.5.2</strong> - Restrict installation of third-party apps to approved selections only</li>
+<li><strong>MS.TEAMS.5.3</strong> - Restrict Teams custom app installation to approved and verified apps only</li>
+<li><strong>MS.TEAMS.6.1</strong> - Enable a Data Loss Prevention (DLP) solution to monitor and prevent data leakage in Teams</li>
+<li><strong>MS.TEAMS.6.1</strong> - Enable a Data Loss Prevention (DLP) solution to monitor and prevent data leakage in Teams</li>
+<li><strong>MS.TEAMS.6.2</strong> - Configure DLP to detect and protect PII and sensitive information shared in Teams</li>
+<li><strong>MS.TEAMS.7.1</strong> - Enable malware scanning for Teams file attachments</li>
+<li><strong>MS.TEAMS.7.2</strong> - Prevent users from opening or downloading malware-detected files in Teams</li>
+<li><strong>MS.TEAMS.8.1</strong> - Enable Safe Links protection for URLs shared in Teams messages</li>
+<li><strong>MS.TEAMS.8.2</strong> - Enable user click tracking for Safe Links in Teams messages</li>
 </ul>
-<h4>Monitoring &amp; Reporting</h4>
+<h3>Power Platform - 8 rules</h3>
 <ul>
-<li><strong>MS.AAD.7.1v1</strong> - Sign-in logs retention</li>
-<li><strong>MS.AAD.7.2v1</strong> - Audit logs enabled</li>
-<li><strong>MS.AAD.7.3v1</strong> - Risk detection alerts</li>
+<li><strong>MS.POWERPLATFORM.1.1</strong> - Restrict creation of production and sandbox environments to admins</li>
+<li><strong>MS.POWERPLATFORM.1.2</strong> - Restrict creation of trial environments to admins</li>
+<li><strong>MS.POWERPLATFORM.2.1</strong> - Create DLP policy to restrict connector access in the default environment</li>
+<li><strong>MS.POWERPLATFORM.2.2</strong> - Apply DLP policies to all non-default environments</li>
+<li><strong>MS.POWERPLATFORM.3.1</strong> - Enable Power Platform tenant isolation</li>
+<li><strong>MS.POWERPLATFORM.3.2</strong> - Configure inbound/outbound connection allowlist</li>
+<li><strong>MS.POWERPLATFORM.4.1</strong> - Enforce Content Security Policy for model-driven and canvas Power Apps</li>
+<li><strong>MS.POWERPLATFORM.5.1</strong> - Restrict Power Pages creation to admins</li>
 </ul>
-<p><strong>Framework mappings:</strong>
-- SOC2: CC6.1, CC6.6, CC6.7, CC7.1
-- PCI-DSS: Requirement 8</p>
-<h3>Exchange Online - 40 Rules</h3>
-<h4>Anti-Phishing</h4>
+<h3>Power BI - 8 rules</h3>
 <ul>
-<li><strong>MS.EXO.1.1v1</strong> - Anti-phishing policy enabled</li>
-<li><strong>MS.EXO.1.2v1</strong> - Impersonation protection</li>
-<li><strong>MS.EXO.1.3v1</strong> - Mailbox intelligence</li>
-<li><strong>MS.EXO.1.4v1</strong> - Safety tips enabled</li>
+<li><strong>MS.POWERBI.1.1</strong> - Disable Publish to Web feature unless business-justified</li>
+<li><strong>MS.POWERBI.2.1</strong> - Restrict or disable Power BI guest access</li>
+<li><strong>MS.POWERBI.3.1</strong> - Disable external invitations unless required by mission need</li>
+<li><strong>MS.POWERBI.4.1</strong> - Restrict Power BI service principal API access to approved groups</li>
+<li><strong>MS.POWERBI.4.2</strong> - Restrict service principals creating or using profiles to approved groups</li>
+<li><strong>MS.POWERBI.5.1</strong> - Block ResourceKey-based authentication unless justified by design</li>
+<li><strong>MS.POWERBI.6.1</strong> - Disable Python and R visual sharing to reduce script-based risk</li>
+<li><strong>MS.POWERBI.7.1</strong> - Enable and enforce sensitivity labels for Power BI content</li>
 </ul>
-<h4>Anti-Malware</h4>
+<h3>Defender for Office 365 - 19 rules</h3>
 <ul>
-<li><strong>MS.EXO.2.1v1</strong> - Anti-malware policies configured</li>
-<li><strong>MS.EXO.2.2v1</strong> - Common attachments filter</li>
-<li><strong>MS.EXO.2.3v1</strong> - Zero-hour auto purge (ZAP)</li>
+<li><strong>MS.DEFENDER.1.1</strong> - Enable Standard and Strict preset security policies in Microsoft Defender</li>
+<li><strong>MS.DEFENDER.1.2</strong> - Assign all users to Exchange Online Protection (EOP) via Standard or Strict preset policies</li>
+<li><strong>MS.DEFENDER.1.3</strong> - Assign all users to Defender for Office 365 protection via preset policies</li>
+<li><strong>MS.DEFENDER.1.4</strong> - Add sensitive accounts to Exchange Online Protection (EOP) strict policy</li>
+<li><strong>MS.DEFENDER.1.5</strong> - Add sensitive accounts to Defender for Office 365 strict policy</li>
+<li><strong>MS.DEFENDER.2.1</strong> - Enable user impersonation protection for sensitive accounts in Standard and Strict policies</li>
+<li><strong>MS.DEFENDER.2.2</strong> - Enable domain impersonation protection for all agency-owned domains</li>
+<li><strong>MS.DEFENDER.2.3</strong> - Enable domain impersonation protection for trusted partner domains</li>
+<li><strong>MS.DEFENDER.3.1</strong> - Enable Safe Attachments for SharePoint, OneDrive, and Microsoft Teams</li>
+<li><strong>MS.DEFENDER.4.1</strong> - Configure a custom Data Loss Prevention (DLP) policy to protect PII and sensitive data</li>
+<li><strong>MS.DEFENDER.4.2</strong> - Apply DLP policies to Exchange, SharePoint, OneDrive, Teams, and Devices</li>
+<li><strong>MS.DEFENDER.4.3</strong> - Configure DLP actions to block sharing sensitive information with all users</li>
+<li><strong>MS.DEFENDER.4.4</strong> - Enable DLP user notifications and policy tips for education and awareness</li>
+<li><strong>MS.DEFENDER.4.5</strong> - Define a list of restricted applications under Endpoint DLP settings</li>
+<li><strong>MS.DEFENDER.4.6</strong> - Block access to sensitive information from restricted or unallowed Bluetooth applications</li>
+<li><strong>MS.DEFENDER.5.1</strong> - Enable mandatory alert policies to detect suspicious or malicious activities across M365 services</li>
+<li><strong>MS.DEFENDER.5.2</strong> - Route security alerts to a monitored mailbox or integrated SIEM for continuous monitoring</li>
+<li><strong>MS.DEFENDER.6.1</strong> - Enable Unified Audit Logging to capture user and administrative activity across Microsoft 365</li>
+<li><strong>MS.DEFENDER.6.3</strong> - Retain Microsoft 365 audit logs for at least 12 months active and 18 months cold storage per OMB M-21-31</li>
 </ul>
-<h4>Data Loss Prevention</h4>
-<ul>
-<li><strong>MS.EXO.3.1v1</strong> - DLP policies for email</li>
-<li><strong>MS.EXO.3.2v1</strong> - Sensitive information types</li>
-<li><strong>MS.EXO.3.3v1</strong> - Policy tips configured</li>
-<li><strong>MS.EXO.3.4v1</strong> - Incident reports</li>
-</ul>
-<h4>Email Encryption</h4>
-<ul>
-<li><strong>MS.EXO.4.1v1</strong> - Message encryption enabled</li>
-<li><strong>MS.EXO.4.2v1</strong> - IRM for emails</li>
-<li><strong>MS.EXO.4.3v1</strong> - TLS enforcement</li>
-</ul>
-<h4>Auditing</h4>
-<ul>
-<li><strong>MS.EXO.5.1v1</strong> - Mailbox auditing enabled</li>
-<li><strong>MS.EXO.5.2v1</strong> - Admin audit log</li>
-<li><strong>MS.EXO.5.3v1</strong> - Audit log retention</li>
-</ul>
-<h4>Safe Links &amp; Attachments</h4>
-<ul>
-<li><strong>MS.EXO.6.1v1</strong> - Safe Links enabled</li>
-<li><strong>MS.EXO.6.2v1</strong> - Safe Attachments enabled</li>
-<li><strong>MS.EXO.6.3v1</strong> - Real-time detonation</li>
-</ul>
-<h4>Transport Rules</h4>
-<ul>
-<li><strong>MS.EXO.7.1v1</strong> - External email warnings</li>
-<li><strong>MS.EXO.7.2v1</strong> - DKIM signing enabled</li>
-<li><strong>MS.EXO.7.3v1</strong> - SPF and DMARC configured</li>
-</ul>
-<p><strong>Framework mappings:</strong>
-- SOC2: CC6.2, CC7.2, CC8.1
-- PCI-DSS: Requirement 3, 4</p>
-<h3>SharePoint - 8 Rules</h3>
-<h4>Sharing &amp; Access</h4>
-<ul>
-<li><strong>MS.SHAREPOINT.1.1</strong> - External sharing restrictions</li>
-<li>
-<p><strong>MS.SHAREPOINT.1.2</strong> - Guest access policies</p>
-</li>
-<li>
-<p><strong>MS.SPO.1.3v1</strong> - Link sharing defaults</p>
-</li>
-<li><strong>MS.SPO.1.4v1</strong> - Anonymous access disabled</li>
-</ul>
-<h4>Data Loss Prevention</h4>
-<ul>
-<li><strong>MS.SPO.2.1v1</strong> - DLP policies for SharePoint</li>
-<li><strong>MS.SPO.2.2v1</strong> - Sensitive document labels</li>
-<li><strong>MS.SPO.2.3v1</strong> - Information barriers</li>
-</ul>
-<h4>Information Rights Management</h4>
-<ul>
-<li><strong>MS.SPO.3.1v1</strong> - IRM enabled</li>
-<li><strong>MS.SPO.3.2v1</strong> - Document encryption</li>
-<li><strong>MS.SPO.3.3v1</strong> - Download restrictions</li>
-</ul>
-<h4>Access Controls</h4>
-<ul>
-<li><strong>MS.SPO.4.1v1</strong> - Conditional Access for SharePoint</li>
-<li><strong>MS.SPO.4.2v1</strong> - Device access policies</li>
-<li><strong>MS.SPO.4.3v1</strong> - IP-based restrictions</li>
-</ul>
-<h4>Auditing</h4>
-<ul>
-<li><strong>MS.SPO.5.1v1</strong> - Audit logging enabled</li>
-<li><strong>MS.SPO.5.2v1</strong> - Version history</li>
-<li><strong>MS.SPO.5.3v1</strong> - Retention policies</li>
-</ul>
-<h4>Site Security</h4>
-<ul>
-<li><strong>MS.SPO.6.1v1</strong> - Site creation restrictions</li>
-<li><strong>MS.SPO.6.2v1</strong> - Custom scripts disabled</li>
-<li><strong>MS.SPO.6.3v1</strong> - Legacy authentication blocked</li>
-</ul>
-<p><strong>Framework mappings:</strong>
-- SOC2: CC6.1, CC6.2, CC7.2, CC8.1
-- PCI-DSS: Requirement 3, 7</p>
-<h3>Teams - 21 Rules</h3>
-<h4>Meeting Security</h4>
-<ul>
-<li><strong>MS.TEAMS.1.1v1</strong> - Lobby settings enforced</li>
-<li><strong>MS.TEAMS.1.2v1</strong> - Anonymous join disabled</li>
-<li><strong>MS.TEAMS.1.3v1</strong> - Recording policies</li>
-<li><strong>MS.TEAMS.1.4v1</strong> - Screen sharing restrictions</li>
-</ul>
-<h4>External Access</h4>
-<ul>
-<li><strong>MS.TEAMS.2.1v1</strong> - External access settings</li>
-<li><strong>MS.TEAMS.2.2v1</strong> - Guest access policies</li>
-<li><strong>MS.TEAMS.2.3v1</strong> - Federation settings</li>
-</ul>
-<h4>Data Protection</h4>
-<ul>
-<li><strong>MS.TEAMS.3.1v1</strong> - DLP policies for Teams</li>
-<li><strong>MS.TEAMS.3.2v1</strong> - Message retention</li>
-<li><strong>MS.TEAMS.3.3v1</strong> - eDiscovery holds</li>
-</ul>
-<h4>Calling &amp; Devices</h4>
-<ul>
-<li><strong>MS.TEAMS.4.1v1</strong> - Emergency calling policies</li>
-<li><strong>MS.TEAMS.4.2v1</strong> - Device management</li>
-<li><strong>MS.TEAMS.4.3v1</strong> - Calling restrictions</li>
-</ul>
-<h4>Compliance</h4>
-<ul>
-<li><strong>MS.TEAMS.5.1v1</strong> - Audit logging enabled</li>
-<li><strong>MS.TEAMS.5.2v1</strong> - Compliance recording</li>
-</ul>
-<p><strong>Framework mappings:</strong>
-- SOC2: CC6.2, CC7.2
-- PCI-DSS: Requirement 4</p>
-<h3>Power Platform - 8 Rules</h3>
-<h4>DLP Policies</h4>
-<ul>
-<li><strong>MS.POWERPLATFORM.1.1v1</strong> - DLP policies configured</li>
-<li><strong>MS.POWERPLATFORM.1.2v1</strong> - Connector classification</li>
-<li><strong>MS.POWERPLATFORM.1.3v1</strong> - Business data protection</li>
-</ul>
-<h4>Environment Management</h4>
-<ul>
-<li><strong>MS.POWERPLATFORM.2.1v1</strong> - Environment creation restrictions</li>
-<li><strong>MS.POWERPLATFORM.2.2v1</strong> - Default environment security</li>
-<li><strong>MS.POWERPLATFORM.2.3v1</strong> - Database encryption</li>
-</ul>
-<h4>Power Apps</h4>
-<ul>
-<li><strong>MS.POWERPLATFORM.3.1v1</strong> - App sharing policies</li>
-<li><strong>MS.POWERPLATFORM.3.2v1</strong> - Connector governance</li>
-<li><strong>MS.POWERPLATFORM.3.3v1</strong> - Trial environment controls</li>
-</ul>
-<h4>Auditing</h4>
-<ul>
-<li><strong>MS.POWERPLATFORM.4.1v1</strong> - Audit logging enabled</li>
-<li><strong>MS.POWERPLATFORM.4.2v1</strong> - Usage analytics</li>
-<li><strong>MS.POWERPLATFORM.4.3v1</strong> - Compliance center integration</li>
-</ul>
-<p><strong>Framework mappings:</strong>
-- SOC2: CC6.1, CC6.8</p>
-<h3>Power BI - 8 Rules</h3>
-<h4>Tenant Settings</h4>
-<ul>
-<li><strong>MS.POWERBI.1.1v1</strong> - External sharing disabled</li>
-<li><strong>MS.POWERBI.1.2v1</strong> - Publish to web disabled</li>
-<li><strong>MS.POWERBI.1.3v1</strong> - Export restrictions</li>
-</ul>
-<h4>Workspace Security</h4>
-<ul>
-<li><strong>MS.POWERBI.2.1v1</strong> - Workspace creation restrictions</li>
-<li><strong>MS.POWERBI.2.2v1</strong> - Sensitivity labels applied</li>
-</ul>
-<h4>Data Protection</h4>
-<ul>
-<li><strong>MS.POWERBI.3.1v1</strong> - Information protection</li>
-<li><strong>MS.POWERBI.3.2v1</strong> - Data lineage tracking</li>
-<li><strong>MS.POWERBI.3.3v1</strong> - Encryption at rest</li>
-</ul>
-<p><strong>Framework mappings:</strong>
-- SOC2: CC6.2, CC8.1</p>
-<h3>Defender for Office 365 - 19 Rules</h3>
-<h4>Safe Links</h4>
-<ul>
-<li><strong>MS.DEFENDER.1.1v1</strong> - Safe Links enabled</li>
-<li><strong>MS.DEFENDER.1.2v1</strong> - Real-time URL scanning</li>
-<li><strong>MS.DEFENDER.1.3v1</strong> - Safe Links for Teams</li>
-</ul>
-<h4>Safe Attachments</h4>
-<ul>
-<li><strong>MS.DEFENDER.2.1v1</strong> - Safe Attachments enabled</li>
-<li><strong>MS.DEFENDER.2.2v1</strong> - Dynamic delivery</li>
-<li><strong>MS.DEFENDER.2.3v1</strong> - Safe attachments for SharePoint</li>
-</ul>
-<h4>Anti-Phishing</h4>
-<ul>
-<li><strong>MS.DEFENDER.3.1v1</strong> - Advanced anti-phishing</li>
-<li><strong>MS.DEFENDER.3.2v1</strong> - Spoof intelligence</li>
-<li><strong>MS.DEFENDER.3.3v1</strong> - Mailbox intelligence</li>
-</ul>
-<h4>Investigation</h4>
-<ul>
-<li><strong>MS.DEFENDER.4.1v1</strong> - Automated investigation enabled</li>
-</ul>
-<p><strong>Framework mappings:</strong>
-- SOC2: CC7.2, CC7.3
-- PCI-DSS: Requirement 5</p>
 <h2>Running M365 Scans</h2>
 <h3>Step 1: Run ScubaGear (Windows PowerShell)</h3>
-<div class="code-block"># Install ScubaGear
+<pre class="code-block"><code># Install ScubaGear
 Install-Module -Name ScubaGear
 
 # Run scan (all domains)
@@ -321,16 +239,16 @@ Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams,powerplatform,defender -OutP
 
 # Run scan (specific domains)
 Invoke-SCuBA -ProductNames aad,exo -OutPath ./ScubaResults
-</div>
+</code></pre>
 <h3>Step 2: Import to AuditKit</h3>
-<div class="code-block"># Import results. The rule mappings ship inside the binary, so this runs from
+<pre class="code-block"><code># Import results. The rule mappings ship inside the binary, so this runs from
 # any directory.
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json
 
 # Generate PDF report
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json -format pdf -output m365-report.pdf
 
-</div>
+</code></pre>
 <h2>M365 License Requirements</h2>
 <h3>Free M365 Features</h3>
 <ul>
@@ -396,18 +314,18 @@ Invoke-SCuBA -ProductNames aad,exo -OutPath ./ScubaResults
 <tr>
 <td>Azure Infrastructure</td>
 <td>Not covered</td>
-<td>Via Azure scan (174 controls)</td>
+<td>Via Azure scan (277 controls)</td>
 </tr>
 </tbody>
 </table></div>
 <p><strong>Recommendation:</strong> Run both for complete coverage</p>
-<div class="code-block"># Scan Azure infrastructure
+<pre class="code-block"><code># Scan Azure infrastructure
 ./auditkit scan -provider azure -framework soc2
 
 # Scan M365 applications
 Invoke-SCuBA -ProductNames aad,exo,sharepoint,teams -OutPath ./ScubaResults
 ./auditkit integrate -source scubagear -file ScubaResults/ScubaResults_*.json
-</div>
+</code></pre>
 <h2>Next Steps</h2>
 <ul>
 <li><strong><a href="../setup/m365.html">M365 Setup Guide →</a></strong></li>

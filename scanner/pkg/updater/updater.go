@@ -64,12 +64,15 @@ func CheckForUpdates() {
 	defer resp.Body.Close()
 
 	var release ReleaseInfo
-	json.NewDecoder(resp.Body).Decode(&release)
+	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil || release.TagName == "" {
+		fmt.Printf("Could not read the release feed. You have %s.\n", CurrentVersion)
+		return
+	}
 
 	// A plain string compare says v0.9.0 > v0.10.0. Compare the numbers.
 	if newerVersion(release.TagName, CurrentVersion) {
 		fmt.Printf("\n New version available: %s (you have %s)\n", release.TagName, CurrentVersion)
-		fmt.Printf("   Update: go install github.com/guardian-nexus/auditkit/scanner/cmd/auditkit@latest\n")
+		fmt.Printf("   Update: go install github.com/guardian-nexus/AuditKit-Community-Edition/scanner/cmd/auditkit@latest\n")
 		fmt.Printf("   Or download: %s\n\n", release.URL)
 	} else {
 		fmt.Printf("You're on the latest version (%s)\n", CurrentVersion)

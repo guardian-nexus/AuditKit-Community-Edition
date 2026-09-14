@@ -101,7 +101,7 @@ chmod +x auditkit-linux-amd64
 ### Upgrade to AuditKit (CMMC Level 2 + Pro Features)
 
 AuditKit includes:
-- **CMMC Level 2** - All 110 Level 2 practices (110 additional controls)
+- **CMMC Level 2** - All 110 Level 2 practices (93 additional practices)
 - **Evidence Package Generator** - C3PAO-ready ZIP files
 - **Exception Management** - Track waivers with compensating controls
 - **Continuous Monitoring** - Scheduled scans with alerting

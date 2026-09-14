@@ -3,33 +3,53 @@ package azure
 import (
 	"context"
 	"fmt"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/mappings"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/applicationinsights/armapplicationinsights"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/databricks/armdatabricks"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/keyvault/armkeyvault"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/security/armsecurity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/sql/armsql"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage"
-	"github.com/guardian-nexus/auditkit/scanner/pkg/azure/checks"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/azure/checks"
+	"github.com/guardian-nexus/AuditKit-Community-Edition/scanner/pkg/vuln/azuredefender"
 	msgraphsdk "github.com/microsoftgraph/msgraph-sdk-go"
 )
 
 type AzureScanner struct {
+	// Cached result of runSuites, so the shared suite list runs once per scan.
+	suiteCache  []ScanResult
+	suiteCached bool
+
 	subscriptionID      string
 	cred                *azidentity.DefaultAzureCredential
 	graphClient         *msgraphsdk.GraphServiceClient
 	storageClient       *armstorage.AccountsClient
+	aksClient           *armcontainerservice.ManagedClustersClient
 	computeClient       *armcompute.VirtualMachinesClient
 	disksClient         *armcompute.DisksClient
 	networkClient       *armnetwork.VirtualNetworksClient
 	nsgClient           *armnetwork.SecurityGroupsClient
 	nicClient           *armnetwork.InterfacesClient
 	publicIPClient      *armnetwork.PublicIPAddressesClient
+	appGatewayClient    *armnetwork.ApplicationGatewaysClient
+	wafPolicyClient     *armnetwork.WebApplicationFirewallPoliciesClient
+	watcherClient       *armnetwork.WatchersClient
+	flowLogClient       *armnetwork.FlowLogsClient
+	vpnGatewayClient    *armnetwork.VirtualNetworkGatewaysClient
+	bastionClient       *armnetwork.BastionHostsClient
+	kvKeysClient        *armkeyvault.KeysClient
+	kvSecretsClient     *armkeyvault.SecretsClient
+	databricksClient    *armdatabricks.WorkspacesClient
 	sqlClient           *armsql.ServersClient
 	sqlDBClient         *armsql.DatabasesClient
 	keyVaultClient      *armkeyvault.VaultsClient
@@ -37,12 +57,17 @@ type AzureScanner struct {
 	diagnosticClient    *armmonitor.DiagnosticSettingsClient
 	policyClient        *armstorage.ManagementPoliciesClient
 	autoscaleClient     *armmonitor.AutoscaleSettingsClient
+	alertClient         *armmonitor.ActivityLogAlertsClient
+	insightsClient      *armapplicationinsights.ComponentsClient
 	blobServiceClient   *armstorage.BlobServicesClient
+	fileServiceClient   *armstorage.FileServicesClient
 	roleClient          *armauthorization.RoleAssignmentsClient
 	roleDefClient       *armauthorization.RoleDefinitionsClient
-	securityClient      *armsecurity.PricingsClient                 // For Defender checks
+	securityClient      *armsecurity.PricingsClient // For Defender checks
+	subAssessClient     *armsecurity.SubAssessmentsClient
 	autoProvisionClient *armsecurity.AutoProvisioningSettingsClient // For auto-provisioning
 	contactsClient      *armsecurity.ContactsClient                 // For security contacts
+	assessmentsClient   *armsecurity.AssessmentsClient              // Defender's own recommendation results
 }
 
 type ScanResult struct {
@@ -76,6 +101,14 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		return nil, fmt.Errorf("failed to create storage client: %v", err)
 	}
 
+	// CIS AKS coverage is free in both editions: the benchmark is published
+	// free, so the paid tier differs by capability - evidence packages,
+	// multi-account, monitoring - not by which requirements you may see.
+	aksClient, err := armcontainerservice.NewManagedClustersClient(subscriptionID, cred, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create AKS client: %v", err)
+	}
+
 	computeClient, err := armcompute.NewVirtualMachinesClient(subscriptionID, cred, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create compute client: %v", err)
@@ -104,6 +137,51 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 	publicIPClient, err := armnetwork.NewPublicIPAddressesClient(subscriptionID, cred, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create public IP client: %v", err)
+	}
+
+	// The section 7 networking recommendations read five different resources.
+	// networkClient is already the virtual networks client, so it serves the
+	// subnet and resource-group enumeration. The rest are optional: each check
+	// reports ERROR when its own client is absent rather than passing on data
+	// it never saw.
+	appGatewayClient, err := armnetwork.NewApplicationGatewaysClient(subscriptionID, cred, nil)
+	if err != nil {
+		appGatewayClient = nil
+	}
+	wafPolicyClient, err := armnetwork.NewWebApplicationFirewallPoliciesClient(subscriptionID, cred, nil)
+	if err != nil {
+		wafPolicyClient = nil
+	}
+	watcherClient, err := armnetwork.NewWatchersClient(subscriptionID, cred, nil)
+	if err != nil {
+		watcherClient = nil
+	}
+	flowLogClient, err := armnetwork.NewFlowLogsClient(subscriptionID, cred, nil)
+	if err != nil {
+		flowLogClient = nil
+	}
+	vpnGatewayClient, err := armnetwork.NewVirtualNetworkGatewaysClient(subscriptionID, cred, nil)
+	if err != nil {
+		vpnGatewayClient = nil
+	}
+	bastionClient, err := armnetwork.NewBastionHostsClient(subscriptionID, cred, nil)
+	if err != nil {
+		bastionClient = nil
+	}
+
+	// The key and secret objects, for the section 8.3 expiry and rotation
+	// recommendations. The vault client alone cannot see them.
+	kvKeysClient, err := armkeyvault.NewKeysClient(subscriptionID, cred, nil)
+	if err != nil {
+		kvKeysClient = nil
+	}
+	kvSecretsClient, err := armkeyvault.NewSecretsClient(subscriptionID, cred, nil)
+	if err != nil {
+		kvSecretsClient = nil
+	}
+	databricksClient, err := armdatabricks.NewWorkspacesClient(subscriptionID, cred, nil)
+	if err != nil {
+		databricksClient = nil
 	}
 
 	sqlClient, err := armsql.NewServersClient(subscriptionID, cred, nil)
@@ -144,9 +222,26 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 	if err != nil {
 		autoscaleClient = nil
 	}
+
+	// Activity log alert rules and Application Insights answer CIS Azure
+	// section 6.1.2 and 6.1.3. Constructed here, with the field, on purpose:
+	// a field declared without its constructor is a nil client, which fails
+	// every recommendation for want of data instead of reporting a finding.
+	alertClient, err := armmonitor.NewActivityLogAlertsClient(subscriptionID, cred, nil)
+	if err != nil {
+		alertClient = nil
+	}
+	insightsClient, err := armapplicationinsights.NewComponentsClient(subscriptionID, cred, nil)
+	if err != nil {
+		insightsClient = nil
+	}
 	blobServiceClient, err := armstorage.NewBlobServicesClient(subscriptionID, cred, nil)
 	if err != nil {
 		blobServiceClient = nil
+	}
+	fileServiceClient, err := armstorage.NewFileServicesClient(subscriptionID, cred, nil)
+	if err != nil {
+		fileServiceClient = nil
 	}
 
 	roleClient, err := armauthorization.NewRoleAssignmentsClient(subscriptionID, cred, nil)
@@ -165,6 +260,11 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		return nil, fmt.Errorf("failed to create security pricing client: %v", err)
 	}
 
+	subAssessClient, err := armsecurity.NewSubAssessmentsClient(cred, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create sub-assessments client: %v", err)
+	}
+
 	autoProvisionClient, err := armsecurity.NewAutoProvisioningSettingsClient(subscriptionID, cred, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create auto-provisioning client: %v", err)
@@ -175,17 +275,35 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		return nil, fmt.Errorf("failed to create security contacts client: %v", err)
 	}
 
+	// Defender's own recommendation results, which is where the operating
+	// system update assessment surfaces. Constructed with its field, not
+	// declared and left nil.
+	assessmentsClient, err := armsecurity.NewAssessmentsClient(cred, nil)
+	if err != nil {
+		assessmentsClient = nil
+	}
+
 	return &AzureScanner{
 		subscriptionID:      subscriptionID,
 		cred:                cred,
 		graphClient:         graphClient,
 		storageClient:       storageClient,
+		aksClient:           aksClient,
 		computeClient:       computeClient,
 		disksClient:         disksClient,
 		networkClient:       networkClient,
 		nsgClient:           nsgClient,
 		nicClient:           nicClient,
 		publicIPClient:      publicIPClient,
+		appGatewayClient:    appGatewayClient,
+		wafPolicyClient:     wafPolicyClient,
+		watcherClient:       watcherClient,
+		flowLogClient:       flowLogClient,
+		vpnGatewayClient:    vpnGatewayClient,
+		bastionClient:       bastionClient,
+		kvKeysClient:        kvKeysClient,
+		kvSecretsClient:     kvSecretsClient,
+		databricksClient:    databricksClient,
 		sqlClient:           sqlClient,
 		sqlDBClient:         sqlDBClient,
 		keyVaultClient:      keyVaultClient,
@@ -193,12 +311,17 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 		diagnosticClient:    diagnosticClient,
 		policyClient:        policyClient,
 		autoscaleClient:     autoscaleClient,
+		alertClient:         alertClient,
+		insightsClient:      insightsClient,
 		blobServiceClient:   blobServiceClient,
+		fileServiceClient:   fileServiceClient,
 		roleClient:          roleClient,
 		roleDefClient:       roleDefClient,
 		securityClient:      securityClient,
+		subAssessClient:     subAssessClient,
 		autoProvisionClient: autoProvisionClient,
 		contactsClient:      contactsClient,
+		assessmentsClient:   assessmentsClient,
 	}, nil
 }
 
@@ -242,6 +365,9 @@ func (s *AzureScanner) ScanServices(ctx context.Context, services []string, verb
 		results = append(results, s.runPCIChecks(ctx, verbose)...)
 		results = append(results, s.runCMMCChecks(ctx, verbose)...)
 		results = append(results, s.runCISChecks(ctx, verbose)...)
+		// The paths share one suite list, so the same finding arrives once
+		// per path.
+		results = dedupeIdenticalResults(results)
 	default:
 		results = append(results, s.runSOC2Checks(ctx, verbose)...)
 	}
@@ -249,15 +375,37 @@ func (s *AzureScanner) ScanServices(ctx context.Context, services []string, verb
 	return results, nil
 }
 
-func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
-	if verbose {
-		fmt.Println("Running SOC2 compliance checks for Azure...")
-	}
-
-	// Run SOC2 CC1-CC9 check modules
-	soc2Checks := []checks.Check{
+// allSuites is every check suite this provider has, constructed once.
+//
+// Each framework path used to hand-pick its own subset, so a suite claiming a
+// framework ran only if somebody had remembered to add it to that path. The PCI
+// path built four suites while more than thirty carried PCI tags, so a PCI scan
+// reported a fraction of what the mappings already covered.
+//
+// The framework filter belongs at the report layer, where
+// controlMatchesFramework already applies it - including to the results that
+// carry no Frameworks field and match through their control id in the
+// framework's catalog, which an in-scan filter on tag presence drops.
+//
+// Every framework path runs this list exactly once, through runSuites, and
+// constructs no suite of its own. A path that built a suite here as well ran
+// it twice and reported every one of its rows twice, with each FAIL counted
+// twice in the score.
+func (s *AzureScanner) allSuites() []checks.Check {
+	return []checks.Check{
+		checks.NewDefenderChecks(s.subscriptionID, s.securityClient, s.autoProvisionClient, s.contactsClient),
+		checks.NewAKSChecks(s.aksClient, s.subscriptionID), // CIS AKS v1.8.0
+		checks.NewAzureCISManualChecks(s.subscriptionID),
+		checks.NewCISFoundationsManualChecks(),                                                // CIS Azure Foundations v6.0.0, the Manual recommendations
+		checks.NewCISStorageChecks(s.storageClient, s.blobServiceClient, s.fileServiceClient), // CIS Azure v6.0.0 section 9
+		checks.NewCISActivityAlertChecks(s.alertClient, s.insightsClient, s.subscriptionID),   // CIS Azure v6.0.0 sections 6.1.2 and 6.1.3
+		checks.NewCISIdentityDefenderChecks(s.roleClient, s.roleDefClient, s.securityClient, // CIS Azure v6.0.0 sections 5.3.3, 5.4 and 8.1
+			s.contactsClient, s.assessmentsClient, s.subscriptionID),
+		checks.NewCISNetworkChecks(s.appGatewayClient, s.wafPolicyClient, s.networkClient, // CIS Azure v6.0.0 section 7
+			s.watcherClient, s.flowLogClient, s.vpnGatewayClient, s.bastionClient),
+		checks.NewCISKeyVaultChecks(s.keyVaultClient, s.kvKeysClient, s.kvSecretsClient),       // CIS Azure v6.0.0 section 8.3
+		checks.NewCISDatabricksChecks(s.databricksClient, s.networkClient, s.diagnosticClient), // CIS Azure v6.0.0 section 2.1
+		checks.NewAppServiceChecks(s.subscriptionID),
 		checks.NewAzureCC1Checks(s.roleClient, s.roleDefClient),
 		checks.NewAzureCC2Checks(),
 		checks.NewAzureCC3Checks(s.monitorClient),
@@ -276,18 +424,31 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 		checks.NewKeyVaultChecks(s.keyVaultClient),
 		checks.NewMonitoringChecks(s.monitorClient, s.subscriptionID),
 		checks.NewIdentityChecks(s.subscriptionID),
+		checks.NewAzureCMMCLevel1Checks(s.roleClient, s.storageClient, s.nsgClient, s.graphClient, s.subscriptionID),
+		// PCI-DSS v4.0.1 requirements. Previously constructed by the PCI path
+		// alone, which is the one place a suite must not be built.
+		checks.NewAzurePCIChecks(s.storageClient, s.nsgClient, s.roleClient, s.sqlDBClient,
+			s.monitorClient, s.graphClient, s.diagnosticClient, s.subscriptionID),
 	}
+}
 
-	for _, check := range soc2Checks {
+// runSuites runs every suite and converts the results. Shared by the framework
+// paths so none of them can quietly run a different set.
+func (s *AzureScanner) runSuites(ctx context.Context, verbose bool) []ScanResult {
+	// Run once per scan. The framework paths share this list, so a scan
+	// that calls several of them would otherwise re-run every suite.
+	if s.suiteCached {
+		return append([]ScanResult(nil), s.suiteCache...)
+	}
+	var results []ScanResult
+	for _, check := range s.allSuites() {
 		if verbose {
-			fmt.Printf("  Running %s...\n", check.Name())
+			fmt.Printf("   Running %s...\n", check.Name())
 		}
-
 		checkResults, err := check.Run(ctx)
 		if err != nil && verbose {
-			fmt.Printf("    Warning in %s: %v\n", check.Name(), err)
+			fmt.Printf("     Warning in %s: %v\n", check.Name(), err)
 		}
-
 		for _, cr := range checkResults {
 			results = append(results, ScanResult{
 				Control:           cr.Control,
@@ -296,61 +457,95 @@ func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanRe
 				Evidence:          cr.Evidence,
 				Remediation:       cr.Remediation,
 				RemediationDetail: cr.RemediationDetail,
-				Severity:          cr.Priority.Level,
+				Severity:          severityOf(cr),
 				ScreenshotGuide:   cr.ScreenshotGuide,
 				ConsoleURL:        cr.ConsoleURL,
 				Frameworks:        cr.Frameworks,
 			})
 		}
 	}
+	s.suiteCache, s.suiteCached = results, true
+	return append([]ScanResult(nil), results...)
+}
+
+// severityOf reads a result's severity from whichever field the suite filled.
+// The AWS and Azure suites mostly set Severity; a few set only Priority.Level,
+// and the framework paths that used to run those suites directly read that
+// field. Now that every suite reaches the report through runSuites, a blank
+// here would drop a HIGH finding to LOW at the report layer.
+func severityOf(cr checks.CheckResult) string {
+	if cr.Severity != "" {
+		return cr.Severity
+	}
+	return cr.Priority.Level
+}
+func (s *AzureScanner) runSOC2Checks(ctx context.Context, verbose bool) []ScanResult {
+	var results []ScanResult
+
+	if verbose {
+		fmt.Println("Running SOC2 compliance checks for Azure...")
+	}
+
+	// Run SOC2 CC1-CC9 check modules
+
+	results = append(results, s.runSuites(ctx, verbose)...)
 
 	return results
 }
 
-func (s *AzureScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
-	if verbose {
-		fmt.Println("Running PCI-DSS v4.0.1 checks for Azure...")
-		fmt.Println("Checking all 12 PCI-DSS requirements...")
+// runVulnCoverage builds the vulnerability coverage check for one framework and
+// converts its results. emit keeps the CMMC and PCI passes from each reporting
+// the other's control, which would double-count it on a scan of all frameworks.
+func (s *AzureScanner) runVulnCoverage(ctx context.Context, emit checks.Emit) []ScanResult {
+	vc := checks.NewVulnCoverageChecks(azuredefender.Clients{
+		Pricing:        s.securityClient,
+		SubAssessments: s.subAssessClient,
+		VMs:            s.computeClient,
+	}, s.subscriptionID, emit)
+	crs, err := vc.Run(ctx)
+	if err != nil {
+		return nil
 	}
-
-	// Use the comprehensive AzurePCIChecks implementation
-	pciChecker := checks.NewAzurePCIChecks(
-		s.storageClient,
-		s.nsgClient,
-		s.roleClient,
-		s.sqlDBClient,
-		s.monitorClient,
-		s.graphClient,
-		s.diagnosticClient,
-		s.subscriptionID,
-	)
-
-	checkResults, _ := pciChecker.Run(ctx)
-	for _, cr := range checkResults {
-		results = append(results, ScanResult{
+	out := make([]ScanResult, 0, len(crs))
+	for _, cr := range crs {
+		out = append(out, ScanResult{
 			Control:           cr.Control,
 			Name:              cr.Name,
 			Status:            cr.Status,
 			Evidence:          cr.Evidence,
 			Remediation:       cr.Remediation,
 			RemediationDetail: cr.RemediationDetail,
-			Severity:          cr.Priority.Level,
+			Severity:          cr.Severity,
 			ScreenshotGuide:   cr.ScreenshotGuide,
 			ConsoleURL:        cr.ConsoleURL,
 			Frameworks:        cr.Frameworks,
 		})
 	}
+	return out
+}
+
+func (s *AzureScanner) runPCIChecks(ctx context.Context, verbose bool) []ScanResult {
+	if verbose {
+		fmt.Println("Running PCI-DSS v4.0.1 checks for Azure...")
+	}
+
+	// Every suite, once. The PCI requirements suite is in allSuites with the
+	// rest; building it here as well ran it twice.
+	//
+	// runSuites hands back the per-scan cache. Clone it before appending, or
+	// this path's extra rows land in the cache's spare capacity, where the next
+	// path to append would overwrite them.
+	results := slices.Clone(s.runSuites(ctx, verbose))
+
+	// PCI-DSS 11.3.1 wants scans quarterly across every in-scope system.
+	results = append(results, s.runVulnCoverage(ctx, checks.EmitPCI)...)
 
 	return results
 }
 
 func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
 	if verbose {
-		fmt.Println("Running CMMC Level 1 - Open Source (the level defines 17 practices)")
+		fmt.Println("Running CMMC - all 110 practices reported, the technical ones measured")
 		fmt.Println("")
 		fmt.Println("IMPORTANT DISCLAIMER:")
 		fmt.Println("This scanner tests technical controls that can be automated.")
@@ -365,10 +560,55 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 		fmt.Println("")
 	}
 
-	level1 := checks.NewAzureCMMCLevel1Checks(s.roleClient, s.storageClient, s.nsgClient, s.graphClient, s.subscriptionID)
-	results1, _ := level1.Run(ctx)
-	for _, cr := range results1 {
-		results = append(results, ScanResult{
+	// Every suite, once. The Level 1 suite is in allSuites with the rest;
+	// building it here as well reported each practice it measures twice.
+	results := slices.Clone(s.runSuites(ctx, verbose))
+
+	// Vulnerability scan coverage, read from Defender rather than asked for as a document.
+	results = append(results, s.runVulnCoverage(ctx, checks.EmitCMMC)...)
+
+	// Every practice nothing above reported, reported as a manual requirement.
+	// A CMMC report's denominator is the benchmark's 110, not the subset this
+	// provider can automate, or a reader cannot tell an absent practice from a
+	// satisfied one. This runs after every suite, so a practice a non-CMMC
+	// suite answered is not reported again as unanswered.
+	results = append(results, s.reportRemainingCMMCPractices(ctx, results)...)
+	results = append(results, s.reportRemainingCISAKS(ctx, results)...)
+
+	if verbose {
+		fmt.Printf("\nCMMC scan complete: all %d practices reported\n", mappings.CMMCPracticeCount)
+		fmt.Println("")
+		fmt.Println("WHAT AUDITKIT PRO ADDS:")
+		fmt.Println("  - More of the 110 practices measured rather than asked for")
+		fmt.Println("  - Evidence packages an assessor can read directly")
+		fmt.Println("  - Multi-account scanning and continuous monitoring")
+		fmt.Println("")
+		fmt.Println("Visit https://auditkit.io/pro")
+	}
+
+	return results
+}
+
+// reportRemainingCMMCPractices fills in the practices the suites above did not
+// name. The covered set is computed from the results just produced rather than
+// kept by hand, so adding an automated check for a practice removes it from
+// here automatically instead of leaving it reported twice.
+func (s *AzureScanner) reportRemainingCMMCPractices(ctx context.Context, reported []ScanResult) []ScanResult {
+	covered := map[string]bool{}
+	for _, r := range reported {
+		covered[r.Control] = true
+		// A tag may name more than one practice. None do today, but a
+		// single-key read would silently report both of them again.
+		for _, id := range strings.Split(r.Frameworks["CMMC"], ",") {
+			if id = strings.TrimSpace(id); id != "" {
+				covered[id] = true
+			}
+		}
+	}
+	var out []ScanResult
+	rows, _ := checks.NewCMMCPracticeReport(covered).Run(ctx)
+	for _, cr := range rows {
+		out = append(out, ScanResult{
 			Control:           cr.Control,
 			Name:              cr.Name,
 			Status:            cr.Status,
@@ -381,131 +621,71 @@ func (s *AzureScanner) runCMMCChecks(ctx context.Context, verbose bool) []ScanRe
 			Frameworks:        cr.Frameworks,
 		})
 	}
-
-	if verbose {
-		fmt.Printf("\nCMMC Level 1 scan complete: %d controls tested\n", len(results))
-		fmt.Println("")
-		fmt.Println("UNLOCK CMMC LEVEL 2:")
-		fmt.Println("  - All 110 CMMC Level 2 practices for CUI")
-		fmt.Println("  - Required for DoW contractors handling CUI")
-		fmt.Println("  - Complete evidence collection guides")
-		fmt.Println("  - November 10, 2025 deadline compliance")
-		fmt.Println("")
-		fmt.Println("Visit https://auditkit.io/pro for full CMMC Level 2")
-	}
-
-	return results
+	return out
 }
 
 func (s *AzureScanner) runCISChecks(ctx context.Context, verbose bool) []ScanResult {
-	var results []ScanResult
-
 	if verbose {
-		fmt.Println("Running CIS Microsoft Azure Foundations Benchmark v3.0")
-		fmt.Println("")
+		cisEd, _ := mappings.EditionFor("CIS-Azure")
+		fmt.Println("Running " + cisEd.Describe())
 	}
 
-	// Run existing Azure check modules - they now return results with CIS mappings
-	checkModules := []checks.Check{
-		checks.NewAADChecks(s.roleClient, s.roleDefClient, s.graphClient),
-		checks.NewStorageChecks(s.storageClient),
-		checks.NewComputeChecks(s.computeClient, s.disksClient, s.nicClient, s.publicIPClient),
-		checks.NewNetworkChecks(s.nsgClient),
-		checks.NewSQLChecks(s.sqlDBClient, s.sqlClient),
-		checks.NewKeyVaultChecks(s.keyVaultClient),
-		checks.NewMonitoringChecks(s.monitorClient, s.subscriptionID),
-		checks.NewIdentityChecks(s.subscriptionID),
-		// Add CIS manual checks for Azure Monitor alerts
-		checks.NewAzureCISManualChecks(s.subscriptionID),
-		// Add Microsoft Defender for Cloud checks - NOW AUTOMATED!
-		checks.NewDefenderChecks(s.subscriptionID, s.securityClient, s.autoProvisionClient, s.contactsClient),
-		// Add App Service checks
-		checks.NewAppServiceChecks(s.subscriptionID),
+	// Every suite, once. This path used to build eleven suites of its own and
+	// never call runSuites, so the CIS Azure v6.0.0 suites never ran on a
+	// cis-azure scan; it also kept only the rows tagged CIS-Azure, dropping a
+	// recommendation answered under its control id alone. The framework filter
+	// lives at the report layer, in controlMatchesFramework.
+	return slices.Clone(s.runSuites(ctx, verbose))
+}
+
+// dedupeIdenticalResults removes results that are the same finding reported by
+// more than one framework path. It keys on control, status and evidence, so
+// genuinely distinct findings that share a control id - several resources
+// failing the same criterion - are preserved.
+//
+// Needed since the framework paths share one suite list: a scan that runs
+// several of them, which is what the derived frameworks do, would otherwise
+// report every finding once per path.
+func dedupeIdenticalResults(results []ScanResult) []ScanResult {
+	seen := make(map[string]bool, len(results))
+	deduped := make([]ScanResult, 0, len(results))
+	for _, result := range results {
+		key := result.Control + "\x00" + result.Status + "\x00" + result.Evidence
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		deduped = append(deduped, result)
 	}
+	return deduped
+}
 
-	// Track which CIS sections we're covering
-	sectionCounts := make(map[string]int)
-
-	for _, check := range checkModules {
-		if verbose {
-			fmt.Printf("  Running %s...\n", check.Name())
-		}
-
-		checkResults, checkErr := check.Run(ctx)
-		if checkErr != nil && verbose {
-			fmt.Printf("    Warning: %v\n", checkErr)
-		}
-
-		for _, cr := range checkResults {
-			// Check if this control has CIS-Azure mapping in Frameworks
-			if cr.Frameworks != nil && cr.Frameworks["CIS-Azure"] != "" {
-				cisControls := cr.Frameworks["CIS-Azure"]
-
-				// Track section coverage - parse section number from control ID or framework value
-				// Handle various formats: "1.1", "1.1, 1.2", "2.1.1", etc.
-				section := ""
-				if strings.HasPrefix(cr.Control, "CIS-") {
-					// Extract from Control ID like "CIS-1.1" or "CIS-2.1.1"
-					parts := strings.Split(cr.Control, "-")
-					if len(parts) > 1 {
-						// Get first character after "CIS-"
-						section = string(parts[1][0])
-					}
-				} else if len(cisControls) > 0 {
-					// Extract from Frameworks value like "1.1" or "2.1.1"
-					section = string(cisControls[0])
-				}
-
-				// Map section number to section name
-				switch section {
-				case "1":
-					sectionCounts["Identity and Access Management"]++
-				case "2":
-					sectionCounts["Microsoft Defender for Cloud"]++
-				case "3":
-					sectionCounts["Storage Accounts"]++
-				case "4":
-					sectionCounts["Database Services"]++
-				case "5":
-					sectionCounts["Logging and Monitoring"]++
-				case "6":
-					sectionCounts["Networking"]++
-				case "7":
-					sectionCounts["Virtual Machines"]++
-				case "8":
-					sectionCounts["Key Vault"]++
-				case "9":
-					sectionCounts["AppService"]++
-				}
-
-				results = append(results, ScanResult{
-					Control:           cr.Control,
-					Name:              cr.Name,
-					Status:            cr.Status,
-					Evidence:          cr.Evidence,
-					Remediation:       cr.Remediation,
-					RemediationDetail: cr.RemediationDetail,
-					Severity:          cr.Priority.Level,
-					ScreenshotGuide:   cr.ScreenshotGuide,
-					ConsoleURL:        cr.ConsoleURL,
-					Frameworks:        cr.Frameworks,
-				})
+// reportRemainingCISAKS accounts for the CIS-AKS recommendations the checks
+// above did not reach. The assessed set is derived from the results just
+// produced, so answering one removes it from the gap rather than leaving it
+// counted both ways.
+func (s *AzureScanner) reportRemainingCISAKS(ctx context.Context, reported []ScanResult) []ScanResult {
+	assessed := map[string]bool{}
+	for _, r := range reported {
+		for _, id := range strings.Split(r.Frameworks["CIS-AKS"], ",") {
+			if id = strings.TrimSpace(id); id != "" {
+				assessed[id] = true
 			}
 		}
 	}
-
-	if verbose {
-		fmt.Printf("\nCIS Azure scan complete: %d controls tested\n", len(results))
-		if len(sectionCounts) > 0 {
-			fmt.Println("\nSection Coverage:")
-			for section, count := range sectionCounts {
-				fmt.Printf("  %s: %d controls\n", section, count)
-			}
-		}
-		fmt.Println("\nNote: CIS Azure Benchmark v3.0 has ~100 total controls")
-		fmt.Println("This scan covers controls automatable via Azure API")
-		fmt.Println("")
+	rows, _ := checks.NewCISAKSReport(assessed).Run(ctx)
+	var out []ScanResult
+	for _, cr := range rows {
+		out = append(out, ScanResult{
+			Control:         cr.Control,
+			Name:            cr.Name,
+			Status:          cr.Status,
+			Evidence:        cr.Evidence,
+			Remediation:     cr.Remediation,
+			Severity:        cr.Severity,
+			ScreenshotGuide: cr.ScreenshotGuide,
+			Frameworks:      cr.Frameworks,
+		})
 	}
-
-	return results
+	return out
 }
