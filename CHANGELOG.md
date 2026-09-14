@@ -5,6 +5,10 @@ All notable changes to AuditKit will be documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- An imported ScubaGear or Prowler run reported only the controls the
+  mapping file knew, so a SOC2 report from it had a denominator of a few
+  findings instead of 43. It carries the whole catalog, as a scan does. The
+  800-53 and FedRAMP summary row counts the catalog rather than rows.
 - 12 CMMC checks reported FAIL when the API call was denied, so a missing
   IAM permission scored as a compliance failure. They report ERROR, which
   is excluded from the score, as the rest of the scanner does.

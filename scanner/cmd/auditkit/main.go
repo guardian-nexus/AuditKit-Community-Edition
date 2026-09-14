@@ -422,6 +422,7 @@ func convertIntegrationResults(results []integrations.IntegrationResult, provide
 		score = float64(passed) / float64(automatedChecks) * 100
 	}
 
+	controls = completeFramework(controls, framework)
 	return ComplianceResult{
 		Timestamp:       time.Now(),
 		Provider:        provider,
@@ -923,6 +924,81 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 		fmt.Fprintf(os.Stderr, "Unknown format: %s\n", format)
 		os.Exit(1)
 	}
+}
+
+// completeFramework reports on every control the framework defines. Anything
+// the scan could not evaluate is emitted as MANUAL rather than omitted, so the
+// control count is the framework's real denominator instead of "whatever we
+// happened to check". Every path that produces a framework-labelled report
+// comes through here: the single-account scan and an imported ScubaGear
+// or Prowler run. Only the single-account
+// scan used to, so the others showed a denominator of what was checked.
+func completeFramework(controls []ControlResult, framework string) []ControlResult {
+	if framework != "all" {
+		missing := mappings.MissingControls(framework, reportedControlIDs(framework, controls))
+
+		// 800-53 and its FedRAMP baselines report the uncovered set as one
+		// count. Listing it adds about a thousand rows to a scan that found
+		// roughly 150 things, and a reader looking for the findings would have
+		// to page past every one. The rule lives in pkg/mappings so both
+		// editions draw the same line.
+		if mappings.ShouldSummariseUncovered(framework) && len(missing) > 0 {
+			// The catalog is the denominator; what the scan reached is the rest.
+			// Counting rows put INFO and ERROR rows, and every row of a control
+			// reported more than once, into the assessed figure and pushed the
+			// total past the catalog.
+			total := len(mappings.CatalogFor(framework))
+			assessed := total - len(missing)
+			controls = append(controls, ControlResult{
+				ID:       strings.ToUpper(framework) + "-UNCOVERED",
+				Name:     "Controls not assessed by this scan",
+				Category: "Manual Documentation",
+				Severity: "MEDIUM",
+				Status:   "MANUAL",
+				Evidence: fmt.Sprintf(
+					"MANUAL: %d of %d controls were assessed. The remaining %d are largely policy, "+
+						"process and personnel controls that a configuration scan cannot evidence; "+
+						"they are enumerated in the framework catalog rather than listed here.",
+					assessed, total, len(missing)),
+				Remediation: "Collect the policy, procedure and personnel evidence for the controls " +
+					"this scan does not reach, and store it with the audit package.",
+				Priority:   "MEDIUM",
+				Frameworks: map[string]string{strings.ToUpper(framework): "coverage"},
+			})
+			missing = nil
+		}
+
+		missingIDs := make([]string, 0, len(missing))
+		for id := range missing {
+			missingIDs = append(missingIDs, id)
+		}
+		// Map iteration order is randomised, which made two identical scans emit
+		// rows (and evidence folders) in a different order every run.
+		sort.Strings(missingIDs)
+		for _, id := range missingIDs {
+			title := missing[id]
+			// The CIS catalogs carry an assessment type where the others
+			// carry a title, because CIS titles are their content and are
+			// deliberately not shipped. Using the value as a name would
+			// label the row "Automated".
+			if title == "Automated" || title == "Manual" {
+				title = "Benchmark recommendation not assessed (" + title + ")"
+			}
+			controls = append(controls, ControlResult{
+				ID:              id,
+				Name:            title,
+				Category:        "Manual Documentation",
+				Severity:        "MEDIUM",
+				Status:          "MANUAL",
+				Evidence:        "MANUAL: No automated check covers this control. Document how it is satisfied and retain the evidence.",
+				Remediation:     "Collect the policy, procedure or configuration evidence that demonstrates this control, and store it with the audit package.",
+				Priority:        "MEDIUM",
+				ScreenshotGuide: "Capture the document or console view that demonstrates this control is implemented.",
+				Frameworks:      map[string]string{strings.ToUpper(framework): id},
+			})
+		}
+	}
+	return controls
 }
 
 func performScan(provider, profile, framework string, verbose bool, services string) ComplianceResult {
@@ -1503,75 +1579,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 		}
 	}
 
-	// Report on every control the framework defines. Anything the scan could not
-	// evaluate is emitted as MANUAL rather than omitted, so the control count is
-	// the framework's real denominator instead of "whatever we happened to check".
-	if framework != "all" {
-		missing := mappings.MissingControls(framework, reportedControlIDs(framework, controls))
-
-		// 800-53 and its FedRAMP baselines report the uncovered set as one
-		// count. Listing it adds about a thousand rows to a scan that found
-		// roughly 150 things, and a reader looking for the findings would have
-		// to page past every one. The rule lives in pkg/mappings so both
-		// editions draw the same line.
-		if mappings.ShouldSummariseUncovered(framework) && len(missing) > 0 {
-			assessed := 0
-			for _, c := range controls {
-				if c.Status != "MANUAL" {
-					assessed++
-				}
-			}
-			total := assessed + len(missing)
-			controls = append(controls, ControlResult{
-				ID:       strings.ToUpper(framework) + "-UNCOVERED",
-				Name:     "Controls not assessed by this scan",
-				Category: "Manual Documentation",
-				Severity: "MEDIUM",
-				Status:   "MANUAL",
-				Evidence: fmt.Sprintf(
-					"MANUAL: %d of %d controls were assessed. The remaining %d are largely policy, "+
-						"process and personnel controls that a configuration scan cannot evidence; "+
-						"they are enumerated in the framework catalog rather than listed here.",
-					assessed, total, len(missing)),
-				Remediation: "Collect the policy, procedure and personnel evidence for the controls " +
-					"this scan does not reach, and store it with the audit package.",
-				Priority:   "MEDIUM",
-				Frameworks: map[string]string{strings.ToUpper(framework): "coverage"},
-			})
-			missing = nil
-		}
-
-		missingIDs := make([]string, 0, len(missing))
-		for id := range missing {
-			missingIDs = append(missingIDs, id)
-		}
-		// Map iteration order is randomised, which made two identical scans emit
-		// rows (and evidence folders) in a different order every run.
-		sort.Strings(missingIDs)
-		for _, id := range missingIDs {
-			title := missing[id]
-			// The CIS catalogs carry an assessment type where the others
-			// carry a title, because CIS titles are their content and are
-			// deliberately not shipped. Using the value as a name would
-			// label the row "Automated".
-			if title == "Automated" || title == "Manual" {
-				title = "Benchmark recommendation not assessed (" + title + ")"
-			}
-			controls = append(controls, ControlResult{
-				ID:              id,
-				Name:            title,
-				Category:        "Manual Documentation",
-				Severity:        "MEDIUM",
-				Status:          "MANUAL",
-				Evidence:        "MANUAL: No automated check covers this control. Document how it is satisfied and retain the evidence.",
-				Remediation:     "Collect the policy, procedure or configuration evidence that demonstrates this control, and store it with the audit package.",
-				Priority:        "MEDIUM",
-				ScreenshotGuide: "Capture the document or console view that demonstrates this control is implemented.",
-				Frameworks:      map[string]string{strings.ToUpper(framework): id},
-			})
-		}
-	}
-
+	controls = completeFramework(controls, framework)
 	score := 0.0
 	automatedChecks := passed + failed
 	if automatedChecks > 0 {
