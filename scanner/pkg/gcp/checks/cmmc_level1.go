@@ -150,7 +150,7 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:    "AC.L1-3.1.2",
 			Name:       "[CMMC L1] Limit Access to Authorized Types",
-			Status:     "FAIL",
+			Status:     "ERROR",
 			Evidence:   "Unable to verify role assignments",
 			Priority:   PriorityCritical,
 			Timestamp:  time.Now(),
@@ -163,7 +163,7 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:    "AC.L1-3.1.2",
 			Name:       "[CMMC L1] Limit Access to Authorized Types",
-			Status:     "FAIL",
+			Status:     "ERROR",
 			Evidence:   "Unable to retrieve IAM policy",
 			Priority:   PriorityCritical,
 			Timestamp:  time.Now(),
@@ -211,7 +211,7 @@ func (c *GCPCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:    "IA.L1-3.5.1",
 			Name:       "[CMMC L1] Identify Users",
-			Status:     "FAIL",
+			Status:     "ERROR",
 			Evidence:   "Unable to verify user identities",
 			Priority:   PriorityCritical,
 			Timestamp:  time.Now(),
@@ -224,7 +224,7 @@ func (c *GCPCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:    "IA.L1-3.5.1",
 			Name:       "[CMMC L1] Identify Users",
-			Status:     "FAIL",
+			Status:     "ERROR",
 			Evidence:   "Unable to retrieve IAM policy",
 			Priority:   PriorityCritical,
 			Timestamp:  time.Now(),
@@ -345,7 +345,7 @@ func (c *GCPCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:     "SC.L1-3.13.1",
 			Name:        "[CMMC L1] Monitor Communications",
-			Status:      "FAIL",
+			Status:      "ERROR",
 			Evidence:    "Unable to verify VPC firewall rules",
 			Remediation: "Configure VPC firewall rules",
 			Priority:    PriorityCritical,

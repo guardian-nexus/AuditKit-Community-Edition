@@ -178,7 +178,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:         "AC.L1-3.1.2",
 			Name:            "[CMMC L1] Limit Access to Permitted Transactions",
-			Status:          "FAIL",
+			Status:          "ERROR",
 			Evidence:        fmt.Sprintf("Unable to verify IAM policies: %v", err),
 			Remediation:     "Configure IAM policies to limit access to permitted functions and transactions",
 			Priority:        PriorityCritical,
@@ -225,7 +225,7 @@ func (c *AWSCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:         "IA.L1-3.5.1",
 			Name:            "[CMMC L1] Identify Users",
-			Status:          "FAIL",
+			Status:          "ERROR",
 			Evidence:        fmt.Sprintf("Unable to verify user identities: %v", err),
 			Remediation:     "Ensure IAM users have unique identities",
 			Priority:        PriorityCritical,
@@ -282,7 +282,7 @@ func (c *AWSCMMCLevel1Checks) CheckIA_L1_002(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:         "IA.L1-3.5.2",
 			Name:            "[CMMC L1] Authenticate Users",
-			Status:          "FAIL",
+			Status:          "ERROR",
 			Evidence:        fmt.Sprintf("Unable to verify authentication: %v", err),
 			Remediation:     "Configure MFA for all users",
 			Priority:        PriorityCritical,
@@ -411,7 +411,7 @@ func (c *AWSCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult {
 		return CheckResult{
 			Control:         "SC.L1-3.13.1",
 			Name:            "[CMMC L1] Monitor Communications",
-			Status:          "FAIL",
+			Status:          "ERROR",
 			Evidence:        fmt.Sprintf("Unable to verify security groups: %v", err),
 			Remediation:     "Configure VPC security groups to monitor network traffic",
 			Priority:        PriorityCritical,

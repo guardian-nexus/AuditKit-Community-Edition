@@ -200,7 +200,7 @@ func (c *AzureCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult 
 		return CheckResult{
 			Control:         "AC.L1-3.1.2",
 			Name:            "[CMMC L1] Limit System Access to Authorized Types",
-			Status:          "FAIL",
+			Status:          "ERROR",
 			Evidence:        fmt.Sprintf("Unable to verify role assignments: %v", err),
 			Remediation:     "Configure RBAC to limit access to authorized transaction types",
 			Priority:        PriorityCritical,
@@ -259,7 +259,7 @@ func (c *AzureCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult 
 		return CheckResult{
 			Control:         "IA.L1-3.5.1",
 			Name:            "[CMMC L1] Identify Users",
-			Status:          "FAIL",
+			Status:          "ERROR",
 			Evidence:        fmt.Sprintf("Unable to verify Azure AD users: %v", err),
 			Remediation:     "Ensure Azure AD is configured with unique user identities",
 			Priority:        PriorityCritical,
@@ -429,7 +429,7 @@ func (c *AzureCMMCLevel1Checks) CheckSC_L1_001(ctx context.Context) CheckResult 
 		return CheckResult{
 			Control:         "SC.L1-3.13.1",
 			Name:            "[CMMC L1] Monitor Communications",
-			Status:          "FAIL",
+			Status:          "ERROR",
 			Evidence:        fmt.Sprintf("Unable to verify NSGs: %v", err),
 			Remediation:     "Configure Network Security Groups",
 			Priority:        PriorityCritical,

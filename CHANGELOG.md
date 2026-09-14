@@ -5,6 +5,10 @@ All notable changes to AuditKit will be documented in this file.
 ## [Unreleased]
 
 ### Fixed
+- 12 CMMC checks reported FAIL when the API call was denied, so a missing
+  IAM permission scored as a compliance failure. They report ERROR, which
+  is excluded from the score, as the rest of the scanner does.
+- The usage footer linked the old repository.
 - A framework-filtered scan (`-framework cmmc`, `pci`, `cis-aws`, ...) ran
   every suite twice and reported every row twice, counting each FAIL twice
   in the score: 123 rows for 110 CMMC practices. Each path now runs the

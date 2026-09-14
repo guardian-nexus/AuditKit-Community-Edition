@@ -208,7 +208,7 @@ Examples:
   # Show all controls (not truncated)
   auditkit scan -provider aws -framework cmmc --full
 
-For more information: https://github.com/guardian-nexus/auditkit`)
+For more information: https://github.com/guardian-nexus/AuditKit-Community-Edition`)
 }
 
 func runIntegration(source, file, format, output, framework string, verbose bool) {
