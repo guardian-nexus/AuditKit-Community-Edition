@@ -9,18 +9,28 @@
 
   // Bump when the vendors behind a category change. A stored choice from an
   // earlier version is not consent for the new vendor, so the banner is shown
-  // again rather than silently reused. v2 added the Reddit Ads pixel.
-  var CONSENT_VERSION = 2;
+  // again rather than silently reused. v2 added the Reddit Ads pixel; v3 added
+  // Google Analytics.
+  var CONSENT_VERSION = 3;
 
   // Google Ads. Both the tag and its conversion event are marketing, not analytics.
   var GTAG_ID = 'AW-17730440946';
   var GTAG_TRIAL_CONVERSION = 'AW-17730440946/SbTxCICVs_IcEPKdxIZC';
+
+  // Google Analytics 4. Analytics, not marketing: it records what a visitor
+  // does after landing, which until now nothing did - ad clicks arrived and
+  // left with no record of whether they reached pricing, the trial or GitHub.
+  // Shares the gtag.js load with the Ads tag; each is configured only under
+  // its own consent category.
+  var GA4_ID = 'G-1EZ4JDY64S';
 
   // Reddit Ads pixel. Advertiser ID from Reddit Ads Manager > Events Manager.
   var REDDIT_PIXEL_ID = 'a2_jn2kx21yst59';
 
   // Trial CTAs all point at the same Stripe checkout.
   var TRIAL_LINK_MATCH = 'buy.stripe.com';
+  // The free edition's download and source links.
+  var COMMUNITY_LINK_MATCH = 'github.com/guardian-nexus/AuditKit-Community-Edition';
   var TRIAL_VALUE = 297.0;
   var TRIAL_CURRENCY = 'USD';
 
@@ -49,24 +59,58 @@
   }
 
   function applyConsent(prefs) {
+    if (prefs.analytics) {
+      loadGa4();
+    }
     if (prefs.marketing) {
       loadGtag();
       loadRdt();
     }
   }
 
-  function loadGtag() {
-    if (document.getElementById('auditkit-gtag')) return;
-    var s = document.createElement('script');
-    s.id = 'auditkit-gtag';
-    s.async = true;
-    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GTAG_ID;
-    document.head.appendChild(s);
+  // One gtag.js serves both Google products. The script is loaded once; each
+  // product is then configured only when its own category is consented to.
+  var gtagScriptAdded = false;
+  function ensureGtagLoaded() {
+    if (!gtagScriptAdded && !document.getElementById('auditkit-gtag')) {
+      gtagScriptAdded = true;
+      var s = document.createElement('script');
+      s.id = 'auditkit-gtag';
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GTAG_ID;
+      document.head.appendChild(s);
+    }
     window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    window.gtag = gtag;
-    gtag('js', new Date());
-    gtag('config', GTAG_ID);
+    if (typeof window.gtag !== 'function') {
+      window.gtag = function () { dataLayer.push(arguments); };
+      window.gtag('js', new Date());
+    }
+  }
+
+  var adsConfigured = false;
+  function loadGtag() {
+    if (adsConfigured) return;
+    adsConfigured = true;
+    ensureGtagLoaded();
+    window.gtag('config', GTAG_ID);
+  }
+
+  var ga4Configured = false;
+  function loadGa4() {
+    if (ga4Configured) return;
+    ga4Configured = true;
+    ensureGtagLoaded();
+    window.gtag('config', GA4_ID);
+  }
+
+  // Analytics events are addressed to GA4 alone so the Ads tag, which shares
+  // the gtag, never receives them.
+  function analyticsEvent(name, params) {
+    var prefs = window.auditKitConsent;
+    if (!(prefs && prefs.analytics) || !ga4Configured) return;
+    var p = params || {};
+    p.send_to = GA4_ID;
+    window.gtag('event', name, p);
   }
 
   function loadRdt() {
@@ -109,6 +153,8 @@
   }
 
   function checkoutReached() {
+    analyticsEvent('begin_checkout', { value: TRIAL_VALUE, currency: TRIAL_CURRENCY });
+
     if (!marketingAllowed()) return;
 
     // Reddit records this as a funnel step, not a conversion event. Google gets
@@ -123,8 +169,18 @@
   // the same id appears on the webhook's session object, so a server-side
   // Conversions API call can later be matched to this event rather than
   // counting the same trial twice.
+  // trial-started.html retries this until it returns true, so the analytics
+  // event remembers which ids it has sent rather than firing on every retry.
+  var trialReportedToGa4 = {};
   function trialStarted(id) {
-    if (!id || !marketingAllowed()) return false;
+    if (!id) return false;
+
+    if (!trialReportedToGa4[id] && window.auditKitConsent && window.auditKitConsent.analytics && ga4Configured) {
+      trialReportedToGa4[id] = true;
+      analyticsEvent('trial_started', { value: TRIAL_VALUE, currency: TRIAL_CURRENCY, transaction_id: id });
+    }
+
+    if (!marketingAllowed()) return false;
 
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'conversion', {
@@ -153,6 +209,8 @@
       var el = e.target;
       if (!el || typeof el.closest !== 'function') return;
       if (el.closest('a[href*="' + TRIAL_LINK_MATCH + '"]')) checkoutReached();
+      var gh = el.closest('a[href*="' + COMMUNITY_LINK_MATCH + '"]');
+      if (gh) analyticsEvent('community_github', { link_url: gh.href });
     }, true);
   }
 
@@ -261,7 +319,7 @@
       '<label class="cc-toggle"><input type="checkbox" checked disabled><span class="cc-toggle-slider"></span></label>' +
       '</div>' +
       '<div class="cc-category">' +
-      '<div class="cc-category-info"><h4>Analytics</h4><p>Helps us understand how visitors use the site.</p></div>' +
+      '<div class="cc-category-info"><h4>Analytics</h4><p>Helps us understand how visitors use the site (Google Analytics).</p></div>' +
       '<label class="cc-toggle"><input type="checkbox" id="cc-analytics" ' + (current.analytics ? 'checked' : '') + '><span class="cc-toggle-slider"></span></label>' +
       '</div>' +
       '<div class="cc-category">' +
