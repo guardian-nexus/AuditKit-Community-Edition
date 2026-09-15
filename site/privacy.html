@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - AuditKit</title>
+    <meta name="description" content="What AuditKit and Guardian Nexus LLC collect on auditkit.io, at checkout, and in the scanner, and what we do with it.">
+    <link rel="icon" type="image/svg+xml" href="./auditkit-logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <nav class="site-nav" aria-label="Main navigation">
+        <div class="nav-inner">
+            <a href="/" class="nav-logo">
+                <img src="./auditkit-logo-dark.svg" alt="AuditKit">
+            </a>
+            <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+            <div class="nav-links">
+                <a href="/#features">Features</a>
+                <a href="/docs/frameworks/">Frameworks</a>
+                <a href="./pricing.html">Pricing</a>
+                <a href="./docs/">Docs</a>
+                <a href="https://buy.stripe.com/28E14m5MS5xM0mj4r7gnK01" class="nav-cta">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <main id="main">
+    <section class="page-header">
+        <div class="container">
+            <h1>Privacy Policy</h1>
+            <p class="subtitle">Effective 15 September 2026. This page describes what Guardian Nexus LLC collects through auditkit.io and the AuditKit products, and what happens to it.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container-prose">
+            <p>
+                The short version: the website uses a few third-party tags, each of which is off until you allow it. Buying a licence involves Stripe and produces a small customer record on our side. The scanner itself runs on your computer and sends nothing to us. The rest of this page is the detail behind those three sentences.
+            </p>
+
+            <h2>Who we are</h2>
+            <p>
+                AuditKit is made by Guardian Nexus LLC. We are the controller of the personal data described here. You can reach us about anything on this page at <a href="mailto:hello@auditkit.io">hello@auditkit.io</a>.
+            </p>
+
+            <h2>The website</h2>
+            <p>
+                auditkit.io is a static site hosted on GitHub Pages and served through GitHub's content delivery network. GitHub records the IP address of every request in its server logs, as any host does. Their handling of those logs is covered by the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub Privacy Statement</a>. We do not receive them.
+            </p>
+            <p>
+                The pages load their typefaces from Google Fonts. Your browser fetches the font files from Google's servers, which means Google sees your IP address and the page you are on. This happens on every page and does not depend on the cookie banner.
+            </p>
+
+            <h3>Cookies and similar storage</h3>
+            <p>
+                When you first arrive, the site asks what you will allow. Your answer is stored in your browser under the name <code class="code-inline">auditkit_cookie_consent</code> and nothing else runs until you have answered. You can change the answer at any time through the Cookie Preferences link in the footer. If we add a vendor to a category you have already accepted, the banner comes back and asks again. An old answer is not taken as covering a vendor it never mentioned.
+            </p>
+            <p>There are three categories.</p>
+            <p>
+                <em>Necessary.</em> The consent record itself. If you start a trial, the confirmation page also stores a flag so that reloading it does not report the same trial twice. Neither is sent anywhere.
+            </p>
+            <p>
+                <em>Analytics.</em> Google Analytics 4. It records which pages are viewed, how far they are scrolled, which outbound links are clicked, and three events we have named: clicking a trial button, reaching the trial confirmation page, and following a link to the Community Edition repository. It sets the usual <code class="code-inline">_ga</code> cookies. We use this to understand which pages and which advertising bring people to the site and what they do afterwards. Google retains event-level data for two months, its default setting, and aggregate reports for longer. Google's own use of the data is described in <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from sites that use its services</a>.
+            </p>
+            <p>
+                <em>Marketing.</em> The Google Ads tag and the Reddit Ads pixel. These exist for one reason: when someone who arrived from an advertisement starts a trial, the network that showed the advertisement is told a trial started, so we can see which advertising is worth paying for. With marketing allowed, the Reddit pixel records each page visit, and clicking a trial button sends Reddit a content-view event. Arriving on the trial confirmation page sends both networks a conversion carrying the Stripe checkout session identifier and the trial value. Neither network receives your email address from the browser.
+            </p>
+
+            <h2>Starting a trial or buying a licence</h2>
+            <p>
+                Checkout is handled by Stripe on Stripe's own pages. Stripe collects your name, email address, card details and billing address, and is the controller for the payment itself under the <a href="https://stripe.com/privacy">Stripe Privacy Policy</a>. We never see your card number.
+            </p>
+            <p>
+                When a checkout completes, Stripe notifies our licence server. From that notification we keep a customer record consisting of your email address, the Stripe customer identifier, the licence key or licence file issued to you, whether the subscription is a trial or paid, whether it is active, and the dates it was created and renewed. The record lives in a database hosted by Supabase, and the licence server runs on Vercel. Both process data in the United States.
+            </p>
+            <p>
+                We then email you the licence file. The email goes out through Resend, which handles your address and the message for delivery. Renewals produce a fresh licence file each month, sent the same way. These emails are part of operating the subscription and are not marketing.
+            </p>
+            <p>
+                At the same time, if you allowed marketing cookies, the licence server reports the trial to Reddit's conversions interface with the same checkout session identifier the pixel used, so the two reports are counted once, plus a SHA-256 hash of your email address. Reddit uses the hash to match the trial to an advertisement click and does not receive the address itself. Google Ads receives nothing from the server; its report comes only from the browser as described above.
+            </p>
+            <p>
+                We keep the customer record for as long as the subscription exists and afterwards for as long as our accounting and tax obligations require us to hold records of the sale.
+            </p>
+
+            <h2>The scanner and the desktop application</h2>
+            <p>
+                AuditKit runs on your machine. It reads configuration from your AWS, Azure or GCP accounts using credentials you supply, compares what it finds against the control catalogs, and writes reports, fix scripts and evidence packages to your local disk. None of that leaves your computer for us. Your cloud credentials are used only to call your cloud provider's APIs and are never transmitted to Guardian Nexus. Results you import from ScubaGear, Prowler, Nessus, Trivy or Grype are processed locally in the same way.
+            </p>
+            <p>
+                The one time the scanner contacts a server that is not your cloud provider is when you run the <code class="code-inline">update</code> command. It asks GitHub for the latest release, which sends GitHub your IP address and the version you are running. It does not do this on its own; it only happens when you run that command.
+            </p>
+            <p>
+                AuditKit Pro verifies its licence file on your machine against a public key built into the binary. It does not call our licence server to do so. The hardware lock it creates is a hash derived from a network interface address, stored in a file next to the licence, and it stays there.
+            </p>
+            <p>
+                The Pro scheduler can send alerts to Slack, Microsoft Teams, email, a webhook, syslog or a file. Those go to endpoints you configure, contain whatever scan summary you configure, and pass through nothing of ours.
+            </p>
+            <p>
+                The desktop application is a local web server. It listens on your own machine and stores its scan history in a local database. It has no account, no login with us, and no telemetry.
+            </p>
+
+            <h2>Email and support</h2>
+            <p>
+                If you write to hello@auditkit.io we keep the correspondence so that we can answer you and refer back to it if you write again. We do not add support addresses to any mailing list. The only routine email we send is about your licence.
+            </p>
+
+            <h2>Who else sees data</h2>
+            <p>
+                The providers named above, each for the purpose named: GitHub and Google Fonts for serving the site, Google Analytics for analytics, Google Ads and Reddit for advertising measurement, Stripe for payment, Supabase and Vercel for the licence server, and Resend for licence email. We do not sell personal data and do not share it with anyone else, except where the law requires us to.
+            </p>
+            <p>
+                Several of these providers are in the United States. If you are in the European Economic Area or the United Kingdom, your data is transferred there when you use the site or buy a licence, under the providers' standard contractual clauses or their participation in the EU-US Data Privacy Framework, as set out in each provider's own policy.
+            </p>
+
+            <h2>Your rights</h2>
+            <p>
+                Depending on where you live, you may have the right to ask what personal data we hold about you, to have it corrected or deleted, to receive a copy of it, to object to or restrict how we use it, and to complain to a supervisory authority. To exercise any of these, email <a href="mailto:hello@auditkit.io">hello@auditkit.io</a> from the address the request concerns. For the website tags, the practical route is the Cookie Preferences link, which withdraws consent immediately. For advertising, Google and Reddit also offer their own controls in your account settings with them.
+            </p>
+            <p>
+                The site and products are for businesses and are not directed at children. We do not knowingly collect data from anyone under 16.
+            </p>
+
+            <h2>Changes to this policy</h2>
+            <p>
+                When we change what we collect or who we share it with, we update this page and the effective date at the top. Where a change adds a new third party to a cookie category, the consent banner will also ask you again the next time you visit.
+            </p>
+        </div>
+    </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p style="margin-bottom: 2rem; color: var(--slate-300); font-size: 1rem;">
+                <strong style="color: var(--white);">Built for compliance teams, by engineers who understand the audit process.</strong>
+            </p>
+
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/">AuditKit</a></li>
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/community.html">Community Edition (Open Source)</a></li>
+                        <li><a href="/about.html">About</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <ul>
+                        <li><a href="/docs/getting-started.html">Quick Start Guide</a></li>
+                        <li><a href="/docs/installation.html">Installation</a></li>
+                        <li><a href="/docs/cli-reference.html">CLI Reference</a></li>
+                        <li><a href="/docs/faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Frameworks</h4>
+                    <ul>
+                        <li><a href="/docs/frameworks/cmmc.html">CMMC</a></li>
+                        <li><a href="/docs/frameworks/soc2.html">SOC2</a></li>
+                        <li><a href="/docs/frameworks/pci-dss.html">PCI-DSS</a></li>
+                        <li><a href="/docs/frameworks/hipaa.html">HIPAA</a></li>
+                        <li><a href="/docs/frameworks/nist-800-53.html">NIST 800-53</a></li>
+                        <li><a href="/docs/frameworks/iso27001.html">ISO 27001</a></li>
+                        <li><a href="/docs/frameworks/fedramp.html">FedRAMP</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="/docs/setup/aws.html">AWS Setup</a></li>
+                        <li><a href="/docs/setup/azure.html">Azure Setup</a></li>
+                        <li><a href="/docs/setup/gcp.html">GCP Setup</a></li>
+                        <li><a href="/docs/setup/m365.html">M365 Setup</a></li>
+                        <li><a href="/examples/">Examples</a></li>
+                        <li><a href="https://github.com/guardian-nexus/AuditKit-Community-Edition">GitHub</a></li>
+                        <li><a href="mailto:hello@auditkit.io">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>Community Edition is Apache 2.0. AuditKit is commercially licensed.</p>
+                <p>&copy; 2026 Guardian Nexus LLC &middot; <a href="/privacy.html">Privacy</a> &middot; <a href="#" data-cookie-preferences>Cookie Preferences</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./cookie-consent.js"></script>
+    <script src="./main.js"></script>
+    <script>
+        (function() {
+            var toggle = document.querySelector('.nav-toggle');
+            var links = document.querySelector('.nav-links');
+            if (toggle && links) {
+                toggle.addEventListener('click', function() {
+                    var open = links.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', open);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

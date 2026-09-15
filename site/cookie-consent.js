@@ -239,6 +239,7 @@
     css.textContent =
       '.cc-banner{position:fixed;bottom:0;left:0;right:0;background:#0f172a;color:#e2e8f0;padding:1.25rem 1.5rem;z-index:10000;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;font-size:.9rem;box-shadow:0 -2px 12px rgba(0,0,0,.3)}' +
       '.cc-banner p{margin:0;line-height:1.5;flex:1}' +
+      '.cc-banner a{color:#10b981;text-decoration:underline}' +
       '.cc-banner-actions{display:flex;gap:.75rem;flex-shrink:0}' +
       '.cc-btn{padding:.5rem 1.25rem;border-radius:6px;font-weight:600;font-size:.85rem;cursor:pointer;border:none;transition:background .15s}' +
       '.cc-btn-accept{background:#10b981;color:#fff}' +
@@ -275,7 +276,7 @@
     banner.className = 'cc-banner';
     banner.id = 'cc-banner';
     banner.innerHTML =
-      '<p>We use cookies to measure site usage and improve your experience. You can manage your preferences at any time.</p>' +
+      '<p>We use cookies to measure site usage and improve your experience. You can manage your preferences at any time. Details are in our <a href="/privacy.html">privacy policy</a>.</p>' +
       '<div class="cc-banner-actions">' +
       '<button class="cc-btn cc-btn-reject" id="cc-reject-all">Reject All</button>' +
       '<button class="cc-btn cc-btn-manage" id="cc-manage">Manage Preferences</button>' +
