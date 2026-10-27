@@ -37,7 +37,7 @@ jobs:
       - name: Lint
         uses: golangci/golangci-lint-action@v8
         with:
-          version: v2.5.0
+          version: v2.15.0
           working-directory: scanner
           # Loading every provider SDK exceeds the 1m default on a shared runner.
           args: --timeout=15m
