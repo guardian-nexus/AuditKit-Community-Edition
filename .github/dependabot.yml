@@ -1,0 +1,9 @@
+# Actions in the workflows are pinned to commit SHAs, so a moved or hijacked
+# tag cannot change what CI runs. Pins do not update themselves; this opens a
+# pull request when a pinned action has a new release.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
