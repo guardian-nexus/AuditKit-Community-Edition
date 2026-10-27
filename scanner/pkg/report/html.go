@@ -693,7 +693,7 @@ func GenerateHTML(result ComplianceResult) string {
 		getFrameworkLabel(result.Framework),
 		getFrameworkLabel(result.Framework),
 		result.Timestamp.Format("January 2, 2006 at 3:04 PM"),
-		result.AccountID,
+		AccountLabel(result.AccountID, result.Region),
 		getScoreClass(result.Score),
 		result.Score,
 		result.TotalControls,

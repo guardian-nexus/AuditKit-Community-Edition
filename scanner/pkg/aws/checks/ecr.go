@@ -23,17 +23,11 @@ func (c *ECRChecks) Name() string {
 func (c *ECRChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckImageScanning(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckImageScanning)
 
-	if result, err := c.CheckImmutableTags(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckImmutableTags)
 
-	if result, err := c.CheckEncryptionAtRest(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEncryptionAtRest)
 
 	return results, nil
 }

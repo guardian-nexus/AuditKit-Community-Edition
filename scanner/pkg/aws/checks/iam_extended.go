@@ -23,19 +23,15 @@ func (c *IAMExtendedChecks) Name() string {
 func (c *IAMExtendedChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckServiceLinkedRoles(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckServiceLinkedRoles)
 
-	if result, err := c.CheckPermissionBoundaries(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckPermissionBoundaries)
 
 	return results, nil
 }
 
 func (c *IAMExtendedChecks) CheckServiceLinkedRoles(ctx context.Context) (CheckResult, error) {
-	roles, err := c.client.ListRoles(ctx, &iam.ListRolesInput{})
+	roles, err := listAllRoles(ctx, c.client, &iam.ListRolesInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-IAM-03",
@@ -82,7 +78,7 @@ func (c *IAMExtendedChecks) CheckServiceLinkedRoles(ctx context.Context) (CheckR
 }
 
 func (c *IAMExtendedChecks) CheckPermissionBoundaries(ctx context.Context) (CheckResult, error) {
-	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-IAM-02",
@@ -95,7 +91,7 @@ func (c *IAMExtendedChecks) CheckPermissionBoundaries(ctx context.Context) (Chec
 		}, err
 	}
 
-	roles, err := c.client.ListRoles(ctx, &iam.ListRolesInput{})
+	roles, err := listAllRoles(ctx, c.client, &iam.ListRolesInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-IAM-02",

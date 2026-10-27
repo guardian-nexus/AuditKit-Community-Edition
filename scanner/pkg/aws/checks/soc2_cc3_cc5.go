@@ -54,6 +54,7 @@ func (c *CC3Checks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *CC3Checks) CheckCC3_1_Objectives(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check if Security Hub is enabled (centralizes security objectives)
@@ -75,7 +76,10 @@ func (c *CC3Checks) CheckCC3_1_Objectives(ctx context.Context) []CheckResult {
 			})
 		} else {
 			// Check for enabled standards
-			standards, _ := c.securityhubClient.DescribeStandards(ctx, &securityhub.DescribeStandardsInput{})
+			standards, err := c.securityhubClient.DescribeStandards(ctx, &securityhub.DescribeStandardsInput{})
+			if err != nil {
+				skipped.add("DescribeStandards", err)
+			}
 
 			if standards != nil && len(standards.Standards) > 0 {
 				results = append(results, CheckResult{
@@ -101,10 +105,11 @@ func (c *CC3Checks) CheckCC3_1_Objectives(ctx context.Context) []CheckResult {
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC3.1", "Security Objectives Management")
 }
 
 func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check GuardDuty for threat detection
@@ -128,9 +133,12 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 			// Check if detector is actually enabled
 			// Only the first detector is examined.
 			for _, detectorId := range detectors.DetectorIds[:min(1, len(detectors.DetectorIds))] {
-				detector, _ := c.guarddutyClient.GetDetector(ctx, &guardduty.GetDetectorInput{
+				detector, err := c.guarddutyClient.GetDetector(ctx, &guardduty.GetDetectorInput{
 					DetectorId: &detectorId,
 				})
+				if err != nil {
+					skipped.add("GetDetector", err)
+				}
 
 				if detector != nil && detector.Status == "ENABLED" {
 					results = append(results, CheckResult{
@@ -159,7 +167,10 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 
 	// Check Inspector for vulnerability assessment
 	if c.inspector2Client != nil {
-		status, _ := c.inspector2Client.BatchGetAccountStatus(ctx, &inspector2.BatchGetAccountStatusInput{})
+		status, err := c.inspector2Client.BatchGetAccountStatus(ctx, &inspector2.BatchGetAccountStatusInput{})
+		if err != nil {
+			skipped.add("BatchGetAccountStatus", err)
+		}
 
 		if status != nil && len(status.Accounts) > 0 {
 			// For now, just check if Inspector is enabled at all
@@ -185,15 +196,19 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC3.2", "Threat Detection and Risk Identification")
 }
 
 func (c *CC3Checks) CheckCC3_3_FraudRisk(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check GuardDuty for IAM finding types (potential fraud indicators)
 	if c.guarddutyClient != nil {
-		detectors, _ := c.guarddutyClient.ListDetectors(ctx, &guardduty.ListDetectorsInput{})
+		detectors, err := c.guarddutyClient.ListDetectors(ctx, &guardduty.ListDetectorsInput{})
+		if err != nil {
+			skipped.add("ListDetectors", err)
+		}
 
 		if detectors != nil && len(detectors.DetectorIds) > 0 {
 			// Simply check if findings exist
@@ -219,7 +234,7 @@ func (c *CC3Checks) CheckCC3_3_FraudRisk(ctx context.Context) []CheckResult {
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC3.3", "Fraud Risk Detection")
 }
 
 func (c *CC3Checks) CheckCC3_4_ChangeRisk(ctx context.Context) []CheckResult {
@@ -270,6 +285,7 @@ func (c *CC4Checks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *CC4Checks) CheckCC4_1_Evaluations(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check Config for continuous monitoring
@@ -291,7 +307,10 @@ func (c *CC4Checks) CheckCC4_1_Evaluations(ctx context.Context) []CheckResult {
 			})
 		} else {
 			// Check if recorder is actually running
-			status, _ := c.configClient.DescribeConfigurationRecorderStatus(ctx, &configservice.DescribeConfigurationRecorderStatusInput{})
+			status, err := c.configClient.DescribeConfigurationRecorderStatus(ctx, &configservice.DescribeConfigurationRecorderStatusInput{})
+			if err != nil {
+				skipped.add("DescribeConfigurationRecorderStatus", err)
+			}
 
 			if status != nil && len(status.ConfigurationRecordersStatus) > 0 {
 				recording := false
@@ -329,7 +348,10 @@ func (c *CC4Checks) CheckCC4_1_Evaluations(ctx context.Context) []CheckResult {
 
 	// Check CloudWatch for monitoring
 	if c.cloudwatchClient != nil {
-		alarms, _ := c.cloudwatchClient.DescribeAlarms(ctx, &cloudwatch.DescribeAlarmsInput{})
+		alarms, err := describeAllAlarms(ctx, c.cloudwatchClient, &cloudwatch.DescribeAlarmsInput{})
+		if err != nil {
+			skipped.add("DescribeAlarms", err)
+		}
 
 		if alarms != nil && len(alarms.MetricAlarms) > 0 {
 			results = append(results, CheckResult{
@@ -354,19 +376,26 @@ func (c *CC4Checks) CheckCC4_1_Evaluations(ctx context.Context) []CheckResult {
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC4.1", "Continuous Configuration Monitoring")
 }
 
 func (c *CC4Checks) CheckCC4_2_Deficiencies(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check Config Rules for compliance evaluation
 	if c.configClient != nil {
-		rules, _ := c.configClient.DescribeConfigRules(ctx, &configservice.DescribeConfigRulesInput{})
+		rules, err := c.configClient.DescribeConfigRules(ctx, &configservice.DescribeConfigRulesInput{})
+		if err != nil {
+			skipped.add("DescribeConfigRules", err)
+		}
 
 		if rules != nil && len(rules.ConfigRules) > 0 {
 			// Check compliance status
-			complianceResults, _ := c.configClient.DescribeComplianceByConfigRule(ctx, &configservice.DescribeComplianceByConfigRuleInput{})
+			complianceResults, err := c.configClient.DescribeComplianceByConfigRule(ctx, &configservice.DescribeComplianceByConfigRuleInput{})
+			if err != nil {
+				skipped.add("DescribeComplianceByConfigRule", err)
+			}
 
 			nonCompliantRules := 0
 			if complianceResults != nil && complianceResults.ComplianceByConfigRules != nil {
@@ -414,7 +443,7 @@ func (c *CC4Checks) CheckCC4_2_Deficiencies(ctx context.Context) []CheckResult {
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC4.2", "Automated Compliance Evaluation")
 }
 
 // CC5: Control Activities (3 criteria)
@@ -452,6 +481,7 @@ func (c *CC5Checks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *CC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check AWS Backup for data protection controls
@@ -473,7 +503,10 @@ func (c *CC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) []CheckResu
 			})
 		} else {
 			// Check backup vaults
-			vaults, _ := c.backupClient.ListBackupVaults(ctx, &backup.ListBackupVaultsInput{})
+			vaults, err := c.backupClient.ListBackupVaults(ctx, &backup.ListBackupVaultsInput{})
+			if err != nil {
+				skipped.add("ListBackupVaults", err)
+			}
 
 			vaultCount := 0
 			if vaults != nil && vaults.BackupVaultList != nil {
@@ -491,10 +524,11 @@ func (c *CC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) []CheckResu
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC5.1", "Backup and Recovery Controls")
 }
 
 func (c *CC5Checks) CheckCC5_2_TechnologyControls(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check KMS for encryption controls
@@ -516,9 +550,12 @@ func (c *CC5Checks) CheckCC5_2_TechnologyControls(ctx context.Context) []CheckRe
 			// Count customer managed keys
 			customerKeys := 0
 			for _, key := range keys.Keys {
-				keyMetadata, _ := c.kmsClient.DescribeKey(ctx, &kms.DescribeKeyInput{
+				keyMetadata, err := c.kmsClient.DescribeKey(ctx, &kms.DescribeKeyInput{
 					KeyId: key.KeyId,
 				})
+				if err != nil {
+					skipped.add("DescribeKey", err)
+				}
 
 				if keyMetadata != nil && keyMetadata.KeyMetadata != nil {
 					if keyMetadata.KeyMetadata.KeyManager == "CUSTOMER" {
@@ -551,7 +588,7 @@ func (c *CC5Checks) CheckCC5_2_TechnologyControls(ctx context.Context) []CheckRe
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC5.2", "Encryption Key Management")
 }
 
 func (c *CC5Checks) CheckCC5_3_Deployment(ctx context.Context) []CheckResult {

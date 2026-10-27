@@ -2,6 +2,7 @@ package checks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/configservice"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
+	iamtypes "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -618,7 +620,7 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 
 	// Check for overly permissive IAM policies
 	// FIXED: Properly handle error instead of ignoring with _
-	users, err := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.iamClient, &iam.ListUsersInput{})
 	if err != nil {
 		return append(results, CheckResult{
 			Control:   "PCI-7.2.1",
@@ -634,12 +636,18 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 	}
 
 	usersWithAdmin := []string{}
+	unreadUsers := unreadable{}
 
 	for _, user := range users.Users {
-		// Check attached policies
-		policies, _ := c.iamClient.ListAttachedUserPolicies(ctx, &iam.ListAttachedUserPoliciesInput{
+		// Check attached policies. The error was discarded and the nil output
+		// dereferenced, so one denied lookup crashed the scan.
+		policies, err := c.iamClient.ListAttachedUserPolicies(ctx, &iam.ListAttachedUserPoliciesInput{
 			UserName: user.UserName,
 		})
+		if err != nil {
+			unreadUsers.add("ListAttachedUserPolicies", err)
+			continue
+		}
 
 		for _, policy := range policies.AttachedPolicies {
 			if strings.Contains(aws.ToString(policy.PolicyName), "AdministratorAccess") ||
@@ -650,6 +658,9 @@ func (c *PCIDSSChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 		}
 	}
 
+	if len(usersWithAdmin) <= 2 && len(unreadUsers.names) > 0 {
+		results = append(results, unreadUsers.passOrError(checkError("PCI-7.2.1", "[PCI-DSS] Least Privilege Access", map[string]string{"PCI-DSS": "7.2.1"}, unreadUsers.first)))
+	}
 	if len(usersWithAdmin) > 2 { // More than 2 is suspicious
 		results = append(results, CheckResult{
 			Control:           "PCI-7.2.1",
@@ -821,7 +832,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 
 	// 8.3.1: MFA for ALL access (not just privileged!)
 	// FIXED: Properly handle error instead of ignoring with _
-	users, err := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.iamClient, &iam.ListUsersInput{})
 	if err != nil {
 		return append(results, CheckResult{
 			Control:   "PCI-8.4.2",
@@ -839,18 +850,24 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 	noMFAUsers := []string{}
 	totalUsers := len(users.Users)
 
+	unreadMFA := unreadable{}
 	for _, user := range users.Users {
 		userName := aws.ToString(user.UserName)
-		mfaDevices, _ := c.iamClient.ListMFADevices(ctx, &iam.ListMFADevicesInput{
+		mfaDevices, err := c.iamClient.ListMFADevices(ctx, &iam.ListMFADevicesInput{
 			UserName: aws.String(userName),
 		})
+		if err != nil {
+			unreadMFA.add("ListMFADevices", err)
+			continue
+		}
 
 		if len(mfaDevices.MFADevices) == 0 {
-			// Check if user has console access
-			_, err := c.iamClient.GetLoginProfile(ctx, &iam.GetLoginProfileInput{
-				UserName: aws.String(userName),
-			})
-			if err == nil {
+			// Check if user has console access. NoSuchEntity is the answer
+			// "no console password"; any other error leaves it unknown.
+			hasConsole, err := hasLoginProfile(ctx, c.iamClient, userName)
+			if err != nil {
+				unreadMFA.add("GetLoginProfile", err)
+			} else if hasConsole {
 				// User has console access but no MFA
 				noMFAUsers = append(noMFAUsers, userName)
 			}
@@ -880,7 +897,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			},
 		})
 	} else if totalUsers > 0 {
-		results = append(results, CheckResult{
+		results = append(results, unreadMFA.passOrError(CheckResult{
 			Control:   "PCI-8.4.2",
 			Name:      "[PCI-DSS] MFA for Console Access",
 			Status:    "PASS",
@@ -890,15 +907,20 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Frameworks: map[string]string{
 				"PCI-DSS": "8.4.2",
 			},
-		})
+		}))
 	}
 
 	// Check access key rotation (90 days for PCI, not 180!)
 	oldKeys := []string{}
+	unreadKeys := unreadable{}
 	for _, user := range users.Users {
-		keys, _ := c.iamClient.ListAccessKeys(ctx, &iam.ListAccessKeysInput{
+		keys, err := c.iamClient.ListAccessKeys(ctx, &iam.ListAccessKeysInput{
 			UserName: user.UserName,
 		})
+		if err != nil {
+			unreadKeys.add("ListAccessKeys", err)
+			continue
+		}
 
 		for _, key := range keys.AccessKeyMetadata {
 			status := string(key.Status)
@@ -935,7 +957,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			},
 		})
 	} else {
-		results = append(results, CheckResult{
+		results = append(results, unreadKeys.passOrError(CheckResult{
 			Control:   "PCI-8.4.2",
 			Name:      "[PCI-DSS] Access Key Age",
 			Status:    "PASS",
@@ -945,7 +967,7 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 			Frameworks: map[string]string{
 				"PCI-DSS": "8.4.2",
 			},
-		})
+		}))
 	}
 
 	// Check for idle session timeout (PCI: 15 minutes)
@@ -1440,7 +1462,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		Frameworks:        map[string]string{"PCI-DSS": "4.2.1.1"},
 	})
 
-	users, err := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.iamClient, &iam.ListUsersInput{})
 	if err != nil {
 		results = append(results, CheckResult{
 			Control:    "PCI-8.6.1",
@@ -1459,6 +1481,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 	// keys is a service account that can also be logged into interactively.
 	interactive := []string{}
 	staleServiceKeys := []string{}
+	unreadAccounts := unreadable{}
 	for _, user := range users.Users {
 		userName := aws.ToString(user.UserName)
 		// The SDK returns a nil output on error, so the result cannot be
@@ -1466,10 +1489,16 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		// ListAccessKeys will: it is a separate IAM permission and is throttled
 		// separately.
 		keys, kerr := c.iamClient.ListAccessKeys(ctx, &iam.ListAccessKeysInput{UserName: user.UserName})
-		if kerr != nil || keys == nil || len(keys.AccessKeyMetadata) == 0 {
+		if kerr != nil {
+			unreadAccounts.add("ListAccessKeys", kerr)
 			continue
 		}
-		if _, err := c.iamClient.GetLoginProfile(ctx, &iam.GetLoginProfileInput{UserName: aws.String(userName)}); err == nil {
+		if keys == nil || len(keys.AccessKeyMetadata) == 0 {
+			continue
+		}
+		if hasConsole, err := hasLoginProfile(ctx, c.iamClient, userName); err != nil {
+			unreadAccounts.add("GetLoginProfile", err)
+		} else if hasConsole {
 			interactive = append(interactive, userName)
 		}
 		// 8.6.3 - credentials for these accounts are rotated periodically.
@@ -1501,7 +1530,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Frameworks:        map[string]string{"PCI-DSS": "8.6.1"},
 		})
 	} else {
-		results = append(results, CheckResult{
+		results = append(results, unreadAccounts.passOrError(CheckResult{
 			Control:    "PCI-8.6.1",
 			Name:       "[PCI-DSS] System Account Interactive Login",
 			Status:     "PASS",
@@ -1509,7 +1538,7 @@ func (c *PCIDSSChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"PCI-DSS": "8.6.1"},
-		})
+		}))
 	}
 
 	// 8.6.2 - credentials must not be hard coded in scripts, config files or
@@ -1630,15 +1659,23 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 	if len(trails.TrailList) == 0 {
 		missing = append(missing, "CloudTrail (no trail configured)")
 	}
+	// A status that could not be read was skipped, and a denied Config call
+	// skipped the recorder entirely, so the PASS below read "CloudTrail and AWS
+	// Config are running" having looked at neither.
+	unreadStatus := unreadable{}
 	for _, t := range trails.TrailList {
 		st, err := c.cloudtrailClient.GetTrailStatus(ctx, &cloudtrail.GetTrailStatusInput{Name: t.Name})
-		if err == nil && st != nil && !aws.ToBool(st.IsLogging) {
+		if err != nil {
+			unreadStatus.add("GetTrailStatus", err)
+		} else if st != nil && !aws.ToBool(st.IsLogging) {
 			stopped = append(stopped, aws.ToString(t.Name))
 		}
 	}
 
 	recorders, recErr := c.configClient.DescribeConfigurationRecorderStatus(ctx, &configservice.DescribeConfigurationRecorderStatusInput{})
-	if recErr == nil && recorders != nil {
+	if recErr != nil {
+		unreadStatus.add("DescribeConfigurationRecorderStatus", recErr)
+	} else if recorders != nil {
 		if len(recorders.ConfigurationRecordersStatus) == 0 {
 			missing = append(missing, "AWS Config (no recorder configured)")
 		}
@@ -1681,7 +1718,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 			Frameworks:        map[string]string{"PCI-DSS": "10.7.2"},
 		})
 	} else {
-		results = append(results, CheckResult{
+		results = append(results, unreadStatus.passOrError(CheckResult{
 			Control:           "PCI-10.7.2",
 			Name:              "[PCI-DSS] Security Control Failure Detection",
 			Status:            "PASS",
@@ -1691,7 +1728,7 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 			Priority:          PriorityHigh,
 			Timestamp:         time.Now(),
 			Frameworks:        map[string]string{"PCI-DSS": "10.7.2"},
-		})
+		}))
 	}
 
 	// 10.7.3 - failures are responded to promptly. A process control.
@@ -1709,4 +1746,19 @@ func (c *PCIDSSChecks) checkAutomatedLogReview(ctx context.Context) []CheckResul
 	})
 
 	return results
+}
+
+// hasLoginProfile reports whether an IAM user has a console password.
+// GetLoginProfile answers "no" with a NoSuchEntity error; every other error
+// means the question was not answered, which callers must not read as "no".
+func hasLoginProfile(ctx context.Context, client *iam.Client, userName string) (bool, error) {
+	_, err := client.GetLoginProfile(ctx, &iam.GetLoginProfileInput{UserName: aws.String(userName)})
+	if err == nil {
+		return true, nil
+	}
+	var noProfile *iamtypes.NoSuchEntityException
+	if errors.As(err, &noProfile) {
+		return false, nil
+	}
+	return false, err
 }

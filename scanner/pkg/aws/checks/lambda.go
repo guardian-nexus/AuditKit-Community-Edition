@@ -24,34 +24,24 @@ func (c *LambdaChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// CIS Section 6 - Lambda controls
-	if result, err := c.CheckLambdaInVPC(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckLambdaInVPC)
 
-	if result, err := c.CheckLambdaEnvironmentEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckLambdaEnvironmentEncryption)
 
-	if result, err := c.CheckLambdaExecutionRole(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckLambdaExecutionRole)
 
-	if result, err := c.CheckLambdaPublicAccess(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckLambdaPublicAccess)
 
-	if result, err := c.CheckLambdaTracing(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckLambdaTracing)
 
 	return results, nil
 }
 
 // Ensure Lambda functions are in VPC when accessing VPC resources
 func (c *LambdaChecks) CheckLambdaInVPC(ctx context.Context) (CheckResult, error) {
-	functions, err := c.client.ListFunctions(ctx, &lambda.ListFunctionsInput{})
+	functions, err := listAllFunctions(ctx, c.client, &lambda.ListFunctionsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-LAMBDA-04", "Lambda Functions in VPC", map[string]string{"SOC2": "CC6.6"}, err), err
 	}
 
 	functionsNotInVPC := []string{}
@@ -100,9 +90,9 @@ func (c *LambdaChecks) CheckLambdaInVPC(ctx context.Context) (CheckResult, error
 
 // Ensure Lambda environment variables are encrypted
 func (c *LambdaChecks) CheckLambdaEnvironmentEncryption(ctx context.Context) (CheckResult, error) {
-	functions, err := c.client.ListFunctions(ctx, &lambda.ListFunctionsInput{})
+	functions, err := listAllFunctions(ctx, c.client, &lambda.ListFunctionsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-LAMBDA-01", "Lambda Environment Encryption", map[string]string{"SOC2": "CC6.7", "PCI-DSS": "3.5.1"}, err), err
 	}
 
 	functionsWithoutKMS := []string{}
@@ -170,9 +160,9 @@ aws lambda update-function-configuration \
 
 // Ensure Lambda execution role follows least privilege
 func (c *LambdaChecks) CheckLambdaExecutionRole(ctx context.Context) (CheckResult, error) {
-	functions, err := c.client.ListFunctions(ctx, &lambda.ListFunctionsInput{})
+	functions, err := listAllFunctions(ctx, c.client, &lambda.ListFunctionsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-LAMBDA-02", "Lambda Execution Role Permissions", map[string]string{"SOC2": "CC6.3", "PCI-DSS": "7.2.2"}, err), err
 	}
 
 	functionsWithBroadRoles := []string{}
@@ -229,9 +219,9 @@ aws lambda update-function-configuration \
 
 // Ensure Lambda functions are not publicly accessible
 func (c *LambdaChecks) CheckLambdaPublicAccess(ctx context.Context) (CheckResult, error) {
-	functions, err := c.client.ListFunctions(ctx, &lambda.ListFunctionsInput{})
+	functions, err := listAllFunctions(ctx, c.client, &lambda.ListFunctionsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-LAMBDA-03", "Lambda Functions Not Public", map[string]string{"SOC2": "CC6.1", "PCI-DSS": "1.4.2"}, err), err
 	}
 
 	publicFunctions := []string{}
@@ -292,9 +282,9 @@ func (c *LambdaChecks) CheckLambdaPublicAccess(ctx context.Context) (CheckResult
 
 // Ensure Lambda functions have tracing enabled
 func (c *LambdaChecks) CheckLambdaTracing(ctx context.Context) (CheckResult, error) {
-	functions, err := c.client.ListFunctions(ctx, &lambda.ListFunctionsInput{})
+	functions, err := listAllFunctions(ctx, c.client, &lambda.ListFunctionsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-LAMBDA-05", "Lambda X-Ray Tracing Enabled", map[string]string{"SOC2": "CC7.2"}, err), err
 	}
 
 	functionsWithoutTracing := []string{}

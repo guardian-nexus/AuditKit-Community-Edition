@@ -24,29 +24,17 @@ func (c *SageMakerChecks) Name() string {
 func (c *SageMakerChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckNotebookEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckNotebookEncryption)
 
-	if result, err := c.CheckNotebookDirectInternet(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckNotebookDirectInternet)
 
-	if result, err := c.CheckNotebookRootAccess(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckNotebookRootAccess)
 
-	if result, err := c.CheckEndpointEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEndpointEncryption)
 
-	if result, err := c.CheckTrainingJobEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckTrainingJobEncryption)
 
-	if result, err := c.CheckModelNetworkIsolation(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckModelNetworkIsolation)
 
 	return results, nil
 }
@@ -54,7 +42,7 @@ func (c *SageMakerChecks) Run(ctx context.Context) ([]CheckResult, error) {
 func (c *SageMakerChecks) CheckNotebookEncryption(ctx context.Context) (CheckResult, error) {
 	notebooks, err := c.client.ListNotebookInstances(ctx, &sagemaker.ListNotebookInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.3", "SageMaker Notebook Encryption", GetFrameworkMappings("SAGEMAKER_ENCRYPTION"), err), err
 	}
 
 	unencrypted := []string{}
@@ -118,7 +106,7 @@ func (c *SageMakerChecks) CheckNotebookEncryption(ctx context.Context) (CheckRes
 func (c *SageMakerChecks) CheckNotebookDirectInternet(ctx context.Context) (CheckResult, error) {
 	notebooks, err := c.client.ListNotebookInstances(ctx, &sagemaker.ListNotebookInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.1", "SageMaker Direct Internet Access", GetFrameworkMappings("SAGEMAKER_NETWORK"), err), err
 	}
 
 	directInternet := []string{}
@@ -181,7 +169,7 @@ func (c *SageMakerChecks) CheckNotebookDirectInternet(ctx context.Context) (Chec
 func (c *SageMakerChecks) CheckNotebookRootAccess(ctx context.Context) (CheckResult, error) {
 	notebooks, err := c.client.ListNotebookInstances(ctx, &sagemaker.ListNotebookInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.6", "SageMaker Root Access", GetFrameworkMappings("SAGEMAKER_ACCESS"), err), err
 	}
 
 	rootEnabled := []string{}
@@ -244,7 +232,7 @@ func (c *SageMakerChecks) CheckNotebookRootAccess(ctx context.Context) (CheckRes
 func (c *SageMakerChecks) CheckEndpointEncryption(ctx context.Context) (CheckResult, error) {
 	endpoints, err := c.client.ListEndpoints(ctx, &sagemaker.ListEndpointsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.3", "SageMaker Endpoint Encryption", GetFrameworkMappings("SAGEMAKER_ENCRYPTION"), err), err
 	}
 
 	unencrypted := []string{}
@@ -317,7 +305,7 @@ func (c *SageMakerChecks) CheckTrainingJobEncryption(ctx context.Context) (Check
 		MaxResults: aws.Int32(100),
 	})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.3", "SageMaker Training Job Encryption", GetFrameworkMappings("SAGEMAKER_ENCRYPTION"), err), err
 	}
 
 	unencrypted := []string{}
@@ -383,7 +371,7 @@ func (c *SageMakerChecks) CheckModelNetworkIsolation(ctx context.Context) (Check
 		MaxResults: aws.Int32(100),
 	})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.1", "SageMaker Model Network Isolation", GetFrameworkMappings("SAGEMAKER_NETWORK"), err), err
 	}
 
 	notIsolated := []string{}

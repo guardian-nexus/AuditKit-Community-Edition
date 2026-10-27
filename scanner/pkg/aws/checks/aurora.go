@@ -24,9 +24,7 @@ func (c *AuroraChecks) Name() string {
 func (c *AuroraChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckBacktrackEnabled(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckBacktrackEnabled)
 
 	return results, nil
 }

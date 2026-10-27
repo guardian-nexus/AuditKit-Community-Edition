@@ -67,7 +67,7 @@ func (c *AWSCMMCLevel1Checks) Run(ctx context.Context) ([]CheckResult, error) {
 
 // AC.L1-3.1.1 - AUTOMATED
 func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
-	users, err := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.iamClient, &iam.ListUsersInput{})
 	if err != nil {
 		return CheckResult{
 			Control:         "AC.L1-3.1.1",
@@ -203,7 +203,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 
 // AC.L1-3.1.2 - AUTOMATED
 func (c *AWSCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
-	policies, err := c.iamClient.ListPolicies(ctx, &iam.ListPoliciesInput{Scope: "Local"})
+	policies, err := listAllPolicies(ctx, c.iamClient, &iam.ListPoliciesInput{Scope: "Local"})
 	if err != nil {
 		return CheckResult{
 			Control:         "AC.L1-3.1.2",
@@ -265,7 +265,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 
 // IA.L1-3.5.1 - AUTOMATED
 func (c *AWSCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
-	users, err := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.iamClient, &iam.ListUsersInput{})
 	if err != nil {
 		return CheckResult{
 			Control:         "IA.L1-3.5.1",

@@ -24,19 +24,13 @@ func (c *SecretsManagerChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// Secret rotation enabled
-	if result, err := c.CheckSecretRotation(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSecretRotation)
 
 	// Secrets encrypted with KMS
-	if result, err := c.CheckSecretEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSecretEncryption)
 
 	// Unused secrets removed
-	if result, err := c.CheckUnusedSecrets(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckUnusedSecrets)
 
 	return results, nil
 }

@@ -23,17 +23,11 @@ func (c *DynamoDBChecks) Name() string {
 func (c *DynamoDBChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckPointInTimeRecovery(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckPointInTimeRecovery)
 
-	if result, err := c.CheckEncryptionAtRest(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEncryptionAtRest)
 
-	if result, err := c.CheckAutoScaling(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAutoScaling)
 
 	return results, nil
 }

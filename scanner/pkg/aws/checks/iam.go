@@ -30,93 +30,53 @@ func (c *IAMChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// Existing checks
-	if result, err := c.CheckRootMFA(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckRootMFA)
 
-	if result, err := c.CheckPasswordPolicy(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckPasswordPolicy)
 
-	if result, err := c.CheckAccessKeyRotation(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAccessKeyRotation)
 
-	if result, err := c.CheckUnusedCredentials(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckUnusedCredentials)
 
 	// NEW CIS checks
-	if result, err := c.CheckRootAccessKeys(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckRootAccessKeys)
 
-	if result, err := c.CheckIAMUsersMFA(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckIAMUsersMFA)
 
-	if result, err := c.CheckCredentialsUnused90Days(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckCredentialsUnused90Days)
 
-	if result, err := c.CheckOneActiveAccessKey(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckOneActiveAccessKey)
 
-	if result, err := c.CheckIAMPoliciesAttached(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckIAMPoliciesAttached)
 
-	if result, err := c.CheckHardwareMFARoot(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckHardwareMFARoot)
 
-	if result, err := c.CheckSupportRole(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSupportRole)
 
-	if result, err := c.CheckIAMInstanceRoles(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckIAMInstanceRoles)
 
-	if result, err := c.CheckIAMPoliciesOnGroupsOnly(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckIAMPoliciesOnGroupsOnly)
 
 	// Additional CIS AWS controls for better coverage
-	if result, err := c.CheckPasswordExpiration(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckPasswordExpiration)
 
-	if result, err := c.CheckPasswordReusePrevention(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckPasswordReusePrevention)
 
 	// Final IAM controls for 100%
 	results = append(results, c.CheckAccountContactDetails(ctx))
 	results = append(results, c.CheckSecurityContactInfo(ctx))
-	if result, err := c.CheckIAMRolesSeparation(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckIAMRolesSeparation)
 	results = append(results, c.CheckIAMUserAccessReview(ctx))
 
 	// NEW CIS controls - v0.7.0 additions
-	if result, err := c.CheckCredentialsUnused45Days(ctx); err == nil {
-		results = append(results, result)
-	}
-	if result, err := c.CheckIAMPoliciesAttachedToUsers(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckCredentialsUnused45Days)
+	results = runCheck(ctx, results, c.CheckIAMPoliciesAttachedToUsers)
 
 	// CIS AWS Foundations v7.0.0 2.14
-	if result, err := c.CheckFullAdminPolicies(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckFullAdminPolicies)
 
 	// CIS AWS Foundations v7.0.0 2.17
-	if result, err := c.CheckExpiredServerCertificates(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckExpiredServerCertificates)
 
 	return results, nil
 }
@@ -240,9 +200,9 @@ func (c *IAMChecks) CheckPasswordPolicy(ctx context.Context) (CheckResult, error
 }
 
 func (c *IAMChecks) CheckAccessKeyRotation(ctx context.Context) (CheckResult, error) {
-	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.8", "Access Key Rotation", GetFrameworkMappings("ACCESS_KEY_ROTATION"), err), err
 	}
 
 	oldKeys := []string{}
@@ -511,7 +471,7 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 func (c *IAMChecks) CheckRootAccessKeys(ctx context.Context) (CheckResult, error) {
 	summary, err := c.client.GetAccountSummary(ctx, &iam.GetAccountSummaryInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-2.4", "Root Account Access Keys", GetFrameworkMappings("ROOT_ACCESS_KEYS"), err), err
 	}
 
 	rootAccessKeysExist := false
@@ -567,9 +527,9 @@ func (c *IAMChecks) CheckHardwareMFARoot(ctx context.Context) (CheckResult, erro
 
 // CIS 2.10 - Ensure MFA is enabled for all IAM users with console access
 func (c *IAMChecks) CheckIAMUsersMFA(ctx context.Context) (CheckResult, error) {
-	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-2.10", "MFA for IAM Users", GetFrameworkMappings("IAM_USER_MFA"), err), err
 	}
 
 	usersWithoutMFA := []string{}
@@ -639,9 +599,9 @@ func (c *IAMChecks) CheckCredentialsUnused90Days(ctx context.Context) (CheckResu
 
 // CIS 2.11 - Ensure there is only one active access key per IAM user
 func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, error) {
-	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-IAM-05", "One Active Access Key Per User", GetFrameworkMappings("IAM_USER_UNUSED"), err), err
 	}
 
 	usersWithMultipleKeys := []string{}
@@ -695,9 +655,10 @@ func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, e
 
 // CIS 2.13 - Ensure IAM users receive permissions only through groups
 func (c *IAMChecks) CheckIAMPoliciesAttached(ctx context.Context) (CheckResult, error) {
-	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
+	skipped := unreadable{}
+	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-2.13", "IAM Policies via Groups Only", GetFrameworkMappings("IAM_POLICIES_ATTACHED"), err), err
 	}
 
 	usersWithDirectPolicies := []string{}
@@ -706,7 +667,9 @@ func (c *IAMChecks) CheckIAMPoliciesAttached(ctx context.Context) (CheckResult, 
 		attached, err := c.client.ListAttachedUserPolicies(ctx, &iam.ListAttachedUserPoliciesInput{
 			UserName: user.UserName,
 		})
-		if err == nil && len(attached.AttachedPolicies) > 0 {
+		if err != nil {
+			skipped.add("ListAttachedUserPolicies", err)
+		} else if len(attached.AttachedPolicies) > 0 {
 			usersWithDirectPolicies = append(usersWithDirectPolicies, *user.UserName)
 			continue
 		}
@@ -715,7 +678,9 @@ func (c *IAMChecks) CheckIAMPoliciesAttached(ctx context.Context) (CheckResult, 
 		inline, err := c.client.ListUserPolicies(ctx, &iam.ListUserPoliciesInput{
 			UserName: user.UserName,
 		})
-		if err == nil && len(inline.PolicyNames) > 0 {
+		if err != nil {
+			skipped.add("ListUserPolicies", err)
+		} else if len(inline.PolicyNames) > 0 {
 			usersWithDirectPolicies = append(usersWithDirectPolicies, *user.UserName)
 		}
 	}
@@ -737,7 +702,7 @@ func (c *IAMChecks) CheckIAMPoliciesAttached(ctx context.Context) (CheckResult, 
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CIS-2.13",
 		Name:       "IAM Policies via Groups Only",
 		Status:     "PASS",
@@ -745,14 +710,15 @@ func (c *IAMChecks) CheckIAMPoliciesAttached(ctx context.Context) (CheckResult, 
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("IAM_POLICIES_ATTACHED"),
-	}, nil
+	}), nil
 }
 
 // CIS 2.15 - Ensure a support role has been created for incident management
 func (c *IAMChecks) CheckSupportRole(ctx context.Context) (CheckResult, error) {
-	roles, err := c.client.ListRoles(ctx, &iam.ListRolesInput{})
+	skipped := unreadable{}
+	roles, err := listAllRoles(ctx, c.client, &iam.ListRolesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-2.15", "IAM Support Role", GetFrameworkMappings("IAM_SUPPORT_ROLE"), err), err
 	}
 
 	hasSupportRole := false
@@ -761,7 +727,9 @@ func (c *IAMChecks) CheckSupportRole(ctx context.Context) (CheckResult, error) {
 		attachedPolicies, err := c.client.ListAttachedRolePolicies(ctx, &iam.ListAttachedRolePoliciesInput{
 			RoleName: role.RoleName,
 		})
-		if err == nil {
+		if err != nil {
+			skipped.add("ListAttachedRolePolicies", err)
+		} else {
 			for _, policy := range attachedPolicies.AttachedPolicies {
 				if aws.ToString(policy.PolicyArn) == "arn:aws:iam::aws:policy/AWSSupportAccess" {
 					hasSupportRole = true
@@ -775,7 +743,7 @@ func (c *IAMChecks) CheckSupportRole(ctx context.Context) (CheckResult, error) {
 	}
 
 	if !hasSupportRole {
-		return CheckResult{
+		return skipped.failOrError(CheckResult{
 			Control:           "CIS-2.15",
 			Name:              "IAM Support Role",
 			Status:            "FAIL",
@@ -788,7 +756,7 @@ func (c *IAMChecks) CheckSupportRole(ctx context.Context) (CheckResult, error) {
 			Priority:          PriorityMedium,
 			Timestamp:         time.Now(),
 			Frameworks:        GetFrameworkMappings("IAM_SUPPORT_ROLE"),
-		}, nil
+		}), nil
 	}
 
 	return CheckResult{
@@ -821,7 +789,8 @@ func (c *IAMChecks) CheckIAMInstanceRoles(ctx context.Context) (CheckResult, err
 
 // CIS 2.13 - Ensure IAM policies are attached only to groups or roles
 func (c *IAMChecks) CheckIAMPoliciesOnGroupsOnly(ctx context.Context) (CheckResult, error) {
-	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
+	skipped := unreadable{}
+	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "CIS-2.13",
@@ -842,7 +811,9 @@ func (c *IAMChecks) CheckIAMPoliciesOnGroupsOnly(ctx context.Context) (CheckResu
 		managedPolicies, err := c.client.ListAttachedUserPolicies(ctx, &iam.ListAttachedUserPoliciesInput{
 			UserName: user.UserName,
 		})
-		if err == nil && len(managedPolicies.AttachedPolicies) > 0 {
+		if err != nil {
+			skipped.add("ListAttachedUserPolicies", err)
+		} else if len(managedPolicies.AttachedPolicies) > 0 {
 			usersWithPolicies = append(usersWithPolicies, fmt.Sprintf("%s (%d policies)", aws.ToString(user.UserName), len(managedPolicies.AttachedPolicies)))
 		}
 
@@ -850,7 +821,9 @@ func (c *IAMChecks) CheckIAMPoliciesOnGroupsOnly(ctx context.Context) (CheckResu
 		inlinePolicies, err := c.client.ListUserPolicies(ctx, &iam.ListUserPoliciesInput{
 			UserName: user.UserName,
 		})
-		if err == nil && len(inlinePolicies.PolicyNames) > 0 {
+		if err != nil {
+			skipped.add("ListUserPolicies", err)
+		} else if len(inlinePolicies.PolicyNames) > 0 {
 			// Only add if not already added for managed policies
 			alreadyAdded := false
 			userName := aws.ToString(user.UserName)
@@ -910,7 +883,7 @@ aws iam delete-user-policy --user-name %s --policy-name INLINE_POLICY_NAME`, fir
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CIS-2.13",
 		Name:       "IAM Policies Attached to Groups Only",
 		Status:     "PASS",
@@ -918,7 +891,7 @@ aws iam delete-user-policy --user-name %s --policy-name INLINE_POLICY_NAME`, fir
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"CIS-AWS": "2.13", "SOC2": "CC6.3", "PCI-DSS": "7.2.2"},
-	}, nil
+	}), nil
 }
 
 // CheckPasswordExpiration verifies password expiration is 90 days or less
@@ -1106,9 +1079,9 @@ func (c *IAMChecks) CheckSecurityContactInfo(ctx context.Context) CheckResult {
 // Ensure IAM Master and IAM Manager roles are in use
 func (c *IAMChecks) CheckIAMRolesSeparation(ctx context.Context) (CheckResult, error) {
 	// List all roles
-	rolesOutput, err := c.client.ListRoles(ctx, &iam.ListRolesInput{})
+	rolesOutput, err := listAllRoles(ctx, c.client, &iam.ListRolesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-IAM-01", "IAM Master and Manager Roles", map[string]string{"SOC2": "CC6.3"}, err), err
 	}
 
 	hasIAMAdminRole := false
@@ -1200,9 +1173,10 @@ func (c *IAMChecks) CheckIAMUserAccessReview(ctx context.Context) CheckResult {
 
 // CIS-1.3 - Ensure credentials unused for 45 days or greater are disabled
 func (c *IAMChecks) CheckCredentialsUnused45Days(ctx context.Context) (CheckResult, error) {
-	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
+	skipped := unreadable{}
+	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-2.11", "Credentials Unused 45+ Days", GetFrameworkMappings("UNUSED_CREDENTIALS_45"), err), err
 	}
 
 	unusedCredentials := []string{}
@@ -1220,7 +1194,9 @@ func (c *IAMChecks) CheckCredentialsUnused45Days(ctx context.Context) (CheckResu
 		keys, err := c.client.ListAccessKeys(ctx, &iam.ListAccessKeysInput{
 			UserName: user.UserName,
 		})
-		if err == nil {
+		if err != nil {
+			skipped.add("ListAccessKeys", err)
+		} else {
 			for _, key := range keys.AccessKeyMetadata {
 				if key.Status == types.StatusTypeActive && key.CreateDate != nil {
 					keyAge := int(time.Since(*key.CreateDate).Hours() / 24)
@@ -1229,7 +1205,9 @@ func (c *IAMChecks) CheckCredentialsUnused45Days(ctx context.Context) (CheckResu
 						accessKeyLastUsed, err := c.client.GetAccessKeyLastUsed(ctx, &iam.GetAccessKeyLastUsedInput{
 							AccessKeyId: key.AccessKeyId,
 						})
-						if err == nil && accessKeyLastUsed.AccessKeyLastUsed != nil && accessKeyLastUsed.AccessKeyLastUsed.LastUsedDate != nil {
+						if err != nil {
+							skipped.add("GetAccessKeyLastUsed", err)
+						} else if accessKeyLastUsed.AccessKeyLastUsed != nil && accessKeyLastUsed.AccessKeyLastUsed.LastUsedDate != nil {
 							daysSinceKeyUsed := int(time.Since(*accessKeyLastUsed.AccessKeyLastUsed.LastUsedDate).Hours() / 24)
 							if daysSinceKeyUsed > 45 {
 								unusedCredentials = append(unusedCredentials, fmt.Sprintf("%s (access key unused %d days)", *user.UserName, daysSinceKeyUsed))
@@ -1258,7 +1236,7 @@ func (c *IAMChecks) CheckCredentialsUnused45Days(ctx context.Context) (CheckResu
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CIS-2.11",
 		Name:       "Credentials Unused 45+ Days",
 		Status:     "PASS",
@@ -1266,14 +1244,15 @@ func (c *IAMChecks) CheckCredentialsUnused45Days(ctx context.Context) (CheckResu
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("UNUSED_CREDENTIALS_45"),
-	}, nil
+	}), nil
 }
 
 // CIS-1.16 - Ensure IAM policies are attached only to groups or roles
 func (c *IAMChecks) CheckIAMPoliciesAttachedToUsers(ctx context.Context) (CheckResult, error) {
-	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
+	skipped := unreadable{}
+	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-2.13", "IAM Policies on Groups/Roles Only", GetFrameworkMappings("IAM_POLICIES_GROUPS_ONLY"), err), err
 	}
 
 	usersWithDirectPolicies := []string{}
@@ -1283,7 +1262,9 @@ func (c *IAMChecks) CheckIAMPoliciesAttachedToUsers(ctx context.Context) (CheckR
 		attachedPolicies, err := c.client.ListAttachedUserPolicies(ctx, &iam.ListAttachedUserPoliciesInput{
 			UserName: user.UserName,
 		})
-		if err == nil && len(attachedPolicies.AttachedPolicies) > 0 {
+		if err != nil {
+			skipped.add("ListAttachedUserPolicies", err)
+		} else if len(attachedPolicies.AttachedPolicies) > 0 {
 			usersWithDirectPolicies = append(usersWithDirectPolicies, fmt.Sprintf("%s (%d policies)", *user.UserName, len(attachedPolicies.AttachedPolicies)))
 		}
 
@@ -1291,7 +1272,9 @@ func (c *IAMChecks) CheckIAMPoliciesAttachedToUsers(ctx context.Context) (CheckR
 		inlinePolicies, err := c.client.ListUserPolicies(ctx, &iam.ListUserPoliciesInput{
 			UserName: user.UserName,
 		})
-		if err == nil && len(inlinePolicies.PolicyNames) > 0 {
+		if err != nil {
+			skipped.add("ListUserPolicies", err)
+		} else if len(inlinePolicies.PolicyNames) > 0 {
 			usersWithDirectPolicies = append(usersWithDirectPolicies, fmt.Sprintf("%s (%d inline)", *user.UserName, len(inlinePolicies.PolicyNames)))
 		}
 	}
@@ -1313,7 +1296,7 @@ func (c *IAMChecks) CheckIAMPoliciesAttachedToUsers(ctx context.Context) (CheckR
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CIS-2.13",
 		Name:       "IAM Policies on Groups/Roles Only",
 		Status:     "PASS",
@@ -1321,7 +1304,7 @@ func (c *IAMChecks) CheckIAMPoliciesAttachedToUsers(ctx context.Context) (CheckR
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("IAM_POLICIES_GROUPS_ONLY"),
-	}, nil
+	}), nil
 }
 
 // CheckFullAdminPolicies answers CIS AWS Foundations v7.0.0 2.14.

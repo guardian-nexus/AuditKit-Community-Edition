@@ -24,38 +24,26 @@ func (c *RDSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// Existing checks
-	if result, err := c.CheckRDSEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckRDSEncryption)
 
-	if result, err := c.CheckRDSPublicAccess(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckRDSPublicAccess)
 
-	if result, err := c.CheckRDSBackups(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckRDSBackups)
 
 	// NEW CIS checks
-	if result, err := c.CheckRDSMinorVersionUpgrade(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckRDSMinorVersionUpgrade)
 
-	if result, err := c.CheckRDSMultiAZ(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckRDSMultiAZ)
 
-	if result, err := c.CheckRDSDeletionProtection(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckRDSDeletionProtection)
 
 	return results, nil
 }
 
 func (c *RDSChecks) CheckRDSEncryption(ctx context.Context) (CheckResult, error) {
-	instances, err := c.client.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
+	instances, err := describeAllDBInstances(ctx, c.client, &rds.DescribeDBInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.3", "RDS Encryption at Rest", GetFrameworkMappings("RDS_ENCRYPTION"), err), err
 	}
 
 	unencrypted := []string{}
@@ -109,9 +97,9 @@ func (c *RDSChecks) CheckRDSEncryption(ctx context.Context) (CheckResult, error)
 }
 
 func (c *RDSChecks) CheckRDSPublicAccess(ctx context.Context) (CheckResult, error) {
-	instances, err := c.client.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
+	instances, err := describeAllDBInstances(ctx, c.client, &rds.DescribeDBInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.1", "RDS Public Access", GetFrameworkMappings("RDS_PUBLIC_ACCESS"), err), err
 	}
 
 	publiclyAccessible := []string{}
@@ -151,9 +139,9 @@ func (c *RDSChecks) CheckRDSPublicAccess(ctx context.Context) (CheckResult, erro
 }
 
 func (c *RDSChecks) CheckRDSBackups(ctx context.Context) (CheckResult, error) {
-	instances, err := c.client.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
+	instances, err := describeAllDBInstances(ctx, c.client, &rds.DescribeDBInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("A1.2", "RDS Backup Retention", GetFrameworkMappings("RDS_BACKUP"), err), err
 	}
 
 	noBackups := []string{}
@@ -198,9 +186,9 @@ func (c *RDSChecks) CheckRDSBackups(ctx context.Context) (CheckResult, error) {
 
 // CIS 3.2.2 - Ensure RDS instances have automatic minor version upgrade enabled
 func (c *RDSChecks) CheckRDSMinorVersionUpgrade(ctx context.Context) (CheckResult, error) {
-	instances, err := c.client.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
+	instances, err := describeAllDBInstances(ctx, c.client, &rds.DescribeDBInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-3.2.2", "RDS Automatic Minor Version Upgrade", GetFrameworkMappings("RDS_MINOR_UPGRADE"), err), err
 	}
 
 	noAutoUpgrade := []string{}
@@ -241,9 +229,9 @@ func (c *RDSChecks) CheckRDSMinorVersionUpgrade(ctx context.Context) (CheckResul
 
 // CIS 3.2.4 - Ensure RDS instances are configured with multiple Availability Zones
 func (c *RDSChecks) CheckRDSMultiAZ(ctx context.Context) (CheckResult, error) {
-	instances, err := c.client.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
+	instances, err := describeAllDBInstances(ctx, c.client, &rds.DescribeDBInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-3.2.4", "RDS Multi-AZ Deployment", GetFrameworkMappings("RDS_MULTI_AZ"), err), err
 	}
 
 	noMultiAZ := []string{}
@@ -284,9 +272,9 @@ func (c *RDSChecks) CheckRDSMultiAZ(ctx context.Context) (CheckResult, error) {
 
 // Ensure RDS instances have deletion protection enabled
 func (c *RDSChecks) CheckRDSDeletionProtection(ctx context.Context) (CheckResult, error) {
-	instances, err := c.client.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
+	instances, err := describeAllDBInstances(ctx, c.client, &rds.DescribeDBInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-RDS-01", "RDS Deletion Protection", GetFrameworkMappings("RDS_DELETION_PROTECTION"), err), err
 	}
 
 	noDeletionProtection := []string{}

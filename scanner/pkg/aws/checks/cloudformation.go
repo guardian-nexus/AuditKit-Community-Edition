@@ -23,13 +23,9 @@ func (c *CloudFormationChecks) Name() string {
 func (c *CloudFormationChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckStackPolicy(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckStackPolicy)
 
-	if result, err := c.CheckDriftDetection(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckDriftDetection)
 
 	return results, nil
 }

@@ -25,19 +25,13 @@ func (c *SSMChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// CIS Section 10.1 - SSM Parameter Store Encryption
-	if result, err := c.CheckParameterEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckParameterEncryption)
 
 	// CIS Section 10.2 - SSM Session Manager Logging
-	if result, err := c.CheckSessionManagerLogging(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSessionManagerLogging)
 
 	// CIS Section 10.3 - SSM Patch Compliance
-	if result, err := c.CheckPatchCompliance(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckPatchCompliance)
 
 	return results, nil
 }
@@ -45,7 +39,7 @@ func (c *SSMChecks) Run(ctx context.Context) ([]CheckResult, error) {
 // CheckParameterEncryption - Ensure SSM Parameter Store uses encryption
 func (c *SSMChecks) CheckParameterEncryption(ctx context.Context) (CheckResult, error) {
 	// List all parameters
-	params, err := c.client.DescribeParameters(ctx, &ssm.DescribeParametersInput{})
+	params, err := describeAllParameters(ctx, c.client, &ssm.DescribeParametersInput{})
 	if err != nil {
 		return CheckResult{
 			Control:           "AWS-SSM-01",
@@ -187,7 +181,7 @@ func (c *SSMChecks) CheckSessionManagerLogging(ctx context.Context) (CheckResult
 // CheckPatchCompliance - Ensure EC2 instances are patch compliant
 func (c *SSMChecks) CheckPatchCompliance(ctx context.Context) (CheckResult, error) {
 	// List managed instances
-	instances, err := c.client.DescribeInstanceInformation(ctx, &ssm.DescribeInstanceInformationInput{})
+	instances, err := describeAllInstanceInformation(ctx, c.client, &ssm.DescribeInstanceInformationInput{})
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-SSM-02",

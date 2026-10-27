@@ -30,39 +30,28 @@ func (c *NetworkFirewallChecks) Run(ctx context.Context) ([]CheckResult, error) 
 	results := []CheckResult{}
 
 	// CIS Section 5 - Network Firewall controls (5.15-5.17)
-	if result, err := c.CheckNetworkFirewallSubnetPlacement(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckNetworkFirewallSubnetPlacement)
 
-	if result, err := c.CheckNetworkFirewallPolicyRules(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckNetworkFirewallPolicyRules)
 
-	if result, err := c.CheckNetworkFirewallLogging(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckNetworkFirewallLogging)
 
 	return results, nil
 }
 
 // Ensure Network Firewall is deployed in each AZ
 func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	// List all firewalls
 	firewalls, err := c.nfwClient.ListFirewalls(ctx, &networkfirewall.ListFirewallsInput{})
 	if err != nil {
-		return CheckResult{
-			Control:    "AWS-NETFW-01",
-			Name:       "Network Firewall AZ Deployment",
-			Status:     "PASS",
-			Evidence:   "No Network Firewalls deployed",
-			Priority:   PriorityInfo,
-			Timestamp:  time.Now(),
-			Frameworks: map[string]string{"SOC2": "CC6.6"},
-		}, nil
+		// This reported PASS "No Network Firewalls deployed" for any error,
+		// including a denied call that looked at nothing.
+		return checkError("AWS-NETFW-01", "Network Firewall AZ Deployment", map[string]string{"SOC2": "CC6.6"}, err), err
 	}
 
 	if len(firewalls.Firewalls) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "AWS-NETFW-01",
 			Name:       "Network Firewall AZ Deployment",
 			Status:     "INFO",
@@ -70,7 +59,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "CC6.6"},
-		}, nil
+		}), nil
 	}
 
 	firewallsWithMissingAZs := []string{}
@@ -117,7 +106,9 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.
 					subnetDetails, err := c.ec2Client.DescribeSubnets(ctx, &ec2.DescribeSubnetsInput{
 						SubnetIds: []string{*mapping.SubnetId},
 					})
-					if err == nil && len(subnetDetails.Subnets) > 0 {
+					if err != nil {
+						skipped.add("DescribeSubnets", err)
+					} else if len(subnetDetails.Subnets) > 0 {
 						if subnetDetails.Subnets[0].AvailabilityZone != nil {
 							fwAZs[*subnetDetails.Subnets[0].AvailabilityZone] = true
 						}
@@ -156,7 +147,7 @@ aws network-firewall associate-subnets \
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-NETFW-01",
 		Name:       "Network Firewall AZ Deployment",
 		Status:     "PASS",
@@ -164,7 +155,7 @@ aws network-firewall associate-subnets \
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC6.6"},
-	}, nil
+	}), nil
 }
 
 // Ensure Network Firewall policy has stateful rule groups

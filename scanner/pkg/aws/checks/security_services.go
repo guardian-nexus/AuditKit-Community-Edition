@@ -35,24 +35,16 @@ func (c *SecurityServicesChecks) Run(ctx context.Context) ([]CheckResult, error)
 	results := []CheckResult{}
 
 	// GuardDuty checks
-	if result, err := c.CheckGuardDutyEnabled(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckGuardDutyEnabled)
 
 	// Macie checks
-	if result, err := c.CheckMacieEnabled(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckMacieEnabled)
 
 	// Security Hub checks
-	if result, err := c.CheckSecurityHubEnabled(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSecurityHubEnabled)
 
 	// Inspector checks
-	if result, err := c.CheckInspectorEnabled(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckInspectorEnabled)
 
 	return results, nil
 }
@@ -100,7 +92,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 		DetectorId: &detectorId,
 	})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-SECSVC-01", "GuardDuty Enabled", map[string]string{"SOC2": "CC7.2", "PCI-DSS": "11.5.1"}, err), err
 	}
 
 	if detector.Status != "ENABLED" {

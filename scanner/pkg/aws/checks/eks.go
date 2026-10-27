@@ -24,37 +24,21 @@ func (c *EKSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// CIS Section 8 - EKS controls
-	if result, err := c.CheckEKSEndpointAccess(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEKSEndpointAccess)
 
-	if result, err := c.CheckEKSLogging(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEKSLogging)
 
-	if result, err := c.CheckEKSEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEKSEncryption)
 
-	if result, err := c.CheckEKSNetworkPolicy(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEKSNetworkPolicy)
 
-	if result, err := c.CheckEKSPodSecurityPolicy(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEKSPodSecurityPolicy)
 
-	if result, err := c.CheckEKSRBAC(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEKSRBAC)
 
-	if result, err := c.CheckEKSSecretsEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEKSSecretsEncryption)
 
-	if result, err := c.CheckEKSAuditLogging(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEKSAuditLogging)
 
 	return results, nil
 }
@@ -63,7 +47,7 @@ func (c *EKSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 func (c *EKSChecks) CheckEKSEndpointAccess(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.ListClusters(ctx, &eks.ListClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-EKS-03", "EKS Cluster Endpoint Access", map[string]string{"SOC2": "CC6.6", "PCI-DSS": "1.4.2"}, err), err
 	}
 
 	if len(clusters.Clusters) == 0 {
@@ -145,7 +129,7 @@ aws eks update-cluster-config \
 func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.ListClusters(ctx, &eks.ListClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-EKS-04", "EKS Cluster Logging", map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1.2"}, err), err
 	}
 
 	if len(clusters.Clusters) == 0 {
@@ -236,7 +220,7 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 func (c *EKSChecks) CheckEKSEncryption(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.ListClusters(ctx, &eks.ListClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-EKS-02", "EKS Cluster Encryption", map[string]string{"SOC2": "CC6.7", "PCI-DSS": "3.5.1"}, err), err
 	}
 
 	if len(clusters.Clusters) == 0 {
@@ -314,7 +298,7 @@ aws eks create-cluster \
 func (c *EKSChecks) CheckEKSNetworkPolicy(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.ListClusters(ctx, &eks.ListClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-EKS-05", "EKS Network Policy", map[string]string{"SOC2": "CC6.6"}, err), err
 	}
 
 	if len(clusters.Clusters) == 0 {
@@ -355,7 +339,7 @@ kubectl apply -f https://raw.githubusercontent.com/aws/amazon-vpc-cni-k8s/master
 func (c *EKSChecks) CheckEKSPodSecurityPolicy(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.ListClusters(ctx, &eks.ListClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-EKS-06", "EKS Pod Security Policy", map[string]string{"SOC2": "CC8.1", "PCI-DSS": "2.2.1"}, err), err
 	}
 
 	if len(clusters.Clusters) == 0 {
@@ -399,7 +383,7 @@ kubectl get namespace default -o yaml | grep pod-security`,
 func (c *EKSChecks) CheckEKSRBAC(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.ListClusters(ctx, &eks.ListClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-EKS-07", "EKS RBAC Configuration", map[string]string{"SOC2": "CC6.3", "PCI-DSS": "7.2.2"}, err), err
 	}
 
 	if len(clusters.Clusters) == 0 {
@@ -451,7 +435,7 @@ func (c *EKSChecks) CheckEKSSecretsEncryption(ctx context.Context) (CheckResult,
 func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.ListClusters(ctx, &eks.ListClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-EKS-01", "EKS Audit Logging", map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1"}, err), err
 	}
 
 	if len(clusters.Clusters) == 0 {

@@ -29,24 +29,16 @@ func (c *OrganizationsAdvancedChecks) Run(ctx context.Context) ([]CheckResult, e
 	results := []CheckResult{}
 
 	// SCPs enabled
-	if result, err := c.CheckSCPsEnabled(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSCPsEnabled)
 
 	// Multi-account structure
-	if result, err := c.CheckMultiAccountStructure(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckMultiAccountStructure)
 
 	// Organization CloudTrail
-	if result, err := c.CheckOrganizationTrail(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckOrganizationTrail)
 
 	// Service Control Policies configured
-	if result, err := c.CheckSCPsConfigured(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSCPsConfigured)
 
 	return results, nil
 }

@@ -57,7 +57,7 @@ func (c *AvailabilityConfidentialityChecks) checkRecoveryTesting(ctx context.Con
 		Frameworks:      map[string]string{FrameworkSOC2: "A1.3"},
 	}
 
-	instances, err := c.rdsClient.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
+	instances, err := describeAllDBInstances(ctx, c.rdsClient, &rds.DescribeDBInstancesInput{})
 	if err != nil {
 		base.Status = "INFO"
 		base.Evidence = "SOC2 A1.3: document and retain evidence of recovery plan testing"

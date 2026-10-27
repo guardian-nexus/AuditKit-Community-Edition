@@ -31,19 +31,13 @@ func (c *MessagingChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// CIS Section 10.13 - SNS Encryption
-	if result, err := c.CheckSNSEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSNSEncryption)
 
 	// CIS Section 10.14 - SQS Encryption
-	if result, err := c.CheckSQSEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSQSEncryption)
 
 	// CIS Section 10.15 - Messaging Access Policies
-	if result, err := c.CheckMessagingAccessPolicies(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckMessagingAccessPolicies)
 
 	return results, nil
 }
