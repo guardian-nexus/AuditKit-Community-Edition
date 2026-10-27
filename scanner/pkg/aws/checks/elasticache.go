@@ -24,25 +24,15 @@ func (c *ElastiCacheChecks) Name() string {
 func (c *ElastiCacheChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckEncryptionAtRest(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEncryptionAtRest)
 
-	if result, err := c.CheckEncryptionInTransit(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEncryptionInTransit)
 
-	if result, err := c.CheckAutoMinorVersionUpgrade(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAutoMinorVersionUpgrade)
 
-	if result, err := c.CheckAuthToken(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAuthToken)
 
-	if result, err := c.CheckBackupRetention(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckBackupRetention)
 
 	return results, nil
 }
@@ -50,7 +40,7 @@ func (c *ElastiCacheChecks) Run(ctx context.Context) ([]CheckResult, error) {
 func (c *ElastiCacheChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.DescribeCacheClusters(ctx, &elasticache.DescribeCacheClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.3", "ElastiCache Encryption at Rest", GetFrameworkMappings("ELASTICACHE_ENCRYPTION"), err), err
 	}
 
 	unencrypted := []string{}
@@ -106,7 +96,7 @@ func (c *ElastiCacheChecks) CheckEncryptionAtRest(ctx context.Context) (CheckRes
 func (c *ElastiCacheChecks) CheckEncryptionInTransit(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.DescribeCacheClusters(ctx, &elasticache.DescribeCacheClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.4", "ElastiCache Encryption in Transit", GetFrameworkMappings("ELASTICACHE_TRANSIT"), err), err
 	}
 
 	noTransitEncryption := []string{}
@@ -162,7 +152,7 @@ func (c *ElastiCacheChecks) CheckEncryptionInTransit(ctx context.Context) (Check
 func (c *ElastiCacheChecks) CheckAutoMinorVersionUpgrade(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.DescribeCacheClusters(ctx, &elasticache.DescribeCacheClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC7.5", "ElastiCache Auto Minor Version Upgrade", GetFrameworkMappings("ELASTICACHE_PATCHING"), err), err
 	}
 
 	noAutoUpgrade := []string{}
@@ -219,7 +209,7 @@ func (c *ElastiCacheChecks) CheckAuthToken(ctx context.Context) (CheckResult, er
 	// Check Redis replication groups for AUTH token
 	repGroups, err := c.client.DescribeReplicationGroups(ctx, &elasticache.DescribeReplicationGroupsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.6", "ElastiCache Redis AUTH Token", GetFrameworkMappings("ELASTICACHE_AUTH"), err), err
 	}
 
 	noAuth := []string{}
@@ -275,7 +265,7 @@ func (c *ElastiCacheChecks) CheckAuthToken(ctx context.Context) (CheckResult, er
 func (c *ElastiCacheChecks) CheckBackupRetention(ctx context.Context) (CheckResult, error) {
 	repGroups, err := c.client.DescribeReplicationGroups(ctx, &elasticache.DescribeReplicationGroupsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("A1.2", "ElastiCache Backup Retention", GetFrameworkMappings("ELASTICACHE_BACKUP"), err), err
 	}
 
 	lowRetention := []string{}

@@ -24,19 +24,13 @@ func (c *BackupVaultChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// CIS Section 10.10 - Backup Vault Encryption
-	if result, err := c.CheckBackupVaultEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckBackupVaultEncryption)
 
 	// CIS Section 10.11 - Backup Plan Exists
-	if result, err := c.CheckBackupPlanExists(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckBackupPlanExists)
 
 	// CIS Section 10.12 - Backup Vault Lock
-	if result, err := c.CheckBackupVaultLock(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckBackupVaultLock)
 
 	return results, nil
 }

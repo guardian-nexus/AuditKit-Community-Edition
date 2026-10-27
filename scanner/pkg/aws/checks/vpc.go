@@ -25,41 +25,27 @@ func (c *VPCChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// Existing check
-	if result, err := c.CheckVPCFlowLogs(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckVPCFlowLogs)
 
 	// NEW CIS checks
-	if result, err := c.CheckDefaultVPC(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckDefaultVPC)
 
-	if result, err := c.CheckVPCPeering(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckVPCPeering)
 
 	// VPC Endpoints
-	if result, err := c.CheckVPCEndpoints(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckVPCEndpoints)
 
 	// NACL restrictions
 	results = append(results, c.CheckNACLRestrictions(ctx)...)
 
 	// Admin port security
-	if result, err := c.CheckAdminPortSecurity(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAdminPortSecurity)
 
 	// EC2 subnet placement
-	if result, err := c.CheckEC2SubnetPlacement(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEC2SubnetPlacement)
 
 	// Unused security groups
-	if result, err := c.CheckUnusedSecurityGroups(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckUnusedSecurityGroups)
 
 	// NEW CIS controls - v0.7.0 additions
 	results = append(results, c.CheckVPCPeeringRouting(ctx))
@@ -72,13 +58,13 @@ func (c *VPCChecks) CheckVPCFlowLogs(ctx context.Context) (CheckResult, error) {
 	// Get all VPCs
 	vpcs, err := c.client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC7.1", "VPC Flow Logs", GetFrameworkMappings("VPC_FLOW_LOGS"), err), err
 	}
 
 	// Get flow logs
 	flowLogs, err := c.client.DescribeFlowLogs(ctx, &ec2.DescribeFlowLogsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC7.1", "VPC Flow Logs", GetFrameworkMappings("VPC_FLOW_LOGS"), err), err
 	}
 
 	// Map flow logs to VPCs
@@ -127,6 +113,7 @@ func (c *VPCChecks) CheckVPCFlowLogs(ctx context.Context) (CheckResult, error) {
 
 // Ensure no default VPC is in use
 func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	vpcs, err := c.client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{
 		Filters: []types.Filter{
 			{
@@ -136,7 +123,7 @@ func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
 		},
 	})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-VPC-01", "Default VPC in Use", GetFrameworkMappings("DEFAULT_VPC"), err), err
 	}
 
 	// Check if default VPC has any resources
@@ -153,7 +140,9 @@ func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
 		})
 
 		hasInstances := false
-		if err == nil {
+		if err != nil {
+			skipped.add("DescribeInstances", err)
+		} else {
 			for _, reservation := range instances.Reservations {
 				if len(reservation.Instances) > 0 {
 					hasInstances = true
@@ -184,7 +173,7 @@ func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-VPC-01",
 		Name:       "Default VPC in Use",
 		Status:     "PASS",
@@ -192,7 +181,7 @@ func (c *VPCChecks) CheckDefaultVPC(ctx context.Context) (CheckResult, error) {
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("DEFAULT_VPC"),
-	}, nil
+	}), nil
 }
 
 // CIS 6.6 - Ensure routing tables for VPC peering are least access
@@ -216,12 +205,12 @@ func (c *VPCChecks) CheckVPCPeering(ctx context.Context) (CheckResult, error) {
 func (c *VPCChecks) CheckVPCEndpoints(ctx context.Context) (CheckResult, error) {
 	vpcs, err := c.client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-6.8", "VPC Endpoints for AWS Services", map[string]string{"CIS-AWS": "6.8, 6.6"}, err), err
 	}
 
 	endpoints, err := c.client.DescribeVpcEndpoints(ctx, &ec2.DescribeVpcEndpointsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-6.8", "VPC Endpoints for AWS Services", map[string]string{"CIS-AWS": "6.8, 6.6"}, err), err
 	}
 
 	// Map endpoints by VPC
@@ -479,7 +468,7 @@ func (c *VPCChecks) CheckNACLRestrictions(ctx context.Context) []CheckResult {
 func (c *VPCChecks) CheckAdminPortSecurity(ctx context.Context) (CheckResult, error) {
 	secGroups, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-6.3", "Security Groups Restrict Admin Ports", map[string]string{"CIS-AWS": "6.3", "PCI-DSS": "1.4.2", "SOC2": "CC6.6"}, err), err
 	}
 
 	violatingSGs := []string{}
@@ -540,7 +529,7 @@ func (c *VPCChecks) CheckEC2SubnetPlacement(ctx context.Context) (CheckResult, e
 		Filters: []types.Filter{{Name: aws.String("isDefault"), Values: []string{"true"}}},
 	})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-VPC-02", "EC2 Instances in Custom VPC", map[string]string{"SOC2": "CC6.6"}, err), err
 	}
 
 	defaultVPCIds := make(map[string]bool)
@@ -551,7 +540,7 @@ func (c *VPCChecks) CheckEC2SubnetPlacement(ctx context.Context) (CheckResult, e
 	// Check instances
 	instances, err := c.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-VPC-02", "EC2 Instances in Custom VPC", map[string]string{"SOC2": "CC6.6"}, err), err
 	}
 
 	instancesInDefault := []string{}
@@ -595,13 +584,13 @@ func (c *VPCChecks) CheckEC2SubnetPlacement(ctx context.Context) (CheckResult, e
 func (c *VPCChecks) CheckUnusedSecurityGroups(ctx context.Context) (CheckResult, error) {
 	secGroups, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-VPC-05", "Unused Security Groups Removed", map[string]string{"SOC2": "CC6.6"}, err), err
 	}
 
 	// Get all ENIs
 	enis, err := c.client.DescribeNetworkInterfaces(ctx, &ec2.DescribeNetworkInterfacesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-VPC-05", "Unused Security Groups Removed", map[string]string{"SOC2": "CC6.6"}, err), err
 	}
 
 	usedSGs := make(map[string]bool)

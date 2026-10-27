@@ -488,7 +488,7 @@ func (s *AWSScanner) runSuites(ctx context.Context, verbose bool) []ScanResult {
 				Control:           cr.Control,
 				Name:              cr.Name,
 				Status:            cr.Status,
-				Evidence:          cr.Evidence,
+				Evidence:          noteRegion(cr, s.cfg.Region),
 				Remediation:       cr.Remediation,
 				RemediationDetail: cr.RemediationDetail,
 				Severity:          severityOf(cr),
@@ -560,4 +560,29 @@ func dedupeIdenticalResults(results []ScanResult) []ScanResult {
 	}
 
 	return deduped
+}
+
+// Region is the single region this scanner reads. Every client is built from
+// one config, so regional services (EC2, RDS, Lambda, GuardDuty, Config, ...)
+// are evaluated in this region only; reports state it so a reader knows.
+func (s *AWSScanner) Region() string {
+	return s.cfg.Region
+}
+
+// regionalServices are security services enabled per region. A PASS saying one
+// is enabled was true of the scanned region only, and read as account-wide.
+var regionalServices = []string{"GuardDuty", "Security Hub", "AWS Config", "Macie", "Access Analyzer", "EBS encryption by default", "EBS default encryption"}
+
+// noteRegion appends the scanned region to the evidence of a PASS that says a
+// regional security service is enabled, unless the evidence already names one.
+func noteRegion(cr checks.CheckResult, region string) string {
+	if cr.Status != checks.StatusPass || region == "" || strings.Contains(strings.ToLower(cr.Evidence), "region") {
+		return cr.Evidence
+	}
+	for _, svc := range regionalServices {
+		if strings.Contains(cr.Evidence, svc) {
+			return cr.Evidence + " (in region " + region + "; other regions not checked)"
+		}
+	}
+	return cr.Evidence
 }

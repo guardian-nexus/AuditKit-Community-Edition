@@ -27,57 +27,33 @@ func (c *EC2Checks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// Existing checks
-	if result, err := c.CheckOpenSecurityGroups(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckOpenSecurityGroups)
 
-	if result, err := c.CheckUnencryptedVolumes(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckUnencryptedVolumes)
 
-	if result, err := c.CheckPublicInstances(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckPublicInstances)
 
-	if result, err := c.CheckOldAMIs(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckOldAMIs)
 
 	// NEW CIS checks
-	if result, err := c.CheckSecurityGroupSSH(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSecurityGroupSSH)
 
-	if result, err := c.CheckSecurityGroupRDP(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSecurityGroupRDP)
 
-	if result, err := c.CheckDefaultSecurityGroup(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckDefaultSecurityGroup)
 
-	if result, err := c.CheckIMDSv2(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckIMDSv2)
 
-	if result, err := c.CheckEBSPublicSnapshots(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEBSPublicSnapshots)
 
 	// Additional CIS AWS controls
-	if result, err := c.CheckInstanceIAMRoles(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckInstanceIAMRoles)
 
 	// CIS AWS Foundations v7.0.0 6.4
-	if result, err := c.CheckSecurityGroupIPv6AdminPorts(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSecurityGroupIPv6AdminPorts)
 
 	// CIS AWS Foundations v7.0.0 6.1.2
-	if result, err := c.CheckSecurityGroupCIFS(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSecurityGroupCIFS)
 
 	return results, nil
 }
@@ -178,7 +154,7 @@ func (c *EC2Checks) CheckOpenSecurityGroups(ctx context.Context) (CheckResult, e
 func (c *EC2Checks) CheckUnencryptedVolumes(ctx context.Context) (CheckResult, error) {
 	volumes, err := c.client.DescribeVolumes(ctx, &ec2.DescribeVolumesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.3", "EBS Volume Encryption", GetFrameworkMappings("EBS_ENCRYPTION"), err), err
 	}
 
 	unencryptedVolumes := []string{}
@@ -246,7 +222,7 @@ func (c *EC2Checks) CheckUnencryptedVolumes(ctx context.Context) (CheckResult, e
 func (c *EC2Checks) CheckPublicInstances(ctx context.Context) (CheckResult, error) {
 	instances, err := c.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.1", "Public EC2 Instances", GetFrameworkMappings("PUBLIC_INSTANCES"), err), err
 	}
 
 	publicInstances := []string{}
@@ -322,7 +298,7 @@ func (c *EC2Checks) CheckOldAMIs(ctx context.Context) (CheckResult, error) {
 		Owners: []string{"self"},
 	})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC7.2", "AMI Age and Patching", GetFrameworkMappings("OLD_AMIS"), err), err
 	}
 
 	oldAMIs := []string{}
@@ -375,7 +351,7 @@ func (c *EC2Checks) CheckOldAMIs(ctx context.Context) (CheckResult, error) {
 func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, error) {
 	sgs, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-6.3", "SSH Access from Internet", GetFrameworkMappings("SECURITY_GROUP_UNRESTRICTED"), err), err
 	}
 
 	sshOpenGroups := []string{}
@@ -428,7 +404,7 @@ func (c *EC2Checks) CheckSecurityGroupSSH(ctx context.Context) (CheckResult, err
 func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, error) {
 	sgs, err := c.client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-6.3", "RDP Access from Internet", GetFrameworkMappings("SECURITY_GROUP_UNRESTRICTED"), err), err
 	}
 
 	rdpOpenGroups := []string{}
@@ -477,9 +453,10 @@ func (c *EC2Checks) CheckSecurityGroupRDP(ctx context.Context) (CheckResult, err
 
 // CIS 6.5 - Ensure default security group restricts all traffic
 func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	vpcs, err := c.client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-6.5", "Default Security Group", GetFrameworkMappings("DEFAULT_VPC"), err), err
 	}
 
 	openDefaultSGs := []string{}
@@ -498,7 +475,9 @@ func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult,
 			},
 		})
 
-		if err == nil && len(sgs.SecurityGroups) > 0 {
+		if err != nil {
+			skipped.add("DescribeSecurityGroups", err)
+		} else if len(sgs.SecurityGroups) > 0 {
 			sg := sgs.SecurityGroups[0]
 			// Check if default SG has any rules
 			if len(sg.IpPermissions) > 0 || len(sg.IpPermissionsEgress) > 1 {
@@ -524,7 +503,7 @@ func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult,
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CIS-6.5",
 		Name:       "Default Security Group",
 		Status:     "PASS",
@@ -532,14 +511,14 @@ func (c *EC2Checks) CheckDefaultSecurityGroup(ctx context.Context) (CheckResult,
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("DEFAULT_VPC"),
-	}, nil
+	}), nil
 }
 
 // CIS 6.7 - Ensure EC2 instances use IMDSv2
 func (c *EC2Checks) CheckIMDSv2(ctx context.Context) (CheckResult, error) {
 	instances, err := c.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-6.7", "EC2 IMDSv2", GetFrameworkMappings("IMDS_V2"), err), err
 	}
 
 	imdsV1Instances := []string{}
@@ -589,11 +568,12 @@ func (c *EC2Checks) CheckIMDSv2(ctx context.Context) (CheckResult, error) {
 
 // Ensure EBS volume snapshots are not publicly accessible
 func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	snapshots, err := c.client.DescribeSnapshots(ctx, &ec2.DescribeSnapshotsInput{
 		OwnerIds: []string{"self"},
 	})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-EC2-01", "EBS Public Snapshots", GetFrameworkMappings("EBS_PUBLIC_SNAPSHOTS"), err), err
 	}
 
 	publicSnapshots := []string{}
@@ -604,7 +584,9 @@ func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, e
 			Attribute:  types.SnapshotAttributeNameCreateVolumePermission,
 		})
 
-		if err == nil {
+		if err != nil {
+			skipped.add("DescribeSnapshotAttribute", err)
+		} else {
 			for _, perm := range attrs.CreateVolumePermissions {
 				if perm.Group == "all" {
 					publicSnapshots = append(publicSnapshots, aws.ToString(snapshot.SnapshotId))
@@ -631,7 +613,7 @@ func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, e
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-EC2-01",
 		Name:       "EBS Public Snapshots",
 		Status:     "PASS",
@@ -639,7 +621,7 @@ func (c *EC2Checks) CheckEBSPublicSnapshots(ctx context.Context) (CheckResult, e
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("EBS_PUBLIC_SNAPSHOTS"),
-	}, nil
+	}), nil
 }
 
 // CheckInstanceIAMRoles verifies EC2 instances use IAM roles (CIS 2.16)

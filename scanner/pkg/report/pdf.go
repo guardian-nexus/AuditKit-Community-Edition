@@ -12,9 +12,11 @@ import (
 )
 
 type ComplianceResult struct {
-	Timestamp       time.Time
-	Provider        string
-	AccountID       string
+	Timestamp time.Time
+	Provider  string
+	AccountID string
+	// Region is the AWS region the scan read; empty for other providers.
+	Region          string
 	Framework       string
 	Score           float64
 	TotalControls   int
@@ -192,7 +194,7 @@ func generateCoverPage(pdf *gofpdf.Fpdf, result ComplianceResult) {
 	pdf.SetFont("Arial", "", 10)
 	pdf.SetTextColor(108, 117, 125)
 	pdf.CellFormat(0, 5, fmt.Sprintf("Generated: %s", result.Timestamp.Format("January 2, 2006 at 3:04 PM")), "", 1, "C", false, 0, "")
-	pdf.CellFormat(0, 5, fmt.Sprintf("Provider: %s | Account: %s", strings.ToUpper(result.Provider), result.AccountID), "", 1, "C", false, 0, "")
+	pdf.CellFormat(0, 5, fmt.Sprintf("Provider: %s | Account: %s", strings.ToUpper(result.Provider), AccountLabel(result.AccountID, result.Region)), "", 1, "C", false, 0, "")
 }
 
 func generateComplianceDisclaimer(pdf *gofpdf.Fpdf, result ComplianceResult) {
@@ -944,4 +946,14 @@ func reportNameSuffix(id, name string) string {
 		return ""
 	}
 	return " - " + name
+}
+
+// AccountLabel is the account as reports print it, with the AWS region the scan
+// read when there is one: regional services were evaluated in that region only,
+// and no report used to say which it was.
+func AccountLabel(account, region string) string {
+	if region == "" {
+		return account
+	}
+	return fmt.Sprintf("%s (region %s only)", account, region)
 }

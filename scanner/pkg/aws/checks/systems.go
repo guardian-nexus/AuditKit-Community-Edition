@@ -28,13 +28,9 @@ func (c *SystemsChecks) Name() string {
 func (c *SystemsChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckPatchCompliance(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckPatchCompliance)
 
-	if result, err := c.CheckAutoScaling(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAutoScaling)
 
 	return results, nil
 }

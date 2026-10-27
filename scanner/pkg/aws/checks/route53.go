@@ -24,9 +24,7 @@ func (c *Route53Checks) Name() string {
 func (c *Route53Checks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckDNSSEC(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckDNSSEC)
 
 	return results, nil
 }

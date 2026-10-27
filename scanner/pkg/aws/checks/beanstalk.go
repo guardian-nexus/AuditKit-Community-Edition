@@ -24,19 +24,13 @@ func (c *BeanstalkChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// CIS Section 10.4 - Enhanced Health Reporting
-	if result, err := c.CheckEnhancedHealthReporting(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEnhancedHealthReporting)
 
 	// CIS Section 10.5 - Managed Platform Updates
-	if result, err := c.CheckManagedPlatformUpdates(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckManagedPlatformUpdates)
 
 	// CIS Section 10.6 - Log Streaming
-	if result, err := c.CheckLogStreaming(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckLogStreaming)
 
 	return results, nil
 }

@@ -26,14 +26,10 @@ func (c *ConfigChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// Existing check
-	if result, err := c.CheckConfigEnabled(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckConfigEnabled)
 
 	// NEW CIS check
-	if result, err := c.CheckConfigRecording(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckConfigRecording)
 
 	return results, nil
 }
@@ -110,7 +106,7 @@ func (c *ConfigChecks) CheckConfigRecording(ctx context.Context) (CheckResult, e
 	// Check if recorder is actually recording
 	recorderStatus, err := c.client.DescribeConfigurationRecorderStatus(ctx, &configservice.DescribeConfigurationRecorderStatusInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-4.3", "AWS Config Recording Status", GetFrameworkMappings("CONFIG_ENABLED"), err), err
 	}
 
 	notRecording := []string{}

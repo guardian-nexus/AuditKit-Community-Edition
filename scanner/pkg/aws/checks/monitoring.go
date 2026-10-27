@@ -32,25 +32,19 @@ func (c *MonitoringChecks) Name() string {
 func (c *MonitoringChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckCloudWatchAlarms(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckCloudWatchAlarms)
 
-	if result, err := c.CheckSNSTopics(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSNSTopics)
 
-	if result, err := c.CheckSecurityHubEnabled(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckSecurityHubEnabled)
 
 	return results, nil
 }
 
 func (c *MonitoringChecks) CheckCloudWatchAlarms(ctx context.Context) (CheckResult, error) {
-	alarms, err := c.cwClient.DescribeAlarms(ctx, &cloudwatch.DescribeAlarmsInput{})
+	alarms, err := describeAllAlarms(ctx, c.cwClient, &cloudwatch.DescribeAlarmsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC7.3", "Security Event Monitoring", nil, err), err
 	}
 
 	// Check for critical security alarms
@@ -107,7 +101,7 @@ func (c *MonitoringChecks) CheckCloudWatchAlarms(ctx context.Context) (CheckResu
 func (c *MonitoringChecks) CheckSNSTopics(ctx context.Context) (CheckResult, error) {
 	topics, err := c.snsClient.ListTopics(ctx, &sns.ListTopicsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC7.4", "Alert Notifications", nil, err), err
 	}
 
 	if len(topics.Topics) == 0 {

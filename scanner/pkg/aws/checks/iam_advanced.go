@@ -24,29 +24,21 @@ func (c *IAMAdvancedChecks) Name() string {
 func (c *IAMAdvancedChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckInactiveUsers(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckInactiveUsers)
 
-	if result, err := c.CheckExcessivePermissions(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckExcessivePermissions)
 
-	if result, err := c.CheckServiceAccountMFA(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckServiceAccountMFA)
 
-	if result, err := c.CheckRootAccountUsage(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckRootAccountUsage)
 
 	return results, nil
 }
 
 func (c *IAMAdvancedChecks) CheckInactiveUsers(ctx context.Context) (CheckResult, error) {
-	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.4", "Zombie IAM Users", nil, err), err
 	}
 
 	inactiveUsers := []string{}
@@ -107,10 +99,11 @@ func (c *IAMAdvancedChecks) CheckInactiveUsers(ctx context.Context) (CheckResult
 }
 
 func (c *IAMAdvancedChecks) CheckExcessivePermissions(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	// Check for users with AdministratorAccess
-	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.5", "Excessive Admin Users", nil, err), err
 	}
 
 	adminUsers := []string{}
@@ -121,7 +114,9 @@ func (c *IAMAdvancedChecks) CheckExcessivePermissions(ctx context.Context) (Chec
 			UserName: user.UserName,
 		})
 
-		if err == nil {
+		if err != nil {
+			skipped.add("ListAttachedUserPolicies", err)
+		} else {
 			for _, policy := range policies.AttachedPolicies {
 				if *policy.PolicyName == "AdministratorAccess" {
 					adminUsers = append(adminUsers, *user.UserName)
@@ -146,21 +141,22 @@ func (c *IAMAdvancedChecks) CheckExcessivePermissions(ctx context.Context) (Chec
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:   "CC6.5",
 		Name:      "Least Privilege Access",
 		Status:    "PASS",
 		Evidence:  "Admin access appropriately restricted",
 		Priority:  PriorityInfo,
 		Timestamp: time.Now(),
-	}, nil
+	}), nil
 }
 
 func (c *IAMAdvancedChecks) CheckServiceAccountMFA(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	// Check for programmatic users without MFA
-	users, err := c.client.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.5", "Service Account Security", nil, err), err
 	}
 
 	serviceAccountsNoMFA := []string{}
@@ -171,13 +167,17 @@ func (c *IAMAdvancedChecks) CheckServiceAccountMFA(ctx context.Context) (CheckRe
 			UserName: user.UserName,
 		})
 
-		if err == nil && len(keys.AccessKeyMetadata) > 0 {
+		if err != nil {
+			skipped.add("ListAccessKeys", err)
+		} else if len(keys.AccessKeyMetadata) > 0 {
 			// Has access keys, check for MFA
 			mfaDevices, err := c.client.ListMFADevices(ctx, &iam.ListMFADevicesInput{
 				UserName: user.UserName,
 			})
 
-			if err == nil && len(mfaDevices.MFADevices) == 0 {
+			if err != nil {
+				skipped.add("ListMFADevices", err)
+			} else if len(mfaDevices.MFADevices) == 0 {
 				// Service account without MFA
 				serviceAccountsNoMFA = append(serviceAccountsNoMFA, *user.UserName)
 			}
@@ -197,14 +197,14 @@ func (c *IAMAdvancedChecks) CheckServiceAccountMFA(ctx context.Context) (CheckRe
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:   "CC6.5",
 		Name:      "Service Account Security",
 		Status:    "PASS",
 		Evidence:  "Service accounts properly secured",
 		Priority:  PriorityInfo,
 		Timestamp: time.Now(),
-	}, nil
+	}), nil
 }
 
 func (c *IAMAdvancedChecks) CheckRootAccountUsage(ctx context.Context) (CheckResult, error) {

@@ -24,29 +24,17 @@ func (c *OpenSearchChecks) Name() string {
 func (c *OpenSearchChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckEncryptionAtRest(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEncryptionAtRest)
 
-	if result, err := c.CheckNodeToNodeEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckNodeToNodeEncryption)
 
-	if result, err := c.CheckHTTPS(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckHTTPS)
 
-	if result, err := c.CheckVPCDeployment(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckVPCDeployment)
 
-	if result, err := c.CheckAuditLogs(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAuditLogs)
 
-	if result, err := c.CheckFineGrainedAccessControl(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckFineGrainedAccessControl)
 
 	return results, nil
 }
@@ -54,7 +42,7 @@ func (c *OpenSearchChecks) Run(ctx context.Context) ([]CheckResult, error) {
 func (c *OpenSearchChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult, error) {
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.3", "OpenSearch Encryption at Rest", GetFrameworkMappings("OPENSEARCH_ENCRYPTION"), err), err
 	}
 
 	unencrypted := []string{}
@@ -118,7 +106,7 @@ func (c *OpenSearchChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResu
 func (c *OpenSearchChecks) CheckNodeToNodeEncryption(ctx context.Context) (CheckResult, error) {
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.4", "OpenSearch Node-to-Node Encryption", GetFrameworkMappings("OPENSEARCH_TRANSIT"), err), err
 	}
 
 	noNodeEncryption := []string{}
@@ -182,7 +170,7 @@ func (c *OpenSearchChecks) CheckNodeToNodeEncryption(ctx context.Context) (Check
 func (c *OpenSearchChecks) CheckHTTPS(ctx context.Context) (CheckResult, error) {
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.4", "OpenSearch HTTPS Required", GetFrameworkMappings("OPENSEARCH_HTTPS"), err), err
 	}
 
 	noHTTPS := []string{}
@@ -246,7 +234,7 @@ func (c *OpenSearchChecks) CheckHTTPS(ctx context.Context) (CheckResult, error) 
 func (c *OpenSearchChecks) CheckVPCDeployment(ctx context.Context) (CheckResult, error) {
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.1", "OpenSearch VPC Deployment", GetFrameworkMappings("OPENSEARCH_NETWORK"), err), err
 	}
 
 	publicDomains := []string{}
@@ -310,7 +298,7 @@ func (c *OpenSearchChecks) CheckVPCDeployment(ctx context.Context) (CheckResult,
 func (c *OpenSearchChecks) CheckAuditLogs(ctx context.Context) (CheckResult, error) {
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC7.1", "OpenSearch Audit Logs", GetFrameworkMappings("OPENSEARCH_LOGGING"), err), err
 	}
 
 	noAuditLogs := []string{}
@@ -387,7 +375,7 @@ func (c *OpenSearchChecks) CheckAuditLogs(ctx context.Context) (CheckResult, err
 func (c *OpenSearchChecks) CheckFineGrainedAccessControl(ctx context.Context) (CheckResult, error) {
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.6", "OpenSearch Fine-Grained Access Control", GetFrameworkMappings("OPENSEARCH_ACCESS"), err), err
 	}
 
 	noFGAC := []string{}

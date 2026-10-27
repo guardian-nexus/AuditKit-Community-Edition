@@ -56,6 +56,7 @@ func (c *CC1Checks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *CC1Checks) CheckCC1_1_IntegrityAndEthics(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check 1: AWS Organizations with SCPs for governance
@@ -76,9 +77,12 @@ func (c *CC1Checks) CheckCC1_1_IntegrityAndEthics(ctx context.Context) []CheckRe
 			})
 		} else {
 			// Check for Service Control Policies
-			policies, _ := c.orgClient.ListPolicies(ctx, &organizations.ListPoliciesInput{
+			policies, err := c.orgClient.ListPolicies(ctx, &organizations.ListPoliciesInput{
 				Filter: "SERVICE_CONTROL_POLICY",
 			})
+			if err != nil {
+				skipped.add("ListPolicies", err)
+			}
 
 			if policies != nil && len(policies.Policies) > 0 {
 				results = append(results, CheckResult{
@@ -104,14 +108,18 @@ func (c *CC1Checks) CheckCC1_1_IntegrityAndEthics(ctx context.Context) []CheckRe
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC1.1", "Organizational Governance Structure")
 }
 
 func (c *CC1Checks) CheckCC1_2_BoardOversight(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check 2: IAM roles for segregation of duties
-	roles, _ := c.iamClient.ListRoles(ctx, &iam.ListRolesInput{})
+	roles, err := listAllRoles(ctx, c.iamClient, &iam.ListRolesInput{})
+	if err != nil {
+		skipped.add("ListRoles", err)
+	}
 
 	adminRoles := 0
 	readOnlyRoles := 0
@@ -150,15 +158,19 @@ func (c *CC1Checks) CheckCC1_2_BoardOversight(ctx context.Context) []CheckResult
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC1.2", "Role-Based Access Segregation")
 }
 
 func (c *CC1Checks) CheckCC1_3_OrganizationalStructure(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check 3: SSM Parameter Store for configuration management
 	if c.ssmClient != nil {
-		params, _ := c.ssmClient.DescribeParameters(ctx, &ssm.DescribeParametersInput{})
+		params, err := describeAllParameters(ctx, c.ssmClient, &ssm.DescribeParametersInput{})
+		if err != nil {
+			skipped.add("DescribeParameters", err)
+		}
 
 		if params != nil && len(params.Parameters) > 0 {
 			// Check for hierarchy in parameters (indicates structure)
@@ -192,21 +204,28 @@ func (c *CC1Checks) CheckCC1_3_OrganizationalStructure(ctx context.Context) []Ch
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC1.3", "Configuration Management Structure")
 }
 
 func (c *CC1Checks) CheckCC1_4_Competence(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check 4: IAM users with MFA (demonstrates security competence)
-	users, _ := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.iamClient, &iam.ListUsersInput{})
+	if err != nil {
+		skipped.add("ListUsers", err)
+	}
 
 	if users != nil && len(users.Users) > 0 {
 		mfaUsers := 0
 		for _, user := range users.Users {
-			mfaDevices, _ := c.iamClient.ListMFADevices(ctx, &iam.ListMFADevicesInput{
+			mfaDevices, err := c.iamClient.ListMFADevices(ctx, &iam.ListMFADevicesInput{
 				UserName: user.UserName,
 			})
+			if err != nil {
+				skipped.add("ListMFADevices", err)
+			}
 			if mfaDevices != nil && len(mfaDevices.MFADevices) > 0 {
 				mfaUsers++
 			}
@@ -237,16 +256,20 @@ func (c *CC1Checks) CheckCC1_4_Competence(ctx context.Context) []CheckResult {
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC1.4", "Security Competence - MFA Adoption")
 }
 
 func (c *CC1Checks) CheckCC1_5_Accountability(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check 5: IAM policies with explicit deny (shows accountability controls)
-	policies, _ := c.iamClient.ListPolicies(ctx, &iam.ListPoliciesInput{
+	policies, err := listAllPolicies(ctx, c.iamClient, &iam.ListPoliciesInput{
 		Scope: "Local",
 	})
+	if err != nil {
+		skipped.add("ListPolicies", err)
+	}
 
 	if policies != nil && policies.Policies != nil {
 		restrictivePolicies := 0
@@ -279,7 +302,7 @@ func (c *CC1Checks) CheckCC1_5_Accountability(ctx context.Context) []CheckResult
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC1.5", "Accountability Controls")
 }
 
 // CC2: Communication and Information (3 criteria)
@@ -319,11 +342,15 @@ func (c *CC2Checks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *CC2Checks) CheckCC2_1_InformationGeneration(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check SSM Parameter Store for configuration information
 	if c.ssmClient != nil {
-		params, _ := c.ssmClient.DescribeParameters(ctx, &ssm.DescribeParametersInput{})
+		params, err := describeAllParameters(ctx, c.ssmClient, &ssm.DescribeParametersInput{})
+		if err != nil {
+			skipped.add("DescribeParameters", err)
+		}
 
 		if params != nil && len(params.Parameters) > 0 {
 			// Check for encrypted parameters (sensitive info handling)
@@ -358,7 +385,7 @@ func (c *CC2Checks) CheckCC2_1_InformationGeneration(ctx context.Context) []Chec
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC2.1", "Secure Information Storage")
 }
 
 func (c *CC2Checks) CheckCC2_2_InternalCommunication(ctx context.Context) []CheckResult {
@@ -424,7 +451,12 @@ func (c *CC2Checks) CheckCC2_3_ExternalCommunication(ctx context.Context) []Chec
 	results := []CheckResult{}
 
 	// Check for cross-account roles (external party communication)
-	roles, _ := c.iamClient.ListRoles(ctx, &iam.ListRolesInput{})
+	roles, err := listAllRoles(ctx, c.iamClient, &iam.ListRolesInput{})
+	if err != nil {
+		// The error was discarded, so a denied ListRoles read as zero roles and
+		// the control passed: "No cross-account access detected".
+		return append(results, checkError("CC2.3", "External Party Integration", nil, err))
+	}
 
 	crossAccountRoles := 0
 	if roles != nil && roles.Roles != nil {

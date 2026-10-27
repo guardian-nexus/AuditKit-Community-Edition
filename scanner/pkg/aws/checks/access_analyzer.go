@@ -28,9 +28,7 @@ func (c *AccessAnalyzerChecks) Name() string {
 func (c *AccessAnalyzerChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckAccessAnalyzerEnabled(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAccessAnalyzerEnabled)
 
 	return results, nil
 }

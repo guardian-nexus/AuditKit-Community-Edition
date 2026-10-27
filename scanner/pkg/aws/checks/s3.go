@@ -32,43 +32,25 @@ func (c *S3Checks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// Existing checks
-	if result, err := c.CheckPublicAccess(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckPublicAccess)
 
-	if result, err := c.CheckEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckEncryption)
 
-	if result, err := c.CheckVersioning(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckVersioning)
 
-	if result, err := c.CheckLogging(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckLogging)
 
 	// NEW CIS checks
-	if result, err := c.CheckMFADelete(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckMFADelete)
 
-	if result, err := c.CheckServerAccessLogging(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckServerAccessLogging)
 
-	if result, err := c.CheckObjectLock(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckObjectLock)
 
-	if result, err := c.CheckS3LifecyclePolicy(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckS3LifecyclePolicy)
 
 	// Additional CIS AWS controls
-	if result, err := c.CheckAccountPublicAccessBlock(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAccountPublicAccessBlock)
 
 	return results, nil
 }
@@ -170,7 +152,7 @@ func (c *S3Checks) CheckPublicAccess(ctx context.Context) (CheckResult, error) {
 func (c *S3Checks) CheckEncryption(ctx context.Context) (CheckResult, error) {
 	resp, err := c.client.ListBuckets(ctx, &s3.ListBucketsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.3", "S3 Encryption at Rest", GetFrameworkMappings("S3_ENCRYPTION"), err), err
 	}
 
 	unencryptedBuckets := []string{}
@@ -225,7 +207,7 @@ func (c *S3Checks) CheckEncryption(ctx context.Context) (CheckResult, error) {
 func (c *S3Checks) CheckVersioning(ctx context.Context) (CheckResult, error) {
 	resp, err := c.client.ListBuckets(ctx, &s3.ListBucketsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("A1.2", "S3 Versioning for Backup", GetFrameworkMappings("S3_VERSIONING"), err), err
 	}
 
 	noVersioning := []string{}
@@ -350,7 +332,7 @@ func (c *S3Checks) CheckLogging(ctx context.Context) (CheckResult, error) {
 func (c *S3Checks) CheckMFADelete(ctx context.Context) (CheckResult, error) {
 	resp, err := c.client.ListBuckets(ctx, &s3.ListBucketsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CIS-3.1.2", "S3 MFA Delete", GetFrameworkMappings("S3_MFA_DELETE"), err), err
 	}
 
 	bucketsWithoutMFADelete := []string{}
@@ -397,7 +379,7 @@ func (c *S3Checks) CheckMFADelete(ctx context.Context) (CheckResult, error) {
 func (c *S3Checks) CheckServerAccessLogging(ctx context.Context) (CheckResult, error) {
 	resp, err := c.client.ListBuckets(ctx, &s3.ListBucketsInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-S3-02", "S3 Server Access Logging", GetFrameworkMappings("S3_LOGGING"), err), err
 	}
 
 	bucketsWithoutLogging := []string{}

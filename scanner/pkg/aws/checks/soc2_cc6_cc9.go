@@ -149,7 +149,7 @@ func (c *CC6Checks) CheckCC6_2_CredentialIssuance(ctx context.Context) []CheckRe
 	results := []CheckResult{}
 
 	// Check IAM user creation and onboarding
-	users, err := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.iamClient, &iam.ListUsersInput{})
 	if err != nil {
 		results = append(results, CheckResult{
 			Control:   "CC6.2",
@@ -211,11 +211,18 @@ func (c *CC6Checks) CheckCC6_2_CredentialIssuance(ctx context.Context) []CheckRe
 }
 
 func (c *CC6Checks) CheckCC6_3_AccessPoints(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check VPC endpoints (secure access points)
-	vpcs, _ := c.ec2Client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
-	endpoints, _ := c.ec2Client.DescribeVpcEndpoints(ctx, &ec2.DescribeVpcEndpointsInput{})
+	vpcs, err := c.ec2Client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
+	if err != nil {
+		skipped.add("DescribeVpcs", err)
+	}
+	endpoints, err := c.ec2Client.DescribeVpcEndpoints(ctx, &ec2.DescribeVpcEndpointsInput{})
+	if err != nil {
+		skipped.add("DescribeVpcEndpoints", err)
+	}
 
 	if vpcs != nil && len(vpcs.Vpcs) > 0 {
 		if endpoints == nil || len(endpoints.VpcEndpoints) == 0 {
@@ -242,20 +249,27 @@ func (c *CC6Checks) CheckCC6_3_AccessPoints(ctx context.Context) []CheckResult {
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC6.3", "Secure Access Points")
 }
 
 func (c *CC6Checks) CheckCC6_4_AssetAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check S3 bucket public access
-	buckets, _ := c.s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
+	buckets, err := c.s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
+	if err != nil {
+		skipped.add("ListBuckets", err)
+	}
 	if buckets != nil && buckets.Buckets != nil {
 		publicBuckets := 0
 		for _, bucket := range buckets.Buckets {
-			acl, _ := c.s3Client.GetBucketAcl(ctx, &s3.GetBucketAclInput{
+			acl, err := c.s3Client.GetBucketAcl(ctx, &s3.GetBucketAclInput{
 				Bucket: bucket.Name,
 			})
+			if err != nil {
+				skipped.add("GetBucketAcl", err)
+			}
 			if acl != nil {
 				for _, grant := range acl.Grants {
 					if grant.Grantee != nil && grant.Grantee.URI != nil {
@@ -292,14 +306,15 @@ func (c *CC6Checks) CheckCC6_4_AssetAccess(ctx context.Context) []CheckResult {
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC6.4", "Asset Access Restrictions")
 }
 
 func (c *CC6Checks) CheckCC6_5_AccessRemoval(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check for inactive users that should be removed
-	users, err := c.iamClient.ListUsers(ctx, &iam.ListUsersInput{})
+	users, err := listAllUsers(ctx, c.iamClient, &iam.ListUsersInput{})
 	if err != nil {
 		results = append(results, CheckResult{
 			Control:   "CC6.5",
@@ -317,9 +332,12 @@ func (c *CC6Checks) CheckCC6_5_AccessRemoval(ctx context.Context) []CheckResult 
 	if users != nil && users.Users != nil {
 		for _, user := range users.Users {
 			// Get user's last activity
-			accessKeys, _ := c.iamClient.ListAccessKeys(ctx, &iam.ListAccessKeysInput{
+			accessKeys, err := c.iamClient.ListAccessKeys(ctx, &iam.ListAccessKeysInput{
 				UserName: user.UserName,
 			})
+			if err != nil {
+				skipped.add("ListAccessKeys", err)
+			}
 
 			hasOldKey := false
 			if accessKeys != nil && accessKeys.AccessKeyMetadata != nil {
@@ -362,14 +380,18 @@ func (c *CC6Checks) CheckCC6_5_AccessRemoval(ctx context.Context) []CheckResult 
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC6.5", "Access Removal Process")
 }
 
 func (c *CC6Checks) CheckCC6_6_UnauthorizedPrevention(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check CloudTrail for unauthorized access monitoring
-	trails, _ := c.cloudtrailClient.DescribeTrails(ctx, &cloudtrail.DescribeTrailsInput{})
+	trails, err := c.cloudtrailClient.DescribeTrails(ctx, &cloudtrail.DescribeTrailsInput{})
+	if err != nil {
+		skipped.add("DescribeTrails", err)
+	}
 	if trails == nil || len(trails.TrailList) == 0 {
 		results = append(results, CheckResult{
 			Control:     "CC6.6",
@@ -413,7 +435,7 @@ func (c *CC6Checks) CheckCC6_6_UnauthorizedPrevention(ctx context.Context) []Che
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC6.6", "Unauthorized Access Prevention")
 }
 
 func (c *CC6Checks) CheckCC6_7_Authentication(ctx context.Context) []CheckResult {
@@ -488,16 +510,23 @@ func (c *CC6Checks) CheckCC6_7_Authentication(ctx context.Context) []CheckResult
 }
 
 func (c *CC6Checks) CheckCC6_8_ModificationPrevention(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check S3 versioning for data modification tracking
-	buckets, _ := c.s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
+	buckets, err := c.s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
+	if err != nil {
+		skipped.add("ListBuckets", err)
+	}
 	if buckets != nil && len(buckets.Buckets) > 0 {
 		versionedBuckets := 0
 		for _, bucket := range buckets.Buckets {
-			versioning, _ := c.s3Client.GetBucketVersioning(ctx, &s3.GetBucketVersioningInput{
+			versioning, err := c.s3Client.GetBucketVersioning(ctx, &s3.GetBucketVersioningInput{
 				Bucket: bucket.Name,
 			})
+			if err != nil {
+				skipped.add("GetBucketVersioning", err)
+			}
 			if versioning != nil && versioning.Status == "Enabled" {
 				versionedBuckets++
 			}
@@ -537,7 +566,7 @@ func (c *CC6Checks) CheckCC6_8_ModificationPrevention(ctx context.Context) []Che
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC6.8", "Data Modification Prevention")
 }
 
 // CC7: System Operations (4 criteria)
@@ -580,16 +609,23 @@ func (c *CC7Checks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *CC7Checks) CheckCC7_1_Monitoring(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check CloudTrail logging
-	trails, _ := c.cloudtrailClient.DescribeTrails(ctx, &cloudtrail.DescribeTrailsInput{})
+	trails, err := c.cloudtrailClient.DescribeTrails(ctx, &cloudtrail.DescribeTrailsInput{})
+	if err != nil {
+		skipped.add("DescribeTrails", err)
+	}
 	if trails != nil && len(trails.TrailList) > 0 {
 		enabledTrails := 0
 		for _, trail := range trails.TrailList {
-			status, _ := c.cloudtrailClient.GetTrailStatus(ctx, &cloudtrail.GetTrailStatusInput{
+			status, err := c.cloudtrailClient.GetTrailStatus(ctx, &cloudtrail.GetTrailStatusInput{
 				Name: trail.Name,
 			})
+			if err != nil {
+				skipped.add("GetTrailStatus", err)
+			}
 			if status != nil && status.IsLogging != nil && *status.IsLogging {
 				enabledTrails++
 			}
@@ -629,14 +665,18 @@ func (c *CC7Checks) CheckCC7_1_Monitoring(ctx context.Context) []CheckResult {
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC7.1", "System Monitoring")
 }
 
 func (c *CC7Checks) CheckCC7_2_AnomalyDetection(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check if Lambda functions exist for anomaly detection
-	functions, _ := c.lambdaClient.ListFunctions(ctx, &lambda.ListFunctionsInput{})
+	functions, err := listAllFunctions(ctx, c.lambdaClient, &lambda.ListFunctionsInput{})
+	if err != nil {
+		skipped.add("ListFunctions", err)
+	}
 	anomalyFunctions := 0
 
 	if functions != nil && functions.Functions != nil {
@@ -669,15 +709,19 @@ func (c *CC7Checks) CheckCC7_2_AnomalyDetection(ctx context.Context) []CheckResu
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC7.2", "Anomaly Detection")
 }
 
 func (c *CC7Checks) CheckCC7_3_SecurityEvents(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check SSM for security patching
 	if c.ssmClient != nil {
-		patches, _ := c.ssmClient.DescribePatchGroups(ctx, &ssm.DescribePatchGroupsInput{})
+		patches, err := c.ssmClient.DescribePatchGroups(ctx, &ssm.DescribePatchGroupsInput{})
+		if err != nil {
+			skipped.add("DescribePatchGroups", err)
+		}
 
 		if patches != nil && len(patches.Mappings) > 0 {
 			results = append(results, CheckResult{
@@ -702,7 +746,7 @@ func (c *CC7Checks) CheckCC7_3_SecurityEvents(ctx context.Context) []CheckResult
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC7.3", "Security Event Management")
 }
 
 func (c *CC7Checks) CheckCC7_4_IncidentResponse(ctx context.Context) []CheckResult {
@@ -750,18 +794,25 @@ func (c *CC8Checks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *CC8Checks) CheckCC8_1_ChangeManagement(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check Lambda function versioning (change tracking)
 	if c.lambdaClient != nil {
-		functions, _ := c.lambdaClient.ListFunctions(ctx, &lambda.ListFunctionsInput{})
+		functions, err := listAllFunctions(ctx, c.lambdaClient, &lambda.ListFunctionsInput{})
+		if err != nil {
+			skipped.add("ListFunctions", err)
+		}
 
 		if functions != nil && len(functions.Functions) > 0 {
 			versionedFunctions := 0
 			for _, fn := range functions.Functions {
-				versions, _ := c.lambdaClient.ListVersionsByFunction(ctx, &lambda.ListVersionsByFunctionInput{
+				versions, err := c.lambdaClient.ListVersionsByFunction(ctx, &lambda.ListVersionsByFunctionInput{
 					FunctionName: fn.FunctionName,
 				})
+				if err != nil {
+					skipped.add("ListVersionsByFunction", err)
+				}
 				if versions != nil && versions.Versions != nil && len(versions.Versions) > 1 {
 					versionedFunctions++
 				}
@@ -794,9 +845,12 @@ func (c *CC8Checks) CheckCC8_1_ChangeManagement(ctx context.Context) []CheckResu
 	}
 
 	// Check EC2 AMIs for image management
-	images, _ := c.ec2Client.DescribeImages(ctx, &ec2.DescribeImagesInput{
+	images, err := c.ec2Client.DescribeImages(ctx, &ec2.DescribeImagesInput{
 		Owners: []string{"self"},
 	})
+	if err != nil {
+		skipped.add("DescribeImages", err)
+	}
 
 	if images != nil && len(images.Images) > 0 {
 		results = append(results, CheckResult{
@@ -819,7 +873,7 @@ func (c *CC8Checks) CheckCC8_1_ChangeManagement(ctx context.Context) []CheckResu
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC8.1", "Change Management - Function Versioning")
 }
 
 // CC9: Risk Mitigation (1 criteria)
@@ -854,10 +908,14 @@ func (c *CC9Checks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *CC9Checks) CheckCC9_1_VendorRisk(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check RDS for database encryption (data at rest protection)
-	databases, _ := c.rdsClient.DescribeDBInstances(ctx, &rds.DescribeDBInstancesInput{})
+	databases, err := describeAllDBInstances(ctx, c.rdsClient, &rds.DescribeDBInstancesInput{})
+	if err != nil {
+		skipped.add("DescribeDBInstances", err)
+	}
 	if databases != nil && len(databases.DBInstances) > 0 {
 		encryptedDBs := 0
 		for _, db := range databases.DBInstances {
@@ -891,20 +949,27 @@ func (c *CC9Checks) CheckCC9_1_VendorRisk(ctx context.Context) []CheckResult {
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC9.1", "Data Protection - Database Encryption")
 }
 
 func (c *CC9Checks) CheckCC9_2_VendorManagement(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check S3 for encryption (vendor data protection)
-	buckets, _ := c.s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
+	buckets, err := c.s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
+	if err != nil {
+		skipped.add("ListBuckets", err)
+	}
 	if buckets != nil && len(buckets.Buckets) > 0 {
 		encryptedBuckets := 0
 		for _, bucket := range buckets.Buckets {
-			encryption, _ := c.s3Client.GetBucketEncryption(ctx, &s3.GetBucketEncryptionInput{
+			encryption, err := c.s3Client.GetBucketEncryption(ctx, &s3.GetBucketEncryptionInput{
 				Bucket: bucket.Name,
 			})
+			if err != nil {
+				skipped.add("GetBucketEncryption", err)
+			}
 			if encryption != nil && encryption.ServerSideEncryptionConfiguration != nil {
 				encryptedBuckets++
 			}
@@ -935,5 +1000,5 @@ func (c *CC9Checks) CheckCC9_2_VendorManagement(ctx context.Context) []CheckResu
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC9.2", "Vendor Data Management - S3 Encryption")
 }

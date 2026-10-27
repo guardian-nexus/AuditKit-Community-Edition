@@ -26,21 +26,13 @@ func (c *ECSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// CIS Section 7 - ECS controls
-	if result, err := c.CheckECSTaskDefinitionLogging(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckECSTaskDefinitionLogging)
 
-	if result, err := c.CheckECSSecretsManagement(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckECSSecretsManagement)
 
-	if result, err := c.CheckECSContainerInsights(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckECSContainerInsights)
 
-	if result, err := c.CheckECSTaskRolePermissions(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckECSTaskRolePermissions)
 
 	return results, nil
 }
@@ -50,7 +42,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 	// List task definition families
 	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-ECS-03", "ECS Task Definition Logging", map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1"}, err), err
 	}
 
 	tasksWithoutLogging := []string{}
@@ -148,7 +140,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult, error) {
 	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-ECS-02", "ECS Secrets Management", map[string]string{"SOC2": "CC6.1", "PCI-DSS": "3.5.1"}, err), err
 	}
 
 	tasksWithPlaintextSecrets := []string{}
@@ -246,7 +238,7 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.ListClusters(ctx, &ecs.ListClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-ECS-01", "ECS Container Insights", map[string]string{"SOC2": "CC7.2"}, err), err
 	}
 
 	if len(clusters.ClusterArns) == 0 {
@@ -266,7 +258,7 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 		Include:  []types.ClusterField{types.ClusterFieldSettings},
 	})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-ECS-01", "ECS Container Insights", map[string]string{"SOC2": "CC7.2"}, err), err
 	}
 
 	clustersWithoutInsights := []string{}
@@ -321,7 +313,7 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 func (c *ECSChecks) CheckECSTaskRolePermissions(ctx context.Context) (CheckResult, error) {
 	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("AWS-ECS-04", "ECS Task Role Permissions", map[string]string{"SOC2": "CC6.3", "PCI-DSS": "7.2.2"}, err), err
 	}
 
 	tasksWithBroadRoles := []string{}

@@ -23,13 +23,9 @@ func (c *ACMChecks) Name() string {
 func (c *ACMChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckCertificateRenewal(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckCertificateRenewal)
 
-	if result, err := c.CheckCertificateInUse(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckCertificateInUse)
 
 	return results, nil
 }

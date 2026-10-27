@@ -29,19 +29,13 @@ func (c *APIGatewayChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	// CIS Section 10.7 - API Gateway Logging
-	if result, err := c.CheckAPIGatewayLogging(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAPIGatewayLogging)
 
 	// CIS Section 10.8 - API Gateway Authentication
-	if result, err := c.CheckAPIGatewayAuth(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAPIGatewayAuth)
 
 	// CIS Section 10.9 - API Gateway TLS
-	if result, err := c.CheckAPIGatewayTLS(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckAPIGatewayTLS)
 
 	return results, nil
 }

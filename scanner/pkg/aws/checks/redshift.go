@@ -24,33 +24,19 @@ func (c *RedshiftChecks) Name() string {
 func (c *RedshiftChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
-	if result, err := c.CheckClusterEncryption(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckClusterEncryption)
 
-	if result, err := c.CheckClusterPublicAccess(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckClusterPublicAccess)
 
-	if result, err := c.CheckClusterLogging(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckClusterLogging)
 
-	if result, err := c.CheckClusterSSL(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckClusterSSL)
 
-	if result, err := c.CheckClusterVersionUpgrade(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckClusterVersionUpgrade)
 
-	if result, err := c.CheckClusterBackupRetention(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckClusterBackupRetention)
 
-	if result, err := c.CheckClusterEnhancedVPCRouting(ctx); err == nil {
-		results = append(results, result)
-	}
+	results = runCheck(ctx, results, c.CheckClusterEnhancedVPCRouting)
 
 	return results, nil
 }
@@ -58,7 +44,7 @@ func (c *RedshiftChecks) Run(ctx context.Context) ([]CheckResult, error) {
 func (c *RedshiftChecks) CheckClusterEncryption(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.DescribeClusters(ctx, &redshift.DescribeClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.3", "Redshift Cluster Encryption", GetFrameworkMappings("REDSHIFT_ENCRYPTION"), err), err
 	}
 
 	unencrypted := []string{}
@@ -114,7 +100,7 @@ func (c *RedshiftChecks) CheckClusterEncryption(ctx context.Context) (CheckResul
 func (c *RedshiftChecks) CheckClusterPublicAccess(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.DescribeClusters(ctx, &redshift.DescribeClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.1", "Redshift Public Access", GetFrameworkMappings("REDSHIFT_NETWORK"), err), err
 	}
 
 	publicClusters := []string{}
@@ -170,7 +156,7 @@ func (c *RedshiftChecks) CheckClusterPublicAccess(ctx context.Context) (CheckRes
 func (c *RedshiftChecks) CheckClusterLogging(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.DescribeClusters(ctx, &redshift.DescribeClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC7.1", "Redshift Audit Logging", GetFrameworkMappings("REDSHIFT_LOGGING"), err), err
 	}
 
 	noLogging := []string{}
@@ -230,7 +216,7 @@ func (c *RedshiftChecks) CheckClusterLogging(ctx context.Context) (CheckResult, 
 func (c *RedshiftChecks) CheckClusterSSL(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.DescribeClusters(ctx, &redshift.DescribeClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.4", "Redshift SSL Required", GetFrameworkMappings("REDSHIFT_SSL"), err), err
 	}
 
 	noSSL := []string{}
@@ -308,7 +294,7 @@ func (c *RedshiftChecks) CheckClusterSSL(ctx context.Context) (CheckResult, erro
 func (c *RedshiftChecks) CheckClusterVersionUpgrade(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.DescribeClusters(ctx, &redshift.DescribeClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC7.5", "Redshift Auto Version Upgrade", GetFrameworkMappings("REDSHIFT_PATCHING"), err), err
 	}
 
 	noAutoUpgrade := []string{}
@@ -364,7 +350,7 @@ func (c *RedshiftChecks) CheckClusterVersionUpgrade(ctx context.Context) (CheckR
 func (c *RedshiftChecks) CheckClusterBackupRetention(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.DescribeClusters(ctx, &redshift.DescribeClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("A1.2", "Redshift Backup Retention", GetFrameworkMappings("REDSHIFT_BACKUP"), err), err
 	}
 
 	lowRetention := []string{}
@@ -421,7 +407,7 @@ func (c *RedshiftChecks) CheckClusterBackupRetention(ctx context.Context) (Check
 func (c *RedshiftChecks) CheckClusterEnhancedVPCRouting(ctx context.Context) (CheckResult, error) {
 	clusters, err := c.client.DescribeClusters(ctx, &redshift.DescribeClustersInput{})
 	if err != nil {
-		return CheckResult{}, err
+		return checkError("CC6.1", "Redshift Enhanced VPC Routing", GetFrameworkMappings("REDSHIFT_NETWORK"), err), err
 	}
 
 	noEnhancedRouting := []string{}

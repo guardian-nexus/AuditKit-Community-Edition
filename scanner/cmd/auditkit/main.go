@@ -29,14 +29,21 @@ import (
 var CurrentVersion = "v1.0.0"
 
 type ComplianceResult struct {
-	Timestamp       time.Time       `json:"timestamp"`
-	Provider        string          `json:"provider"`
-	Framework       string          `json:"framework"`
-	AccountID       string          `json:"account_id,omitempty"`
-	Score           float64         `json:"score"`
-	TotalControls   int             `json:"total_controls"`
-	PassedControls  int             `json:"passed_controls"`
-	FailedControls  int             `json:"failed_controls"`
+	Timestamp      time.Time `json:"timestamp"`
+	Provider       string    `json:"provider"`
+	Framework      string    `json:"framework"`
+	AccountID      string    `json:"account_id,omitempty"`
+	Score          float64   `json:"score"`
+	TotalControls  int       `json:"total_controls"`
+	PassedControls int       `json:"passed_controls"`
+	FailedControls int       `json:"failed_controls"`
+	// ErroredControls counts controls whose check could not run, usually a
+	// missing permission. They are outside the score, and the JSON carried no
+	// count of them, so a consumer reading only the summary could not tell a
+	// clean scan from one that saw little.
+	ErroredControls int `json:"errored_controls"`
+	// Region is the AWS region a scan read; empty for other providers.
+	Region          string          `json:"region,omitempty"`
 	Controls        []ControlResult `json:"controls"`
 	Recommendations []string        `json:"recommendations"`
 }
@@ -262,6 +269,7 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 		case "text":
 			printIntegrationSummary(integrationResult, source)
 		case "json":
+			integrationResult.ErroredControls = erroredCount(integrationResult.Controls)
 			data, _ := json.MarshalIndent(integrationResult, "", "  ")
 			if output != "" {
 				if err := os.WriteFile(output, data, 0644); err != nil {
@@ -280,6 +288,7 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 				Timestamp:       integrationResult.Timestamp,
 				Provider:        integrationResult.Provider,
 				AccountID:       integrationResult.AccountID,
+				Region:          integrationResult.Region,
 				Score:           integrationResult.Score,
 				TotalControls:   integrationResult.TotalControls,
 				PassedControls:  integrationResult.PassedControls,
@@ -340,6 +349,7 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 		case "text":
 			printIntegrationSummary(integrationResult, source)
 		case "json":
+			integrationResult.ErroredControls = erroredCount(integrationResult.Controls)
 			data, _ := json.MarshalIndent(integrationResult, "", "  ")
 			if output != "" {
 				if err := os.WriteFile(output, data, 0644); err != nil {
@@ -358,6 +368,7 @@ func runIntegration(source, file, format, output, framework string, verbose bool
 				Timestamp:       integrationResult.Timestamp,
 				Provider:        integrationResult.Provider,
 				AccountID:       integrationResult.AccountID,
+				Region:          integrationResult.Region,
 				Score:           integrationResult.Score,
 				TotalControls:   integrationResult.TotalControls,
 				PassedControls:  integrationResult.PassedControls,
@@ -620,6 +631,7 @@ func runOfflineScan(provider, profile, framework, format, output string, verbose
 			Timestamp:       result.Timestamp,
 			Provider:        result.Provider,
 			AccountID:       result.AccountID,
+			Region:          result.Region,
 			Score:           result.Score,
 			TotalControls:   result.TotalControls,
 			PassedControls:  result.PassedControls,
@@ -899,6 +911,7 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 			Timestamp:       result.Timestamp,
 			Provider:        result.Provider,
 			AccountID:       result.AccountID,
+			Region:          result.Region,
 			Score:           result.Score,
 			TotalControls:   result.TotalControls,
 			PassedControls:  result.PassedControls,
@@ -1001,7 +1014,7 @@ func completeFramework(controls []ControlResult, framework string) []ControlResu
 				Category:        "Manual Documentation",
 				Severity:        "MEDIUM",
 				Status:          "MANUAL",
-				Evidence:        "MANUAL: No automated check covers this control. Document how it is satisfied and retain the evidence.",
+				Evidence:        "MANUAL: No automated result for this control. Either no automated check covers it, or one could not run and is listed among the errors. Document how it is satisfied and retain the evidence.",
 				Remediation:     "Collect the policy, procedure or configuration evidence that demonstrates this control, and store it with the audit package.",
 				Priority:        "MEDIUM",
 				ScreenshotGuide: "Capture the document or console view that demonstrates this control is implemented.",
@@ -1015,6 +1028,9 @@ func completeFramework(controls []ControlResult, framework string) []ControlResu
 func performScan(provider, profile, framework string, verbose bool, services string) ComplianceResult {
 	var scanResults []interface{}
 	var accountID string
+	// scanRegion is the one AWS region the scan read. Regional services are
+	// evaluated there only, and no report said which region that was.
+	var scanRegion string
 
 	ctx := context.Background()
 
@@ -1059,6 +1075,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 		}
 
 		accountID = scanner.GetAccountID(ctx)
+		scanRegion = scanner.Region()
 
 		if verbose {
 			fmt.Fprintf(os.Stderr, "Scanning AWS Account: %s\n", accountID)
@@ -1614,6 +1631,7 @@ func performScan(provider, profile, framework string, verbose bool, services str
 		Provider:        provider,
 		Framework:       framework,
 		AccountID:       accountID,
+		Region:          scanRegion,
 		Score:           score,
 		TotalControls:   len(controls),
 		PassedControls:  passed,
@@ -2127,6 +2145,9 @@ func printTextSummary(result ComplianceResult, full bool) {
 		result.TotalControls,
 	))
 	fmt.Printf("Scan Time: %s\n", result.Timestamp.Format("2006-01-02 15:04:05"))
+	if result.Region != "" {
+		fmt.Printf("Region: %s (regional AWS services were checked in this region only)\n", result.Region)
+	}
 
 	criticalCount := 0
 	highCount := 0
@@ -2601,7 +2622,11 @@ func outputTextToFile(result ComplianceResult, output string) {
 	sb.WriteString(fmt.Sprintf("Generated: %s\n", result.Timestamp.Format("2006-01-02 15:04:05")))
 	sb.WriteString(fmt.Sprintf("Provider: %s\n", result.Provider))
 	sb.WriteString(fmt.Sprintf("Framework: %s\n", frameworkLabel))
-	sb.WriteString(fmt.Sprintf("Account: %s\n\n", result.AccountID))
+	sb.WriteString(fmt.Sprintf("Account: %s\n", result.AccountID))
+	if result.Region != "" {
+		sb.WriteString(fmt.Sprintf("Region: %s (regional AWS services were checked in this region only)\n", result.Region))
+	}
+	sb.WriteString("\n")
 	sb.WriteString(fmt.Sprintf("COMPLIANCE SCORE: %.1f%%\n", result.Score))
 	sb.WriteString(fmt.Sprintf("Controls Passed: %d/%d\n", result.PassedControls, result.TotalControls))
 	sb.WriteString(fmt.Sprintf("Controls Failed: %d\n\n", result.FailedControls))
@@ -2633,7 +2658,19 @@ func outputTextToFile(result ComplianceResult, output string) {
 	fmt.Printf("Report saved to %s\n", output)
 }
 
+// erroredCount is the number of controls reported as ERROR.
+func erroredCount(controls []ControlResult) int {
+	n := 0
+	for _, c := range controls {
+		if c.Status == "ERROR" {
+			n++
+		}
+	}
+	return n
+}
+
 func outputJSON(result ComplianceResult, output string) {
+	result.ErroredControls = erroredCount(result.Controls)
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error formatting JSON: %v\n", err)
@@ -2657,6 +2694,7 @@ func outputHTML(result ComplianceResult, output string) {
 		Timestamp:       result.Timestamp,
 		Provider:        result.Provider,
 		AccountID:       result.AccountID,
+		Region:          result.Region,
 		Score:           result.Score,
 		TotalControls:   result.TotalControls,
 		PassedControls:  result.PassedControls,
