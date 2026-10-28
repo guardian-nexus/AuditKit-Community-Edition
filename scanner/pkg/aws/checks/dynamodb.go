@@ -34,7 +34,7 @@ func (c *DynamoDBChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *DynamoDBChecks) CheckPointInTimeRecovery(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	tables, err := c.client.ListTables(ctx, &dynamodb.ListTablesInput{})
+	tables, err := listAllTables(ctx, c.client, &dynamodb.ListTablesInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-DYNAMODB-03",
@@ -109,7 +109,7 @@ func (c *DynamoDBChecks) CheckPointInTimeRecovery(ctx context.Context) (CheckRes
 
 func (c *DynamoDBChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	tables, err := c.client.ListTables(ctx, &dynamodb.ListTablesInput{})
+	tables, err := listAllTables(ctx, c.client, &dynamodb.ListTablesInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-DYNAMODB-02",
@@ -187,7 +187,7 @@ func (c *DynamoDBChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult
 
 func (c *DynamoDBChecks) CheckAutoScaling(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	tables, err := c.client.ListTables(ctx, &dynamodb.ListTablesInput{})
+	tables, err := listAllTables(ctx, c.client, &dynamodb.ListTablesInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-DYNAMODB-01",

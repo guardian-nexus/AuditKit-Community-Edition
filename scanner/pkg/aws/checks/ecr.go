@@ -33,7 +33,7 @@ func (c *ECRChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *ECRChecks) CheckImageScanning(ctx context.Context) (CheckResult, error) {
-	repos, err := c.client.DescribeRepositories(ctx, &ecr.DescribeRepositoriesInput{})
+	repos, err := describeAllRepositories(ctx, c.client, &ecr.DescribeRepositoriesInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-ECR-02",
@@ -97,7 +97,7 @@ func (c *ECRChecks) CheckImageScanning(ctx context.Context) (CheckResult, error)
 }
 
 func (c *ECRChecks) CheckImmutableTags(ctx context.Context) (CheckResult, error) {
-	repos, err := c.client.DescribeRepositories(ctx, &ecr.DescribeRepositoriesInput{})
+	repos, err := describeAllRepositories(ctx, c.client, &ecr.DescribeRepositoriesInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-ECR-03",
@@ -161,7 +161,7 @@ func (c *ECRChecks) CheckImmutableTags(ctx context.Context) (CheckResult, error)
 }
 
 func (c *ECRChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult, error) {
-	repos, err := c.client.DescribeRepositories(ctx, &ecr.DescribeRepositoriesInput{})
+	repos, err := describeAllRepositories(ctx, c.client, &ecr.DescribeRepositoriesInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-ECR-01",

@@ -36,7 +36,7 @@ func (c *SecretsManagerChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *SecretsManagerChecks) CheckSecretRotation(ctx context.Context) (CheckResult, error) {
-	secrets, err := c.client.ListSecrets(ctx, &secretsmanager.ListSecretsInput{})
+	secrets, err := listAllSecrets(ctx, c.client, &secretsmanager.ListSecretsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-SECRETS-02",
@@ -120,7 +120,7 @@ func (c *SecretsManagerChecks) CheckSecretRotation(ctx context.Context) (CheckRe
 }
 
 func (c *SecretsManagerChecks) CheckSecretEncryption(ctx context.Context) (CheckResult, error) {
-	secrets, err := c.client.ListSecrets(ctx, &secretsmanager.ListSecretsInput{})
+	secrets, err := listAllSecrets(ctx, c.client, &secretsmanager.ListSecretsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-SECRETS-01",
@@ -197,7 +197,7 @@ To use custom KMS keys:
 }
 
 func (c *SecretsManagerChecks) CheckUnusedSecrets(ctx context.Context) (CheckResult, error) {
-	secrets, err := c.client.ListSecrets(ctx, &secretsmanager.ListSecretsInput{})
+	secrets, err := listAllSecrets(ctx, c.client, &secretsmanager.ListSecretsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-SECRETS-03",

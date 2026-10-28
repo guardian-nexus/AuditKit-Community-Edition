@@ -1004,7 +1004,7 @@ func (c *PCIDSSChecks) CheckReq10_Logging(ctx context.Context) []CheckResult {
 
 	// Check CloudTrail
 	// FIXED: Properly handle error instead of ignoring with _
-	trails, err := c.cloudtrailClient.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
+	trails, err := listAllTrails(ctx, c.cloudtrailClient, &cloudtrail.ListTrailsInput{})
 	if err != nil {
 		return append(results, CheckResult{
 			Control:   "PCI-10.2.1",

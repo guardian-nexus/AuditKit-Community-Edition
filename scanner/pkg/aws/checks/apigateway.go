@@ -44,7 +44,7 @@ func (c *APIGatewayChecks) Run(ctx context.Context) ([]CheckResult, error) {
 func (c *APIGatewayChecks) CheckAPIGatewayLogging(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
 	// Check REST APIs (v1)
-	restAPIs, err := c.clientV1.GetRestApis(ctx, &apigateway.GetRestApisInput{})
+	restAPIs, err := getAllRestApis(ctx, c.clientV1, &apigateway.GetRestApisInput{})
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-APIGW-02",
@@ -173,7 +173,7 @@ Continue monitoring logs for security events and errors.`, stagesWithLogging),
 
 // CheckAPIGatewayAuth - Ensure API Gateway uses authorization
 func (c *APIGatewayChecks) CheckAPIGatewayAuth(ctx context.Context) (CheckResult, error) {
-	restAPIs, err := c.clientV1.GetRestApis(ctx, &apigateway.GetRestApisInput{})
+	restAPIs, err := getAllRestApis(ctx, c.clientV1, &apigateway.GetRestApisInput{})
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-APIGW-01",

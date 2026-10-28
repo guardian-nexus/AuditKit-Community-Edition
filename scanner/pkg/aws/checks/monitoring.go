@@ -99,7 +99,7 @@ func (c *MonitoringChecks) CheckCloudWatchAlarms(ctx context.Context) (CheckResu
 }
 
 func (c *MonitoringChecks) CheckSNSTopics(ctx context.Context) (CheckResult, error) {
-	topics, err := c.snsClient.ListTopics(ctx, &sns.ListTopicsInput{})
+	topics, err := listAllTopics(ctx, c.snsClient, &sns.ListTopicsInput{})
 	if err != nil && !isNotFound(err) {
 		return checkError("CC7.4", "Alert Notifications", nil, err), err
 	}

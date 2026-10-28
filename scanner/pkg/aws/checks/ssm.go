@@ -223,7 +223,7 @@ Required permissions:
 	}
 
 	// Check patch compliance for managed instances
-	patchStates, err := c.client.DescribeInstancePatchStates(ctx, &ssm.DescribeInstancePatchStatesInput{
+	patchStates, err := describeAllInstancePatchStates(ctx, c.client, &ssm.DescribeInstancePatchStatesInput{
 		InstanceIds: getInstanceIds(instances.InstanceInformationList),
 	})
 
