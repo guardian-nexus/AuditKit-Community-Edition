@@ -611,6 +611,9 @@ func runOfflineScan(provider, profile, framework, format, output string, verbose
 	}
 
 	// Convert cached scan to ComplianceResult
+	if note := cachedScan.IntegrityNote(); note != "" {
+		fmt.Fprintf(os.Stderr, "WARNING: %s\n\n", note)
+	}
 	result := convertCachedToComplianceResult(cachedScan)
 
 	// Display offline mode indicator
@@ -696,7 +699,7 @@ func convertCachedToComplianceResult(cached *offline.CachedScan) ComplianceResul
 		PassedControls:  cached.PassedControls,
 		FailedControls:  cached.FailedControls,
 		Controls:        controls,
-		Recommendations: cached.Recommendations,
+		Recommendations: cachedRecommendations(cached),
 	}
 }
 
@@ -3610,4 +3613,14 @@ func controlDisplayName(name, controlID string) string {
 		return name
 	}
 	return getControlName(controlID)
+}
+
+// cachedRecommendations puts the cache integrity outcome at the top of the
+// report's recommendations when it is anything but verified, so a reader of
+// the offline report sees it there and not only on the terminal.
+func cachedRecommendations(cached *offline.CachedScan) []string {
+	if note := cached.IntegrityNote(); note != "" {
+		return append([]string{"OFFLINE CACHE: " + note}, cached.Recommendations...)
+	}
+	return cached.Recommendations
 }

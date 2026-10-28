@@ -1,6 +1,11 @@
 package offline
 
 import (
+	"crypto/hmac"
+	"crypto/rand"
+	"crypto/sha256"
+	"crypto/subtle"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -22,6 +27,36 @@ type CachedScan struct {
 	Controls        []CachedControl `json:"controls"`
 	Recommendations []string        `json:"recommendations"`
 	Version         string          `json:"version"`
+	// Signature is an HMAC-SHA256 of the rest of the record, keyed by a secret
+	// that lives only on the machine that wrote it. A cache file is plain JSON
+	// that the offline report and the drift baseline trust as a past scan;
+	// without this, an edited or substituted file was indistinguishable from
+	// a real one (threat model A7).
+	Signature string `json:"signature,omitempty"`
+	// Integrity is set when the record is loaded: IntegrityVerified,
+	// IntegrityUnsigned or IntegrityNotVerified. It is not stored.
+	Integrity string `json:"-"`
+}
+
+// Integrity outcomes for a loaded cache record.
+const (
+	IntegrityVerified    = "verified"
+	IntegrityUnsigned    = "unsigned"     // written before cache files were signed
+	IntegrityNotVerified = "not verified" // edited since it was written, or written on another machine
+)
+
+// Verified reports whether the record carries a signature this machine made.
+func (s *CachedScan) Verified() bool { return s.Integrity == IntegrityVerified }
+
+// IntegrityNote is one line for a warning or a report, empty when verified.
+func (s *CachedScan) IntegrityNote() string {
+	switch s.Integrity {
+	case IntegrityUnsigned:
+		return "Cached scan is unsigned: it was written by an earlier version, so edits to it cannot be detected"
+	case IntegrityNotVerified:
+		return "Cached scan FAILED its integrity check: it was edited after it was written, or written on another machine. Treat its contents as unverified"
+	}
+	return ""
 }
 
 // CachedControl represents a cached control result
@@ -54,7 +89,7 @@ func NewCache() (*Cache, error) {
 	}
 
 	basePath := filepath.Join(homeDir, ".auditkit", "cache")
-	if err := os.MkdirAll(basePath, 0755); err != nil {
+	if err := os.MkdirAll(basePath, 0700); err != nil {
 		return nil, fmt.Errorf("failed to create cache directory: %w", err)
 	}
 
@@ -71,18 +106,30 @@ func (c *Cache) Save(scan CachedScan) error {
 	filename := c.getScanFilename(scan.Provider, scan.AccountID, scan.Framework, scan.Timestamp)
 	scanPath := filepath.Join(c.basePath, filename)
 
+	key, err := c.signingKey()
+	if err != nil {
+		return err
+	}
+	sig, err := sign(scan, key)
+	if err != nil {
+		return err
+	}
+	scan.Signature = sig
+
 	data, err := json.MarshalIndent(scan, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal scan data: %w", err)
 	}
 
-	if err := os.WriteFile(scanPath, data, 0644); err != nil {
+	// 0600: a cache file is a map of the account's weaknesses, and was
+	// world-readable on a shared host.
+	if err := os.WriteFile(scanPath, data, 0600); err != nil {
 		return fmt.Errorf("failed to write cache file: %w", err)
 	}
 
 	// Also update the "latest" symlink/copy
 	latestPath := filepath.Join(c.basePath, c.getLatestFilename(scan.Provider, scan.AccountID, scan.Framework))
-	if err := os.WriteFile(latestPath, data, 0644); err != nil {
+	if err := os.WriteFile(latestPath, data, 0600); err != nil {
 		return fmt.Errorf("failed to write latest cache file: %w", err)
 	}
 
@@ -120,8 +167,64 @@ func (c *Cache) loadFromFile(filePath string) (*CachedScan, error) {
 	if err := json.Unmarshal(data, &scan); err != nil {
 		return nil, fmt.Errorf("failed to parse cache file: %w", err)
 	}
+	scan.Integrity = c.verify(&scan)
 
 	return &scan, nil
+}
+
+// verify classifies a loaded record. It never refuses the load: the caller
+// decides what an unverified past scan is worth, and says so in the report.
+func (c *Cache) verify(scan *CachedScan) string {
+	if scan.Signature == "" {
+		return IntegrityUnsigned
+	}
+	key, err := c.signingKey()
+	if err != nil {
+		return IntegrityNotVerified
+	}
+	want, err := sign(*scan, key)
+	if err != nil || subtle.ConstantTimeCompare([]byte(want), []byte(scan.Signature)) != 1 {
+		return IntegrityNotVerified
+	}
+	return IntegrityVerified
+}
+
+// sign returns the HMAC-SHA256, hex-encoded, of the record with its own
+// signature and load-time state cleared.
+func sign(scan CachedScan, key []byte) (string, error) {
+	scan.Signature = ""
+	scan.Integrity = ""
+	body, err := json.Marshal(scan)
+	if err != nil {
+		return "", fmt.Errorf("failed to encode scan for signing: %w", err)
+	}
+	mac := hmac.New(sha256.New, key)
+	mac.Write(body)
+	return hex.EncodeToString(mac.Sum(nil)), nil
+}
+
+// signingKey reads the per-machine secret beside the cache directory,
+// creating it (32 random bytes, 0600) on first use. Anyone who can read it can
+// forge a signature, so this detects edits and substitution by anyone else -
+// not by whoever already has this account.
+func (c *Cache) signingKey() ([]byte, error) {
+	path := filepath.Join(filepath.Dir(c.basePath), "cache.key")
+	if data, err := os.ReadFile(path); err == nil {
+		if key, derr := hex.DecodeString(strings.TrimSpace(string(data))); derr == nil && len(key) == 32 {
+			return key, nil
+		}
+		return nil, fmt.Errorf("cache signing key at %s is malformed; delete it and re-run the scan", path)
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("reading the cache signing key: %w", err)
+	}
+	key := make([]byte, 32)
+	if _, err := rand.Read(key); err != nil {
+		return nil, fmt.Errorf("generating the cache signing key: %w", err)
+	}
+	if err := os.WriteFile(path, []byte(hex.EncodeToString(key)+"\n"), 0600); err != nil {
+		return nil, fmt.Errorf("writing the cache signing key: %w", err)
+	}
+	return key, nil
 }
 
 // ListScans returns all cached scans matching the criteria
