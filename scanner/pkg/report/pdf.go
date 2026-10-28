@@ -955,5 +955,8 @@ func AccountLabel(account, region string) string {
 	if region == "" {
 		return account
 	}
+	if strings.Contains(region, ",") {
+		return fmt.Sprintf("%s (regions %s)", account, region)
+	}
 	return fmt.Sprintf("%s (region %s only)", account, region)
 }

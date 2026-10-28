@@ -68,6 +68,7 @@ auditkit scan --full
 - `-format` - Output format: `text`, `json`, `html`, `pdf`, `csv` (default: `text`)
 - `-output` - Output file path (e.g., `report.pdf`)
 - `-profile` - AWS profile name (AWS only)
+- `-regions` - AWS only: `all` scans every enabled region, or give a comma-separated list. Without it only the configured region is scanned, and the report says so. Regional services are checked in each region and merged per control; a failure in any region is the control's verdict and the evidence names the region
 
 These exist only on the Pro binary. Passing them to Community Edition exits with
 `flag provided but not defined`:

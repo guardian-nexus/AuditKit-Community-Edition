@@ -84,7 +84,8 @@ auditkit scan --full
 - <code>--full</code> - Show all controls without truncation
 - <code>-format</code> - Output format: <code>text</code>, <code>json</code>, <code>html</code>, <code>pdf</code>, <code>csv</code> (default: <code>text</code>)
 - <code>-output</code> - Output file path (e.g., <code>report.pdf</code>)
-- <code>-profile</code> - AWS profile name (AWS only)</p>
+- <code>-profile</code> - AWS profile name (AWS only)
+- <code>-regions</code> - AWS only: <code>all</code> scans every enabled region, or give a comma-separated list. Without it only the configured region is scanned, and the report says so. Regional services are checked in each region and merged per control; a failure in any region is the control's verdict and the evidence names the region</p>
 <p>These exist only on the Pro binary. Passing them to Community Edition exits with
 <code>flag provided but not defined</code>:</p>
 <ul>

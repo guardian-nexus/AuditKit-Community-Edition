@@ -89,6 +89,7 @@ func main() {
 		verbose     = flag.Bool("verbose", false, "Verbose output")
 		full        = flag.Bool("full", false, "Show all controls in text output (default: truncated for readability)")
 		services    = flag.String("services", "all", "Comma-separated services to scan")
+		regions     = flag.String("regions", "", "AWS regions to scan: 'all' for every enabled region, or a comma-separated list (default: the configured region only)")
 		source      = flag.String("source", "", "Integration source: scubagear, prowler")
 		file        = flag.String("file", "", "Integration file to parse")
 		offlineMode = flag.Bool("offline", false, "Use cached scan results (no cloud API calls)")
@@ -105,7 +106,7 @@ func main() {
 
 	switch command {
 	case "scan":
-		runScan(*provider, *profile, *framework, *format, *output, *verbose, *full, *services, *offlineMode, *cacheFile)
+		runScan(*provider, *profile, *framework, *format, *output, *verbose, *full, *services, *regions, *offlineMode, *cacheFile)
 	case "integrate":
 		runIntegration(*source, *file, *format, *output, *framework, *verbose)
 	case "evidence":
@@ -164,6 +165,7 @@ Options:
   -format string     Output format (text, json, html, pdf, csv) (default "text")
   -output string     Output file (default: stdout)
   -services string   Services to scan (default "all")
+  -regions all|LIST    AWS only: scan every enabled region, or the listed ones (default: the configured region)
   -source string     Integration source: scubagear, prowler
   -file string       File to parse for integration
   -verbose          Verbose output
@@ -787,7 +789,7 @@ func runCacheCommand(provider, profile, framework string, verbose bool) {
 	fmt.Println()
 }
 
-func runScan(provider, profile, framework, format, output string, verbose bool, full bool, services string, offlineMode bool, cacheFile string) {
+func runScan(provider, profile, framework, format, output string, verbose bool, full bool, services string, regions string, offlineMode bool, cacheFile string) {
 	// Handle offline mode
 	if offlineMode || cacheFile != "" {
 		runOfflineScan(provider, profile, framework, format, output, verbose, full, cacheFile)
@@ -831,7 +833,7 @@ func runScan(provider, profile, framework, format, output string, verbose bool, 
 			strings.ToUpper(framework), provider)
 	}
 
-	result := performScan(provider, profile, framework, verbose, services)
+	result := performScan(provider, profile, framework, verbose, services, regions)
 
 	if err := saveProgress(result.AccountID, result.Score, result.Controls, framework); err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: progress not saved: %v\n", err)
@@ -1028,7 +1030,7 @@ func completeFramework(controls []ControlResult, framework string) []ControlResu
 	return controls
 }
 
-func performScan(provider, profile, framework string, verbose bool, services string) ComplianceResult {
+func performScan(provider, profile, framework string, verbose bool, services string, regions string) ComplianceResult {
 	var scanResults []interface{}
 	var accountID string
 	// scanRegion is the one AWS region the scan read. Regional services are
@@ -1090,10 +1092,28 @@ func performScan(provider, profile, framework string, verbose bool, services str
 			serviceList = []string{"s3", "iam", "ec2", "cloudtrail", "rds"}
 		}
 
-		awsResults, err := scanner.ScanServices(ctx, serviceList, verbose, framework)
-		if err != nil {
-			scanErr = err
-			fmt.Fprintf(os.Stderr, "Warning during scan: %v\n", err)
+		var awsResults []awsScanner.ScanResult
+		if regions != "" {
+			// -regions: run every suite that reads a regional service in each
+			// region and merge per control; the global suites run once.
+			regionList, rerr := awsScanner.ResolveRegions(ctx, scanner.Config(), regions)
+			if rerr != nil {
+				fmt.Fprintf(os.Stderr, "Error resolving -regions %q: %v\n", regions, rerr)
+				os.Exit(1)
+			}
+			var scanned []string
+			awsResults, scanned, err = awsScanner.ScanRegions(ctx, scanner.Config(), regionList, serviceList, verbose, framework)
+			scanRegion = strings.Join(scanned, ", ")
+			if err != nil {
+				scanErr = err
+				fmt.Fprintf(os.Stderr, "Warning during scan: %v\n", err)
+			}
+		} else {
+			awsResults, err = scanner.ScanServices(ctx, serviceList, verbose, framework)
+			if err != nil {
+				scanErr = err
+				fmt.Fprintf(os.Stderr, "Warning during scan: %v\n", err)
+			}
 		}
 
 		for _, r := range awsResults {
@@ -2149,7 +2169,7 @@ func printTextSummary(result ComplianceResult, full bool) {
 	))
 	fmt.Printf("Scan Time: %s\n", result.Timestamp.Format("2006-01-02 15:04:05"))
 	if result.Region != "" {
-		fmt.Printf("Region: %s (regional AWS services were checked in this region only)\n", result.Region)
+		fmt.Printf("Region: %s\n", regionStatement(result.Region))
 	}
 
 	criticalCount := 0
@@ -2627,7 +2647,7 @@ func outputTextToFile(result ComplianceResult, output string) {
 	sb.WriteString(fmt.Sprintf("Framework: %s\n", frameworkLabel))
 	sb.WriteString(fmt.Sprintf("Account: %s\n", result.AccountID))
 	if result.Region != "" {
-		sb.WriteString(fmt.Sprintf("Region: %s (regional AWS services were checked in this region only)\n", result.Region))
+		sb.WriteString(fmt.Sprintf("Region: %s\n", regionStatement(result.Region)))
 	}
 	sb.WriteString("\n")
 	sb.WriteString(fmt.Sprintf("COMPLIANCE SCORE: %.1f%%\n", result.Score))
@@ -3623,4 +3643,13 @@ func cachedRecommendations(cached *offline.CachedScan) []string {
 		return append([]string{"OFFLINE CACHE: " + note}, cached.Recommendations...)
 	}
 	return cached.Recommendations
+}
+
+// regionStatement says which AWS regions a scan read, in a form that is honest
+// for one region and for several.
+func regionStatement(region string) string {
+	if strings.Contains(region, ",") {
+		return region + " (regional AWS services were checked in these regions)"
+	}
+	return region + " (regional AWS services were checked in this region only; use -regions all for every enabled region)"
 }

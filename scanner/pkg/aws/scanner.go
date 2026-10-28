@@ -55,6 +55,11 @@ type AWSScanner struct {
 	// Cached result of runSuites, so the shared suite list runs once per scan.
 	suiteCache  []ScanResult
 	suiteCached bool
+	// Set by ScanRegions: this scanner is one region of a multi-region scan,
+	// so the region note on regional passes is left to the merge, and the
+	// global suites are skipped in every region but the first.
+	multiRegion bool
+	skipGlobal  bool
 
 	cfg                  aws.Config
 	s3Client             *s3.Client
@@ -476,6 +481,9 @@ func (s *AWSScanner) runSuites(ctx context.Context, verbose bool) []ScanResult {
 	}
 	var results []ScanResult
 	for _, check := range s.allSuites(ctx) {
+		if s.skipGlobal && globalSuites[check.Name()] {
+			continue
+		}
 		if verbose {
 			fmt.Printf("   Running %s...\n", check.Name())
 		}
@@ -488,7 +496,7 @@ func (s *AWSScanner) runSuites(ctx context.Context, verbose bool) []ScanResult {
 				Control:           cr.Control,
 				Name:              cr.Name,
 				Status:            cr.Status,
-				Evidence:          noteRegion(cr, s.cfg.Region),
+				Evidence:          s.regionNote(cr),
 				Remediation:       cr.Remediation,
 				RemediationDetail: cr.RemediationDetail,
 				Severity:          severityOf(cr),
@@ -572,6 +580,15 @@ func (s *AWSScanner) Region() string {
 // regionalServices are security services enabled per region. A PASS saying one
 // is enabled was true of the scanned region only, and read as account-wide.
 var regionalServices = []string{"GuardDuty", "Security Hub", "AWS Config", "Macie", "Access Analyzer", "EBS encryption by default", "EBS default encryption"}
+
+// regionNote applies noteRegion for a single-region scan only; in a
+// multi-region scan the merge names the regions itself.
+func (s *AWSScanner) regionNote(cr checks.CheckResult) string {
+	if s.multiRegion {
+		return cr.Evidence
+	}
+	return noteRegion(cr, s.cfg.Region)
+}
 
 // noteRegion appends the scanned region to the evidence of a PASS that says a
 // regional security service is enabled, unless the evidence already names one.
