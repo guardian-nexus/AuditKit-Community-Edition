@@ -18,8 +18,8 @@ transparency log). To verify a download:
 
 ```bash
 cosign verify-blob --bundle auditkit-checksums.txt.sigstore.json \
-  --certificate-identity '<SIGNER_IDENTITY>' \
-  --certificate-oidc-issuer '<SIGNER_ISSUER>' auditkit-checksums.txt
+  --certificate-identity 'rob@guardiannex.us' \
+  --certificate-oidc-issuer 'https://github.com/login/oauth' auditkit-checksums.txt
 sha256sum --check --ignore-missing auditkit-checksums.txt
 ```
 
