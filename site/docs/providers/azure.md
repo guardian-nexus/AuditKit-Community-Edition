@@ -211,7 +211,7 @@ The framework suites add their own identifiers on top of the service checks: CIS
 
 ### PCI-DSS v4.0.1 (63 requirements with automated checks)
 
-Automated checks map into all twelve requirement families (1 through 12). Requirements with no automated check are still reported and marked "No automated check covers this control".
+Automated checks map into all twelve requirement families (1 through 12). Requirements with no automated check are still reported and marked "No automated result for this control" (no automated check covers it, or one could not run and is listed among the errors).
 
 ### CMMC Level 1 (17 practices, 13 automated)
 

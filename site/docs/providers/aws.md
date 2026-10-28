@@ -359,7 +359,7 @@ The 43-criteria catalogue breaks down as:
 
 ### PCI-DSS v4.0.1 (59 of the 312 catalogued requirements carry automated AWS checks; 69 across all providers)
 
-Automated AWS checks map into all twelve requirement families (1 through 12). Requirements with no automated check are still reported and marked "No automated check covers this control" so they can be evidenced manually.
+Automated AWS checks map into all twelve requirement families (1 through 12). Requirements with no automated check are still reported and marked "No automated result for this control" (no automated check covers it, or one could not run and is listed among the errors) so they can be evidenced manually.
 
 ### CMMC Level 1 (17 practices, 13 automated)
 

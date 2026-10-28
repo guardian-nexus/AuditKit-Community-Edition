@@ -8,6 +8,23 @@ AuditKit is designed with security-first principles. This document outlines the 
 
 ---
 
+
+## Release Integrity
+
+Release archives are published with a checksum file, and from v1.1.0 the checksum
+file carries a Sigstore signature made with cosign (keyless: a short-lived
+certificate issued to the maintainer's identity, recorded in the public
+transparency log). To verify a download:
+
+```bash
+cosign verify-blob --bundle auditkit-checksums.txt.sigstore.json \
+  --certificate-identity '<SIGNER_IDENTITY>' \
+  --certificate-oidc-issuer '<SIGNER_ISSUER>' auditkit-checksums.txt
+sha256sum --check --ignore-missing auditkit-checksums.txt
+```
+
+Releases before v1.1.0 were not signed; only their checksums are available.
+
 ## Permissions Required
 
 ### AWS Permissions (Read-Only)

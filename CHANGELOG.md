@@ -2,6 +2,53 @@
 
 All notable changes to AuditKit will be documented in this file.
 
+## [1.1.0] - 2026-10-28
+
+A security release: the findings of a threat model of the scanner, its reports
+and its release path, fixed across both editions. Reports and scores change; see
+"Scores can move" below. Replace the binary; nothing else changes.
+
+### Security
+- **Scores can move.** A check whose API call failed used to vanish from the report
+  and reappear as "No automated check covers this control", or in some cases pass.
+  Every such check now reports ERROR with its own control identifier, counted under
+  "could not be checked" and excluded from the score. Scans run with a narrow
+  permission set will show more errors and a different percentage; the error list
+  says why. Two checks that passed on a denied call (Network Firewall, cross-account
+  roles) and several that reported a missing resource when the call was refused now
+  report ERROR instead.
+- **AWS list calls read every page.** IAM users, roles and policies, Lambda functions,
+  SSM instances and parameters, RDS instances and CloudWatch alarms were read one page
+  at a time (100, 50 or 10 items), so resources past the first page were never
+  evaluated.
+- **The scanned AWS region is stated** in every report and in the JSON (`region`),
+  and regional "X is enabled" passes name the region. New `-regions all` (or a list)
+  scans every enabled region and merges per control; a failure in any region is the
+  control's verdict and the evidence names the region.
+- **Generated fix scripts are inert until edited.** `fix` writes every line of every
+  fix commented out, CRITICAL included; "uncomment to run" HIGH fixes used to leave
+  their second and later lines live, and CRITICAL fixes ran as written.
+- **HTML reports escape scan data.** Resource names, tags and imported findings were
+  interpolated raw into the report; markup in them became part of the page.
+- **Offline cache files are signed** with a per-machine key and now private (0600).
+  An edited cache, or one written on another machine, is flagged in the offline
+  report. Caches written by earlier releases show as "unsigned" until rewritten.
+- **Releases are signed.** The checksum file carries a Sigstore signature; the
+  verification command is in the README. Earlier releases were not signed.
+- Dependencies: toolchain go1.26.10 (go1.24 is out of support); `golang.org/x/net`,
+  `grpc`, OpenTelemetry, `go-jose`, `kiota-http-go` and three AWS SDK modules updated
+  to versions with no reachable advisories.
+
+### Fixed
+- Six nil-pointer dereferences on an empty account (IAM password policy, Organizations,
+  caller identity) and eleven unguarded Microsoft Graph results that each crashed the
+  scan.
+- Three loops that retried a failed call forever and hung the scan on a denied
+  permission: GCP KMS key listing, Azure activity-log reads, Azure SQL pagers.
+- JSON reports carry `errored_controls`.
+- Community automates 6 CMMC Level 2 practices on GCP, not 7: IA.L2-3.5.3 had been
+  counted through a check that never produces a verdict.
+
 ## [1.0.0] - 2026-09-14
 
 ### Added

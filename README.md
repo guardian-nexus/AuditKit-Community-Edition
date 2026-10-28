@@ -4,10 +4,10 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v1.0.0-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
+[![Version](https://img.shields.io/badge/version-v1.1.0-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://guardiannexus.substack.com)
 
-**New in v1.0.0:** the first stable release - a correctness and accuracy pass across the scanner and the site. Empty-scope checks and denied API calls no longer count as compliance results, framework scans no longer double-count, and every published number is measured from the code.
+**New in v1.1.0:** a security release. Failed checks now report as errors instead of vanishing or passing, AWS list calls read every page, the scanned region is stated and `-regions all` scans every enabled region, fix scripts are inert until you uncomment them, reports escape scan data, caches are signed, and releases carry a Sigstore signature. Scores can move; see the [changelog](CHANGELOG.md).
 
 **All 110 CMMC practices are reported in the Community Edition** - every failing
 check with its fix and the console screen to photograph. AuditKit turns those
@@ -141,7 +141,23 @@ Everything in the Community column runs from this repository with no licence key
 
 ---
 
-## Recent Changes (v1.0.0)
+## Recent Changes (v1.1.0)
+
+A security release built from a threat model of the scanner, its reports and its
+release path. Full detail in [CHANGELOG.md](CHANGELOG.md).
+
+- **Honest errors.** A check whose API call failed used to disappear from the report
+  (and come back as "no automated check") or, in a few cases, pass. It now reports
+  ERROR with its control identifier. Scans run with narrow permissions show more
+  errors and a different score; the error list explains why.
+- **Complete AWS listings.** IAM, Lambda, SSM, RDS and CloudWatch calls read every page.
+- **Regions.** Every report states the AWS region scanned; `-regions all` scans every
+  enabled region and merges results per control, naming the region in the evidence.
+- **Fix scripts are inert until edited.** Every fix is written commented out.
+- **Signed releases and caches.** Checksums carry a Sigstore signature (see
+  Installation); offline caches are signed per machine and flagged if edited.
+
+## Changes in v1.0.0
 
 **September 2026**
 

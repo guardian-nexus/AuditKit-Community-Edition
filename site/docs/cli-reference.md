@@ -126,9 +126,9 @@ auditkit fix
 # Save to file
 auditkit fix -output fixes.sh
 
-# Review before running
-cat fixes.sh
-bash fixes.sh  # Run after review
+# Every fix is written commented out. Read the script, replace any
+# placeholder, uncomment the lines you intend to run, then:
+bash fixes.sh
 ```
 
 **Flags:**
@@ -303,7 +303,7 @@ auditkit version
 
 **Output:**
 ```
-AuditKit v1.0.0 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
+AuditKit v1.1.0 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
 ```
 
 ---
@@ -448,8 +448,7 @@ auditkit evidence -format html -output evidence-tracker.html
 # Generate fix script
 auditkit fix -output fixes.sh
 
-# Review and run fixes
-cat fixes.sh
+# Uncomment the fixes you want to apply, then run
 bash fixes.sh
 
 # Re-scan to verify

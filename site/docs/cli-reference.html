@@ -126,9 +126,9 @@ auditkit fix
 # Save to file
 auditkit fix -output fixes.sh
 
-# Review before running
-cat fixes.sh
-bash fixes.sh  # Run after review
+# Every fix is written commented out. Read the script, replace any
+# placeholder, uncomment the lines you intend to run, then:
+bash fixes.sh
 </code></pre>
 <p><strong>Flags:</strong>
 - <code>-output</code> - Output file path (default: <code>auditkit-&lt;provider&gt;-fixes.sh</code>)
@@ -237,7 +237,7 @@ Download: https://github.com/guardian-nexus/AuditKit-Community-Edition/releases/
 <pre class="code-block"><code>auditkit version
 </code></pre>
 <p><strong>Output:</strong></p>
-<pre class="code-block"><code>AuditKit v1.0.0 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
+<pre class="code-block"><code>AuditKit v1.1.0 - Multi-cloud compliance scanning (AWS, Azure, GCP; M365 via ScubaGear import)
 </code></pre>
 <h2>Global Flags</h2>
 <p>These flags work with all commands:</p>
@@ -332,8 +332,7 @@ auditkit evidence -format html -output evidence-tracker.html
 <pre class="code-block"><code># Generate fix script
 auditkit fix -output fixes.sh
 
-# Review and run fixes
-cat fixes.sh
+# Uncomment the fixes you want to apply, then run
 bash fixes.sh
 
 # Re-scan to verify
