@@ -162,6 +162,7 @@ az network bastion create \
 }
 
 func (c *NetworkChecks) CheckSSHAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListAllPager(nil)
@@ -172,6 +173,7 @@ func (c *NetworkChecks) CheckSSHAccess(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client ListAll", err)
 			break
 		}
 
@@ -249,10 +251,11 @@ Best practice: Combine Azure Bastion + disable password authentication + use SSH
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-7.2", "SSH Access from Internet")
 }
 
 func (c *NetworkChecks) CheckUDPAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListAllPager(nil)
@@ -263,6 +266,7 @@ func (c *NetworkChecks) CheckUDPAccess(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client ListAll", err)
 			break
 		}
 
@@ -343,10 +347,11 @@ Restrict to specific source IPs where possible.`,
 		})
 	}
 
-	return results
+	return skipped.finish(results, "AZ-NETWORK-01", "UDP Access from Internet")
 }
 
 func (c *NetworkChecks) CheckHTTPAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListAllPager(nil)
@@ -358,6 +363,7 @@ func (c *NetworkChecks) CheckHTTPAccess(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client ListAll", err)
 			break
 		}
 
@@ -425,7 +431,7 @@ Document business justification for each HTTP/HTTPS rule.`,
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-7.4", "HTTP(S) Access from Internet")
 }
 
 func (c *NetworkChecks) CheckFlowLogRetention(ctx context.Context) []CheckResult {
@@ -543,6 +549,7 @@ Consider:
 }
 
 func (c *NetworkChecks) CheckOpenPorts(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListAllPager(nil)
@@ -566,6 +573,7 @@ func (c *NetworkChecks) CheckOpenPorts(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client ListAll", err)
 			break
 		}
 
@@ -637,5 +645,5 @@ This is a critical security vulnerability enabling:
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-7.1", "Dangerous Open Ports")
 }

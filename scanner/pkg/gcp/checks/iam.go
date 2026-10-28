@@ -56,6 +56,7 @@ func (c *IAMChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 // CheckServiceAccountKeys checks for old or excessive service account keys
 func (c *IAMChecks) CheckServiceAccountKeys(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	// List service accounts
@@ -97,6 +98,7 @@ func (c *IAMChecks) CheckServiceAccountKeys(ctx context.Context) []CheckResult {
 
 		keyResp, err := c.client.ListServiceAccountKeys(ctx, keyReq)
 		if err != nil {
+			skipped.add("ListServiceAccountKeys", err)
 			continue
 		}
 
@@ -185,7 +187,7 @@ gcloud iam service-accounts keys delete KEY_ID \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC6.1", "Service Account Key Rotation")
 }
 
 // CheckUserMFA verifies 2FA is enforced for users
@@ -193,7 +195,7 @@ func (c *IAMChecks) CheckUserMFA(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
 	// Get project IAM policy to check for user accounts
-	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformScope))
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions(option.WithScopes(cloudresourcemanager.CloudPlatformScope))...)
 	if err != nil {
 		results = append(results, CheckResult{
 			Control:     "CC6.1",
@@ -276,14 +278,14 @@ func (c *IAMChecks) CheckUserMFA(ctx context.Context) []CheckResult {
 func (c *IAMChecks) CheckPrimitiveRoles(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
-	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformScope))
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions(option.WithScopes(cloudresourcemanager.CloudPlatformScope))...)
 	if err != nil {
-		return results
+		return append(results, checkError("CC6.3", "Primitive Role Usage", GetFrameworkMappings("IAM_PRIMITIVE_ROLES"), err))
 	}
 
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CC6.3", "Primitive Role Usage", GetFrameworkMappings("IAM_PRIMITIVE_ROLES"), err))
 	}
 
 	primitiveRoles := []string{"roles/owner", "roles/editor", "roles/viewer"}
@@ -350,14 +352,14 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 func (c *IAMChecks) CheckServiceAccountPermissions(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
-	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformScope))
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions(option.WithScopes(cloudresourcemanager.CloudPlatformScope))...)
 	if err != nil {
-		return results
+		return append(results, checkError("CC6.3", "Service Account Permissions", nil, err))
 	}
 
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CC6.3", "Service Account Permissions", nil, err))
 	}
 
 	dangerousRoles := []string{"roles/owner", "roles/editor"}
@@ -460,14 +462,14 @@ gcloud services api-keys update KEY_ID \
 func (c *IAMChecks) CheckServiceAccountAdminSeparation(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
-	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformScope))
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions(option.WithScopes(cloudresourcemanager.CloudPlatformScope))...)
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-1.9", "[CIS-GCP-1.9] Service Account Admin Separation", GetFrameworkMappings("IAM_SERVICE_ACCOUNT_ADMIN"), err))
 	}
 
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-1.9", "[CIS-GCP-1.9] Service Account Admin Separation", GetFrameworkMappings("IAM_SERVICE_ACCOUNT_ADMIN"), err))
 	}
 
 	// Check if same user has both Service Account Admin and Service Account User roles
@@ -544,14 +546,14 @@ gcloud projects remove-iam-policy-binding PROJECT_ID \
 func (c *IAMChecks) CheckCorporateLogin(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
-	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformScope))
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions(option.WithScopes(cloudresourcemanager.CloudPlatformScope))...)
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-1.2", "[CIS-GCP-1.2] Corporate Login Enforcement", GetFrameworkMappings("IAM_CORPORATE_LOGIN"), err))
 	}
 
 	policy, err := crmService.Projects.GetIamPolicy(c.projectID, &cloudresourcemanager.GetIamPolicyRequest{}).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-1.2", "[CIS-GCP-1.2] Corporate Login Enforcement", GetFrameworkMappings("IAM_CORPORATE_LOGIN"), err))
 	}
 
 	// Check for gmail.com user accounts (non-corporate)
@@ -782,7 +784,7 @@ func (c *IAMChecks) CheckSeparationOfDuties(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
 	// Get project IAM policy
-	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformReadOnlyScope))
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions(option.WithScopes(cloudresourcemanager.CloudPlatformReadOnlyScope))...)
 	if err != nil {
 		return []CheckResult{{
 			Control:     "GCP-IAM-02",
@@ -926,7 +928,7 @@ func (c *IAMChecks) CheckKMSRoleSeparation(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
 	// Get project IAM policy
-	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformReadOnlyScope))
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions(option.WithScopes(cloudresourcemanager.CloudPlatformReadOnlyScope))...)
 	if err != nil {
 		return []CheckResult{{
 			Control:     "CIS-GCP-1.12",
@@ -1036,7 +1038,7 @@ func (c *IAMChecks) CheckIAMUserRoles(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
 	// Get project IAM policy
-	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformReadOnlyScope))
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions(option.WithScopes(cloudresourcemanager.CloudPlatformReadOnlyScope))...)
 	if err != nil {
 		return []CheckResult{{
 			Control:     "CIS-GCP-1.7",

@@ -101,6 +101,7 @@ func (c *AzurePCIChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 // Requirement 1: Network segmentation for CDE
 func (c *AzurePCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check for network segmentation using NSGs
@@ -112,6 +113,7 @@ func (c *AzurePCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Ch
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("networkClient ListAll", err)
 			break
 		}
 
@@ -171,11 +173,12 @@ func (c *AzurePCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Ch
 		})
 	}
 
-	return results
+	return skipped.finish(results, "PCI-1.4.1", "[PCI-DSS] Network Segmentation")
 }
 
 // Requirement 3: Storage encryption for cardholder data
 func (c *AzurePCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.storageClient.NewListPager(nil)
@@ -187,6 +190,7 @@ func (c *AzurePCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []Chec
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("storageClient List", err)
 			break
 		}
 
@@ -241,11 +245,12 @@ func (c *AzurePCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []Chec
 		})
 	}
 
-	return results
+	return skipped.finish(results, "PCI-3.5.1", "[PCI-DSS] Storage Encryption (Mandatory)")
 }
 
 // Requirement 4: Encryption in transit
 func (c *AzurePCIChecks) CheckReq4_TransitEncryption(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check storage accounts for HTTPS enforcement
@@ -257,6 +262,7 @@ func (c *AzurePCIChecks) CheckReq4_TransitEncryption(ctx context.Context) []Chec
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("storageClient List", err)
 			break
 		}
 
@@ -312,11 +318,12 @@ func (c *AzurePCIChecks) CheckReq4_TransitEncryption(ctx context.Context) []Chec
 		})
 	}
 
-	return results
+	return skipped.finish(results, "PCI-4.2.1", "[PCI-DSS] HTTPS Enforcement")
 }
 
 // Requirement 7: Access control
 func (c *AzurePCIChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check for excessive privileged roles
@@ -329,6 +336,7 @@ func (c *AzurePCIChecks) CheckReq7_AccessControl(ctx context.Context) []CheckRes
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("roleClient List", err)
 			break
 		}
 
@@ -380,7 +388,7 @@ func (c *AzurePCIChecks) CheckReq7_AccessControl(ctx context.Context) []CheckRes
 		})
 	}
 
-	return results
+	return skipped.finish(results, "PCI-7.2.1", "[PCI-DSS] Least Privilege Violation")
 }
 
 // Requirement 8: Authentication

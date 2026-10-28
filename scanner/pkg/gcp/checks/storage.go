@@ -223,6 +223,7 @@ func (c *StorageChecks) CheckBucketEncryption(ctx context.Context) []CheckResult
 
 // CheckBucketVersioning verifies versioning is enabled for data protection
 func (c *StorageChecks) CheckBucketVersioning(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	it := c.client.Buckets(ctx, c.projectID)
@@ -249,6 +250,7 @@ func (c *StorageChecks) CheckBucketVersioning(ctx context.Context) []CheckResult
 		bucket := c.client.Bucket(attrs.Name)
 		bucketAttrs, err := bucket.Attrs(ctx)
 		if err != nil {
+			skipped.add("Attrs", err)
 			continue
 		}
 
@@ -292,11 +294,12 @@ func (c *StorageChecks) CheckBucketVersioning(ctx context.Context) []CheckResult
 		})
 	}
 
-	return results
+	return skipped.finish(results, "A1.2", "GCS Bucket Versioning Check")
 }
 
 // CheckBucketLogging verifies access logging is enabled
 func (c *StorageChecks) CheckBucketLogging(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	it := c.client.Buckets(ctx, c.projectID)
@@ -323,6 +326,7 @@ func (c *StorageChecks) CheckBucketLogging(ctx context.Context) []CheckResult {
 		bucket := c.client.Bucket(attrs.Name)
 		bucketAttrs, err := bucket.Attrs(ctx)
 		if err != nil {
+			skipped.add("Attrs", err)
 			continue
 		}
 
@@ -368,11 +372,12 @@ func (c *StorageChecks) CheckBucketLogging(ctx context.Context) []CheckResult {
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC7.2", "GCS Bucket Logging Check")
 }
 
 // CheckUniformBucketLevelAccess verifies uniform bucket-level access is enabled (CIS 5.2)
 func (c *StorageChecks) CheckUniformBucketLevelAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	it := c.client.Buckets(ctx, c.projectID)
@@ -402,6 +407,7 @@ func (c *StorageChecks) CheckUniformBucketLevelAccess(ctx context.Context) []Che
 		bucket := c.client.Bucket(attrs.Name)
 		bucketAttrs, err := bucket.Attrs(ctx)
 		if err != nil {
+			skipped.add("Attrs", err)
 			continue
 		}
 
@@ -443,11 +449,12 @@ func (c *StorageChecks) CheckUniformBucketLevelAccess(ctx context.Context) []Che
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-5.2", "GCS Uniform Bucket-Level Access")
 }
 
 // CheckBucketRetentionPolicy verifies retention policies are set
 func (c *StorageChecks) CheckBucketRetentionPolicy(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	it := c.client.Buckets(ctx, c.projectID)
@@ -467,6 +474,7 @@ func (c *StorageChecks) CheckBucketRetentionPolicy(ctx context.Context) []CheckR
 		bucket := c.client.Bucket(attrs.Name)
 		bucketAttrs, err := bucket.Attrs(ctx)
 		if err != nil {
+			skipped.add("Attrs", err)
 			continue
 		}
 
@@ -508,5 +516,5 @@ func (c *StorageChecks) CheckBucketRetentionPolicy(ctx context.Context) []CheckR
 		})
 	}
 
-	return results
+	return skipped.finish(results, "GCP-STOR-01", "GCS Bucket Retention Policy")
 }

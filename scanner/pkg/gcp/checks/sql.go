@@ -58,7 +58,7 @@ func (c *SQLChecks) CheckPublicIP(ctx context.Context) []CheckResult {
 	var results []CheckResult
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CC6.6", "Cloud SQL - Public IP", GetFrameworkMappings("SQL_PUBLIC_IP"), err))
 	}
 
 	publicInstances := []string{}
@@ -104,7 +104,7 @@ func (c *SQLChecks) CheckBackupEnabled(ctx context.Context) []CheckResult {
 	var results []CheckResult
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("A1.2", "Cloud SQL - Automated Backups", GetFrameworkMappings("SQL_BACKUP_ENABLED"), err))
 	}
 
 	noBackup := []string{}
@@ -153,7 +153,7 @@ func (c *SQLChecks) CheckBackupRetention(ctx context.Context) []CheckResult {
 	var results []CheckResult
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-6.8", "[CIS-GCP-6.8] SQL Backup Retention", map[string]string{"CIS-GCP": "6.8", "SOC2": "A1.2", "PCI-DSS": "3.2.1"}, err))
 	}
 
 	if len(instanceList.Items) == 0 {
@@ -240,7 +240,7 @@ func (c *SQLChecks) CheckSSLRequired(ctx context.Context) []CheckResult {
 	var results []CheckResult
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CC6.1", "Cloud SQL - SSL Enforcement", GetFrameworkMappings("SQL_SSL_REQUIRED"), err))
 	}
 
 	noSSL := []string{}
@@ -288,7 +288,7 @@ func (c *SQLChecks) CheckPostgreSQLLogCheckpoints(ctx context.Context) []CheckRe
 	var results []CheckResult
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("GCP-SQL-01", "[GCP-SQL-01] PostgreSQL log_checkpoints Flag", map[string]string{"SOC2": "CC7.2"}, err))
 	}
 
 	nonCompliantInstances := []string{}
@@ -371,7 +371,7 @@ func (c *SQLChecks) CheckPostgreSQLLogConnections(ctx context.Context) []CheckRe
 	var results []CheckResult
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-6.2.2", "[CIS-GCP-6.2.2] PostgreSQL log_connections Flag", map[string]string{"CIS-GCP": "6.2.2", "SOC2": "CC7.2", "PCI-DSS": "10.2.1.5"}, err))
 	}
 
 	nonCompliantInstances := []string{}
@@ -453,7 +453,7 @@ func (c *SQLChecks) CheckMySQLSkipShowDatabase(ctx context.Context) []CheckResul
 	var results []CheckResult
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-6.1.2", "[CIS-GCP-6.1.2] MySQL skip_show_database Flag", map[string]string{"CIS-GCP": "6.1.2", "SOC2": "CC6.1"}, err))
 	}
 
 	nonCompliantInstances := []string{}
@@ -534,7 +534,7 @@ func (c *SQLChecks) CheckPostgreSQLLogDisconnections(ctx context.Context) []Chec
 	var results []CheckResult
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-6.2.3", "[CIS-GCP-6.2.3] PostgreSQL log_disconnections Flag", map[string]string{"CIS-GCP": "6.2.3", "SOC2": "CC7.2", "PCI-DSS": "10.2.1.5"}, err))
 	}
 
 	nonCompliantInstances := []string{}
@@ -616,7 +616,7 @@ func (c *SQLChecks) CheckPostgreSQLLogDuration(ctx context.Context) []CheckResul
 	var results []CheckResult
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-6.2.7", "[CIS-GCP-6.2.7] PostgreSQL log_min_duration_statement Flag", map[string]string{"CIS-GCP": "6.2.7", "SOC2": "CC7.2"}, err))
 	}
 
 	nonCompliantInstances := []string{}
@@ -703,7 +703,7 @@ func (c *SQLChecks) CheckSQLServerTraceFlag(ctx context.Context) []CheckResult {
 	var results []CheckResult
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-6.3.6", "[CIS-GCP-6.3.6] SQL Server Trace Flag 3625", map[string]string{"CIS-GCP": "6.3.6", "SOC2": "CC6.1"}, err))
 	}
 
 	nonCompliantInstances := []string{}
@@ -844,7 +844,7 @@ func (c *SQLChecks) checkDatabaseFlag(ctx context.Context, dbType, flagName, exp
 
 	instanceList, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError(cisControl, checkName, map[string]string{"CIS-GCP": strings.TrimPrefix(strings.TrimPrefix(cisControl, "CIS-GCP-"), "CIS GCP "), "SOC2": "CC6.1"}, err))
 	}
 
 	violatingInstances := []string{}

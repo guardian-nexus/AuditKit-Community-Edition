@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/applicationinsights/armapplicationinsights"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/authorization/armauthorization"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute"
@@ -31,7 +31,7 @@ type AzureScanner struct {
 	suiteCached bool
 
 	subscriptionID      string
-	cred                *azidentity.DefaultAzureCredential
+	cred                azcore.TokenCredential
 	graphClient         *msgraphsdk.GraphServiceClient
 	storageClient       *armstorage.AccountsClient
 	aksClient           *armcontainerservice.ManagedClustersClient
@@ -84,19 +84,19 @@ type ScanResult struct {
 }
 
 func NewScanner(subscriptionID string) (*AzureScanner, error) {
-	cred, err := azidentity.NewDefaultAzureCredential(nil)
+	cred, err := checks.Credential()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Azure credential: %v", err)
 	}
 
 	// Create Microsoft Graph client
-	graphClient, err := msgraphsdk.NewGraphServiceClientWithCredentials(cred, []string{"https://graph.microsoft.com/.default"})
+	graphClient, err := checks.NewGraphClient(cred, []string{"https://graph.microsoft.com/.default"})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Graph client: %v", err)
 	}
 
 	// Create Azure Resource Manager clients
-	storageClient, err := armstorage.NewAccountsClient(subscriptionID, cred, nil)
+	storageClient, err := armstorage.NewAccountsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create storage client: %v", err)
 	}
@@ -104,37 +104,37 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 	// CIS AKS coverage is free in both editions: the benchmark is published
 	// free, so the paid tier differs by capability - evidence packages,
 	// multi-account, monitoring - not by which requirements you may see.
-	aksClient, err := armcontainerservice.NewManagedClustersClient(subscriptionID, cred, nil)
+	aksClient, err := armcontainerservice.NewManagedClustersClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create AKS client: %v", err)
 	}
 
-	computeClient, err := armcompute.NewVirtualMachinesClient(subscriptionID, cred, nil)
+	computeClient, err := armcompute.NewVirtualMachinesClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create compute client: %v", err)
 	}
 
-	disksClient, err := armcompute.NewDisksClient(subscriptionID, cred, nil)
+	disksClient, err := armcompute.NewDisksClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create disks client: %v", err)
 	}
 
-	networkClient, err := armnetwork.NewVirtualNetworksClient(subscriptionID, cred, nil)
+	networkClient, err := armnetwork.NewVirtualNetworksClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create network client: %v", err)
 	}
 
-	nsgClient, err := armnetwork.NewSecurityGroupsClient(subscriptionID, cred, nil)
+	nsgClient, err := armnetwork.NewSecurityGroupsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create NSG client: %v", err)
 	}
 
-	nicClient, err := armnetwork.NewInterfacesClient(subscriptionID, cred, nil)
+	nicClient, err := armnetwork.NewInterfacesClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create NIC client: %v", err)
 	}
 
-	publicIPClient, err := armnetwork.NewPublicIPAddressesClient(subscriptionID, cred, nil)
+	publicIPClient, err := armnetwork.NewPublicIPAddressesClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create public IP client: %v", err)
 	}
@@ -144,81 +144,81 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 	// subnet and resource-group enumeration. The rest are optional: each check
 	// reports ERROR when its own client is absent rather than passing on data
 	// it never saw.
-	appGatewayClient, err := armnetwork.NewApplicationGatewaysClient(subscriptionID, cred, nil)
+	appGatewayClient, err := armnetwork.NewApplicationGatewaysClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		appGatewayClient = nil
 	}
-	wafPolicyClient, err := armnetwork.NewWebApplicationFirewallPoliciesClient(subscriptionID, cred, nil)
+	wafPolicyClient, err := armnetwork.NewWebApplicationFirewallPoliciesClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		wafPolicyClient = nil
 	}
-	watcherClient, err := armnetwork.NewWatchersClient(subscriptionID, cred, nil)
+	watcherClient, err := armnetwork.NewWatchersClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		watcherClient = nil
 	}
-	flowLogClient, err := armnetwork.NewFlowLogsClient(subscriptionID, cred, nil)
+	flowLogClient, err := armnetwork.NewFlowLogsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		flowLogClient = nil
 	}
-	vpnGatewayClient, err := armnetwork.NewVirtualNetworkGatewaysClient(subscriptionID, cred, nil)
+	vpnGatewayClient, err := armnetwork.NewVirtualNetworkGatewaysClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		vpnGatewayClient = nil
 	}
-	bastionClient, err := armnetwork.NewBastionHostsClient(subscriptionID, cred, nil)
+	bastionClient, err := armnetwork.NewBastionHostsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		bastionClient = nil
 	}
 
 	// The key and secret objects, for the section 8.3 expiry and rotation
 	// recommendations. The vault client alone cannot see them.
-	kvKeysClient, err := armkeyvault.NewKeysClient(subscriptionID, cred, nil)
+	kvKeysClient, err := armkeyvault.NewKeysClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		kvKeysClient = nil
 	}
-	kvSecretsClient, err := armkeyvault.NewSecretsClient(subscriptionID, cred, nil)
+	kvSecretsClient, err := armkeyvault.NewSecretsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		kvSecretsClient = nil
 	}
-	databricksClient, err := armdatabricks.NewWorkspacesClient(subscriptionID, cred, nil)
+	databricksClient, err := armdatabricks.NewWorkspacesClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		databricksClient = nil
 	}
 
-	sqlClient, err := armsql.NewServersClient(subscriptionID, cred, nil)
+	sqlClient, err := armsql.NewServersClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create SQL client: %v", err)
 	}
 
-	sqlDBClient, err := armsql.NewDatabasesClient(subscriptionID, cred, nil)
+	sqlDBClient, err := armsql.NewDatabasesClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create SQL DB client: %v", err)
 	}
 
-	keyVaultClient, err := armkeyvault.NewVaultsClient(subscriptionID, cred, nil)
+	keyVaultClient, err := armkeyvault.NewVaultsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Key Vault client: %v", err)
 	}
 
-	monitorClient, err := armmonitor.NewActivityLogsClient(subscriptionID, cred, nil)
+	monitorClient, err := armmonitor.NewActivityLogsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create monitor client: %v", err)
 	}
 
 	// Diagnostic settings are addressed by resource URI rather than subscription.
 	// A failure here is not fatal: the checks that use it degrade to manual.
-	diagnosticClient, err := armmonitor.NewDiagnosticSettingsClient(cred, nil)
+	diagnosticClient, err := armmonitor.NewDiagnosticSettingsClient(cred, checks.ARMOptions())
 	if err != nil {
 		diagnosticClient = nil
 	}
 
 	// Blob lifecycle policies. Optional: the checks that use it degrade to manual.
-	policyClient, err := armstorage.NewManagementPoliciesClient(subscriptionID, cred, nil)
+	policyClient, err := armstorage.NewManagementPoliciesClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		policyClient = nil
 	}
 
 	// Capacity and blob retention. Optional: checks degrade to manual.
-	autoscaleClient, err := armmonitor.NewAutoscaleSettingsClient(subscriptionID, cred, nil)
+	autoscaleClient, err := armmonitor.NewAutoscaleSettingsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		autoscaleClient = nil
 	}
@@ -227,50 +227,50 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 	// section 6.1.2 and 6.1.3. Constructed here, with the field, on purpose:
 	// a field declared without its constructor is a nil client, which fails
 	// every recommendation for want of data instead of reporting a finding.
-	alertClient, err := armmonitor.NewActivityLogAlertsClient(subscriptionID, cred, nil)
+	alertClient, err := armmonitor.NewActivityLogAlertsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		alertClient = nil
 	}
-	insightsClient, err := armapplicationinsights.NewComponentsClient(subscriptionID, cred, nil)
+	insightsClient, err := armapplicationinsights.NewComponentsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		insightsClient = nil
 	}
-	blobServiceClient, err := armstorage.NewBlobServicesClient(subscriptionID, cred, nil)
+	blobServiceClient, err := armstorage.NewBlobServicesClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		blobServiceClient = nil
 	}
-	fileServiceClient, err := armstorage.NewFileServicesClient(subscriptionID, cred, nil)
+	fileServiceClient, err := armstorage.NewFileServicesClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		fileServiceClient = nil
 	}
 
-	roleClient, err := armauthorization.NewRoleAssignmentsClient(subscriptionID, cred, nil)
+	roleClient, err := armauthorization.NewRoleAssignmentsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create role assignments client: %v", err)
 	}
 
-	roleDefClient, err := armauthorization.NewRoleDefinitionsClient(cred, nil)
+	roleDefClient, err := armauthorization.NewRoleDefinitionsClient(cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create role definitions client: %v", err)
 	}
 
 	// FIXED: Security Center clients - removed subscriptionID from constructor
-	securityClient, err := armsecurity.NewPricingsClient(cred, nil)
+	securityClient, err := armsecurity.NewPricingsClient(cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create security pricing client: %v", err)
 	}
 
-	subAssessClient, err := armsecurity.NewSubAssessmentsClient(cred, nil)
+	subAssessClient, err := armsecurity.NewSubAssessmentsClient(cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create sub-assessments client: %v", err)
 	}
 
-	autoProvisionClient, err := armsecurity.NewAutoProvisioningSettingsClient(subscriptionID, cred, nil)
+	autoProvisionClient, err := armsecurity.NewAutoProvisioningSettingsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create auto-provisioning client: %v", err)
 	}
 
-	contactsClient, err := armsecurity.NewContactsClient(subscriptionID, cred, nil)
+	contactsClient, err := armsecurity.NewContactsClient(subscriptionID, cred, checks.ARMOptions())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create security contacts client: %v", err)
 	}
@@ -278,7 +278,7 @@ func NewScanner(subscriptionID string) (*AzureScanner, error) {
 	// Defender's own recommendation results, which is where the operating
 	// system update assessment surfaces. Constructed with its field, not
 	// declared and left nil.
-	assessmentsClient, err := armsecurity.NewAssessmentsClient(cred, nil)
+	assessmentsClient, err := armsecurity.NewAssessmentsClient(cred, checks.ARMOptions())
 	if err != nil {
 		assessmentsClient = nil
 	}

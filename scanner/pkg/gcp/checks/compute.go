@@ -43,10 +43,11 @@ func (c *ComputeChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *ComputeChecks) CheckDiskEncryption(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 	zones, err := c.service.Zones.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CC6.7", "Disk Encryption with CMEK", GetFrameworkMappings("COMPUTE_DISK_ENCRYPTION"), err))
 	}
 
 	unencryptedDisks := []string{}
@@ -55,6 +56,7 @@ func (c *ComputeChecks) CheckDiskEncryption(ctx context.Context) []CheckResult {
 	for _, zone := range zones.Items {
 		diskList, err := c.service.Disks.List(c.projectID, zone.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -98,14 +100,15 @@ func (c *ComputeChecks) CheckDiskEncryption(ctx context.Context) []CheckResult {
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC6.7", "Disk Encryption with CMEK")
 }
 
 func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 	zones, err := c.service.Zones.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CC6.6", "Compute Instances - Public IP Addresses", GetFrameworkMappings("COMPUTE_PUBLIC_IP"), err))
 	}
 
 	instancesWithPublicIP := []string{}
@@ -114,6 +117,7 @@ func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
 	for _, zone := range zones.Items {
 		instances, err := c.service.Instances.List(c.projectID, zone.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -160,7 +164,7 @@ func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC6.6", "Compute Instances - Public IP Addresses")
 }
 
 func (c *ComputeChecks) CheckOSPatchManagement(ctx context.Context) []CheckResult {
@@ -189,11 +193,12 @@ func (c *ComputeChecks) CheckOSPatchManagement(ctx context.Context) []CheckResul
 
 // CheckOSLogin verifies OS Login is enabled (CIS 4.4)
 func (c *ComputeChecks) CheckOSLogin(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	zones, err := c.service.Zones.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-4.4", "[CIS-GCP-4.4] OS Login Enabled", GetFrameworkMappings("COMPUTE_OS_LOGIN"), err))
 	}
 
 	instancesWithoutOSLogin := []string{}
@@ -202,6 +207,7 @@ func (c *ComputeChecks) CheckOSLogin(ctx context.Context) []CheckResult {
 	for _, zone := range zones.Items {
 		instances, err := c.service.Instances.List(c.projectID, zone.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -264,16 +270,17 @@ gcloud compute instances add-metadata INSTANCE_NAME \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-4.4", "[CIS-GCP-4.4] OS Login Enabled")
 }
 
 // CheckShieldedVM verifies Shielded VM features are enabled (CIS 4.8)
 func (c *ComputeChecks) CheckShieldedVM(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	zones, err := c.service.Zones.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-4.8", "[CIS-GCP-4.8] Shielded VM Features", GetFrameworkMappings("COMPUTE_SHIELDED_VM"), err))
 	}
 
 	instancesWithoutShieldedVM := []string{}
@@ -282,6 +289,7 @@ func (c *ComputeChecks) CheckShieldedVM(ctx context.Context) []CheckResult {
 	for _, zone := range zones.Items {
 		instances, err := c.service.Instances.List(c.projectID, zone.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -335,16 +343,17 @@ gcloud compute instances update INSTANCE_NAME \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-4.8", "[CIS-GCP-4.8] Shielded VM Features")
 }
 
 // CheckSerialPortAccess verifies serial port access is disabled (CIS 4.5)
 func (c *ComputeChecks) CheckSerialPortAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	zones, err := c.service.Zones.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-4.5", "[CIS-GCP-4.5] Serial Port Access Disabled", GetFrameworkMappings("COMPUTE_SERIAL_PORT"), err))
 	}
 
 	instancesWithSerialPort := []string{}
@@ -353,6 +362,7 @@ func (c *ComputeChecks) CheckSerialPortAccess(ctx context.Context) []CheckResult
 	for _, zone := range zones.Items {
 		instances, err := c.service.Instances.List(c.projectID, zone.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -405,16 +415,17 @@ func (c *ComputeChecks) CheckSerialPortAccess(ctx context.Context) []CheckResult
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-4.5", "[CIS-GCP-4.5] Serial Port Access Disabled")
 }
 
 // CheckIPForwarding verifies IP forwarding is disabled (CIS 4.6)
 func (c *ComputeChecks) CheckIPForwarding(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	zones, err := c.service.Zones.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-4.6", "[CIS-GCP-4.6] IP Forwarding Disabled", GetFrameworkMappings("COMPUTE_IP_FORWARDING"), err))
 	}
 
 	instancesWithIPForwarding := []string{}
@@ -423,6 +434,7 @@ func (c *ComputeChecks) CheckIPForwarding(ctx context.Context) []CheckResult {
 	for _, zone := range zones.Items {
 		instances, err := c.service.Instances.List(c.projectID, zone.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -471,7 +483,7 @@ gcloud compute instances create INSTANCE_NAME \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-4.6", "[CIS-GCP-4.6] IP Forwarding Disabled")
 }
 
 // CheckProjectSSHKeys verifies project-wide SSH keys are not used (CIS 4.3)
@@ -545,11 +557,12 @@ gcloud compute project-info add-metadata \
 
 // CheckDefaultServiceAccountFullAccess verifies instances don't use default SA with full API access (CIS 4.2)
 func (c *ComputeChecks) CheckDefaultServiceAccountFullAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	zones, err := c.service.Zones.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-4.2", "[CIS-GCP-4.2] Default SA Full Access", map[string]string{"CIS-GCP": "4.2", "SOC2": "CC6.3"}, err))
 	}
 
 	instancesWithFullAccess := []string{}
@@ -558,6 +571,7 @@ func (c *ComputeChecks) CheckDefaultServiceAccountFullAccess(ctx context.Context
 	for _, zone := range zones.Items {
 		instances, err := c.service.Instances.List(c.projectID, zone.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -627,16 +641,17 @@ gcloud compute instances set-service-account %s \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-4.2", "[CIS-GCP-4.2] Default SA Full Access")
 }
 
 // CheckConfidentialComputing verifies Confidential Computing is enabled for sensitive workloads (CIS 4.11)
 func (c *ComputeChecks) CheckConfidentialComputing(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	zones, err := c.service.Zones.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-4.11", "[CIS-GCP-4.11] Confidential Computing", map[string]string{"CIS-GCP": "4.11", "SOC2": "CC6.7"}, err))
 	}
 
 	instancesWithoutConfidential := []string{}
@@ -646,6 +661,7 @@ func (c *ComputeChecks) CheckConfidentialComputing(ctx context.Context) []CheckR
 	for _, zone := range zones.Items {
 		instances, err := c.service.Instances.List(c.projectID, zone.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -717,16 +733,17 @@ Confidential Computing encrypts data in use (memory encryption).`),
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-4.11", "[CIS-GCP-4.11] Confidential Computing")
 }
 
 // CheckShieldedVMEnabled verifies instances use Shielded VM (CIS 4.8)
 func (c *ComputeChecks) CheckShieldedVMEnabled(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	zones, err := c.service.Zones.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-4.8", "[CIS-GCP-4.8] Shielded VM Enabled", map[string]string{"CIS-GCP": "4.8", "SOC2": "CC6.1"}, err))
 	}
 
 	instancesWithoutShieldedVM := []string{}
@@ -735,6 +752,7 @@ func (c *ComputeChecks) CheckShieldedVMEnabled(ctx context.Context) []CheckResul
 	for _, zone := range zones.Items {
 		instances, err := c.service.Instances.List(c.projectID, zone.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -806,16 +824,17 @@ gcloud compute instances create new-instance \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-4.8", "[CIS-GCP-4.8] Shielded VM Enabled")
 }
 
 // CheckInstancePublicIPs verifies instances don't have public IPs (CIS 4.9)
 func (c *ComputeChecks) CheckInstancePublicIPs(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	zones, err := c.service.Zones.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-4.9", "[CIS-GCP-4.9] No Public IP Addresses", map[string]string{"CIS-GCP": "4.9", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"}, err))
 	}
 
 	instancesWithPublicIP := []string{}
@@ -824,6 +843,7 @@ func (c *ComputeChecks) CheckInstancePublicIPs(ctx context.Context) []CheckResul
 	for _, zone := range zones.Items {
 		instances, err := c.service.Instances.List(c.projectID, zone.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -903,5 +923,5 @@ gcloud compute routers nats create nat-config \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-4.9", "[CIS-GCP-4.9] No Public IP Addresses")
 }

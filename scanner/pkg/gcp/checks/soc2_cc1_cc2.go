@@ -90,7 +90,7 @@ func (c *GCPCC1Checks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *GCPCC1Checks) CheckCC1_3_OrganizationalStructure(ctx context.Context) CheckResult {
 	// Check for proper IAM roles (separation of duties)
-	crmService, err := cloudresourcemanager.NewService(ctx)
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions()...)
 	if err != nil {
 		return CheckResult{
 			Control:   "CC1.3",
@@ -169,7 +169,7 @@ func (c *GCPCC1Checks) CheckCC1_3_OrganizationalStructure(ctx context.Context) C
 
 func (c *GCPCC1Checks) CheckCC1_5_Accountability(ctx context.Context) CheckResult {
 	// Check for IAM bindings with proper accountability
-	crmService, err := cloudresourcemanager.NewService(ctx)
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions()...)
 	if err != nil {
 		return CheckResult{
 			Control:   "CC1.5",

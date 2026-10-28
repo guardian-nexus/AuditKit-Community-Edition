@@ -37,6 +37,7 @@ func (c *KMSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 // CheckKMSKeyRotation verifies automatic key rotation is enabled (CIS 1.11)
 func (c *KMSChecks) CheckKMSKeyRotation(ctx context.Context) []CheckResult {
 	var results []CheckResult
+	skipped := unreadable{}
 
 	keysWithoutRotation := []string{}
 	totalKeys := 0
@@ -58,7 +59,11 @@ func (c *KMSChecks) CheckKMSKeyRotation(ctx context.Context) []CheckResult {
 				break
 			}
 			if err != nil {
-				continue
+				// This was "continue". A persistent error - a denied permission -
+				// comes back on every Next call, so the loop never ended and the
+				// scan hung on any project where KMS could not be listed.
+				skipped.add("ListKeyRings "+location, err)
+				break
 			}
 
 			// List crypto keys in this key ring
@@ -74,7 +79,8 @@ func (c *KMSChecks) CheckKMSKeyRotation(ctx context.Context) []CheckResult {
 					break
 				}
 				if err != nil {
-					continue
+					skipped.add("ListCryptoKeys", err)
+					break
 				}
 
 				totalKeys++
@@ -134,7 +140,7 @@ func (c *KMSChecks) CheckKMSKeyRotation(ctx context.Context) []CheckResult {
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-1.11", "[CIS-GCP-1.11] KMS Key Rotation")
 }
 
 // CheckKMSSeparationOfDuties verifies separation of duties for KMS (CIS 1.12)
@@ -142,7 +148,7 @@ func (c *KMSChecks) CheckKMSSeparationOfDuties(ctx context.Context) []CheckResul
 	var results []CheckResult
 
 	// Get project IAM policy
-	crmService, err := cloudresourcemanager.NewService(ctx, option.WithScopes(cloudresourcemanager.CloudPlatformScope))
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions(option.WithScopes(cloudresourcemanager.CloudPlatformScope))...)
 	if err != nil {
 		results = append(results, CheckResult{
 			Control:     "CIS-GCP-1.12",

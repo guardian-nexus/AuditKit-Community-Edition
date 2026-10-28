@@ -81,6 +81,7 @@ func (c *CISKeyVaultChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *CISKeyVaultChecks) legacyKeyExpiry(ctx context.Context) CheckResult {
+	skipped := unreadable{}
 	base := CheckResult{
 		Control:     "CIS-8.3.2",
 		Name:        "Key Expiry Set on Access-Policy Key Vaults",
@@ -122,6 +123,7 @@ covered by 8.3.1.`,
 		for pager.More() {
 			page, err := pager.NextPage(ctx)
 			if err != nil {
+				skipped.add("keys List", err)
 				break
 			}
 			for _, k := range page.Value {
@@ -144,6 +146,7 @@ covered by 8.3.1.`,
 }
 
 func (c *CISKeyVaultChecks) legacySecretExpiry(ctx context.Context) CheckResult {
+	skipped := unreadable{}
 	base := CheckResult{
 		Control:     "CIS-8.3.4",
 		Name:        "Secret Expiry Set on Access-Policy Key Vaults",
@@ -184,6 +187,7 @@ covered by 8.3.3.`,
 		for pager.More() {
 			page, err := pager.NextPage(ctx)
 			if err != nil {
+				skipped.add("secrets List", err)
 				break
 			}
 			for _, s := range page.Value {
@@ -219,6 +223,7 @@ func legacyVaults(all []vault) []vault {
 }
 
 func (c *CISKeyVaultChecks) automaticKeyRotation(ctx context.Context) CheckResult {
+	skipped := unreadable{}
 	base := CheckResult{
 		Control:     "CIS-8.3.9",
 		Name:        "Automatic Key Rotation Enabled",
@@ -256,6 +261,7 @@ somebody and rotates nothing, so it does not satisfy this.`,
 		for pager.More() {
 			page, err := pager.NextPage(ctx)
 			if err != nil {
+				skipped.add("keys List", err)
 				break
 			}
 			for _, k := range page.Value {

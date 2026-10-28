@@ -21,6 +21,7 @@ func (c *KeyVaultChecks) Name() string {
 }
 
 func (c *KeyVaultChecks) Run(ctx context.Context) ([]CheckResult, error) {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Count vaults for reporting
@@ -29,6 +30,7 @@ func (c *KeyVaultChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client List", err)
 			break
 		}
 		totalVaults += len(page.Value)
@@ -112,5 +114,5 @@ az keyvault update --name <vault> --enable-rbac-authorization true`,
 		})
 	}
 
-	return results, nil
+	return skipped.finish(results, "AZ-KEYVAULT-01", "Key Vault Recovery Settings"), nil
 }

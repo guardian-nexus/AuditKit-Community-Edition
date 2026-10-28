@@ -92,13 +92,15 @@ func (c *AzureCC3Checks) CheckCC3_2_SecurityCenter(ctx context.Context) CheckRes
 
 	pager := c.monitorClient.NewListPager(filter, nil)
 
+	// One page is enough to show logs exist. This was a loop that left only on
+	// success; a failed NextPage leaves More() true, so a denied activity-log
+	// read retried forever and hung the scan.
 	hasLogs := false
-	for pager.More() {
-		_, err := pager.NextPage(ctx)
-		if err == nil {
-			hasLogs = true
-			break
+	if pager.More() {
+		if _, err := pager.NextPage(ctx); err != nil {
+			return checkError("CC3.2", "Risk Analysis and Assessment", map[string]string{"SOC2": "CC3.2"}, err)
 		}
+		hasLogs = true
 	}
 
 	if hasLogs {
@@ -272,6 +274,7 @@ func (c *AzureCC5Checks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *AzureCC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) CheckResult {
+	skipped := unreadable{}
 	// Check if Key Vault is used (indicates control selection for secrets management)
 	pager := c.keyVaultClient.NewListPager(nil)
 
@@ -279,13 +282,14 @@ func (c *AzureCC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) CheckR
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("keyVaultClient List", err)
 			break
 		}
 		vaultCount += len(page.Value)
 	}
 
 	if vaultCount > 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:         "CC5.1",
 			Name:            "Control Selection and Development",
 			Status:          "PASS",
@@ -298,10 +302,10 @@ func (c *AzureCC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) CheckR
 			Frameworks: map[string]string{
 				"SOC2": "CC5.1",
 			},
-		}
+		})
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:     "CC5.1",
 		Name:        "Control Selection and Development",
 		Status:      "INFO",
@@ -313,7 +317,7 @@ func (c *AzureCC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) CheckR
 		Frameworks: map[string]string{
 			"SOC2": "CC5.1",
 		},
-	}
+	})
 }
 
 func (c *AzureCC5Checks) CheckCC5_2_TechnologyControls(ctx context.Context) CheckResult {

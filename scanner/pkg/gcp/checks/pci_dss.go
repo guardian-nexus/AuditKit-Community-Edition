@@ -115,7 +115,7 @@ func (c *GCPPCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 	}
 
 	if len(results) == 0 {
-		results = append(results, CheckResult{
+		results = append(results, passIfEvidenced(firewallResults, CheckResult{
 			Control:   "PCI-1.4.1",
 			Name:      "[PCI-DSS] Network Segmentation",
 			Status:    "PASS",
@@ -125,7 +125,7 @@ func (c *GCPPCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Chec
 			Frameworks: map[string]string{
 				"PCI-DSS": "1.4.1",
 			},
-		})
+		}))
 	}
 
 	return results
@@ -218,7 +218,7 @@ func (c *GCPPCIChecks) CheckReq4_TransitEncryption(ctx context.Context) []CheckR
 	}
 
 	if len(results) == 0 {
-		results = append(results, CheckResult{
+		results = append(results, passIfEvidenced(sslResults, CheckResult{
 			Control:   "PCI-4.2.1",
 			Name:      "[PCI-DSS] Encryption in Transit",
 			Status:    "PASS",
@@ -228,7 +228,7 @@ func (c *GCPPCIChecks) CheckReq4_TransitEncryption(ctx context.Context) []CheckR
 			Frameworks: map[string]string{
 				"PCI-DSS": "4.2.1",
 			},
-		})
+		}))
 	}
 
 	return results
@@ -252,7 +252,7 @@ func (c *GCPPCIChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 	}
 
 	if len(results) == 0 {
-		results = append(results, CheckResult{
+		results = append(results, passIfEvidenced(iamResults, CheckResult{
 			Control:   "PCI-7.2.1",
 			Name:      "[PCI-DSS] Least Privilege",
 			Status:    "PASS",
@@ -262,7 +262,7 @@ func (c *GCPPCIChecks) CheckReq7_AccessControl(ctx context.Context) []CheckResul
 			Frameworks: map[string]string{
 				"PCI-DSS": "7.2.1",
 			},
-		})
+		}))
 	}
 
 	return results
@@ -767,6 +767,9 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		Name: fmt.Sprintf("projects/%s", c.projectID),
 	})
 	iamErr := ""
+	// An account whose keys could not be listed was skipped, so both PASS
+	// verdicts below could rest on accounts nobody looked at.
+	unreadKeys := unreadable{}
 	for {
 		sa, err := it.Next()
 		if err == iterator.Done {
@@ -778,6 +781,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 		}
 		keyResp, err := c.iamClient.ListServiceAccountKeys(ctx, &adminpb.ListServiceAccountKeysRequest{Name: sa.Name})
 		if err != nil {
+			unreadKeys.add("ListServiceAccountKeys", err)
 			continue
 		}
 		for _, key := range keyResp.Keys {
@@ -824,7 +828,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Frameworks:        map[string]string{"PCI-DSS": "8.6.1"},
 		})
 	} else {
-		results = append(results, CheckResult{
+		results = append(results, unreadKeys.passOrError(CheckResult{
 			Control:    "PCI-8.6.1",
 			Name:       "[PCI-DSS] Application Account Credential Management",
 			Status:     "PASS",
@@ -832,7 +836,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"PCI-DSS": "8.6.1"},
-		})
+		}))
 	}
 
 	// 8.6.2 - credentials must not be hard coded. Not visible from configuration.
@@ -879,7 +883,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Frameworks:        map[string]string{"PCI-DSS": "8.6.3"},
 		})
 	} else {
-		results = append(results, CheckResult{
+		results = append(results, unreadKeys.passOrError(CheckResult{
 			Control:    "PCI-8.6.3",
 			Name:       "[PCI-DSS] Application Account Credential Rotation",
 			Status:     "PASS",
@@ -887,7 +891,7 @@ func (c *GCPPCIChecks) CheckFutureDated(ctx context.Context) []CheckResult {
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"PCI-DSS": "8.6.3"},
-		})
+		}))
 	}
 
 	// 10.4.1.1 - automated log review. A log sink exporting to BigQuery, Pub/Sub

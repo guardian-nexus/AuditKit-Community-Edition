@@ -63,7 +63,7 @@ func (c *GCPCMMCLevel1Checks) Run(ctx context.Context) ([]CheckResult, error) {
 
 // AC.L1-3.1.1 - Limit System Access
 func (c *GCPCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
-	crmService, err := cloudresourcemanager.NewService(ctx)
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions()...)
 	if err != nil {
 		return CheckResult{
 			Control:         "AC.L1-3.1.1",
@@ -160,7 +160,7 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 
 // AC.L1-3.1.2 - Limit System Access to Authorized Types
 func (c *GCPCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
-	crmService, err := cloudresourcemanager.NewService(ctx)
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions()...)
 	if err != nil {
 		return CheckResult{
 			Control:    "AC.L1-3.1.2",
@@ -234,7 +234,7 @@ func (c *GCPCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult {
 
 // IA.L1-3.5.1 - Identify Users
 func (c *GCPCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
-	crmService, err := cloudresourcemanager.NewService(ctx)
+	crmService, err := cloudresourcemanager.NewService(ctx, RESTOptions()...)
 	if err != nil {
 		return CheckResult{
 			Control:    "IA.L1-3.5.1",

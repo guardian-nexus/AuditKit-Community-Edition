@@ -47,39 +47,39 @@ type ScanResult struct {
 func NewScanner(projectID string) (*GCPScanner, error) {
 	ctx := context.Background()
 
-	storageClient, err := storage.NewClient(ctx)
+	storageClient, err := storage.NewClient(ctx, checks.RESTOptions()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create storage client: %v", err)
 	}
 
 	// Use the IAM Admin API client (not google.golang.org/api/iam/v1)
-	iamClient, err := admin.NewIamClient(ctx)
+	iamClient, err := admin.NewIamClient(ctx, checks.GRPCOptions()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create IAM client: %v", err)
 	}
 
-	computeService, err := compute.NewService(ctx)
+	computeService, err := compute.NewService(ctx, checks.RESTOptions()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create compute service: %v", err)
 	}
 
 	// Use sqladmin v1 (not v1beta4)
-	sqlService, err := sqladmin.NewService(ctx)
+	sqlService, err := sqladmin.NewService(ctx, checks.RESTOptions()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create SQL service: %v", err)
 	}
 
-	loggingClient, err := logging.NewConfigClient(ctx)
+	loggingClient, err := logging.NewConfigClient(ctx, checks.GRPCOptions()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create logging client: %v", err)
 	}
 
-	kmsClient, err := kms.NewKeyManagementClient(ctx)
+	kmsClient, err := kms.NewKeyManagementClient(ctx, checks.GRPCOptions()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create KMS client: %v", err)
 	}
 
-	gkeService, err := container.NewService(ctx)
+	gkeService, err := container.NewService(ctx, checks.RESTOptions()...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create GKE service: %v", err)
 	}

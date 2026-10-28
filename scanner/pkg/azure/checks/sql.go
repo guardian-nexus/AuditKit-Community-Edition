@@ -115,6 +115,7 @@ az sql server tde-key set \
 }
 
 func (c *SQLChecks) CheckSQLAuditing(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	if c.serverClient == nil {
@@ -136,6 +137,7 @@ func (c *SQLChecks) CheckSQLAuditing(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("serverClient List", err)
 			break
 		}
 
@@ -175,10 +177,11 @@ Best practice: Send to both Storage (long-term retention) and Log Analytics (que
 		})
 	}
 
-	return results
+	return skipped.finish(results, "AZ-SQL-02", "SQL Auditing")
 }
 
 func (c *SQLChecks) CheckSQLFirewall(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	if c.serverClient == nil {
@@ -201,6 +204,7 @@ func (c *SQLChecks) CheckSQLFirewall(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("serverClient List", err)
 			break
 		}
 
@@ -274,10 +278,11 @@ If public access is required, ensure NO firewall rules allow:
 		})
 	}
 
-	return results
+	return skipped.finish(results, "AZ-SQL-13", "SQL Server Firewall and Public Access")
 }
 
 func (c *SQLChecks) CheckSQLEntraID(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	if c.serverClient == nil {
@@ -300,6 +305,7 @@ func (c *SQLChecks) CheckSQLEntraID(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("serverClient List", err)
 			break
 		}
 
@@ -365,7 +371,7 @@ Best practice: Use Entra ID authentication exclusively and disable SQL authentic
 		})
 	}
 
-	return results
+	return skipped.finish(results, "AZ-SQL-06", "SQL Entra ID Authentication")
 }
 
 func (c *SQLChecks) CheckSQLDefender(ctx context.Context) []CheckResult {

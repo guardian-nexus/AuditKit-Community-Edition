@@ -123,6 +123,7 @@ az storage account update \
 }
 
 func (c *StorageChecks) CheckEncryption(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListPager(nil)
@@ -134,6 +135,7 @@ func (c *StorageChecks) CheckEncryption(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client List", err)
 			break
 		}
 
@@ -204,10 +206,11 @@ For enhanced security, use customer-managed keys in Azure Key Vault.`,
 		})
 	}
 
-	return results
+	return skipped.finish(results, "AZ-STORAGE-93", "Storage Encryption at Rest")
 }
 
 func (c *StorageChecks) CheckSecureTransfer(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListPager(nil)
@@ -218,6 +221,7 @@ func (c *StorageChecks) CheckSecureTransfer(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client List", err)
 			break
 		}
 
@@ -270,10 +274,11 @@ az storage account update \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-9.3.4", "Secure Transfer Required")
 }
 
 func (c *StorageChecks) CheckInfrastructureEncryption(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListPager(nil)
@@ -284,6 +289,7 @@ func (c *StorageChecks) CheckInfrastructureEncryption(ctx context.Context) []Che
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client List", err)
 			break
 		}
 
@@ -350,10 +356,11 @@ az storage account create \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "AZ-STORAGE-03", "Infrastructure Encryption")
 }
 
 func (c *StorageChecks) CheckPublicNetworkAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListPager(nil)
@@ -364,6 +371,7 @@ func (c *StorageChecks) CheckPublicNetworkAccess(ctx context.Context) []CheckRes
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client List", err)
 			break
 		}
 
@@ -421,10 +429,11 @@ Then configure Private Endpoints for access from VNets.`, publicAccessAccounts[0
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-9.3.2.2", "Public Network Access Disabled")
 }
 
 func (c *StorageChecks) CheckMinimumTLS(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListPager(nil)
@@ -435,6 +444,7 @@ func (c *StorageChecks) CheckMinimumTLS(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client List", err)
 			break
 		}
 
@@ -492,10 +502,11 @@ az storage account update \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-9.3.6", "Minimum TLS Version")
 }
 
 func (c *StorageChecks) CheckBlobAnonymousAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListPager(nil)
@@ -506,6 +517,7 @@ func (c *StorageChecks) CheckBlobAnonymousAccess(ctx context.Context) []CheckRes
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client List", err)
 			break
 		}
 
@@ -558,10 +570,11 @@ az storage account update \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "AZ-STORAGE-02", "Blob Anonymous Access")
 }
 
 func (c *StorageChecks) CheckCrosstenantReplication(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListPager(nil)
@@ -572,6 +585,7 @@ func (c *StorageChecks) CheckCrosstenantReplication(ctx context.Context) []Check
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client List", err)
 			break
 		}
 
@@ -624,7 +638,7 @@ az storage account update \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-9.3.7", "Cross-Tenant Replication")
 }
 
 func (c *StorageChecks) CheckBlobSoftDelete(ctx context.Context) []CheckResult {
@@ -663,6 +677,7 @@ Storage account → Data protection → Enable soft delete for blobs and contain
 }
 
 func (c *StorageChecks) CheckNetworkRestrictions(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.client.NewListPager(nil)
@@ -673,6 +688,7 @@ func (c *StorageChecks) CheckNetworkRestrictions(ctx context.Context) []CheckRes
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("client List", err)
 			break
 		}
 
@@ -741,7 +757,7 @@ Then whitelist specific VNets or IP ranges.`, openAccounts[0]),
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-9.3.2.3", "Default Network Access Rule")
 }
 
 func (c *StorageChecks) CheckKeyRotation(ctx context.Context) []CheckResult {

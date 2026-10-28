@@ -182,6 +182,7 @@ Configure via Conditional Access or Security Defaults`,
 	}
 
 	totalUsers := 0
+	unreadMFA := unreadable{}
 	usersWithoutMFA := 0
 	adminUsersWithoutMFA := 0
 
@@ -193,6 +194,9 @@ Configure via Conditional Access or Security Defaults`,
 			// Note: This requires reading authentication methods
 			authMethods, err := c.graphClient.Users().ByUserId(*user.GetId()).Authentication().Methods().Get(ctx, nil)
 			if err != nil {
+				// The user was counted but never examined, so "All N users have
+				// MFA enabled" could include users nobody read.
+				unreadMFA.add("authentication methods", err)
 				continue
 			}
 
@@ -246,7 +250,7 @@ Azure AD → Security → Conditional Access → Create policy requiring MFA for
 			Frameworks:      GetFrameworkMappings("AAD_MFA"),
 		})
 	} else {
-		results = append(results, CheckResult{
+		results = append(results, unreadMFA.passOrError(CheckResult{
 			Control:    "CIS-5.1.3",
 			Name:       "MFA for All Users",
 			Status:     "PASS",
@@ -254,7 +258,7 @@ Azure AD → Security → Conditional Access → Create policy requiring MFA for
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("AAD_MFA"),
-		})
+		}))
 	}
 
 	// CIS 5.1.3: MFA for privileged users
@@ -276,7 +280,7 @@ Create Conditional Access policy targeting directory roles requiring MFA`,
 			Frameworks:      GetFrameworkMappings("AAD_MFA"),
 		})
 	} else {
-		results = append(results, CheckResult{
+		results = append(results, unreadMFA.passOrError(CheckResult{
 			Control:    "AZ-ENTRA-90",
 			Name:       "MFA for Privileged Users",
 			Status:     "PASS",
@@ -284,7 +288,7 @@ Create Conditional Access policy targeting directory roles requiring MFA`,
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("AAD_MFA"),
-		})
+		}))
 	}
 
 	return results
@@ -504,6 +508,7 @@ Create Conditional Access policy targeting Exchange ActiveSync and Other clients
 }
 
 func (c *AADChecks) CheckGuestAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check for guest/external user access via ARM
@@ -515,6 +520,7 @@ func (c *AADChecks) CheckGuestAccess(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("roleClient List", err)
 			break
 		}
 
@@ -609,5 +615,5 @@ Azure AD → External Identities → External collaboration settings → Restric
 		},
 	})
 
-	return results
+	return skipped.finish(results, "CIS-5.3.2", "Guest User Access Review")
 }

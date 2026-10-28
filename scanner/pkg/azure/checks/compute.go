@@ -43,6 +43,7 @@ func (c *ComputeChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *ComputeChecks) CheckDiskEncryption(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.diskClient.NewListPager(nil)
@@ -53,6 +54,7 @@ func (c *ComputeChecks) CheckDiskEncryption(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("diskClient List", err)
 			break
 		}
 
@@ -118,10 +120,11 @@ az vm encryption enable \
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC6.3", "Disk Encryption at Rest")
 }
 
 func (c *ComputeChecks) CheckManagedDisks(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	vmPager := c.vmClient.NewListAllPager(nil)
@@ -132,6 +135,7 @@ func (c *ComputeChecks) CheckManagedDisks(ctx context.Context) []CheckResult {
 	for vmPager.More() {
 		page, err := vmPager.NextPage(ctx)
 		if err != nil {
+			skipped.add("vmClient ListAll", err)
 			break
 		}
 
@@ -195,10 +199,11 @@ Azure Portal → VM → Disks → Migrate to managed disks`,
 		})
 	}
 
-	return results
+	return skipped.finish(results, "AZ-COMPUTE-01", "Managed Disks")
 }
 
 func (c *ComputeChecks) CheckVMExtensions(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.vmClient.NewListAllPager(nil)
@@ -210,6 +215,7 @@ func (c *ComputeChecks) CheckVMExtensions(ctx context.Context) []CheckResult {
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("vmClient ListAll", err)
 			break
 		}
 
@@ -307,11 +313,12 @@ VM → Backup → Enable and configure policy`,
 		Frameworks:      GetFrameworkMappings("VM_BACKUP"),
 	})
 
-	return results
+	return skipped.finish(results, "CC7.1", "VM Monitoring Agents")
 }
 
 // Disk network access restriction
 func (c *ComputeChecks) CheckDiskNetworkAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	pager := c.diskClient.NewListPager(nil)
@@ -322,6 +329,7 @@ func (c *ComputeChecks) CheckDiskNetworkAccess(ctx context.Context) []CheckResul
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
+			skipped.add("diskClient List", err)
 			break
 		}
 
@@ -406,10 +414,11 @@ Security impact:
 		})
 	}
 
-	return results
+	return skipped.finish(results, "AZ-COMPUTE-02", "Disk Network Access Restriction")
 }
 
 func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// First, build a map of all public IPs in the subscription
@@ -481,6 +490,7 @@ func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
 					// Get the NIC details
 					nic, err := c.nicClient.Get(ctx, rgName, nicName, nil)
 					if err != nil {
+						skipped.add("Get", err)
 						continue
 					}
 
@@ -550,5 +560,5 @@ func (c *ComputeChecks) CheckPublicIPs(ctx context.Context) []CheckResult {
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC6.1", "VM Public IP Exposure")
 }

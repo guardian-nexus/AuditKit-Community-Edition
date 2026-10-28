@@ -268,6 +268,7 @@ rather than an empty group.`,
 }
 
 func (c *CISDatabricksChecks) diagnosticLogDelivery(ctx context.Context) CheckResult {
+	skipped := unreadable{}
 	base := CheckResult{
 		Control:     "CIS-2.1.7",
 		Name:        "Databricks Diagnostic Log Delivery Configured",
@@ -316,6 +317,7 @@ assessor after the fact.`,
 		for pager.More() {
 			page, err := pager.NextPage(ctx)
 			if err != nil {
+				skipped.add("diagnostics List", err)
 				break
 			}
 			for _, ds := range page.Value {

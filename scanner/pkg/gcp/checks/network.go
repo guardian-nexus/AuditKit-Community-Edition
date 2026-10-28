@@ -171,11 +171,12 @@ gcloud compute firewall-rules create restricted-ssh \
 
 // CheckDefaultNetwork checks if default network is still in use
 func (c *NetworkChecks) CheckDefaultNetwork(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	networkList, err := c.service.Networks.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-3.1", "[CIS-GCP-3.1] Default VPC Network Deleted", GetFrameworkMappings("VPC_DEFAULT_NETWORK"), err))
 	}
 
 	hasDefaultNetwork := false
@@ -188,12 +189,14 @@ func (c *NetworkChecks) CheckDefaultNetwork(ctx context.Context) []CheckResult {
 			// Check how many instances use default network
 			zones, err := c.service.Zones.List(c.projectID).Context(ctx).Do()
 			if err != nil {
+				skipped.add("List", err)
 				continue
 			}
 
 			for _, zone := range zones.Items {
 				instances, err := c.service.Instances.List(c.projectID, zone.Name).Context(ctx).Do()
 				if err != nil {
+					skipped.add("List", err)
 					continue
 				}
 
@@ -283,16 +286,17 @@ gcloud compute networks delete default --quiet --project=%s`, c.projectID, c.pro
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-3.1", "[CIS-GCP-3.1] Default VPC Network Deleted")
 }
 
 // CheckPrivateGoogleAccess verifies Private Google Access is enabled
 func (c *NetworkChecks) CheckPrivateGoogleAccess(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	regions, err := c.service.Regions.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CC6.1", "Private Google Access", GetFrameworkMappings("VPC_PRIVATE_GOOGLE_ACCESS"), err))
 	}
 
 	subnetsWithoutPGA := []string{}
@@ -301,6 +305,7 @@ func (c *NetworkChecks) CheckPrivateGoogleAccess(ctx context.Context) []CheckRes
 	for _, region := range regions.Items {
 		subnetList, err := c.service.Subnetworks.List(c.projectID, region.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -347,18 +352,19 @@ func (c *NetworkChecks) CheckPrivateGoogleAccess(ctx context.Context) []CheckRes
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CC6.1", "Private Google Access")
 }
 
 // NEW CIS CHECKS BELOW
 
 // CheckVPCFlowLogs verifies VPC Flow Logs are enabled (CIS 3.10)
 func (c *NetworkChecks) CheckVPCFlowLogs(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	var results []CheckResult
 
 	regions, err := c.service.Regions.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-3.10", "[CIS-GCP-3.10] VPC Flow Logs", GetFrameworkMappings("VPC_FLOW_LOGS"), err))
 	}
 
 	subnetsWithoutFlowLogs := []string{}
@@ -367,6 +373,7 @@ func (c *NetworkChecks) CheckVPCFlowLogs(ctx context.Context) []CheckResult {
 	for _, region := range regions.Items {
 		subnetList, err := c.service.Subnetworks.List(c.projectID, region.Name).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -417,7 +424,7 @@ func (c *NetworkChecks) CheckVPCFlowLogs(ctx context.Context) []CheckResult {
 		})
 	}
 
-	return results
+	return skipped.finish(results, "CIS-GCP-3.10", "[CIS-GCP-3.10] VPC Flow Logs")
 }
 
 // CheckDNSSEC checks if DNSSEC is enabled (CIS 3.3)
@@ -475,7 +482,7 @@ func (c *NetworkChecks) CheckLegacyNetworks(ctx context.Context) []CheckResult {
 
 	networkList, err := c.service.Networks.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-3.2", "[CIS-GCP-3.2] Legacy Networks", map[string]string{"CIS-GCP": "3.2", "SOC2": "CC6.1"}, err))
 	}
 
 	legacyNetworks := []string{}
@@ -537,7 +544,7 @@ func (c *NetworkChecks) CheckSSHFromInternet(ctx context.Context) []CheckResult 
 
 	firewallList, err := c.service.Firewalls.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-3.6", "[CIS-GCP-3.6] SSH Access from Internet", map[string]string{"CIS-GCP": "3.6", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"}, err))
 	}
 
 	sshRulesFromInternet := []string{}
@@ -634,7 +641,7 @@ func (c *NetworkChecks) CheckRDPFromInternet(ctx context.Context) []CheckResult 
 
 	firewallList, err := c.service.Firewalls.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return results
+		return append(results, checkError("CIS-GCP-3.7", "[CIS-GCP-3.7] RDP Access from Internet", map[string]string{"CIS-GCP": "3.7", "SOC2": "CC6.6", "PCI-DSS": "1.4.2"}, err))
 	}
 
 	rdpRulesFromInternet := []string{}

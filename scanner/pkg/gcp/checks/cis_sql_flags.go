@@ -25,7 +25,9 @@ import (
 func (c *SQLChecks) checkFlagAbsent(ctx context.Context, dbType, flagName, control, checkName, remediation string) []CheckResult {
 	instances, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return nil
+		// Returning nothing made the flag recommendation disappear from the
+		// report, and the catalog then listed it as MANUAL.
+		return []CheckResult{checkError(control, checkName, map[string]string{"CIS-GCP": strings.TrimPrefix(control, "CIS-GCP-"), "SOC2": "CC6.1"}, err)}
 	}
 	offenders, relevant := []string{}, 0
 	for _, inst := range instances.Items {
@@ -55,7 +57,9 @@ func (c *SQLChecks) checkFlagAbsent(ctx context.Context, dbType, flagName, contr
 func (c *SQLChecks) checkFlagIfPresent(ctx context.Context, dbType, flagName, want, control, checkName, remediation string) []CheckResult {
 	instances, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return nil
+		// Returning nothing made the flag recommendation disappear from the
+		// report, and the catalog then listed it as MANUAL.
+		return []CheckResult{checkError(control, checkName, map[string]string{"CIS-GCP": strings.TrimPrefix(control, "CIS-GCP-"), "SOC2": "CC6.1"}, err)}
 	}
 	offenders, relevant := []string{}, 0
 	for _, inst := range instances.Items {
@@ -161,7 +165,7 @@ func (c *SQLChecks) CheckSQLServerUserOptions(ctx context.Context) []CheckResult
 func (c *SQLChecks) CheckSQLAuthorizedNetworks(ctx context.Context) []CheckResult {
 	instances, err := c.service.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		return nil
+		return []CheckResult{checkError("CIS-GCP-6.5", "[CIS-GCP-6.5] Cloud SQL Does Not Whitelist All Public IPs", map[string]string{"CIS-GCP": "6.5", "SOC2": "CC6.6", "PCI-DSS": "1.3.1"}, err)}
 	}
 	offenders, total := []string{}, 0
 	for _, inst := range instances.Items {

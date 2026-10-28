@@ -82,7 +82,7 @@ func NewVulnCoverageChecksWithClients(clients gcposconfig.Clients, projectID str
 func NewVulnCoverageChecks(ctx context.Context, projectID string, emit Emit) *VulnCoverageChecks {
 	var clients gcposconfig.Clients
 
-	osSvc, err := osconfig.NewService(ctx, option.WithScopes(osconfig.CloudPlatformScope))
+	osSvc, err := osconfig.NewService(ctx, RESTOptions(option.WithScopes(osconfig.CloudPlatformScope))...)
 	if err != nil {
 		return newWithClients(clients, projectID, emit, fmt.Errorf("osconfig service: %w", err))
 	}
@@ -91,7 +91,7 @@ func NewVulnCoverageChecks(ctx context.Context, projectID string, emit Emit) *Vu
 	// The inventory is the denominator. Without it coverage cannot be
 	// expressed as a fraction, so its absence is an error rather than a
 	// silently smaller number.
-	compSvc, err := compute.NewService(ctx, option.WithScopes(compute.CloudPlatformScope))
+	compSvc, err := compute.NewService(ctx, RESTOptions(option.WithScopes(compute.CloudPlatformScope))...)
 	if err != nil {
 		return newWithClients(clients, projectID, emit, fmt.Errorf("compute service: %w", err))
 	}

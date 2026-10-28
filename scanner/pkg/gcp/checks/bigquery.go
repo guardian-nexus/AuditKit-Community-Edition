@@ -21,7 +21,7 @@ func (c *BigQueryChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	var results []CheckResult
 
 	// Initialize BigQuery service
-	bqService, err := bigquery.NewService(ctx, option.WithScopes(bigquery.CloudPlatformReadOnlyScope))
+	bqService, err := bigquery.NewService(ctx, RESTOptions(option.WithScopes(bigquery.CloudPlatformReadOnlyScope))...)
 	if err != nil {
 		return results, err
 	}
@@ -35,6 +35,7 @@ func (c *BigQueryChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 // CheckPublicDatasets verifies BigQuery datasets are not publicly accessible (CIS 7.1)
 func (c *BigQueryChecks) CheckPublicDatasets(ctx context.Context, bqService *bigquery.Service) []CheckResult {
+	skipped := unreadable{}
 	datasetList, err := bqService.Datasets.List(c.projectID).Context(ctx).Do()
 	if err != nil {
 		return []CheckResult{{
@@ -67,6 +68,7 @@ func (c *BigQueryChecks) CheckPublicDatasets(ctx context.Context, bqService *big
 		// Get full dataset details to check access controls
 		ds, err := bqService.Datasets.Get(c.projectID, dataset.DatasetReference.DatasetId).Context(ctx).Do()
 		if err != nil {
+			skipped.add("Get", err)
 			continue
 		}
 
@@ -87,7 +89,7 @@ func (c *BigQueryChecks) CheckPublicDatasets(ctx context.Context, bqService *big
 			displayDatasets = publicDatasets[:3]
 		}
 
-		return []CheckResult{{
+		return skipped.finish([]CheckResult{{
 			Control:     "CIS-GCP-7.1",
 			Name:        "[CIS-GCP-7.1] BigQuery Datasets Not Public",
 			Status:      "FAIL",
@@ -108,10 +110,10 @@ bq update --remove_all_users %s:%s
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
 			Frameworks:      GetFrameworkMappings("BIGQUERY_PUBLIC_DATASETS"),
-		}}
+		}}, "CIS-GCP-7.1", "[CIS-GCP-7.1] BigQuery Datasets Not Public")
 	}
 
-	return []CheckResult{{
+	return skipped.finish([]CheckResult{{
 		Control:    "CIS-GCP-7.1",
 		Name:       "[CIS-GCP-7.1] BigQuery Datasets Not Public",
 		Status:     "PASS",
@@ -119,11 +121,12 @@ bq update --remove_all_users %s:%s
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("BIGQUERY_PUBLIC_DATASETS"),
-	}}
+	}}, "CIS-GCP-7.1", "[CIS-GCP-7.1] BigQuery Datasets Not Public")
 }
 
 // CheckDatasetEncryption verifies BigQuery datasets/tables use CMEK (CIS 7.2, 7.3)
 func (c *BigQueryChecks) CheckDatasetEncryption(ctx context.Context, bqService *bigquery.Service) []CheckResult {
+	skipped := unreadable{}
 	datasetList, err := bqService.Datasets.List(c.projectID).Context(ctx).Do()
 	if err != nil {
 		return []CheckResult{{
@@ -155,6 +158,7 @@ func (c *BigQueryChecks) CheckDatasetEncryption(ctx context.Context, bqService *
 	for _, dataset := range datasetList.Datasets {
 		ds, err := bqService.Datasets.Get(c.projectID, dataset.DatasetReference.DatasetId).Context(ctx).Do()
 		if err != nil {
+			skipped.add("Get", err)
 			continue
 		}
 
@@ -170,7 +174,7 @@ func (c *BigQueryChecks) CheckDatasetEncryption(ctx context.Context, bqService *
 			displayDatasets = datasetsWithoutCMEK[:3]
 		}
 
-		return []CheckResult{{
+		return skipped.finish([]CheckResult{{
 			Control:     "CIS-GCP-7.3",
 			Name:        "[CIS-GCP-7.3] BigQuery CMEK Encryption",
 			Status:      "FAIL",
@@ -194,10 +198,10 @@ Note: Existing tables must be copied to new tables with CMEK`, c.projectID, c.pr
 			Priority:        PriorityMedium,
 			Timestamp:       time.Now(),
 			Frameworks:      GetFrameworkMappings("BIGQUERY_ENCRYPTION"),
-		}}
+		}}, "CIS-GCP-7.3", "[CIS-GCP-7.3] BigQuery CMEK Encryption")
 	}
 
-	return []CheckResult{{
+	return skipped.finish([]CheckResult{{
 		Control:    "CIS-GCP-7.3",
 		Name:       "[CIS-GCP-7.3] BigQuery CMEK Encryption",
 		Status:     "PASS",
@@ -205,13 +209,14 @@ Note: Existing tables must be copied to new tables with CMEK`, c.projectID, c.pr
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("BIGQUERY_ENCRYPTION"),
-	}}
+	}}, "CIS-GCP-7.3", "[CIS-GCP-7.3] BigQuery CMEK Encryption")
 }
 
 // Ported from Pro, which answered 7.2 - CMEK on BigQuery tables - while this
 // edition did not.
 // CheckTableCMEKEncryption verifies all BigQuery tables use customer-managed encryption keys (CIS 7.2)
 func (c *BigQueryChecks) CheckTableCMEKEncryption(ctx context.Context, bqService *bigquery.Service) []CheckResult {
+	skipped := unreadable{}
 	datasetList, err := bqService.Datasets.List(c.projectID).Context(ctx).Do()
 	if err != nil {
 		return []CheckResult{{
@@ -245,6 +250,7 @@ func (c *BigQueryChecks) CheckTableCMEKEncryption(ctx context.Context, bqService
 		// List all tables in the dataset
 		tableList, err := bqService.Tables.List(c.projectID, dataset.DatasetReference.DatasetId).Context(ctx).Do()
 		if err != nil {
+			skipped.add("List", err)
 			continue
 		}
 
@@ -258,6 +264,7 @@ func (c *BigQueryChecks) CheckTableCMEKEncryption(ctx context.Context, bqService
 			// Get full table details to check encryption
 			table, err := bqService.Tables.Get(c.projectID, dataset.DatasetReference.DatasetId, tableRef.TableReference.TableId).Context(ctx).Do()
 			if err != nil {
+				skipped.add("Get", err)
 				continue
 			}
 
@@ -270,7 +277,7 @@ func (c *BigQueryChecks) CheckTableCMEKEncryption(ctx context.Context, bqService
 	}
 
 	if totalTables == 0 {
-		return []CheckResult{{
+		return skipped.finish([]CheckResult{{
 			Control:    "CIS-GCP-7.2",
 			Name:       "[CIS-GCP-7.2] BigQuery Tables CMEK Encryption",
 			Status:     "INFO",
@@ -278,7 +285,7 @@ func (c *BigQueryChecks) CheckTableCMEKEncryption(ctx context.Context, bqService
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("BIGQUERY_TABLE_ENCRYPTION"),
-		}}
+		}}, "CIS-GCP-7.2", "[CIS-GCP-7.2] BigQuery Tables CMEK Encryption")
 	}
 
 	if len(tablesWithoutCMEK) > 0 {
@@ -287,7 +294,7 @@ func (c *BigQueryChecks) CheckTableCMEKEncryption(ctx context.Context, bqService
 			displayTables = tablesWithoutCMEK[:3]
 		}
 
-		return []CheckResult{{
+		return skipped.finish([]CheckResult{{
 			Control:     "CIS-GCP-7.2",
 			Name:        "[CIS-GCP-7.2] BigQuery Tables CMEK Encryption",
 			Status:      "FAIL",
@@ -317,10 +324,10 @@ Note: Existing tables CANNOT have encryption changed. Must copy to new table.`, 
 			Priority:        PriorityMedium,
 			Timestamp:       time.Now(),
 			Frameworks:      GetFrameworkMappings("BIGQUERY_TABLE_ENCRYPTION"),
-		}}
+		}}, "CIS-GCP-7.2", "[CIS-GCP-7.2] BigQuery Tables CMEK Encryption")
 	}
 
-	return []CheckResult{{
+	return skipped.finish([]CheckResult{{
 		Control:    "CIS-GCP-7.2",
 		Name:       "[CIS-GCP-7.2] BigQuery Tables CMEK Encryption",
 		Status:     "PASS",
@@ -328,5 +335,5 @@ Note: Existing tables CANNOT have encryption changed. Must copy to new table.`, 
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("BIGQUERY_TABLE_ENCRYPTION"),
-	}}
+	}}, "CIS-GCP-7.2", "[CIS-GCP-7.2] BigQuery Tables CMEK Encryption")
 }

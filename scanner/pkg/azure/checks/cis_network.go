@@ -111,6 +111,7 @@ func (c *CISNetworkChecks) resourceGroups(ctx context.Context) ([]string, error)
 }
 
 func (c *CISNetworkChecks) virtualNetworkFlowLogRetention(ctx context.Context) CheckResult {
+	skipped := unreadable{}
 	base := CheckResult{
 		Control:     "CIS-7.8",
 		Name:        "Virtual Network Flow Log Retention at Least 90 Days",
@@ -160,6 +161,7 @@ has nothing to read.`,
 				for fPager.More() {
 					fPage, err := fPager.NextPage(ctx)
 					if err != nil {
+						skipped.add("flowLogs List", err)
 						break
 					}
 					for _, fl := range fPage.Value {
@@ -195,6 +197,7 @@ func retentionSatisfies90(p *armnetwork.RetentionPolicyParameters) bool {
 }
 
 func (c *CISNetworkChecks) vpnGatewayAuthType(ctx context.Context) CheckResult {
+	skipped := unreadable{}
 	base := CheckResult{
 		Control:     "CIS-7.9",
 		Name:        "VPN Gateway Point-to-Site Uses Entra ID Only",
@@ -228,6 +231,7 @@ gateway offering both is only as strong as the weaker option.`,
 		for pager.More() {
 			page, err := pager.NextPage(ctx)
 			if err != nil {
+				skipped.add("vpnGateways List", err)
 				break
 			}
 			for _, g := range page.Value {
