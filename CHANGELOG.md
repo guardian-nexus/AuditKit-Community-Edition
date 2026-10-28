@@ -2,6 +2,30 @@
 
 All notable changes to AuditKit will be documented in this file.
 
+## [1.1.1] - 2026-10-28
+
+A follow-up to 1.1.0. Only AWS list calls changed; reports, scores and flags are
+as in 1.1.0.
+
+### Fixed
+- **Every remaining paged AWS list call reads every page.** After 1.1.0, 27
+  operations were still read one page at a time: SNS `ListTopics`, ECR
+  `DescribeRepositories`, ECS `ListTaskDefinitionFamilies`, DynamoDB `ListTables`,
+  KMS `ListKeys`, Auto Scaling `DescribeAutoScalingGroups`, API Gateway
+  `GetRestApis`, Organizations `ListPolicies` and `ListAccounts`, ElastiCache
+  `DescribeCacheClusters`, SageMaker `ListEndpoints`, `ListTrainingJobs` and
+  `ListNotebookInstances`, CloudTrail `ListTrails`, Secrets Manager `ListSecrets`,
+  Backup `ListBackupVaults` and `ListBackupPlans`, Network Firewall `ListFirewalls`
+  and `ListFirewallPolicies`, Config `DescribeConfigRules` and
+  `DescribeComplianceByConfigRule`, Security Hub `DescribeStandards`, SSM
+  `DescribePatchGroups`, `DescribePatchBaselines` and `DescribeInstancePatchStates`,
+  and ACM `ListCertificates`. They now go through the paginator helpers, and the
+  source test that fails the build on a direct one-page call covers all of them.
+  `DescribeInstancePatchStates` sends instance IDs in batches of 50, the API's
+  limit, instead of one call that fails above 50.
+- **KMS key rotation (CIS 4.6) reads every key.** The check used to stop after 50
+  pages (5,000 keys) with nothing in the evidence to say it had stopped.
+
 ## [1.1.0] - 2026-10-28
 
 A security release: the findings of a threat model of the scanner, its reports

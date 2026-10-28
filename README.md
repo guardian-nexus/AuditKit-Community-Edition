@@ -4,7 +4,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/guardian-nexus/AuditKit-Community-Edition)](https://github.com/guardian-nexus/AuditKit-Community-Edition/stargazers)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/version-v1.1.0-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
+[![Version](https://img.shields.io/badge/version-v1.1.1-green.svg)](https://github.com/guardian-nexus/AuditKit-Community-Edition/releases)
 [![Newsletter](https://img.shields.io/badge/Newsletter-Subscribe-orange)](https://guardiannexus.substack.com)
 
 **New in v1.1.0:** a security release. Failed checks now report as errors instead of vanishing or passing, AWS list calls read every page, the scanned region is stated and `-regions all` scans every enabled region, fix scripts are inert until you uncomment them, reports escape scan data, caches are signed, and releases carry a Sigstore signature. Scores can move; see the [changelog](CHANGELOG.md).
