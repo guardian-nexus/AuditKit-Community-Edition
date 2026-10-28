@@ -34,10 +34,6 @@ func (c *KMSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	return []CheckResult{result}, nil
 }
 
-// maxKeyPages bounds the walk. An account with more keys than this gets a
-// verdict on the first 5,000, and the evidence says how many were examined.
-const maxKeyPages = 50
-
 // CheckKeyRotation answers CIS AWS Foundations v7.0.0 4.6.
 //
 // Only customer-managed symmetric encryption keys are in scope. AWS-managed
@@ -62,48 +58,43 @@ func (c *KMSChecks) CheckKeyRotation(ctx context.Context) (CheckResult, error) {
 		return fail("KMS client not configured"), nil
 	}
 
+	// Every page: an account with thousands of keys used to be judged on the
+	// first 5,000 with no sign that the walk had stopped.
+	keys, err := listAllKeys(ctx, c.client, &kms.ListKeysInput{})
+	if err != nil {
+		return fail(fmt.Sprintf("Unable to list KMS keys: %v", err)), nil
+	}
 	var withoutRotation []string
 	inScope := 0
-	var marker *string
-	for page := 0; page < maxKeyPages; page++ {
-		out, err := c.client.ListKeys(ctx, &kms.ListKeysInput{Marker: marker})
+	for _, k := range keys.Keys {
+		id := aws.ToString(k.KeyId)
+		desc, err := c.client.DescribeKey(ctx, &kms.DescribeKeyInput{KeyId: k.KeyId})
+		if err != nil || desc.KeyMetadata == nil {
+			// One unreadable key must not decide the control either way.
+			continue
+		}
+		md := desc.KeyMetadata
+		if md.KeyManager != kmstypes.KeyManagerTypeCustomer {
+			continue // AWS-managed keys rotate on their own schedule
+		}
+		if md.KeySpec != kmstypes.KeySpecSymmetricDefault {
+			continue // asymmetric and HMAC keys cannot be rotated
+		}
+		if md.KeyState != kmstypes.KeyStateEnabled {
+			continue // a disabled or pending-deletion key is not in scope
+		}
+		inScope++
+		rot, err := c.client.GetKeyRotationStatus(ctx, &kms.GetKeyRotationStatusInput{KeyId: k.KeyId})
 		if err != nil {
-			return fail(fmt.Sprintf("Unable to list KMS keys: %v", err)), nil
+			continue
 		}
-		for _, k := range out.Keys {
-			id := aws.ToString(k.KeyId)
-			desc, err := c.client.DescribeKey(ctx, &kms.DescribeKeyInput{KeyId: k.KeyId})
-			if err != nil || desc.KeyMetadata == nil {
-				// One unreadable key must not decide the control either way.
-				continue
+		if !rot.KeyRotationEnabled {
+			label := id
+			if aws.ToString(md.Description) != "" {
+				label = fmt.Sprintf("%s (%s)", id, aws.ToString(md.Description))
 			}
-			md := desc.KeyMetadata
-			if md.KeyManager != kmstypes.KeyManagerTypeCustomer {
-				continue // AWS-managed keys rotate on their own schedule
-			}
-			if md.KeySpec != kmstypes.KeySpecSymmetricDefault {
-				continue // asymmetric and HMAC keys cannot be rotated
-			}
-			if md.KeyState != kmstypes.KeyStateEnabled {
-				continue // a disabled or pending-deletion key is not in scope
-			}
-			inScope++
-			rot, err := c.client.GetKeyRotationStatus(ctx, &kms.GetKeyRotationStatusInput{KeyId: k.KeyId})
-			if err != nil {
-				continue
-			}
-			if !rot.KeyRotationEnabled {
-				label := id
-				if aws.ToString(md.Description) != "" {
-					label = fmt.Sprintf("%s (%s)", id, aws.ToString(md.Description))
-				}
-				withoutRotation = append(withoutRotation, label)
-			}
+			withoutRotation = append(withoutRotation, label)
 		}
-		if !out.Truncated || out.NextMarker == nil {
-			break
-		}
-		marker = out.NextMarker
 	}
 
 	if len(withoutRotation) > 0 {

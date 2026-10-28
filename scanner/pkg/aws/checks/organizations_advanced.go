@@ -124,7 +124,7 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsEnabled(ctx context.Context) (Che
 }
 
 func (c *OrganizationsAdvancedChecks) CheckMultiAccountStructure(ctx context.Context) (CheckResult, error) {
-	accounts, err := c.orgClient.ListAccounts(ctx, &organizations.ListAccountsInput{})
+	accounts, err := listAllAccounts(ctx, c.orgClient, &organizations.ListAccountsInput{})
 	if err != nil && !isNotFound(err) {
 		return checkError("AWS-ORG-01", "Multi-Account Structure", GetFrameworkMappings("ORGANIZATIONS_MULTI_ACCOUNT"), err), err
 	}
@@ -244,7 +244,7 @@ func (c *OrganizationsAdvancedChecks) CheckOrganizationTrail(ctx context.Context
 }
 
 func (c *OrganizationsAdvancedChecks) CheckSCPsConfigured(ctx context.Context) (CheckResult, error) {
-	policies, err := c.orgClient.ListPolicies(ctx, &organizations.ListPoliciesInput{
+	policies, err := listAllOrgPolicies(ctx, c.orgClient, &organizations.ListPoliciesInput{
 		Filter: "SERVICE_CONTROL_POLICY",
 	})
 	if err != nil && !isNotFound(err) {

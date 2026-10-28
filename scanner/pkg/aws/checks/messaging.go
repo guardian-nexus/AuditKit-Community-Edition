@@ -45,7 +45,7 @@ func (c *MessagingChecks) Run(ctx context.Context) ([]CheckResult, error) {
 // CheckSNSEncryption - Ensure SNS topics use encryption at rest
 func (c *MessagingChecks) CheckSNSEncryption(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	topics, err := c.snsClient.ListTopics(ctx, &sns.ListTopicsInput{})
+	topics, err := listAllTopics(ctx, c.snsClient, &sns.ListTopicsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-MESSAGING-02",
@@ -254,7 +254,7 @@ Continue using encryption for all new queues.`, encryptedQueues),
 // CheckMessagingAccessPolicies - Ensure SNS/SQS use restrictive access policies
 func (c *MessagingChecks) CheckMessagingAccessPolicies(ctx context.Context) (CheckResult, error) {
 	// Check SNS topics
-	topics, err := c.snsClient.ListTopics(ctx, &sns.ListTopicsInput{})
+	topics, err := listAllTopics(ctx, c.snsClient, &sns.ListTopicsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-MESSAGING-01",

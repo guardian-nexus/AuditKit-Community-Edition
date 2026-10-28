@@ -79,7 +79,7 @@ func (c *CC1Checks) CheckCC1_1_IntegrityAndEthics(ctx context.Context) []CheckRe
 			}))
 		} else {
 			// Check for Service Control Policies
-			policies, err := c.orgClient.ListPolicies(ctx, &organizations.ListPoliciesInput{
+			policies, err := listAllOrgPolicies(ctx, c.orgClient, &organizations.ListPoliciesInput{
 				Filter: "SERVICE_CONTROL_POLICY",
 			})
 			if err != nil {
@@ -396,7 +396,7 @@ func (c *CC2Checks) CheckCC2_2_InternalCommunication(ctx context.Context) []Chec
 
 	// Check SNS topics for internal alerting
 	if c.snsClient != nil {
-		topics, err := c.snsClient.ListTopics(ctx, &sns.ListTopicsInput{})
+		topics, err := listAllTopics(ctx, c.snsClient, &sns.ListTopicsInput{})
 
 		if err != nil {
 			skipped.add("ListTopics", err)

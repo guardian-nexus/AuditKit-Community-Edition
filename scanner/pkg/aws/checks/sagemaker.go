@@ -41,7 +41,7 @@ func (c *SageMakerChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *SageMakerChecks) CheckNotebookEncryption(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	notebooks, err := c.client.ListNotebookInstances(ctx, &sagemaker.ListNotebookInstancesInput{})
+	notebooks, err := listAllNotebookInstances(ctx, c.client, &sagemaker.ListNotebookInstancesInput{})
 	if err != nil {
 		return checkError("CC6.3", "SageMaker Notebook Encryption", GetFrameworkMappings("SAGEMAKER_ENCRYPTION"), err), err
 	}
@@ -107,7 +107,7 @@ func (c *SageMakerChecks) CheckNotebookEncryption(ctx context.Context) (CheckRes
 
 func (c *SageMakerChecks) CheckNotebookDirectInternet(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	notebooks, err := c.client.ListNotebookInstances(ctx, &sagemaker.ListNotebookInstancesInput{})
+	notebooks, err := listAllNotebookInstances(ctx, c.client, &sagemaker.ListNotebookInstancesInput{})
 	if err != nil {
 		return checkError("CC6.1", "SageMaker Direct Internet Access", GetFrameworkMappings("SAGEMAKER_NETWORK"), err), err
 	}
@@ -172,7 +172,7 @@ func (c *SageMakerChecks) CheckNotebookDirectInternet(ctx context.Context) (Chec
 
 func (c *SageMakerChecks) CheckNotebookRootAccess(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	notebooks, err := c.client.ListNotebookInstances(ctx, &sagemaker.ListNotebookInstancesInput{})
+	notebooks, err := listAllNotebookInstances(ctx, c.client, &sagemaker.ListNotebookInstancesInput{})
 	if err != nil {
 		return checkError("CC6.6", "SageMaker Root Access", GetFrameworkMappings("SAGEMAKER_ACCESS"), err), err
 	}
@@ -237,7 +237,7 @@ func (c *SageMakerChecks) CheckNotebookRootAccess(ctx context.Context) (CheckRes
 
 func (c *SageMakerChecks) CheckEndpointEncryption(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	endpoints, err := c.client.ListEndpoints(ctx, &sagemaker.ListEndpointsInput{})
+	endpoints, err := listAllEndpoints(ctx, c.client, &sagemaker.ListEndpointsInput{})
 	if err != nil {
 		return checkError("CC6.3", "SageMaker Endpoint Encryption", GetFrameworkMappings("SAGEMAKER_ENCRYPTION"), err), err
 	}
@@ -311,7 +311,7 @@ func (c *SageMakerChecks) CheckEndpointEncryption(ctx context.Context) (CheckRes
 
 func (c *SageMakerChecks) CheckTrainingJobEncryption(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	jobs, err := c.client.ListTrainingJobs(ctx, &sagemaker.ListTrainingJobsInput{
+	jobs, err := listAllTrainingJobs(ctx, c.client, &sagemaker.ListTrainingJobsInput{
 		MaxResults: aws.Int32(100),
 	})
 	if err != nil {

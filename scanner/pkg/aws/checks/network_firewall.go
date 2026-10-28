@@ -43,7 +43,7 @@ func (c *NetworkFirewallChecks) Run(ctx context.Context) ([]CheckResult, error) 
 func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
 	// List all firewalls
-	firewalls, err := c.nfwClient.ListFirewalls(ctx, &networkfirewall.ListFirewallsInput{})
+	firewalls, err := listAllFirewalls(ctx, c.nfwClient, &networkfirewall.ListFirewallsInput{})
 	if err != nil {
 		// This reported PASS "No Network Firewalls deployed" for any error,
 		// including a denied call that looked at nothing.
@@ -164,7 +164,7 @@ aws network-firewall associate-subnets \
 func (c *NetworkFirewallChecks) CheckNetworkFirewallPolicyRules(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
 	// List all firewall policies
-	policies, err := c.nfwClient.ListFirewallPolicies(ctx, &networkfirewall.ListFirewallPoliciesInput{})
+	policies, err := listAllFirewallPolicies(ctx, c.nfwClient, &networkfirewall.ListFirewallPoliciesInput{})
 	if err != nil && !isNotFound(err) {
 		return checkError("AWS-NETFW-03", "Network Firewall Policy Rules", map[string]string{"SOC2": "CC6.1", "PCI-DSS": "1.2.1"}, err), err
 	}
@@ -264,7 +264,7 @@ aws network-firewall update-firewall-policy \
 // Ensure Network Firewall logging is enabled
 func (c *NetworkFirewallChecks) CheckNetworkFirewallLogging(ctx context.Context) (CheckResult, error) {
 	// List all firewalls
-	firewalls, err := c.nfwClient.ListFirewalls(ctx, &networkfirewall.ListFirewallsInput{})
+	firewalls, err := listAllFirewalls(ctx, c.nfwClient, &networkfirewall.ListFirewallsInput{})
 	if err != nil && !isNotFound(err) {
 		return checkError("AWS-NETFW-02", "Network Firewall Logging", map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1"}, err), err
 	}

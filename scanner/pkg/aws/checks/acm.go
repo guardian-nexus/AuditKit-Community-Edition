@@ -32,7 +32,7 @@ func (c *ACMChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *ACMChecks) CheckCertificateRenewal(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	certs, err := c.client.ListCertificates(ctx, &acm.ListCertificatesInput{})
+	certs, err := listAllCertificates(ctx, c.client, &acm.ListCertificatesInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-ACM-01",
@@ -126,7 +126,7 @@ func (c *ACMChecks) CheckCertificateRenewal(ctx context.Context) (CheckResult, e
 
 func (c *ACMChecks) CheckCertificateInUse(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	certs, err := c.client.ListCertificates(ctx, &acm.ListCertificatesInput{})
+	certs, err := listAllCertificates(ctx, c.client, &acm.ListCertificatesInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-ACM-02",

@@ -37,7 +37,7 @@ func (c *SystemsChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *SystemsChecks) CheckPatchCompliance(ctx context.Context) (CheckResult, error) {
 	// Check if Systems Manager is being used for patching
-	patches, err := c.ssmClient.DescribePatchBaselines(ctx, &ssm.DescribePatchBaselinesInput{})
+	patches, err := describeAllPatchBaselines(ctx, c.ssmClient, &ssm.DescribePatchBaselinesInput{})
 
 	if err != nil && !isNotFound(err) {
 		return checkError("CC7.1", "Patch Management", nil, err), err
@@ -72,7 +72,7 @@ func (c *SystemsChecks) CheckPatchCompliance(ctx context.Context) (CheckResult, 
 }
 
 func (c *SystemsChecks) CheckAutoScaling(ctx context.Context) (CheckResult, error) {
-	groups, err := c.asClient.DescribeAutoScalingGroups(ctx, &autoscaling.DescribeAutoScalingGroupsInput{})
+	groups, err := describeAllAutoScalingGroups(ctx, c.asClient, &autoscaling.DescribeAutoScalingGroupsInput{})
 
 	if err != nil && !isNotFound(err) {
 		return checkError("A1.1", "Processing Capacity Management", nil, err), err

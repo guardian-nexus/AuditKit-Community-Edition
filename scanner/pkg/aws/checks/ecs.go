@@ -41,7 +41,7 @@ func (c *ECSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
 	// List task definition families
-	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
+	families, err := listAllTaskDefinitionFamilies(ctx, c.client, &ecs.ListTaskDefinitionFamiliesInput{})
 	if err != nil {
 		return checkError("AWS-ECS-03", "ECS Task Definition Logging", map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1"}, err), err
 	}
@@ -145,7 +145,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 // Ensure ECS uses Secrets Manager for sensitive data
 func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
+	families, err := listAllTaskDefinitionFamilies(ctx, c.client, &ecs.ListTaskDefinitionFamiliesInput{})
 	if err != nil {
 		return checkError("AWS-ECS-02", "ECS Secrets Management", map[string]string{"SOC2": "CC6.1", "PCI-DSS": "3.5.1"}, err), err
 	}
@@ -324,7 +324,7 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 // Ensure ECS task roles follow least privilege
 func (c *ECSChecks) CheckECSTaskRolePermissions(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
+	families, err := listAllTaskDefinitionFamilies(ctx, c.client, &ecs.ListTaskDefinitionFamiliesInput{})
 	if err != nil {
 		return checkError("AWS-ECS-04", "ECS Task Role Permissions", map[string]string{"SOC2": "CC6.3", "PCI-DSS": "7.2.2"}, err), err
 	}

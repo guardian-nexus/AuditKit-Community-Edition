@@ -78,7 +78,7 @@ func (c *CC3Checks) CheckCC3_1_Objectives(ctx context.Context) []CheckResult {
 			}))
 		} else {
 			// Check for enabled standards
-			standards, err := c.securityhubClient.DescribeStandards(ctx, &securityhub.DescribeStandardsInput{})
+			standards, err := describeAllStandards(ctx, c.securityhubClient, &securityhub.DescribeStandardsInput{})
 			if err != nil {
 				skipped.add("DescribeStandards", err)
 			}
@@ -391,14 +391,14 @@ func (c *CC4Checks) CheckCC4_2_Deficiencies(ctx context.Context) []CheckResult {
 
 	// Check Config Rules for compliance evaluation
 	if c.configClient != nil {
-		rules, err := c.configClient.DescribeConfigRules(ctx, &configservice.DescribeConfigRulesInput{})
+		rules, err := describeAllConfigRules(ctx, c.configClient, &configservice.DescribeConfigRulesInput{})
 		if err != nil {
 			skipped.add("DescribeConfigRules", err)
 		}
 
 		if rules != nil && len(rules.ConfigRules) > 0 {
 			// Check compliance status
-			complianceResults, err := c.configClient.DescribeComplianceByConfigRule(ctx, &configservice.DescribeComplianceByConfigRuleInput{})
+			complianceResults, err := describeAllComplianceByConfigRule(ctx, c.configClient, &configservice.DescribeComplianceByConfigRuleInput{})
 			if err != nil {
 				skipped.add("DescribeComplianceByConfigRule", err)
 			}
@@ -492,7 +492,7 @@ func (c *CC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) []CheckResu
 
 	// Check AWS Backup for data protection controls
 	if c.backupClient != nil {
-		plans, err := c.backupClient.ListBackupPlans(ctx, &backup.ListBackupPlansInput{})
+		plans, err := listAllBackupPlans(ctx, c.backupClient, &backup.ListBackupPlansInput{})
 
 		if err != nil {
 			skipped.add("ListBackupPlans", err)
@@ -511,7 +511,7 @@ func (c *CC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) []CheckResu
 			}))
 		} else {
 			// Check backup vaults
-			vaults, err := c.backupClient.ListBackupVaults(ctx, &backup.ListBackupVaultsInput{})
+			vaults, err := listAllBackupVaults(ctx, c.backupClient, &backup.ListBackupVaultsInput{})
 			if err != nil {
 				skipped.add("ListBackupVaults", err)
 			}
@@ -541,7 +541,7 @@ func (c *CC5Checks) CheckCC5_2_TechnologyControls(ctx context.Context) []CheckRe
 
 	// Check KMS for encryption controls
 	if c.kmsClient != nil {
-		keys, err := c.kmsClient.ListKeys(ctx, &kms.ListKeysInput{})
+		keys, err := listAllKeys(ctx, c.kmsClient, &kms.ListKeysInput{})
 
 		if err != nil {
 			skipped.add("ListKeys", err)

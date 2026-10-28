@@ -54,7 +54,7 @@ func (c *CloudTrailChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 func (c *CloudTrailChecks) CheckTrailEnabled(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
+	trails, err := listAllTrails(ctx, c.client, &cloudtrail.ListTrailsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "CC7.1",
@@ -129,7 +129,7 @@ func (c *CloudTrailChecks) CheckTrailEnabled(ctx context.Context) (CheckResult, 
 
 func (c *CloudTrailChecks) CheckMultiRegion(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
+	trails, err := listAllTrails(ctx, c.client, &cloudtrail.ListTrailsInput{})
 	if err != nil && !isNotFound(err) {
 		return checkError("CC7.1", "Multi-Region CloudTrail", GetFrameworkMappings("CLOUDTRAIL_MULTIREGION"), err), err
 	}
@@ -185,7 +185,7 @@ func (c *CloudTrailChecks) CheckMultiRegion(ctx context.Context) (CheckResult, e
 
 func (c *CloudTrailChecks) CheckLogFileValidation(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
+	trails, err := listAllTrails(ctx, c.client, &cloudtrail.ListTrailsInput{})
 	if err != nil && !isNotFound(err) {
 		return checkError("CC7.1", "CloudTrail Log Integrity", GetFrameworkMappings("CLOUDTRAIL_INTEGRITY"), err), err
 	}
@@ -243,7 +243,7 @@ func (c *CloudTrailChecks) CheckLogFileValidation(ctx context.Context) (CheckRes
 // CIS 4.5 - Ensure CloudTrail logs are encrypted at rest using KMS CMKs
 func (c *CloudTrailChecks) CheckCloudTrailEncryption(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
+	trails, err := listAllTrails(ctx, c.client, &cloudtrail.ListTrailsInput{})
 	if err != nil && !isNotFound(err) {
 		return checkError("CIS-4.5", "CloudTrail Encryption at Rest", GetFrameworkMappings("CLOUDTRAIL_ENCRYPTION"), err), err
 	}
@@ -300,7 +300,7 @@ func (c *CloudTrailChecks) CheckCloudTrailEncryption(ctx context.Context) (Check
 // Ensure CloudWatch Logs integration is enabled
 func (c *CloudTrailChecks) CheckCloudTrailLogIntegration(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
+	trails, err := listAllTrails(ctx, c.client, &cloudtrail.ListTrailsInput{})
 	if err != nil && !isNotFound(err) {
 		return checkError("AWS-CLOUDTRAIL-01", "CloudTrail CloudWatch Logs Integration", GetFrameworkMappings("CLOUDWATCH_LOG_ENCRYPTION"), err), err
 	}
@@ -374,7 +374,7 @@ func (c *CloudTrailChecks) CheckS3BucketAccessLogging(ctx context.Context) (Chec
 // CIS 4.2 - Ensure CloudTrail log file validation is enabled (duplicate but with CIS label)
 func (c *CloudTrailChecks) CheckCloudTrailLogValidation(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
+	trails, err := listAllTrails(ctx, c.client, &cloudtrail.ListTrailsInput{})
 	if err != nil && !isNotFound(err) {
 		return checkError("CIS-4.2", "CloudTrail Log File Validation", GetFrameworkMappings("CLOUDTRAIL_VALIDATION"), err), err
 	}
@@ -469,7 +469,7 @@ func (c *CloudTrailChecks) CheckCloudTrailKMSKey(ctx context.Context) (CheckResu
 // CheckS3ObjectLevelLoggingWrite verifies S3 object-level logging for write events (CIS 4.8)
 func (c *CloudTrailChecks) CheckS3ObjectLevelLoggingWrite(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
+	trails, err := listAllTrails(ctx, c.client, &cloudtrail.ListTrailsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "CIS-4.8",
@@ -584,7 +584,7 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 // CheckS3ObjectLevelLoggingRead verifies S3 object-level logging for read events (CIS 4.9)
 func (c *CloudTrailChecks) CheckS3ObjectLevelLoggingRead(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
-	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
+	trails, err := listAllTrails(ctx, c.client, &cloudtrail.ListTrailsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "CIS-4.9",

@@ -740,7 +740,7 @@ func (c *CC7Checks) CheckCC7_3_SecurityEvents(ctx context.Context) []CheckResult
 
 	// Check SSM for security patching
 	if c.ssmClient != nil {
-		patches, err := c.ssmClient.DescribePatchGroups(ctx, &ssm.DescribePatchGroupsInput{})
+		patches, err := describeAllPatchGroups(ctx, c.ssmClient, &ssm.DescribePatchGroupsInput{})
 		if err != nil {
 			skipped.add("DescribePatchGroups", err)
 		}

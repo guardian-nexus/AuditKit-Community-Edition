@@ -37,7 +37,7 @@ func (c *BackupVaultChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 // CheckBackupVaultEncryption - Ensure backup vaults use encryption
 func (c *BackupVaultChecks) CheckBackupVaultEncryption(ctx context.Context) (CheckResult, error) {
-	vaults, err := c.client.ListBackupVaults(ctx, &backup.ListBackupVaultsInput{})
+	vaults, err := listAllBackupVaults(ctx, c.client, &backup.ListBackupVaultsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-BACKUP-02",
@@ -124,7 +124,7 @@ Continue using encryption for all new backup vaults.`, encryptedVaults),
 
 // CheckBackupPlanExists - Ensure backup plans are configured
 func (c *BackupVaultChecks) CheckBackupPlanExists(ctx context.Context) (CheckResult, error) {
-	plans, err := c.client.ListBackupPlans(ctx, &backup.ListBackupPlansInput{})
+	plans, err := listAllBackupPlans(ctx, c.client, &backup.ListBackupPlansInput{})
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-BACKUP-01",
@@ -195,7 +195,7 @@ Regularly verify:
 
 // CheckBackupVaultLock - Ensure backup vaults use vault lock for compliance
 func (c *BackupVaultChecks) CheckBackupVaultLock(ctx context.Context) (CheckResult, error) {
-	vaults, err := c.client.ListBackupVaults(ctx, &backup.ListBackupVaultsInput{})
+	vaults, err := listAllBackupVaults(ctx, c.client, &backup.ListBackupVaultsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-BACKUP-03",

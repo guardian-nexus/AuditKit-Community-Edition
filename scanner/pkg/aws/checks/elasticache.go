@@ -38,7 +38,7 @@ func (c *ElastiCacheChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *ElastiCacheChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult, error) {
-	clusters, err := c.client.DescribeCacheClusters(ctx, &elasticache.DescribeCacheClustersInput{})
+	clusters, err := describeAllCacheClusters(ctx, c.client, &elasticache.DescribeCacheClustersInput{})
 	if err != nil {
 		return checkError("CC6.3", "ElastiCache Encryption at Rest", GetFrameworkMappings("ELASTICACHE_ENCRYPTION"), err), err
 	}
@@ -94,7 +94,7 @@ func (c *ElastiCacheChecks) CheckEncryptionAtRest(ctx context.Context) (CheckRes
 }
 
 func (c *ElastiCacheChecks) CheckEncryptionInTransit(ctx context.Context) (CheckResult, error) {
-	clusters, err := c.client.DescribeCacheClusters(ctx, &elasticache.DescribeCacheClustersInput{})
+	clusters, err := describeAllCacheClusters(ctx, c.client, &elasticache.DescribeCacheClustersInput{})
 	if err != nil {
 		return checkError("CC6.4", "ElastiCache Encryption in Transit", GetFrameworkMappings("ELASTICACHE_TRANSIT"), err), err
 	}
@@ -150,7 +150,7 @@ func (c *ElastiCacheChecks) CheckEncryptionInTransit(ctx context.Context) (Check
 }
 
 func (c *ElastiCacheChecks) CheckAutoMinorVersionUpgrade(ctx context.Context) (CheckResult, error) {
-	clusters, err := c.client.DescribeCacheClusters(ctx, &elasticache.DescribeCacheClustersInput{})
+	clusters, err := describeAllCacheClusters(ctx, c.client, &elasticache.DescribeCacheClustersInput{})
 	if err != nil {
 		return checkError("CC7.5", "ElastiCache Auto Minor Version Upgrade", GetFrameworkMappings("ELASTICACHE_PATCHING"), err), err
 	}

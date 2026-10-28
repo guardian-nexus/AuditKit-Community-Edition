@@ -42,7 +42,11 @@ func TestListAllUsersReadsEveryPage(t *testing.T) {
 // describeAll helpers in paginate.go, or page explicitly with Marker or
 // NextToken as the two IAM ListPolicies loops do.
 func TestPagedListCallsReadEveryPage(t *testing.T) {
-	direct := regexp.MustCompile(`\.(ListUsers|ListRoles|ListFunctions|DescribeInstanceInformation|DescribeParameters|DescribeDBInstances|DescribeAlarms)\(\w+, |\.ListPolicies\(\w+, &iam\.ListPoliciesInput\{`)
+	direct := regexp.MustCompile(`\.(ListUsers|ListRoles|ListFunctions|DescribeInstanceInformation|DescribeParameters|DescribeDBInstances|DescribeAlarms` +
+		`|ListTopics|DescribeRepositories|ListTaskDefinitionFamilies|ListTables|ListKeys|DescribeAutoScalingGroups|GetRestApis|ListAccounts|DescribeCacheClusters` +
+		`|ListEndpoints|ListTrainingJobs|ListNotebookInstances|ListTrails|ListSecrets|ListBackupVaults|ListBackupPlans|ListFirewalls|ListFirewallPolicies` +
+		`|DescribeConfigRules|DescribeComplianceByConfigRule|DescribeStandards|DescribePatchGroups|DescribePatchBaselines|DescribeInstancePatchStates|ListCertificates)\(\w+, ` +
+		`|\.ListPolicies\(\w+, &(iam|organizations)\.ListPoliciesInput\{`)
 	files, _ := filepath.Glob("*.go")
 	for _, f := range files {
 		if strings.HasSuffix(f, "_test.go") || f == "paginate.go" {
