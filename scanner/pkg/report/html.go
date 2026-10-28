@@ -4,6 +4,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"html"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -21,6 +23,7 @@ func generateReportIDHTML() string {
 }
 
 func GenerateHTML(result ComplianceResult) string {
+	result = escapeForHTML(result)
 	// Count automated vs manual checks
 	automated := 0
 	manual := 0
@@ -1032,4 +1035,61 @@ func generateErroredControlsHTML(result ComplianceResult) string {
 	}
 
 	return html
+}
+
+// escapeForHTML returns a copy of result with every string that came from a
+// scan or an imported file escaped for HTML.
+//
+// The report is assembled with fmt.Sprintf, and these fields went in raw: an
+// Entra display name, a resource tag or an imported finding containing markup
+// became part of the report an assessor opens - script, or plain HTML that
+// rewrote a FAIL to read as a PASS (threat model A5). Escaping once, before any
+// template sees the data, covers every place it is interpolated. ConsoleURL is
+// also limited to http and https: escaping does not stop a javascript: URL in
+// an href from running.
+func escapeForHTML(result ComplianceResult) ComplianceResult {
+	esc := html.EscapeString
+	result.Provider = esc(result.Provider)
+	result.AccountID = esc(result.AccountID)
+	result.Region = esc(result.Region)
+	result.Framework = esc(result.Framework)
+
+	recs := make([]string, len(result.Recommendations))
+	for i, r := range result.Recommendations {
+		recs[i] = esc(r)
+	}
+	result.Recommendations = recs
+
+	controls := make([]ControlResult, len(result.Controls))
+	for i, c := range result.Controls {
+		c.ID = esc(c.ID)
+		c.Name = esc(c.Name)
+		c.Category = esc(c.Category)
+		c.Severity = esc(c.Severity)
+		c.Status = esc(c.Status)
+		c.Evidence = esc(c.Evidence)
+		c.Remediation = esc(c.Remediation)
+		c.RemediationDetail = esc(c.RemediationDetail)
+		c.ScreenshotGuide = esc(c.ScreenshotGuide)
+		c.ConsoleURL = esc(webURL(c.ConsoleURL))
+		if c.Frameworks != nil {
+			fw := make(map[string]string, len(c.Frameworks))
+			for k, v := range c.Frameworks {
+				fw[esc(k)] = esc(v)
+			}
+			c.Frameworks = fw
+		}
+		controls[i] = c
+	}
+	result.Controls = controls
+	return result
+}
+
+// webURL returns raw if it is an absolute http or https URL, and "" otherwise.
+func webURL(raw string) string {
+	u, err := url.Parse(strings.TrimSpace(raw))
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
+		return ""
+	}
+	return raw
 }
