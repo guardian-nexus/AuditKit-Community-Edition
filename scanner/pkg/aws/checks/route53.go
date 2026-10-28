@@ -32,13 +32,14 @@ func (c *Route53Checks) Run(ctx context.Context) ([]CheckResult, error) {
 // CheckDNSSEC verifies DNSSEC is enabled on Route53 hosted zones
 // CIS AWS Foundations Benchmark 5.19
 func (c *Route53Checks) CheckDNSSEC(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	// List all hosted zones
 	resp, err := c.client.ListHostedZones(ctx, &route53.ListHostedZonesInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-ROUTE53-01",
 			Name:       "Route53 DNSSEC Enabled",
-			Status:     "FAIL",
+			Status:     StatusError,
 			Evidence:   fmt.Sprintf("Unable to check Route53 hosted zones: %v", err),
 			Severity:   "MEDIUM",
 			Priority:   PriorityMedium,
@@ -76,7 +77,11 @@ func (c *Route53Checks) CheckDNSSEC(ctx context.Context) (CheckResult, error) {
 			HostedZoneId: zone.Id,
 		})
 
-		if err != nil || dnssecResp == nil || dnssecResp.Status == nil || dnssecResp.Status.ServeSignature == nil {
+		if err != nil {
+			skipped.add("GetDNSSEC", err)
+			continue
+		}
+		if dnssecResp == nil || dnssecResp.Status == nil || dnssecResp.Status.ServeSignature == nil {
 			// DNSSEC not configured
 			zoneName := *zone.Name
 			nonDNSSECZones = append(nonDNSSECZones, zoneName)
@@ -125,7 +130,7 @@ aws route53 enable-hosted-zone-dnssec --hosted-zone-id $(aws route53 list-hosted
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-ROUTE53-01",
 		Name:       "Route53 DNSSEC Enabled",
 		Status:     "PASS",
@@ -134,5 +139,5 @@ aws route53 enable-hosted-zone-dnssec --hosted-zone-id $(aws route53 list-hosted
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("ROUTE53_DNSSEC"),
-	}, nil
+	}), nil
 }

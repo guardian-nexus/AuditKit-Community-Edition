@@ -45,6 +45,9 @@ func (c *OrganizationsAdvancedChecks) Run(ctx context.Context) ([]CheckResult, e
 
 func (c *OrganizationsAdvancedChecks) CheckSCPsEnabled(ctx context.Context) (CheckResult, error) {
 	org, err := c.orgClient.DescribeOrganization(ctx, &organizations.DescribeOrganizationInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("CIS-2.1.2", "AWS Organizations SCPs Enabled", GetFrameworkMappings("ORGANIZATIONS_SCPS_ENABLED"), err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:     "CIS-2.1.2",
@@ -62,6 +65,9 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsEnabled(ctx context.Context) (Che
 		}, nil
 	}
 
+	if org.Organization == nil {
+		return checkError("CIS-2.1.2", "AWS Organizations SCPs Enabled", GetFrameworkMappings("ORGANIZATIONS_SCPS_ENABLED"), fmt.Errorf("DescribeOrganization returned no organization")), fmt.Errorf("no organization in response")
+	}
 	if len(org.Organization.AvailablePolicyTypes) == 0 {
 		return CheckResult{
 			Control:     "CIS-2.1.2",
@@ -119,6 +125,9 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsEnabled(ctx context.Context) (Che
 
 func (c *OrganizationsAdvancedChecks) CheckMultiAccountStructure(ctx context.Context) (CheckResult, error) {
 	accounts, err := c.orgClient.ListAccounts(ctx, &organizations.ListAccountsInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("AWS-ORG-01", "Multi-Account Structure", GetFrameworkMappings("ORGANIZATIONS_MULTI_ACCOUNT"), err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:     "AWS-ORG-01",
@@ -238,11 +247,14 @@ func (c *OrganizationsAdvancedChecks) CheckSCPsConfigured(ctx context.Context) (
 	policies, err := c.orgClient.ListPolicies(ctx, &organizations.ListPoliciesInput{
 		Filter: "SERVICE_CONTROL_POLICY",
 	})
+	if err != nil && !isNotFound(err) {
+		return checkError("CIS-2.1.2", "Service Control Policies Configured", GetFrameworkMappings("ORGANIZATIONS_SCPS_CONFIGURED"), err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:     "CIS-2.1.2",
 			Name:        "Service Control Policies Configured",
-			Status:      "INFO",
+			Status:      StatusError,
 			Evidence:    "Cannot list SCPs - not using Organizations or no permissions",
 			Remediation: "N/A",
 			Priority:    PriorityLow,

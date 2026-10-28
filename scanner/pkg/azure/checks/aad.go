@@ -168,6 +168,11 @@ Configure via Conditional Access or Security Defaults`,
 
 	// Get all users and check MFA registration
 	users, err := c.graphClient.Users().Get(ctx, nil)
+	if err == nil && users == nil {
+		// The SDK returns no error and no result for an empty body; the
+		// code below dereferenced it and crashed the scan.
+		err = errNoGraphData
+	}
 	if err != nil {
 		results = append(results, CheckResult{
 			Control:    "CIS-5.1.3",
@@ -193,6 +198,9 @@ Configure via Conditional Access or Security Defaults`,
 			// Check if user has MFA registered
 			// Note: This requires reading authentication methods
 			authMethods, err := c.graphClient.Users().ByUserId(*user.GetId()).Authentication().Methods().Get(ctx, nil)
+			if err == nil && authMethods == nil {
+				err = errNoGraphData
+			}
 			if err != nil {
 				// The user was counted but never examined, so "All N users have
 				// MFA enabled" could include users nobody read.
@@ -314,6 +322,9 @@ func (c *AADChecks) CheckPasswordPolicy(ctx context.Context) []CheckResult {
 
 	// Query password policies via Graph API
 	policies, err := c.graphClient.Policies().AuthenticationMethodsPolicy().Get(ctx, nil)
+	if err == nil && policies == nil {
+		err = errNoGraphData
+	}
 	if err != nil {
 		results = append(results, CheckResult{
 			Control:    "AZ-ENTRA-01",
@@ -395,6 +406,9 @@ func (c *AADChecks) CheckConditionalAccess(ctx context.Context) []CheckResult {
 
 	// Query Conditional Access policies
 	policies, err := c.graphClient.Identity().ConditionalAccess().Policies().Get(ctx, nil)
+	if err == nil && policies == nil {
+		err = errNoGraphData
+	}
 	if err != nil {
 		results = append(results, CheckResult{
 			Control:    "CIS-5.1.1",

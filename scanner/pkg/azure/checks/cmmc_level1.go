@@ -95,6 +95,11 @@ func (c *AzureCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult 
 	}
 
 	directory, err := c.graphClient.Users().Get(ctx, &users.UsersRequestBuilderGetRequestConfiguration{})
+	if err == nil && directory == nil {
+		// The SDK returns no error and no result for an empty body; the
+		// code below dereferenced it and crashed the scan.
+		err = errNoGraphData
+	}
 	if err != nil {
 		return CheckResult{
 			Control:         "AC.L1-3.1.1",
@@ -304,6 +309,11 @@ func (c *AzureCMMCLevel1Checks) CheckAC_L1_002(ctx context.Context) CheckResult 
 func (c *AzureCMMCLevel1Checks) CheckIA_L1_001(ctx context.Context) CheckResult {
 	requestConfig := &users.UsersRequestBuilderGetRequestConfiguration{}
 	result, err := c.graphClient.Users().Get(ctx, requestConfig)
+	if err == nil && result == nil {
+		// The SDK returns no error and no result for an empty body; the
+		// code below dereferenced it and crashed the scan.
+		err = errNoGraphData
+	}
 
 	if err != nil {
 		return CheckResult{

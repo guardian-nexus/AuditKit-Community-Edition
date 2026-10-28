@@ -40,6 +40,7 @@ func (c *SageMakerChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *SageMakerChecks) CheckNotebookEncryption(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	notebooks, err := c.client.ListNotebookInstances(ctx, &sagemaker.ListNotebookInstancesInput{})
 	if err != nil {
 		return checkError("CC6.3", "SageMaker Notebook Encryption", GetFrameworkMappings("SAGEMAKER_ENCRYPTION"), err), err
@@ -55,6 +56,7 @@ func (c *SageMakerChecks) CheckNotebookEncryption(ctx context.Context) (CheckRes
 			NotebookInstanceName: nb.NotebookInstanceName,
 		})
 		if err != nil {
+			skipped.add("DescribeNotebookInstance", err)
 			continue
 		}
 
@@ -81,7 +83,7 @@ func (c *SageMakerChecks) CheckNotebookEncryption(ctx context.Context) (CheckRes
 	}
 
 	if len(notebooks.NotebookInstances) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.3",
 			Name:       "SageMaker Notebook Encryption",
 			Status:     StatusInfo,
@@ -89,10 +91,10 @@ func (c *SageMakerChecks) CheckNotebookEncryption(ctx context.Context) (CheckRes
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SAGEMAKER_ENCRYPTION"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.3",
 		Name:       "SageMaker Notebook Encryption",
 		Status:     "PASS",
@@ -100,10 +102,11 @@ func (c *SageMakerChecks) CheckNotebookEncryption(ctx context.Context) (CheckRes
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("SAGEMAKER_ENCRYPTION"),
-	}, nil
+	}), nil
 }
 
 func (c *SageMakerChecks) CheckNotebookDirectInternet(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	notebooks, err := c.client.ListNotebookInstances(ctx, &sagemaker.ListNotebookInstancesInput{})
 	if err != nil {
 		return checkError("CC6.1", "SageMaker Direct Internet Access", GetFrameworkMappings("SAGEMAKER_NETWORK"), err), err
@@ -118,6 +121,7 @@ func (c *SageMakerChecks) CheckNotebookDirectInternet(ctx context.Context) (Chec
 			NotebookInstanceName: nb.NotebookInstanceName,
 		})
 		if err != nil {
+			skipped.add("DescribeNotebookInstance", err)
 			continue
 		}
 
@@ -144,7 +148,7 @@ func (c *SageMakerChecks) CheckNotebookDirectInternet(ctx context.Context) (Chec
 	}
 
 	if len(notebooks.NotebookInstances) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.1",
 			Name:       "SageMaker Direct Internet Access",
 			Status:     StatusInfo,
@@ -152,10 +156,10 @@ func (c *SageMakerChecks) CheckNotebookDirectInternet(ctx context.Context) (Chec
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SAGEMAKER_NETWORK"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.1",
 		Name:       "SageMaker Direct Internet Access",
 		Status:     "PASS",
@@ -163,10 +167,11 @@ func (c *SageMakerChecks) CheckNotebookDirectInternet(ctx context.Context) (Chec
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("SAGEMAKER_NETWORK"),
-	}, nil
+	}), nil
 }
 
 func (c *SageMakerChecks) CheckNotebookRootAccess(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	notebooks, err := c.client.ListNotebookInstances(ctx, &sagemaker.ListNotebookInstancesInput{})
 	if err != nil {
 		return checkError("CC6.6", "SageMaker Root Access", GetFrameworkMappings("SAGEMAKER_ACCESS"), err), err
@@ -181,6 +186,7 @@ func (c *SageMakerChecks) CheckNotebookRootAccess(ctx context.Context) (CheckRes
 			NotebookInstanceName: nb.NotebookInstanceName,
 		})
 		if err != nil {
+			skipped.add("DescribeNotebookInstance", err)
 			continue
 		}
 
@@ -207,7 +213,7 @@ func (c *SageMakerChecks) CheckNotebookRootAccess(ctx context.Context) (CheckRes
 	}
 
 	if len(notebooks.NotebookInstances) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.6",
 			Name:       "SageMaker Root Access",
 			Status:     StatusInfo,
@@ -215,10 +221,10 @@ func (c *SageMakerChecks) CheckNotebookRootAccess(ctx context.Context) (CheckRes
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SAGEMAKER_ACCESS"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.6",
 		Name:       "SageMaker Root Access",
 		Status:     "PASS",
@@ -226,10 +232,11 @@ func (c *SageMakerChecks) CheckNotebookRootAccess(ctx context.Context) (CheckRes
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("SAGEMAKER_ACCESS"),
-	}, nil
+	}), nil
 }
 
 func (c *SageMakerChecks) CheckEndpointEncryption(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	endpoints, err := c.client.ListEndpoints(ctx, &sagemaker.ListEndpointsInput{})
 	if err != nil {
 		return checkError("CC6.3", "SageMaker Endpoint Encryption", GetFrameworkMappings("SAGEMAKER_ENCRYPTION"), err), err
@@ -244,6 +251,7 @@ func (c *SageMakerChecks) CheckEndpointEncryption(ctx context.Context) (CheckRes
 			EndpointName: ep.EndpointName,
 		})
 		if err != nil {
+			skipped.add("DescribeEndpoint", err)
 			continue
 		}
 
@@ -252,6 +260,7 @@ func (c *SageMakerChecks) CheckEndpointEncryption(ctx context.Context) (CheckRes
 			EndpointConfigName: detail.EndpointConfigName,
 		})
 		if err != nil {
+			skipped.add("DescribeEndpointConfig", err)
 			continue
 		}
 
@@ -278,7 +287,7 @@ func (c *SageMakerChecks) CheckEndpointEncryption(ctx context.Context) (CheckRes
 	}
 
 	if len(endpoints.Endpoints) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.3",
 			Name:       "SageMaker Endpoint Encryption",
 			Status:     StatusInfo,
@@ -286,10 +295,10 @@ func (c *SageMakerChecks) CheckEndpointEncryption(ctx context.Context) (CheckRes
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SAGEMAKER_ENCRYPTION"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.3",
 		Name:       "SageMaker Endpoint Encryption",
 		Status:     "PASS",
@@ -297,10 +306,11 @@ func (c *SageMakerChecks) CheckEndpointEncryption(ctx context.Context) (CheckRes
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("SAGEMAKER_ENCRYPTION"),
-	}, nil
+	}), nil
 }
 
 func (c *SageMakerChecks) CheckTrainingJobEncryption(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	jobs, err := c.client.ListTrainingJobs(ctx, &sagemaker.ListTrainingJobsInput{
 		MaxResults: aws.Int32(100),
 	})
@@ -317,6 +327,7 @@ func (c *SageMakerChecks) CheckTrainingJobEncryption(ctx context.Context) (Check
 			TrainingJobName: job.TrainingJobName,
 		})
 		if err != nil {
+			skipped.add("DescribeTrainingJob", err)
 			continue
 		}
 
@@ -344,7 +355,7 @@ func (c *SageMakerChecks) CheckTrainingJobEncryption(ctx context.Context) (Check
 	}
 
 	if len(jobs.TrainingJobSummaries) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.3",
 			Name:       "SageMaker Training Job Encryption",
 			Status:     StatusInfo,
@@ -352,10 +363,10 @@ func (c *SageMakerChecks) CheckTrainingJobEncryption(ctx context.Context) (Check
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SAGEMAKER_ENCRYPTION"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.3",
 		Name:       "SageMaker Training Job Encryption",
 		Status:     "PASS",
@@ -363,10 +374,11 @@ func (c *SageMakerChecks) CheckTrainingJobEncryption(ctx context.Context) (Check
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("SAGEMAKER_ENCRYPTION"),
-	}, nil
+	}), nil
 }
 
 func (c *SageMakerChecks) CheckModelNetworkIsolation(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	models, err := c.client.ListModels(ctx, &sagemaker.ListModelsInput{
 		MaxResults: aws.Int32(100),
 	})
@@ -383,6 +395,7 @@ func (c *SageMakerChecks) CheckModelNetworkIsolation(ctx context.Context) (Check
 			ModelName: model.ModelName,
 		})
 		if err != nil {
+			skipped.add("DescribeModel", err)
 			continue
 		}
 
@@ -410,7 +423,7 @@ func (c *SageMakerChecks) CheckModelNetworkIsolation(ctx context.Context) (Check
 	}
 
 	if len(models.Models) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.1",
 			Name:       "SageMaker Model Network Isolation",
 			Status:     StatusInfo,
@@ -418,10 +431,10 @@ func (c *SageMakerChecks) CheckModelNetworkIsolation(ctx context.Context) (Check
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("SAGEMAKER_NETWORK"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.1",
 		Name:       "SageMaker Model Network Isolation",
 		Status:     "PASS",
@@ -429,5 +442,5 @@ func (c *SageMakerChecks) CheckModelNetworkIsolation(ctx context.Context) (Check
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("SAGEMAKER_NETWORK"),
-	}, nil
+	}), nil
 }

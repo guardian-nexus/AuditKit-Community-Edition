@@ -163,7 +163,7 @@ func (c *GCPPCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []CheckR
 			},
 		})
 	} else {
-		results = append(results, CheckResult{
+		results = append(results, passIfEvidenced(encryptionResults, CheckResult{
 			Control:   "PCI-3.5.1",
 			Name:      "[PCI-DSS] Storage Encryption",
 			Status:    "PASS",
@@ -173,7 +173,7 @@ func (c *GCPPCIChecks) CheckReq3_StorageEncryption(ctx context.Context) []CheckR
 			Frameworks: map[string]string{
 				"PCI-DSS": "3.5.1",
 			},
-		})
+		}))
 	}
 
 	// Check KMS key rotation (PCI-DSS 3.7.4)

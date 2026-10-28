@@ -386,6 +386,7 @@ func (c *PCIDSSChecks) CheckReq3_Encryption(ctx context.Context) []CheckResult {
 
 // Requirement 4: Encryption in Transit (CRITICAL - MISSING)
 func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check for security groups allowing unencrypted protocols
@@ -482,7 +483,11 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 		})
 
 		// If no policy or policy doesn't enforce SSL
-		if err != nil || !strings.Contains(aws.ToString(policy.Policy), "aws:SecureTransport") {
+		if err != nil {
+			skipped.add("GetBucketPolicy", err)
+			continue
+		}
+		if !strings.Contains(aws.ToString(policy.Policy), "aws:SecureTransport") {
 			bucketsWithoutSSL = append(bucketsWithoutSSL, bucketName)
 		}
 	}
@@ -505,7 +510,7 @@ func (c *PCIDSSChecks) CheckReq4_EncryptionInTransit(ctx context.Context) []Chec
 		})
 	}
 
-	return results
+	return skipped.finish(results, "PCI-4.2.1", "[PCI-DSS] Encryption in Transit")
 }
 
 // Requirement 6: Secure Systems (Patching)
@@ -705,7 +710,9 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 	// 8.2.4: Passwords must be changed every 90 days MAX (not 180!)
 	passwordPolicy, err := c.iamClient.GetAccountPasswordPolicy(ctx, &iam.GetAccountPasswordPolicyInput{})
 
-	if err != nil {
+	if err != nil && !isNotFound(err) {
+		results = append(results, checkError("PCI-8.3.9", "[PCI-DSS] 90-Day Password Rotation", map[string]string{"PCI-DSS": "8.3.9"}, err))
+	} else if err != nil {
 		results = append(results, CheckResult{
 			Control:           "PCI-8.3.9",
 			Name:              "[PCI-DSS] 90-Day Password Rotation",
@@ -722,6 +729,8 @@ func (c *PCIDSSChecks) CheckReq8_Authentication(ctx context.Context) []CheckResu
 				"PCI-DSS": "8.3.9",
 			},
 		})
+	} else if passwordPolicy.PasswordPolicy == nil {
+		results = append(results, checkError("PCI-8.3.9", "[PCI-DSS] 90-Day Password Rotation", map[string]string{"PCI-DSS": "8.3.9"}, fmt.Errorf("GetAccountPasswordPolicy returned no policy")))
 	} else {
 		maxAge := aws.ToInt32(passwordPolicy.PasswordPolicy.MaxPasswordAge)
 		if maxAge == 0 || maxAge > 90 {

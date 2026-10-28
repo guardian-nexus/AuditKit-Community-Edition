@@ -132,6 +132,9 @@ func (c *SSMChecks) CheckSessionManagerLogging(ctx context.Context) (CheckResult
 		Name: &docName,
 	})
 
+	if err != nil && !isNotFound(err) {
+		return checkError("AWS-SSM-03", "SSM Session Manager Logging", GetFrameworkMappings("SSM_SESSION_LOGGING"), err), err
+	}
 	if err != nil {
 		// Document might not exist or access denied
 		return CheckResult{

@@ -46,18 +46,21 @@ func (c *GKEChecks) CheckBinaryAuthorization(ctx context.Context) []CheckResult 
 
 	var allClusters []*container.Cluster
 	totalClusters := 0
+	zonesListed := 0
+	var listErr error
 
 	for _, location := range locations {
 		parent := fmt.Sprintf("projects/%s/locations/%s", c.projectID, location)
 		resp, err := c.service.Projects.Locations.Clusters.List(parent).Context(ctx).Do()
 		if err != nil {
+			listErr = err
 			// Try legacy zones API if locations API fails
 			zones, zErr := c.listAllZones(ctx)
 			if zErr != nil {
 				return []CheckResult{{
 					Control:     "CIS-GKE-5.1.3",
 					Name:        "[CIS-GKE-5.1.3] GKE Binary Authorization",
-					Status:      "FAIL",
+					Status:      StatusError,
 					Severity:    "HIGH",
 					Evidence:    fmt.Sprintf("Unable to list GKE clusters: %v", err),
 					Remediation: "Verify Kubernetes Engine API is enabled",
@@ -71,9 +74,11 @@ func (c *GKEChecks) CheckBinaryAuthorization(ctx context.Context) []CheckResult 
 			for _, zone := range zones {
 				zoneParent := fmt.Sprintf("projects/%s/locations/%s", c.projectID, zone)
 				zoneResp, zErr := c.service.Projects.Locations.Clusters.List(zoneParent).Context(ctx).Do()
-				if zErr == nil && zoneResp.Clusters != nil {
-					allClusters = append(allClusters, zoneResp.Clusters...)
+				if zErr != nil {
+					continue
 				}
+				zonesListed++
+				allClusters = append(allClusters, zoneResp.Clusters...)
 			}
 			break
 		}
@@ -84,7 +89,10 @@ func (c *GKEChecks) CheckBinaryAuthorization(ctx context.Context) []CheckResult 
 	}
 
 	totalClusters = len(allClusters)
-
+	if listErr != nil && zonesListed == 0 {
+		// Neither the all-locations call nor any zone could be listed.
+		return []CheckResult{checkError("CIS-GKE-5.1.3", "[CIS-GKE-5.1.3] GKE Binary Authorization", map[string]string{"CIS-GKE": "5.1.3", "SOC2": "CC8.1", "PCI-DSS": "2.2.1"}, listErr)}
+	}
 	if totalClusters == 0 {
 		return []CheckResult{{
 			Control:    "CIS-GKE-5.1.3",
@@ -159,7 +167,10 @@ gcloud container binauthz policy import policy.yaml`,
 func (c *GKEChecks) CheckNetworkPolicies(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
-	clusters := c.getAllClusters(ctx)
+	clusters, err := c.getAllClusters(ctx)
+	if err != nil {
+		return []CheckResult{checkError("CIS-GKE-4.3.1", "[CIS-GKE-4.3.1] GKE Network Policies", map[string]string{"CIS-GKE": "4.3.1", "SOC2": "CC6.6"}, err)}
+	}
 
 	if len(clusters) == 0 {
 		return []CheckResult{{
@@ -238,7 +249,10 @@ kubectl apply -f network-policy.yaml`,
 func (c *GKEChecks) CheckKubernetesDashboard(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
-	clusters := c.getAllClusters(ctx)
+	clusters, err := c.getAllClusters(ctx)
+	if err != nil {
+		return []CheckResult{checkError("GCP-GKE-02", "[GCP-GKE-02] Kubernetes Dashboard Disabled", map[string]string{"SOC2": "CC6.1"}, err)}
+	}
 
 	if len(clusters) == 0 {
 		return []CheckResult{{
@@ -311,7 +325,10 @@ gcloud container clusters update CLUSTER_NAME \
 func (c *GKEChecks) CheckPodSecurityPolicy(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
-	clusters := c.getAllClusters(ctx)
+	clusters, err := c.getAllClusters(ctx)
+	if err != nil {
+		return []CheckResult{checkError("CIS-GKE-4.2.1", "[CIS-GKE-4.2.1] Pod Security Policy", map[string]string{"CIS-GKE": "4.2.1", "SOC2": "CC6.1"}, err)}
+	}
 
 	if len(clusters) == 0 {
 		return []CheckResult{{
@@ -408,7 +425,10 @@ gcloud container clusters create-auto CLUSTER_NAME \
 func (c *GKEChecks) CheckWorkloadIdentity(ctx context.Context) []CheckResult {
 	var results []CheckResult
 
-	clusters := c.getAllClusters(ctx)
+	clusters, err := c.getAllClusters(ctx)
+	if err != nil {
+		return []CheckResult{checkError("CIS-GKE-5.2.2", "[CIS-GKE-5.2.2] GKE Workload Identity", map[string]string{"CIS-GKE": "5.2.2", "SOC2": "CC6.1"}, err)}
+	}
 
 	if len(clusters) == 0 {
 		return []CheckResult{{
@@ -497,32 +517,37 @@ gcloud container clusters create CLUSTER_NAME \
 }
 
 // Helper function to get all clusters across all zones/regions
-func (c *GKEChecks) getAllClusters(ctx context.Context) []*container.Cluster {
+// getAllClusters lists every cluster in the project. It returns an error only
+// when nothing could be listed: the all-locations call failed and so did every
+// per-zone fallback. The fallback used to swallow those errors and hand back an
+// empty list, so a denied permission read as "No GKE clusters found".
+func (c *GKEChecks) getAllClusters(ctx context.Context) ([]*container.Cluster, error) {
 	parent := fmt.Sprintf("projects/%s/locations/-", c.projectID)
 	resp, err := c.service.Projects.Locations.Clusters.List(parent).Context(ctx).Do()
-	if err != nil {
-		// Try legacy zones API
-		zones, zErr := c.listAllZones(ctx)
+	if err == nil {
+		return resp.Clusters, nil
+	}
+
+	// Try legacy zones API
+	zones, zErr := c.listAllZones(ctx)
+	if zErr != nil {
+		return nil, err
+	}
+	var allClusters []*container.Cluster
+	listed := false
+	for _, zone := range zones {
+		zoneParent := fmt.Sprintf("projects/%s/locations/%s", c.projectID, zone)
+		zoneResp, zErr := c.service.Projects.Locations.Clusters.List(zoneParent).Context(ctx).Do()
 		if zErr != nil {
-			return []*container.Cluster{}
+			continue
 		}
-
-		var allClusters []*container.Cluster
-		for _, zone := range zones {
-			zoneParent := fmt.Sprintf("projects/%s/locations/%s", c.projectID, zone)
-			zoneResp, zErr := c.service.Projects.Locations.Clusters.List(zoneParent).Context(ctx).Do()
-			if zErr == nil && zoneResp.Clusters != nil {
-				allClusters = append(allClusters, zoneResp.Clusters...)
-			}
-		}
-		return allClusters
+		listed = true
+		allClusters = append(allClusters, zoneResp.Clusters...)
 	}
-
-	if resp.Clusters == nil {
-		return []*container.Cluster{}
+	if !listed {
+		return nil, err
 	}
-
-	return resp.Clusters
+	return allClusters, nil
 }
 
 // Helper function to list all available zones

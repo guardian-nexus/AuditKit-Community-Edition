@@ -70,6 +70,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.
 			FirewallArn: fw.FirewallArn,
 		})
 		if err != nil {
+			skipped.add("DescribeFirewall", err)
 			continue
 		}
 
@@ -87,6 +88,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallSubnetPlacement(ctx context.
 				},
 			})
 			if err != nil {
+				skipped.add("DescribeSubnets", err)
 				continue
 			}
 
@@ -160,8 +162,12 @@ aws network-firewall associate-subnets \
 
 // Ensure Network Firewall policy has stateful rule groups
 func (c *NetworkFirewallChecks) CheckNetworkFirewallPolicyRules(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	// List all firewall policies
 	policies, err := c.nfwClient.ListFirewallPolicies(ctx, &networkfirewall.ListFirewallPoliciesInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("AWS-NETFW-03", "Network Firewall Policy Rules", map[string]string{"SOC2": "CC6.1", "PCI-DSS": "1.2.1"}, err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-NETFW-03",
@@ -194,6 +200,7 @@ func (c *NetworkFirewallChecks) CheckNetworkFirewallPolicyRules(ctx context.Cont
 			FirewallPolicyArn: policy.Arn,
 		})
 		if err != nil {
+			skipped.add("DescribeFirewallPolicy", err)
 			continue
 		}
 
@@ -243,7 +250,7 @@ aws network-firewall update-firewall-policy \
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-NETFW-03",
 		Name:       "Network Firewall Policy Rules",
 		Status:     "PASS",
@@ -251,13 +258,16 @@ aws network-firewall update-firewall-policy \
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC6.1"},
-	}, nil
+	}), nil
 }
 
 // Ensure Network Firewall logging is enabled
 func (c *NetworkFirewallChecks) CheckNetworkFirewallLogging(ctx context.Context) (CheckResult, error) {
 	// List all firewalls
 	firewalls, err := c.nfwClient.ListFirewalls(ctx, &networkfirewall.ListFirewallsInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("AWS-NETFW-02", "Network Firewall Logging", map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1"}, err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:    "AWS-NETFW-02",

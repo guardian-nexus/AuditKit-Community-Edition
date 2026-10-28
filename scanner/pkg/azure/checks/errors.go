@@ -72,6 +72,13 @@ func (u *unreadable) passOrError(pass CheckResult) CheckResult {
 	return pass
 }
 
+// failOrError is passOrError for checks that pass by finding something. Finding
+// one proves the pass whatever else could not be read, so there the unsafe
+// verdict is the FAIL "none found", which becomes ERROR when lookups failed.
+func (u *unreadable) failOrError(fail CheckResult) CheckResult {
+	return u.passOrError(fail)
+}
+
 // finish applies the same rule to a check that returns several results for
 // one control: when any lookup failed, a PASS or INFO built from what could
 // not be read becomes ERROR, and a check that produced nothing at all reports
@@ -90,3 +97,7 @@ func (u *unreadable) finish(results []CheckResult, control, name string) []Check
 	}
 	return results
 }
+
+// errNoGraphData stands in for a Microsoft Graph call that returned neither an
+// error nor a result, so the caller reports ERROR instead of dereferencing nil.
+var errNoGraphData = fmt.Errorf("no data returned by Microsoft Graph")

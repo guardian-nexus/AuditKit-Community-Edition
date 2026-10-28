@@ -33,6 +33,7 @@ func (c *DynamoDBChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *DynamoDBChecks) CheckPointInTimeRecovery(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	tables, err := c.client.ListTables(ctx, &dynamodb.ListTablesInput{})
 	if err != nil {
 		return CheckResult{
@@ -66,6 +67,7 @@ func (c *DynamoDBChecks) CheckPointInTimeRecovery(ctx context.Context) (CheckRes
 			TableName: &tableName,
 		})
 		if err != nil {
+			skipped.add("DescribeContinuousBackups", err)
 			continue
 		}
 
@@ -93,7 +95,7 @@ func (c *DynamoDBChecks) CheckPointInTimeRecovery(ctx context.Context) (CheckRes
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-DYNAMODB-03",
 		Name:       "DynamoDB Point-in-Time Recovery",
 		Status:     "PASS",
@@ -102,10 +104,11 @@ func (c *DynamoDBChecks) CheckPointInTimeRecovery(ctx context.Context) (CheckRes
 		Timestamp:  time.Now(),
 		ConsoleURL: "https://console.aws.amazon.com/dynamodbv2/home#tables",
 		Frameworks: GetFrameworkMappings("DYNAMODB_PITR"),
-	}, nil
+	}), nil
 }
 
 func (c *DynamoDBChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	tables, err := c.client.ListTables(ctx, &dynamodb.ListTablesInput{})
 	if err != nil {
 		return CheckResult{
@@ -140,6 +143,7 @@ func (c *DynamoDBChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult
 			TableName: &tableName,
 		})
 		if err != nil {
+			skipped.add("DescribeTable", err)
 			continue
 		}
 
@@ -169,7 +173,7 @@ func (c *DynamoDBChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-DYNAMODB-02",
 		Name:       "DynamoDB Encryption at Rest",
 		Status:     "PASS",
@@ -178,10 +182,11 @@ func (c *DynamoDBChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult
 		Timestamp:  time.Now(),
 		ConsoleURL: "https://console.aws.amazon.com/dynamodbv2/home#tables",
 		Frameworks: GetFrameworkMappings("DYNAMODB_ENCRYPTION"),
-	}, nil
+	}), nil
 }
 
 func (c *DynamoDBChecks) CheckAutoScaling(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	tables, err := c.client.ListTables(ctx, &dynamodb.ListTablesInput{})
 	if err != nil {
 		return CheckResult{
@@ -216,6 +221,7 @@ func (c *DynamoDBChecks) CheckAutoScaling(ctx context.Context) (CheckResult, err
 			TableName: &tableName,
 		})
 		if err != nil {
+			skipped.add("DescribeTable", err)
 			continue
 		}
 
@@ -226,7 +232,7 @@ func (c *DynamoDBChecks) CheckAutoScaling(ctx context.Context) (CheckResult, err
 		}
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-DYNAMODB-01",
 		Name:       "DynamoDB Auto Scaling Enabled",
 		Status:     "PASS",
@@ -235,5 +241,5 @@ func (c *DynamoDBChecks) CheckAutoScaling(ctx context.Context) (CheckResult, err
 		Timestamp:  time.Now(),
 		ConsoleURL: "https://console.aws.amazon.com/dynamodbv2/home#tables",
 		Frameworks: GetFrameworkMappings("DYNAMODB_AUTOSCALING"),
-	}, nil
+	}), nil
 }

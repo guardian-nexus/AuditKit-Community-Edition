@@ -184,11 +184,12 @@ func (c *AzureCC4Checks) CheckCC4_1_PerformanceMonitoring(ctx context.Context) C
 
 	page, err := pager.NextPage(ctx)
 	if err != nil {
+		// FAIL "not properly configured" for a call that was refused.
 		return CheckResult{
 			Control:     "CC4.1",
 			Name:        "Performance Monitoring",
-			Status:      "FAIL",
-			Evidence:    "Azure Monitor not properly configured",
+			Status:      StatusError,
+			Evidence:    fmt.Sprintf("Could not run this check: %v", err),
 			Severity:    "HIGH",
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),

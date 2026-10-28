@@ -61,7 +61,7 @@ func (c *S3Checks) CheckPublicAccess(ctx context.Context) (CheckResult, error) {
 		return CheckResult{
 			Control:    "CC6.2",
 			Name:       "S3 Public Access Block",
-			Status:     "FAIL",
+			Status:     StatusError,
 			Evidence:   fmt.Sprintf("Unable to check S3 buckets: %v", err),
 			Severity:   "HIGH",
 			Priority:   PriorityHigh,
@@ -205,6 +205,7 @@ func (c *S3Checks) CheckEncryption(ctx context.Context) (CheckResult, error) {
 }
 
 func (c *S3Checks) CheckVersioning(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	resp, err := c.client.ListBuckets(ctx, &s3.ListBucketsInput{})
 	if err != nil {
 		return checkError("A1.2", "S3 Versioning for Backup", GetFrameworkMappings("S3_VERSIONING"), err), err
@@ -217,7 +218,11 @@ func (c *S3Checks) CheckVersioning(ctx context.Context) (CheckResult, error) {
 			Bucket: bucket.Name,
 		})
 
-		if err != nil || versioning.Status != "Enabled" {
+		if err != nil {
+			skipped.add("GetBucketVersioning", err)
+			continue
+		}
+		if versioning.Status != "Enabled" {
 			noVersioning = append(noVersioning, *bucket.Name)
 		}
 	}
@@ -240,7 +245,7 @@ func (c *S3Checks) CheckVersioning(ctx context.Context) (CheckResult, error) {
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "A1.2",
 		Name:       "S3 Versioning for Backup",
 		Status:     "PASS",
@@ -248,16 +253,17 @@ func (c *S3Checks) CheckVersioning(ctx context.Context) (CheckResult, error) {
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("S3_VERSIONING"),
-	}, nil
+	}), nil
 }
 
 func (c *S3Checks) CheckLogging(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	resp, err := c.client.ListBuckets(ctx, &s3.ListBucketsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "CC7.1",
 			Name:       "S3 Access Logging",
-			Status:     "FAIL",
+			Status:     StatusError,
 			Evidence:   fmt.Sprintf("Unable to check S3 buckets: %v", err),
 			Severity:   "HIGH",
 			Priority:   PriorityHigh,
@@ -288,7 +294,11 @@ func (c *S3Checks) CheckLogging(ctx context.Context) (CheckResult, error) {
 		})
 
 		// If error or no logging enabled, add to list
-		if err != nil || logging.LoggingEnabled == nil {
+		if err != nil {
+			skipped.add("GetBucketLogging", err)
+			continue
+		}
+		if logging.LoggingEnabled == nil {
 			bucketsWithoutLogging = append(bucketsWithoutLogging, *bucket.Name)
 		}
 	}
@@ -315,7 +325,7 @@ func (c *S3Checks) CheckLogging(ctx context.Context) (CheckResult, error) {
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC7.1",
 		Name:       "S3 Access Logging",
 		Status:     "PASS",
@@ -323,13 +333,14 @@ func (c *S3Checks) CheckLogging(ctx context.Context) (CheckResult, error) {
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("S3_LOGGING"),
-	}, nil
+	}), nil
 }
 
 // NEW CIS-SPECIFIC CHECKS
 
 // CIS 3.1.2 - Ensure S3 Bucket has MFA Delete enabled
 func (c *S3Checks) CheckMFADelete(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	resp, err := c.client.ListBuckets(ctx, &s3.ListBucketsInput{})
 	if err != nil {
 		return checkError("CIS-3.1.2", "S3 MFA Delete", GetFrameworkMappings("S3_MFA_DELETE"), err), err
@@ -342,7 +353,11 @@ func (c *S3Checks) CheckMFADelete(ctx context.Context) (CheckResult, error) {
 			Bucket: bucket.Name,
 		})
 
-		if err != nil || versioning.MFADelete != "Enabled" {
+		if err != nil {
+			skipped.add("GetBucketVersioning", err)
+			continue
+		}
+		if versioning.MFADelete != "Enabled" {
 			bucketsWithoutMFADelete = append(bucketsWithoutMFADelete, *bucket.Name)
 		}
 	}
@@ -364,7 +379,7 @@ func (c *S3Checks) CheckMFADelete(ctx context.Context) (CheckResult, error) {
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CIS-3.1.2",
 		Name:       "S3 MFA Delete",
 		Status:     "PASS",
@@ -372,7 +387,7 @@ func (c *S3Checks) CheckMFADelete(ctx context.Context) (CheckResult, error) {
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("S3_MFA_DELETE"),
-	}, nil
+	}), nil
 }
 
 // Ensure S3 bucket logging is enabled
@@ -469,6 +484,9 @@ func (c *S3Checks) CheckAccountPublicAccessBlock(ctx context.Context) (CheckResu
 	}
 
 	identity, err := c.stsClient.GetCallerIdentity(ctx, &sts.GetCallerIdentityInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("CIS-3.1.4", "S3 Account Public Access Block", map[string]string{"CIS-AWS": "3.1.4", "SOC2": "CC6.1", "PCI-DSS": "1.4.2"}, err), err
+	}
 	if err != nil {
 		return unavailableAccountPABResult(fmt.Sprintf("unable to resolve account ID: %v", err)), nil
 	}
@@ -476,6 +494,9 @@ func (c *S3Checks) CheckAccountPublicAccessBlock(ctx context.Context) (CheckResu
 	config, err := c.s3controlClient.GetPublicAccessBlock(ctx, &s3control.GetPublicAccessBlockInput{
 		AccountId: identity.Account,
 	})
+	if err != nil && !isNotFound(err) {
+		return checkError("CIS-3.1.4", "S3 Account Public Access Block", map[string]string{"CIS-AWS": "3.1.4", "SOC2": "CC6.1", "PCI-DSS": "1.4.2"}, err), err
+	}
 	if err != nil {
 		// If error is "NoSuchPublicAccessBlockConfiguration", it means it's not configured
 		if strings.Contains(err.Error(), "NoSuchPublicAccessBlockConfiguration") {

@@ -45,6 +45,7 @@ func (c *EKSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 // Ensure EKS cluster endpoint access is properly configured
 func (c *EKSChecks) CheckEKSEndpointAccess(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	clusters, err := c.client.ListClusters(ctx, &eks.ListClustersInput{})
 	if err != nil {
 		return checkError("AWS-EKS-03", "EKS Cluster Endpoint Access", map[string]string{"SOC2": "CC6.6", "PCI-DSS": "1.4.2"}, err), err
@@ -69,6 +70,7 @@ func (c *EKSChecks) CheckEKSEndpointAccess(ctx context.Context) (CheckResult, er
 			Name: &clusterName,
 		})
 		if err != nil {
+			skipped.add("DescribeCluster", err)
 			continue
 		}
 
@@ -114,7 +116,7 @@ aws eks update-cluster-config \
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-EKS-03",
 		Name:       "EKS Cluster Endpoint Access",
 		Status:     "PASS",
@@ -122,11 +124,12 @@ aws eks update-cluster-config \
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC6.6"},
-	}, nil
+	}), nil
 }
 
 // Ensure EKS cluster logging is enabled
 func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	clusters, err := c.client.ListClusters(ctx, &eks.ListClustersInput{})
 	if err != nil {
 		return checkError("AWS-EKS-04", "EKS Cluster Logging", map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1.2"}, err), err
@@ -152,6 +155,7 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 			Name: &clusterName,
 		})
 		if err != nil {
+			skipped.add("DescribeCluster", err)
 			continue
 		}
 
@@ -205,7 +209,7 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-EKS-04",
 		Name:       "EKS Cluster Logging",
 		Status:     "PASS",
@@ -213,11 +217,12 @@ func (c *EKSChecks) CheckEKSLogging(ctx context.Context) (CheckResult, error) {
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC7.2"},
-	}, nil
+	}), nil
 }
 
 // Ensure EKS cluster encryption is enabled
 func (c *EKSChecks) CheckEKSEncryption(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	clusters, err := c.client.ListClusters(ctx, &eks.ListClustersInput{})
 	if err != nil {
 		return checkError("AWS-EKS-02", "EKS Cluster Encryption", map[string]string{"SOC2": "CC6.7", "PCI-DSS": "3.5.1"}, err), err
@@ -242,6 +247,7 @@ func (c *EKSChecks) CheckEKSEncryption(ctx context.Context) (CheckResult, error)
 			Name: &clusterName,
 		})
 		if err != nil {
+			skipped.add("DescribeCluster", err)
 			continue
 		}
 
@@ -283,7 +289,7 @@ aws eks create-cluster \
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-EKS-02",
 		Name:       "EKS Cluster Encryption",
 		Status:     "PASS",
@@ -291,7 +297,7 @@ aws eks create-cluster \
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC6.7"},
-	}, nil
+	}), nil
 }
 
 // Ensure EKS network policy is enabled
@@ -433,6 +439,7 @@ func (c *EKSChecks) CheckEKSSecretsEncryption(ctx context.Context) (CheckResult,
 
 // Ensure EKS audit logging is enabled
 func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	clusters, err := c.client.ListClusters(ctx, &eks.ListClustersInput{})
 	if err != nil {
 		return checkError("AWS-EKS-01", "EKS Audit Logging", map[string]string{"SOC2": "CC7.2", "PCI-DSS": "10.2.1"}, err), err
@@ -457,6 +464,7 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 			Name: &clusterName,
 		})
 		if err != nil {
+			skipped.add("DescribeCluster", err)
 			continue
 		}
 
@@ -506,7 +514,7 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-EKS-01",
 		Name:       "EKS Audit Logging",
 		Status:     "PASS",
@@ -514,5 +522,5 @@ func (c *EKSChecks) CheckEKSAuditLogging(ctx context.Context) (CheckResult, erro
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC7.2"},
-	}, nil
+	}), nil
 }

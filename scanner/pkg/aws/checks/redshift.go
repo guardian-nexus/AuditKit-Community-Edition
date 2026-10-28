@@ -154,6 +154,7 @@ func (c *RedshiftChecks) CheckClusterPublicAccess(ctx context.Context) (CheckRes
 }
 
 func (c *RedshiftChecks) CheckClusterLogging(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	clusters, err := c.client.DescribeClusters(ctx, &redshift.DescribeClustersInput{})
 	if err != nil {
 		return checkError("CC7.1", "Redshift Audit Logging", GetFrameworkMappings("REDSHIFT_LOGGING"), err), err
@@ -168,7 +169,11 @@ func (c *RedshiftChecks) CheckClusterLogging(ctx context.Context) (CheckResult, 
 		logging, err := c.client.DescribeLoggingStatus(ctx, &redshift.DescribeLoggingStatusInput{
 			ClusterIdentifier: cluster.ClusterIdentifier,
 		})
-		if err != nil || !aws.ToBool(logging.LoggingEnabled) {
+		if err != nil {
+			skipped.add("DescribeLoggingStatus", err)
+			continue
+		}
+		if !aws.ToBool(logging.LoggingEnabled) {
 			noLogging = append(noLogging, clusterID)
 		}
 	}
@@ -191,7 +196,7 @@ func (c *RedshiftChecks) CheckClusterLogging(ctx context.Context) (CheckResult, 
 	}
 
 	if len(clusters.Clusters) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC7.1",
 			Name:       "Redshift Audit Logging",
 			Status:     StatusInfo,
@@ -199,10 +204,10 @@ func (c *RedshiftChecks) CheckClusterLogging(ctx context.Context) (CheckResult, 
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("REDSHIFT_LOGGING"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC7.1",
 		Name:       "Redshift Audit Logging",
 		Status:     "PASS",
@@ -210,10 +215,11 @@ func (c *RedshiftChecks) CheckClusterLogging(ctx context.Context) (CheckResult, 
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("REDSHIFT_LOGGING"),
-	}, nil
+	}), nil
 }
 
 func (c *RedshiftChecks) CheckClusterSSL(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	clusters, err := c.client.DescribeClusters(ctx, &redshift.DescribeClustersInput{})
 	if err != nil {
 		return checkError("CC6.4", "Redshift SSL Required", GetFrameworkMappings("REDSHIFT_SSL"), err), err
@@ -233,6 +239,7 @@ func (c *RedshiftChecks) CheckClusterSSL(ctx context.Context) (CheckResult, erro
 					ParameterGroupName: &pgName,
 				})
 				if err != nil {
+					skipped.add("DescribeClusterParameters", err)
 					continue
 				}
 
@@ -269,7 +276,7 @@ func (c *RedshiftChecks) CheckClusterSSL(ctx context.Context) (CheckResult, erro
 	}
 
 	if len(clusters.Clusters) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.4",
 			Name:       "Redshift SSL Required",
 			Status:     StatusInfo,
@@ -277,10 +284,10 @@ func (c *RedshiftChecks) CheckClusterSSL(ctx context.Context) (CheckResult, erro
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("REDSHIFT_SSL"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.4",
 		Name:       "Redshift SSL Required",
 		Status:     "PASS",
@@ -288,7 +295,7 @@ func (c *RedshiftChecks) CheckClusterSSL(ctx context.Context) (CheckResult, erro
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("REDSHIFT_SSL"),
-	}, nil
+	}), nil
 }
 
 func (c *RedshiftChecks) CheckClusterVersionUpgrade(ctx context.Context) (CheckResult, error) {

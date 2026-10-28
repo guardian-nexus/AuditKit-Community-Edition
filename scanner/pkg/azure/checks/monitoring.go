@@ -62,7 +62,12 @@ func (c *MonitoringChecks) CheckActivityLogDiagnostics(ctx context.Context) []Ch
 	// Check if we can retrieve activity logs (indicates logging is functional)
 	if pager.More() {
 		page, err := pager.NextPage(ctx)
-		if err == nil && len(page.Value) > 0 {
+		if err != nil {
+			// A failed read used to fall through to the FAIL below, which
+			// says logging is missing when the scanner simply could not look.
+			return []CheckResult{checkError("CIS-6.1.1.2", "Activity Log Export and Retention", GetFrameworkMappings("ACTIVITY_LOG"), err)}
+		}
+		if len(page.Value) > 0 {
 			hasActivityLogs = true
 			logsFound = len(page.Value)
 		}

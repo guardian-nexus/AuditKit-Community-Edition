@@ -87,7 +87,7 @@ func (c *IAMChecks) CheckRootMFA(ctx context.Context) (CheckResult, error) {
 		return CheckResult{
 			Control:    "CC6.6",
 			Name:       "Root Account MFA",
-			Status:     "FAIL",
+			Status:     StatusError,
 			Evidence:   "Unable to check root MFA status",
 			Severity:   "HIGH",
 			Priority:   PriorityHigh,
@@ -129,6 +129,9 @@ func (c *IAMChecks) CheckRootMFA(ctx context.Context) (CheckResult, error) {
 
 func (c *IAMChecks) CheckPasswordPolicy(ctx context.Context) (CheckResult, error) {
 	policy, err := c.client.GetAccountPasswordPolicy(ctx, &iam.GetAccountPasswordPolicyInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("CC6.7", "Password Policy", GetFrameworkMappings("PASSWORD_POLICY"), err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:           "CC6.7",
@@ -144,6 +147,12 @@ func (c *IAMChecks) CheckPasswordPolicy(ctx context.Context) (CheckResult, error
 			Timestamp:         time.Now(),
 			Frameworks:        GetFrameworkMappings("PASSWORD_POLICY"),
 		}, nil
+	}
+
+	if policy.PasswordPolicy == nil {
+		// Never seen from AWS, which answers NoSuchEntity instead, but a nil
+		// here took the whole scan down.
+		return checkError("CC6.6", "Password Policy", GetFrameworkMappings("PASSWORD_POLICY"), fmt.Errorf("GetAccountPasswordPolicy returned no policy")), fmt.Errorf("no password policy in response")
 	}
 
 	minLength := aws.ToInt32(policy.PasswordPolicy.MinimumPasswordLength)
@@ -200,6 +209,7 @@ func (c *IAMChecks) CheckPasswordPolicy(ctx context.Context) (CheckResult, error
 }
 
 func (c *IAMChecks) CheckAccessKeyRotation(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
 		return checkError("CC6.8", "Access Key Rotation", GetFrameworkMappings("ACCESS_KEY_ROTATION"), err), err
@@ -213,6 +223,7 @@ func (c *IAMChecks) CheckAccessKeyRotation(ctx context.Context) (CheckResult, er
 			UserName: user.UserName,
 		})
 		if err != nil {
+			skipped.add("ListAccessKeys", err)
 			continue
 		}
 
@@ -286,7 +297,7 @@ func (c *IAMChecks) CheckAccessKeyRotation(ctx context.Context) (CheckResult, er
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.8",
 		Name:       "Access Key Rotation",
 		Status:     "PASS",
@@ -294,7 +305,7 @@ func (c *IAMChecks) CheckAccessKeyRotation(ctx context.Context) (CheckResult, er
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("ACCESS_KEY_ROTATION"),
-	}, nil
+	}), nil
 }
 
 func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, error) {
@@ -308,7 +319,7 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 			return CheckResult{
 				Control:    "CC6.7",
 				Name:       "Unused Credentials",
-				Status:     "INFO",
+				Status:     StatusError,
 				Evidence:   "Unable to generate credential report | Meets PCI DSS 8.2.6 (remove inactive accounts within 90 days)",
 				Priority:   PriorityInfo,
 				Timestamp:  time.Now(),
@@ -330,11 +341,14 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 	// Parse the CSV report
 	csvReader := csv.NewReader(strings.NewReader(string(report.Content)))
 	records, err := csvReader.ReadAll()
+	if err != nil && !isNotFound(err) {
+		return checkError("CC6.7", "Unused Credentials", GetFrameworkMappings("UNUSED_CREDENTIALS"), err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:    "CC6.7",
 			Name:       "Unused Credentials",
-			Status:     "INFO",
+			Status:     StatusError,
 			Evidence:   fmt.Sprintf("Unable to parse credential report: %v", err),
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
@@ -470,6 +484,9 @@ func (c *IAMChecks) CheckUnusedCredentials(ctx context.Context) (CheckResult, er
 // CIS 2.4 - Ensure no root user access keys exist
 func (c *IAMChecks) CheckRootAccessKeys(ctx context.Context) (CheckResult, error) {
 	summary, err := c.client.GetAccountSummary(ctx, &iam.GetAccountSummaryInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("CIS-2.4", "Root Account Access Keys", GetFrameworkMappings("ROOT_ACCESS_KEYS"), err), err
+	}
 	if err != nil {
 		return checkError("CIS-2.4", "Root Account Access Keys", GetFrameworkMappings("ROOT_ACCESS_KEYS"), err), err
 	}
@@ -527,6 +544,7 @@ func (c *IAMChecks) CheckHardwareMFARoot(ctx context.Context) (CheckResult, erro
 
 // CIS 2.10 - Ensure MFA is enabled for all IAM users with console access
 func (c *IAMChecks) CheckIAMUsersMFA(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
 		return checkError("CIS-2.10", "MFA for IAM Users", GetFrameworkMappings("IAM_USER_MFA"), err), err
@@ -547,7 +565,11 @@ func (c *IAMChecks) CheckIAMUsersMFA(ctx context.Context) (CheckResult, error) {
 		mfaDevices, err := c.client.ListMFADevices(ctx, &iam.ListMFADevicesInput{
 			UserName: user.UserName,
 		})
-		if err != nil || len(mfaDevices.MFADevices) == 0 {
+		if err != nil {
+			skipped.add("ListMFADevices", err)
+			continue
+		}
+		if len(mfaDevices.MFADevices) == 0 {
 			usersWithoutMFA = append(usersWithoutMFA, *user.UserName)
 		}
 	}
@@ -569,7 +591,7 @@ func (c *IAMChecks) CheckIAMUsersMFA(ctx context.Context) (CheckResult, error) {
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CIS-2.10",
 		Name:       "MFA for IAM Users",
 		Status:     "PASS",
@@ -577,7 +599,7 @@ func (c *IAMChecks) CheckIAMUsersMFA(ctx context.Context) (CheckResult, error) {
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("IAM_USER_MFA"),
-	}, nil
+	}), nil
 }
 
 // CIS 2.11 - Ensure credentials unused for 90 days or greater are disabled
@@ -599,6 +621,7 @@ func (c *IAMChecks) CheckCredentialsUnused90Days(ctx context.Context) (CheckResu
 
 // CIS 2.11 - Ensure there is only one active access key per IAM user
 func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	users, err := listAllUsers(ctx, c.client, &iam.ListUsersInput{})
 	if err != nil {
 		return checkError("AWS-IAM-05", "One Active Access Key Per User", GetFrameworkMappings("IAM_USER_UNUSED"), err), err
@@ -610,6 +633,7 @@ func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, e
 			UserName: user.UserName,
 		})
 		if err != nil {
+			skipped.add("ListAccessKeys", err)
 			continue
 		}
 
@@ -642,7 +666,7 @@ func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, e
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-IAM-05",
 		Name:       "One Active Access Key Per User",
 		Status:     "PASS",
@@ -650,7 +674,7 @@ func (c *IAMChecks) CheckOneActiveAccessKey(ctx context.Context) (CheckResult, e
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("IAM_USER_UNUSED"),
-	}, nil
+	}), nil
 }
 
 // CIS 2.13 - Ensure IAM users receive permissions only through groups
@@ -795,7 +819,7 @@ func (c *IAMChecks) CheckIAMPoliciesOnGroupsOnly(ctx context.Context) (CheckResu
 		return CheckResult{
 			Control:    "CIS-2.13",
 			Name:       "IAM Policies Attached to Groups Only",
-			Status:     "FAIL",
+			Status:     StatusError,
 			Evidence:   "Unable to check IAM user policies",
 			Severity:   "HIGH",
 			Priority:   PriorityHigh,
@@ -897,6 +921,9 @@ aws iam delete-user-policy --user-name %s --policy-name INLINE_POLICY_NAME`, fir
 // CheckPasswordExpiration verifies password expiration is 90 days or less
 func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, error) {
 	policy, err := c.client.GetAccountPasswordPolicy(ctx, &iam.GetAccountPasswordPolicyInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("AWS-IAM-06", "Password Expiration Policy", map[string]string{"SOC2": "CC6.1", "PCI-DSS": "8.3.9"}, err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:           "AWS-IAM-06",
@@ -964,6 +991,9 @@ func (c *IAMChecks) CheckPasswordExpiration(ctx context.Context) (CheckResult, e
 // CheckPasswordReusePrevention verifies password reuse prevention is configured (CIS 2.9)
 func (c *IAMChecks) CheckPasswordReusePrevention(ctx context.Context) (CheckResult, error) {
 	policy, err := c.client.GetAccountPasswordPolicy(ctx, &iam.GetAccountPasswordPolicyInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("CIS-2.9", "Password Reuse Prevention", map[string]string{"CIS-AWS": "2.9", "SOC2": "CC6.1", "PCI-DSS": "8.3.7"}, err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:           "CIS-2.9",

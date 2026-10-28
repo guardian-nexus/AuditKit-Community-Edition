@@ -495,7 +495,7 @@ func (c *ComputeChecks) CheckProjectSSHKeys(ctx context.Context) []CheckResult {
 		results = append(results, CheckResult{
 			Control:     "CIS-GCP-4.3",
 			Name:        "[CIS-GCP-4.3] Project-Wide SSH Keys",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Evidence:    fmt.Sprintf("Unable to check project SSH keys: %v", err),
 			Remediation: "Verify compute.projects.get permission",
 			Priority:    PriorityHigh,

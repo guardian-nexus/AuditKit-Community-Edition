@@ -40,6 +40,7 @@ func (c *OpenSearchChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *OpenSearchChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
 		return checkError("CC6.3", "OpenSearch Encryption at Rest", GetFrameworkMappings("OPENSEARCH_ENCRYPTION"), err), err
@@ -54,6 +55,7 @@ func (c *OpenSearchChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResu
 			DomainName: domain.DomainName,
 		})
 		if err != nil {
+			skipped.add("DescribeDomain", err)
 			continue
 		}
 
@@ -81,7 +83,7 @@ func (c *OpenSearchChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResu
 	}
 
 	if len(domains.DomainNames) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.3",
 			Name:       "OpenSearch Encryption at Rest",
 			Status:     StatusInfo,
@@ -89,10 +91,10 @@ func (c *OpenSearchChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResu
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("OPENSEARCH_ENCRYPTION"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.3",
 		Name:       "OpenSearch Encryption at Rest",
 		Status:     "PASS",
@@ -100,10 +102,11 @@ func (c *OpenSearchChecks) CheckEncryptionAtRest(ctx context.Context) (CheckResu
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("OPENSEARCH_ENCRYPTION"),
-	}, nil
+	}), nil
 }
 
 func (c *OpenSearchChecks) CheckNodeToNodeEncryption(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
 		return checkError("CC6.4", "OpenSearch Node-to-Node Encryption", GetFrameworkMappings("OPENSEARCH_TRANSIT"), err), err
@@ -118,6 +121,7 @@ func (c *OpenSearchChecks) CheckNodeToNodeEncryption(ctx context.Context) (Check
 			DomainName: domain.DomainName,
 		})
 		if err != nil {
+			skipped.add("DescribeDomain", err)
 			continue
 		}
 
@@ -145,7 +149,7 @@ func (c *OpenSearchChecks) CheckNodeToNodeEncryption(ctx context.Context) (Check
 	}
 
 	if len(domains.DomainNames) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.4",
 			Name:       "OpenSearch Node-to-Node Encryption",
 			Status:     StatusInfo,
@@ -153,10 +157,10 @@ func (c *OpenSearchChecks) CheckNodeToNodeEncryption(ctx context.Context) (Check
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("OPENSEARCH_TRANSIT"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.4",
 		Name:       "OpenSearch Node-to-Node Encryption",
 		Status:     "PASS",
@@ -164,10 +168,11 @@ func (c *OpenSearchChecks) CheckNodeToNodeEncryption(ctx context.Context) (Check
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("OPENSEARCH_TRANSIT"),
-	}, nil
+	}), nil
 }
 
 func (c *OpenSearchChecks) CheckHTTPS(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
 		return checkError("CC6.4", "OpenSearch HTTPS Required", GetFrameworkMappings("OPENSEARCH_HTTPS"), err), err
@@ -182,6 +187,7 @@ func (c *OpenSearchChecks) CheckHTTPS(ctx context.Context) (CheckResult, error) 
 			DomainName: domain.DomainName,
 		})
 		if err != nil {
+			skipped.add("DescribeDomain", err)
 			continue
 		}
 
@@ -209,7 +215,7 @@ func (c *OpenSearchChecks) CheckHTTPS(ctx context.Context) (CheckResult, error) 
 	}
 
 	if len(domains.DomainNames) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.4",
 			Name:       "OpenSearch HTTPS Required",
 			Status:     StatusInfo,
@@ -217,10 +223,10 @@ func (c *OpenSearchChecks) CheckHTTPS(ctx context.Context) (CheckResult, error) 
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("OPENSEARCH_HTTPS"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.4",
 		Name:       "OpenSearch HTTPS Required",
 		Status:     "PASS",
@@ -228,10 +234,11 @@ func (c *OpenSearchChecks) CheckHTTPS(ctx context.Context) (CheckResult, error) 
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("OPENSEARCH_HTTPS"),
-	}, nil
+	}), nil
 }
 
 func (c *OpenSearchChecks) CheckVPCDeployment(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
 		return checkError("CC6.1", "OpenSearch VPC Deployment", GetFrameworkMappings("OPENSEARCH_NETWORK"), err), err
@@ -246,6 +253,7 @@ func (c *OpenSearchChecks) CheckVPCDeployment(ctx context.Context) (CheckResult,
 			DomainName: domain.DomainName,
 		})
 		if err != nil {
+			skipped.add("DescribeDomain", err)
 			continue
 		}
 
@@ -273,7 +281,7 @@ func (c *OpenSearchChecks) CheckVPCDeployment(ctx context.Context) (CheckResult,
 	}
 
 	if len(domains.DomainNames) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.1",
 			Name:       "OpenSearch VPC Deployment",
 			Status:     StatusInfo,
@@ -281,10 +289,10 @@ func (c *OpenSearchChecks) CheckVPCDeployment(ctx context.Context) (CheckResult,
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("OPENSEARCH_NETWORK"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.1",
 		Name:       "OpenSearch VPC Deployment",
 		Status:     "PASS",
@@ -292,10 +300,11 @@ func (c *OpenSearchChecks) CheckVPCDeployment(ctx context.Context) (CheckResult,
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("OPENSEARCH_NETWORK"),
-	}, nil
+	}), nil
 }
 
 func (c *OpenSearchChecks) CheckAuditLogs(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
 		return checkError("CC7.1", "OpenSearch Audit Logs", GetFrameworkMappings("OPENSEARCH_LOGGING"), err), err
@@ -310,6 +319,7 @@ func (c *OpenSearchChecks) CheckAuditLogs(ctx context.Context) (CheckResult, err
 			DomainName: domain.DomainName,
 		})
 		if err != nil {
+			skipped.add("DescribeDomain", err)
 			continue
 		}
 
@@ -350,7 +360,7 @@ func (c *OpenSearchChecks) CheckAuditLogs(ctx context.Context) (CheckResult, err
 	}
 
 	if len(domains.DomainNames) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC7.1",
 			Name:       "OpenSearch Audit Logs",
 			Status:     StatusInfo,
@@ -358,10 +368,10 @@ func (c *OpenSearchChecks) CheckAuditLogs(ctx context.Context) (CheckResult, err
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("OPENSEARCH_LOGGING"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC7.1",
 		Name:       "OpenSearch Audit Logs",
 		Status:     "PASS",
@@ -369,10 +379,11 @@ func (c *OpenSearchChecks) CheckAuditLogs(ctx context.Context) (CheckResult, err
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("OPENSEARCH_LOGGING"),
-	}, nil
+	}), nil
 }
 
 func (c *OpenSearchChecks) CheckFineGrainedAccessControl(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	domains, err := c.client.ListDomainNames(ctx, &opensearch.ListDomainNamesInput{})
 	if err != nil {
 		return checkError("CC6.6", "OpenSearch Fine-Grained Access Control", GetFrameworkMappings("OPENSEARCH_ACCESS"), err), err
@@ -387,6 +398,7 @@ func (c *OpenSearchChecks) CheckFineGrainedAccessControl(ctx context.Context) (C
 			DomainName: domain.DomainName,
 		})
 		if err != nil {
+			skipped.add("DescribeDomain", err)
 			continue
 		}
 
@@ -414,7 +426,7 @@ func (c *OpenSearchChecks) CheckFineGrainedAccessControl(ctx context.Context) (C
 	}
 
 	if len(domains.DomainNames) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "CC6.6",
 			Name:       "OpenSearch Fine-Grained Access Control",
 			Status:     StatusInfo,
@@ -422,10 +434,10 @@ func (c *OpenSearchChecks) CheckFineGrainedAccessControl(ctx context.Context) (C
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: GetFrameworkMappings("OPENSEARCH_ACCESS"),
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CC6.6",
 		Name:       "OpenSearch Fine-Grained Access Control",
 		Status:     "PASS",
@@ -433,5 +445,5 @@ func (c *OpenSearchChecks) CheckFineGrainedAccessControl(ctx context.Context) (C
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: GetFrameworkMappings("OPENSEARCH_ACCESS"),
-	}, nil
+	}), nil
 }

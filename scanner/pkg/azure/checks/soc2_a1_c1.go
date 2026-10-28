@@ -91,7 +91,7 @@ func (c *AzureAvailabilityConfidentialityChecks) checkCapacity(ctx context.Conte
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
-			base.Status = "INFO"
+			base.Status = StatusError
 			base.Evidence = fmt.Sprintf("SOC2 A1.1: unable to read autoscale settings (%v), verify capacity management by hand", err)
 			base.Remediation = "Configure autoscale rules for capacity-sensitive workloads"
 			base.RemediationDetail = "Define autoscale settings with metric thresholds, or document how capacity is monitored and provisioned instead."
@@ -157,7 +157,7 @@ func (c *AzureAvailabilityConfidentialityChecks) checkStorageClassification(ctx 
 				{
 					Control:           "C1.1",
 					Name:              "Confidential Data Identification",
-					Status:            "INFO",
+					Status:            StatusError,
 					Evidence:          fmt.Sprintf("SOC2 C1.1: unable to list storage accounts (%v). Identify and maintain a record of which resources hold confidential information", err),
 					Remediation:       "Tag data-bearing resources with a classification",
 					RemediationDetail: "Apply a classification tag to each storage account and keep an inventory of what each holds.",

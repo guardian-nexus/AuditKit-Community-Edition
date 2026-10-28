@@ -56,7 +56,7 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 		return CheckResult{
 			Control:           "AWS-SECSVC-01",
 			Name:              "GuardDuty Enabled",
-			Status:            "FAIL",
+			Status:            StatusError,
 			Severity:          "CRITICAL",
 			Evidence:          fmt.Sprintf("Unable to check GuardDuty status: %v", err),
 			Remediation:       "Enable GuardDuty",
@@ -126,6 +126,9 @@ func (c *SecurityServicesChecks) CheckGuardDutyEnabled(ctx context.Context) (Che
 // Ensure Amazon Macie is enabled
 func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckResult, error) {
 	session, err := c.macieClient.GetMacieSession(ctx, &macie2.GetMacieSessionInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("AWS-SECSVC-03", "Macie Enabled", map[string]string{"SOC2": "C1.1", "PCI-DSS": "3.2.1, 12.5.2"}, err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:           "AWS-SECSVC-03",
@@ -174,6 +177,9 @@ func (c *SecurityServicesChecks) CheckMacieEnabled(ctx context.Context) (CheckRe
 // CIS 5.16 - Ensure Security Hub is enabled
 func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (CheckResult, error) {
 	hub, err := c.securityHubClient.DescribeHub(ctx, &securityhub.DescribeHubInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("CIS-5.16", "Security Hub Enabled", map[string]string{"CIS-AWS": "5.16", "SOC2": "CC7.1, CC7.2", "PCI-DSS": "10.7.2"}, err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:           "CIS-5.16",
@@ -222,6 +228,9 @@ func (c *SecurityServicesChecks) CheckSecurityHubEnabled(ctx context.Context) (C
 // Ensure Amazon Inspector is enabled
 func (c *SecurityServicesChecks) CheckInspectorEnabled(ctx context.Context) (CheckResult, error) {
 	status, err := c.inspectorClient.BatchGetAccountStatus(ctx, &inspector2.BatchGetAccountStatusInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("AWS-SECSVC-02", "Inspector Enabled", map[string]string{"SOC2": "CC8.1"}, err), err
+	}
 	if err != nil {
 		return CheckResult{
 			Control:           "AWS-SECSVC-02",

@@ -62,8 +62,10 @@ func (c *CC1Checks) CheckCC1_1_IntegrityAndEthics(ctx context.Context) []CheckRe
 	// Check 1: AWS Organizations with SCPs for governance
 	if c.orgClient != nil {
 		org, err := c.orgClient.DescribeOrganization(ctx, &organizations.DescribeOrganizationInput{})
-		if err != nil || org == nil || org.Organization == nil {
-			results = append(results, CheckResult{
+		if err != nil {
+			skipped.add("DescribeOrganization", err)
+		} else if org == nil || org.Organization == nil {
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:         "CC1.1",
 				Name:            "Organizational Governance Structure",
 				Status:          "FAIL",
@@ -74,7 +76,7 @@ func (c *CC1Checks) CheckCC1_1_IntegrityAndEthics(ctx context.Context) []CheckRe
 				ConsoleURL:      "https://console.aws.amazon.com/organizations/",
 				Priority:        PriorityHigh,
 				Timestamp:       time.Now(),
-			})
+			}))
 		} else {
 			// Check for Service Control Policies
 			policies, err := c.orgClient.ListPolicies(ctx, &organizations.ListPoliciesInput{
@@ -146,7 +148,7 @@ func (c *CC1Checks) CheckCC1_2_BoardOversight(ctx context.Context) []CheckResult
 			Timestamp: time.Now(),
 		})
 	} else {
-		results = append(results, CheckResult{
+		results = append(results, skipped.failOrError(CheckResult{
 			Control:     "CC1.2",
 			Name:        "Role-Based Access Segregation",
 			Status:      "FAIL",
@@ -155,7 +157,7 @@ func (c *CC1Checks) CheckCC1_2_BoardOversight(ctx context.Context) []CheckResult
 			Remediation: "Create separate admin, operator, and audit roles",
 			Priority:    PriorityMedium,
 			Timestamp:   time.Now(),
-		})
+		}))
 	}
 
 	return skipped.finish(results, "CC1.2", "Role-Based Access Segregation")
@@ -389,14 +391,17 @@ func (c *CC2Checks) CheckCC2_1_InformationGeneration(ctx context.Context) []Chec
 }
 
 func (c *CC2Checks) CheckCC2_2_InternalCommunication(ctx context.Context) []CheckResult {
+	skipped := unreadable{}
 	results := []CheckResult{}
 
 	// Check SNS topics for internal alerting
 	if c.snsClient != nil {
 		topics, err := c.snsClient.ListTopics(ctx, &sns.ListTopicsInput{})
 
-		if err != nil || topics == nil || len(topics.Topics) == 0 {
-			results = append(results, CheckResult{
+		if err != nil {
+			skipped.add("ListTopics", err)
+		} else if topics == nil || len(topics.Topics) == 0 {
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:         "CC2.2",
 				Name:            "Internal Alert Communication",
 				Status:          "FAIL",
@@ -407,7 +412,7 @@ func (c *CC2Checks) CheckCC2_2_InternalCommunication(ctx context.Context) []Chec
 				ConsoleURL:      "https://console.aws.amazon.com/sns/",
 				Priority:        PriorityHigh,
 				Timestamp:       time.Now(),
-			})
+			}))
 		} else {
 			// Check for security-related topics
 			securityTopics := 0
@@ -444,7 +449,7 @@ func (c *CC2Checks) CheckCC2_2_InternalCommunication(ctx context.Context) []Chec
 		}
 	}
 
-	return results
+	return skipped.finish(results, "CC2.2", "Security Alert Communication")
 }
 
 func (c *CC2Checks) CheckCC2_3_ExternalCommunication(ctx context.Context) []CheckResult {

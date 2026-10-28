@@ -59,7 +59,7 @@ func (c *CloudTrailChecks) CheckTrailEnabled(ctx context.Context) (CheckResult, 
 		return CheckResult{
 			Control:    "CC7.1",
 			Name:       "CloudTrail Logging Enabled",
-			Status:     "FAIL",
+			Status:     StatusError,
 			Evidence:   "Unable to check CloudTrail status",
 			Severity:   "CRITICAL",
 			Priority:   PriorityCritical,
@@ -69,7 +69,7 @@ func (c *CloudTrailChecks) CheckTrailEnabled(ctx context.Context) (CheckResult, 
 	}
 
 	if len(trails.Trails) == 0 {
-		return CheckResult{
+		return skipped.failOrError(CheckResult{
 			Control:         "CC7.1",
 			Name:            "CloudTrail Logging Enabled",
 			Status:          "FAIL",
@@ -81,7 +81,7 @@ func (c *CloudTrailChecks) CheckTrailEnabled(ctx context.Context) (CheckResult, 
 			Priority:        PriorityCritical,
 			Timestamp:       time.Now(),
 			Frameworks:      GetFrameworkMappings("CLOUDTRAIL_ENABLED"),
-		}, nil
+		}), nil
 	}
 
 	// Check if at least one trail is logging
@@ -130,8 +130,15 @@ func (c *CloudTrailChecks) CheckTrailEnabled(ctx context.Context) (CheckResult, 
 func (c *CloudTrailChecks) CheckMultiRegion(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
-	if err != nil || len(trails.Trails) == 0 {
+	if err != nil && !isNotFound(err) {
 		return checkError("CC7.1", "Multi-Region CloudTrail", GetFrameworkMappings("CLOUDTRAIL_MULTIREGION"), err), err
+	}
+	if err != nil {
+		return checkError("CC7.1", "Multi-Region CloudTrail", GetFrameworkMappings("CLOUDTRAIL_MULTIREGION"), err), err
+	}
+	if len(trails.Trails) == 0 {
+		// Nothing to evaluate. CloudTrail Logging Enabled reports the missing trail as a FAIL.
+		return CheckResult{Control: "CC7.1", Name: "Multi-Region CloudTrail", Status: StatusInfo, Evidence: "No CloudTrail trails exist to evaluate; see CloudTrail Logging Enabled", Priority: PriorityInfo, Timestamp: time.Now(), Frameworks: GetFrameworkMappings("CLOUDTRAIL_MULTIREGION")}, nil
 	}
 
 	multiRegionTrails := 0
@@ -179,8 +186,15 @@ func (c *CloudTrailChecks) CheckMultiRegion(ctx context.Context) (CheckResult, e
 func (c *CloudTrailChecks) CheckLogFileValidation(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
-	if err != nil || len(trails.Trails) == 0 {
+	if err != nil && !isNotFound(err) {
 		return checkError("CC7.1", "CloudTrail Log Integrity", GetFrameworkMappings("CLOUDTRAIL_INTEGRITY"), err), err
+	}
+	if err != nil {
+		return checkError("CC7.1", "CloudTrail Log Integrity", GetFrameworkMappings("CLOUDTRAIL_INTEGRITY"), err), err
+	}
+	if len(trails.Trails) == 0 {
+		// Nothing to evaluate. CloudTrail Logging Enabled reports the missing trail as a FAIL.
+		return CheckResult{Control: "CC7.1", Name: "CloudTrail Log Integrity", Status: StatusInfo, Evidence: "No CloudTrail trails exist to evaluate; see CloudTrail Logging Enabled", Priority: PriorityInfo, Timestamp: time.Now(), Frameworks: GetFrameworkMappings("CLOUDTRAIL_INTEGRITY")}, nil
 	}
 
 	validationEnabled := 0
@@ -230,8 +244,15 @@ func (c *CloudTrailChecks) CheckLogFileValidation(ctx context.Context) (CheckRes
 func (c *CloudTrailChecks) CheckCloudTrailEncryption(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
-	if err != nil || len(trails.Trails) == 0 {
+	if err != nil && !isNotFound(err) {
 		return checkError("CIS-4.5", "CloudTrail Encryption at Rest", GetFrameworkMappings("CLOUDTRAIL_ENCRYPTION"), err), err
+	}
+	if err != nil {
+		return checkError("CIS-4.5", "CloudTrail Encryption at Rest", GetFrameworkMappings("CLOUDTRAIL_ENCRYPTION"), err), err
+	}
+	if len(trails.Trails) == 0 {
+		// Nothing to evaluate. CloudTrail Logging Enabled reports the missing trail as a FAIL.
+		return CheckResult{Control: "CIS-4.5", Name: "CloudTrail Encryption at Rest", Status: StatusInfo, Evidence: "No CloudTrail trails exist to evaluate; see CloudTrail Logging Enabled", Priority: PriorityInfo, Timestamp: time.Now(), Frameworks: GetFrameworkMappings("CLOUDTRAIL_ENCRYPTION")}, nil
 	}
 
 	unencryptedTrails := []string{}
@@ -280,8 +301,15 @@ func (c *CloudTrailChecks) CheckCloudTrailEncryption(ctx context.Context) (Check
 func (c *CloudTrailChecks) CheckCloudTrailLogIntegration(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
-	if err != nil || len(trails.Trails) == 0 {
+	if err != nil && !isNotFound(err) {
 		return checkError("AWS-CLOUDTRAIL-01", "CloudTrail CloudWatch Logs Integration", GetFrameworkMappings("CLOUDWATCH_LOG_ENCRYPTION"), err), err
+	}
+	if err != nil {
+		return checkError("AWS-CLOUDTRAIL-01", "CloudTrail CloudWatch Logs Integration", GetFrameworkMappings("CLOUDWATCH_LOG_ENCRYPTION"), err), err
+	}
+	if len(trails.Trails) == 0 {
+		// Nothing to evaluate. CloudTrail Logging Enabled reports the missing trail as a FAIL.
+		return CheckResult{Control: "AWS-CLOUDTRAIL-01", Name: "CloudTrail CloudWatch Logs Integration", Status: StatusInfo, Evidence: "No CloudTrail trails exist to evaluate; see CloudTrail Logging Enabled", Priority: PriorityInfo, Timestamp: time.Now(), Frameworks: GetFrameworkMappings("CLOUDWATCH_LOG_ENCRYPTION")}, nil
 	}
 
 	trailsWithoutCWL := []string{}
@@ -347,8 +375,15 @@ func (c *CloudTrailChecks) CheckS3BucketAccessLogging(ctx context.Context) (Chec
 func (c *CloudTrailChecks) CheckCloudTrailLogValidation(ctx context.Context) (CheckResult, error) {
 	skipped := unreadable{}
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
-	if err != nil || len(trails.Trails) == 0 {
+	if err != nil && !isNotFound(err) {
 		return checkError("CIS-4.2", "CloudTrail Log File Validation", GetFrameworkMappings("CLOUDTRAIL_VALIDATION"), err), err
+	}
+	if err != nil {
+		return checkError("CIS-4.2", "CloudTrail Log File Validation", GetFrameworkMappings("CLOUDTRAIL_VALIDATION"), err), err
+	}
+	if len(trails.Trails) == 0 {
+		// Nothing to evaluate. CloudTrail Logging Enabled reports the missing trail as a FAIL.
+		return CheckResult{Control: "CIS-4.2", Name: "CloudTrail Log File Validation", Status: StatusInfo, Evidence: "No CloudTrail trails exist to evaluate; see CloudTrail Logging Enabled", Priority: PriorityInfo, Timestamp: time.Now(), Frameworks: GetFrameworkMappings("CLOUDTRAIL_VALIDATION")}, nil
 	}
 
 	trailsWithoutValidation := []string{}
@@ -433,12 +468,13 @@ func (c *CloudTrailChecks) CheckCloudTrailKMSKey(ctx context.Context) (CheckResu
 
 // CheckS3ObjectLevelLoggingWrite verifies S3 object-level logging for write events (CIS 4.8)
 func (c *CloudTrailChecks) CheckS3ObjectLevelLoggingWrite(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "CIS-4.8",
 			Name:       "S3 Object-Level Logging (Write)",
-			Status:     "FAIL",
+			Status:     StatusError,
 			Evidence:   fmt.Sprintf("Unable to check CloudTrail configuration: %v", err),
 			Priority:   PriorityHigh,
 			Timestamp:  time.Now(),
@@ -447,7 +483,7 @@ func (c *CloudTrailChecks) CheckS3ObjectLevelLoggingWrite(ctx context.Context) (
 	}
 
 	if len(trails.Trails) == 0 {
-		return CheckResult{
+		return skipped.failOrError(CheckResult{
 			Control:     "CIS-4.8",
 			Name:        "S3 Object-Level Logging (Write)",
 			Status:      "FAIL",
@@ -478,7 +514,7 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 			Priority:        PriorityHigh,
 			Timestamp:       time.Now(),
 			Frameworks:      map[string]string{"CIS-AWS": "4.8", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
-		}, nil
+		}), nil
 	}
 
 	// Check each trail for S3 data event selectors
@@ -491,6 +527,7 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 			TrailName: trail.Name,
 		})
 		if err != nil {
+			skipped.add("GetEventSelectors", err)
 			continue
 		}
 
@@ -533,7 +570,7 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CIS-4.8",
 		Name:       "S3 Object-Level Logging (Write)",
 		Status:     "PASS",
@@ -541,17 +578,18 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"CIS-AWS": "4.8", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
-	}, nil
+	}), nil
 }
 
 // CheckS3ObjectLevelLoggingRead verifies S3 object-level logging for read events (CIS 4.9)
 func (c *CloudTrailChecks) CheckS3ObjectLevelLoggingRead(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	trails, err := c.client.ListTrails(ctx, &cloudtrail.ListTrailsInput{})
 	if err != nil {
 		return CheckResult{
 			Control:    "CIS-4.9",
 			Name:       "S3 Object-Level Logging (Read)",
-			Status:     "FAIL",
+			Status:     StatusError,
 			Evidence:   fmt.Sprintf("Unable to check CloudTrail configuration: %v", err),
 			Priority:   PriorityMedium,
 			Timestamp:  time.Now(),
@@ -560,7 +598,7 @@ func (c *CloudTrailChecks) CheckS3ObjectLevelLoggingRead(ctx context.Context) (C
 	}
 
 	if len(trails.Trails) == 0 {
-		return CheckResult{
+		return skipped.failOrError(CheckResult{
 			Control:     "CIS-4.9",
 			Name:        "S3 Object-Level Logging (Read)",
 			Status:      "FAIL",
@@ -591,7 +629,7 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 			Priority:        PriorityMedium,
 			Timestamp:       time.Now(),
 			Frameworks:      map[string]string{"CIS-AWS": "4.9", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
-		}, nil
+		}), nil
 	}
 
 	// Check each trail for S3 data event selectors
@@ -604,6 +642,7 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 			TrailName: trail.Name,
 		})
 		if err != nil {
+			skipped.add("GetEventSelectors", err)
 			continue
 		}
 
@@ -646,7 +685,7 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "CIS-4.9",
 		Name:       "S3 Object-Level Logging (Read)",
 		Status:     "PASS",
@@ -654,5 +693,5 @@ aws cloudtrail put-event-selectors --trail-name [TRAIL_NAME] --event-selectors '
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"CIS-AWS": "4.9", "SOC2": "CC7.2", "PCI-DSS": "10.2.1"},
-	}, nil
+	}), nil
 }

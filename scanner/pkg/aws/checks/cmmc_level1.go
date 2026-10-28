@@ -67,6 +67,7 @@ func (c *AWSCMMCLevel1Checks) Run(ctx context.Context) ([]CheckResult, error) {
 
 // AC.L1-3.1.1 - AUTOMATED
 func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
+	skipped := unreadable{}
 	users, err := listAllUsers(ctx, c.iamClient, &iam.ListUsersInput{})
 	if err != nil {
 		return CheckResult{
@@ -98,6 +99,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 		name := aws.ToString(user.UserName)
 		keys, err := c.iamClient.ListAccessKeys(ctx, &iam.ListAccessKeysInput{UserName: user.UserName})
 		if err != nil {
+			skipped.add("ListAccessKeys", err)
 			continue
 		}
 		for _, key := range keys.AccessKeyMetadata {
@@ -109,6 +111,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 				AccessKeyId: key.AccessKeyId,
 			})
 			if err != nil {
+				skipped.add("GetAccessKeyLastUsed", err)
 				continue
 			}
 			// A key the service has no record of using has never been used.
@@ -127,7 +130,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 		// Nothing in scope is not a pass: an empty or wrongly scoped account
 		// read as compliant.
 		if len(users.Users) == 0 {
-			return CheckResult{
+			return skipped.passOrError(CheckResult{
 				Control:         "AC.L1-3.1.1",
 				Name:            "[CMMC L1] Limit System Access",
 				Status:          "INFO",
@@ -137,9 +140,9 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 				ScreenshotGuide: "AWS Console → IAM → Users → Security credentials → Screenshot showing no active keys",
 				ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
 				Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
-			}
+			})
 		}
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:         "AC.L1-3.1.1",
 			Name:            "[CMMC L1] Limit System Access",
 			Status:          "PASS",
@@ -150,7 +153,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 			ScreenshotGuide: "AWS Console → IAM → Users → Security credentials → Screenshot showing no active keys",
 			ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
 			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
-		}
+		})
 	}
 
 	if len(stale) > 0 {
@@ -175,7 +178,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 	// Nothing in scope is not a pass: an empty or wrongly scoped account
 	// read as compliant.
 	if len(users.Users) == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:         "AC.L1-3.1.1",
 			Name:            "[CMMC L1] Limit System Access",
 			Status:          "INFO",
@@ -185,9 +188,9 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 			ScreenshotGuide: "AWS Console → IAM → Credential report → Screenshot the access key last-used columns",
 			ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
 			Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
-		}
+		})
 	}
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:         "AC.L1-3.1.1",
 		Name:            "[CMMC L1] Limit System Access",
 		Status:          "PASS",
@@ -198,7 +201,7 @@ func (c *AWSCMMCLevel1Checks) CheckAC_L1_001(ctx context.Context) CheckResult {
 		ScreenshotGuide: "AWS Console → IAM → Credential report → Screenshot the access key last-used columns",
 		ConsoleURL:      "https://console.aws.amazon.com/iam/home#/users",
 		Frameworks:      map[string]string{"CMMC": "AC.L1-3.1.1", "NIST 800-171": "3.1.1"},
-	}
+	})
 }
 
 // AC.L1-3.1.2 - AUTOMATED

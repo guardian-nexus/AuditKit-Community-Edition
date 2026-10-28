@@ -153,7 +153,7 @@ func (c *KMSChecks) CheckKMSSeparationOfDuties(ctx context.Context) []CheckResul
 		results = append(results, CheckResult{
 			Control:     "CIS-GCP-1.12",
 			Name:        "[CIS-GCP-1.12] KMS Separation of Duties",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Evidence:    fmt.Sprintf("Unable to check KMS separation of duties: %v", err),
 			Remediation: "Verify Cloud Resource Manager API is enabled",
 			Priority:    PriorityMedium,
@@ -168,7 +168,7 @@ func (c *KMSChecks) CheckKMSSeparationOfDuties(ctx context.Context) []CheckResul
 		results = append(results, CheckResult{
 			Control:     "CIS-GCP-1.12",
 			Name:        "[CIS-GCP-1.12] KMS Separation of Duties",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Evidence:    fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
 			Remediation: "Verify resourcemanager.projects.getIamPolicy permission",
 			Priority:    PriorityMedium,

@@ -55,7 +55,7 @@ func (c *NetworkChecks) CheckFirewallRules(ctx context.Context) []CheckResult {
 		results = append(results, CheckResult{
 			Control:     "CC6.6",
 			Name:        "VPC Firewall Rules Check",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("Unable to check firewall rules: %v", err),
 			Remediation: "Verify Compute Engine API is enabled and credentials have compute.firewalls.list permission",
@@ -742,7 +742,7 @@ func (c *NetworkChecks) CheckHTTPSForwarding(ctx context.Context) []CheckResult 
 		results = append(results, CheckResult{
 			Control:     "GCP-NET-01",
 			Name:        "[GCP-NET-01] HTTPS Load Balancer Configuration",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("Unable to check URL maps: %v", err),
 			Remediation: "Verify Compute Engine API is enabled and permissions are correct",
@@ -807,7 +807,7 @@ func (c *NetworkChecks) CheckTLSVersions(ctx context.Context) []CheckResult {
 		results = append(results, CheckResult{
 			Control:     "CIS-GCP-3.11",
 			Name:        "[CIS-GCP-3.11] SSL Policy TLS Version",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("Unable to check SSL policies: %v", err),
 			Remediation: "Verify Compute Engine API is enabled and permissions are correct",

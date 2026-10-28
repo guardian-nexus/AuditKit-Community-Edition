@@ -44,6 +44,7 @@ func (c *MessagingChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 // CheckSNSEncryption - Ensure SNS topics use encryption at rest
 func (c *MessagingChecks) CheckSNSEncryption(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	topics, err := c.snsClient.ListTopics(ctx, &sns.ListTopicsInput{})
 	if err != nil {
 		return CheckResult{
@@ -87,6 +88,7 @@ func (c *MessagingChecks) CheckSNSEncryption(ctx context.Context) (CheckResult, 
 			TopicArn: topic.TopicArn,
 		})
 		if err != nil {
+			skipped.add("GetTopicAttributes", err)
 			continue
 		}
 
@@ -127,7 +129,7 @@ func (c *MessagingChecks) CheckSNSEncryption(ctx context.Context) (CheckResult, 
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:     "AWS-MESSAGING-02",
 		Name:        "SNS Topic Encryption",
 		Status:      "PASS",
@@ -141,11 +143,12 @@ Continue using encryption for all new topics.`, encryptedTopics),
 		ScreenshotGuide: "SNS → Topics → Screenshot showing all topics encrypted",
 		ConsoleURL:      "https://console.aws.amazon.com/sns/home#/topics",
 		Frameworks:      GetFrameworkMappings("SNS_ENCRYPTION"),
-	}, nil
+	}), nil
 }
 
 // CheckSQSEncryption - Ensure SQS queues use encryption at rest
 func (c *MessagingChecks) CheckSQSEncryption(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	queues, err := c.sqsClient.ListQueues(ctx, &sqs.ListQueuesInput{})
 	if err != nil {
 		return CheckResult{
@@ -190,6 +193,7 @@ func (c *MessagingChecks) CheckSQSEncryption(ctx context.Context) (CheckResult, 
 			AttributeNames: []types.QueueAttributeName{types.QueueAttributeNameAll},
 		})
 		if err != nil {
+			skipped.add("GetQueueAttributes", err)
 			continue
 		}
 
@@ -230,7 +234,7 @@ func (c *MessagingChecks) CheckSQSEncryption(ctx context.Context) (CheckResult, 
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:     "AWS-MESSAGING-03",
 		Name:        "SQS Queue Encryption",
 		Status:      "PASS",
@@ -244,7 +248,7 @@ Continue using encryption for all new queues.`, encryptedQueues),
 		ScreenshotGuide: "SQS → Queues → Screenshot showing all queues encrypted",
 		ConsoleURL:      "https://console.aws.amazon.com/sqs/home#/queues",
 		Frameworks:      GetFrameworkMappings("SQS_ENCRYPTION"),
-	}, nil
+	}), nil
 }
 
 // CheckMessagingAccessPolicies - Ensure SNS/SQS use restrictive access policies

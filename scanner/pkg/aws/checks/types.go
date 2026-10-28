@@ -2,9 +2,12 @@ package checks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/aws/smithy-go"
 )
 
 // Check result statuses. Only StatusPass and StatusFail are scoreable; every
@@ -909,4 +912,23 @@ func (u *unreadable) finish(results []CheckResult, control, name string) []Check
 		}
 	}
 	return results
+}
+
+// isNotFound reports whether err is AWS saying the thing asked about does not
+// exist - NoSuchEntity for a password policy, AWSOrganizationsNotInUseException,
+// a missing bucket configuration - as opposed to a call that could not be made.
+// Only the first kind is evidence about the account; the second is not, and a
+// check that reported FAIL "not configured" for a denied call was guessing.
+func isNotFound(err error) bool {
+	var apiErr smithy.APIError
+	if !errors.As(err, &apiErr) {
+		return false
+	}
+	code := apiErr.ErrorCode()
+	for _, marker := range []string{"NoSuch", "NotFound", "NotInUse", "NotExist", "NoSuchEntity"} {
+		if strings.Contains(code, marker) {
+			return true
+		}
+	}
+	return false
 }

@@ -61,8 +61,10 @@ func (c *CC3Checks) CheckCC3_1_Objectives(ctx context.Context) []CheckResult {
 	if c.securityhubClient != nil {
 		hub, err := c.securityhubClient.DescribeHub(ctx, &securityhub.DescribeHubInput{})
 
-		if err != nil || hub == nil || hub.HubArn == nil {
-			results = append(results, CheckResult{
+		if err != nil {
+			skipped.add("DescribeHub", err)
+		} else if hub == nil || hub.HubArn == nil {
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:         "CC3.1",
 				Name:            "Security Objectives Management",
 				Status:          "FAIL",
@@ -73,7 +75,7 @@ func (c *CC3Checks) CheckCC3_1_Objectives(ctx context.Context) []CheckResult {
 				ConsoleURL:      "https://console.aws.amazon.com/securityhub/",
 				Priority:        PriorityHigh,
 				Timestamp:       time.Now(),
-			})
+			}))
 		} else {
 			// Check for enabled standards
 			standards, err := c.securityhubClient.DescribeStandards(ctx, &securityhub.DescribeStandardsInput{})
@@ -116,8 +118,10 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 	if c.guarddutyClient != nil {
 		detectors, err := c.guarddutyClient.ListDetectors(ctx, &guardduty.ListDetectorsInput{})
 
-		if err != nil || detectors == nil || len(detectors.DetectorIds) == 0 {
-			results = append(results, CheckResult{
+		if err != nil {
+			skipped.add("ListDetectors", err)
+		} else if detectors == nil || len(detectors.DetectorIds) == 0 {
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:         "CC3.2",
 				Name:            "Threat Detection and Risk Identification",
 				Status:          "FAIL",
@@ -128,7 +132,7 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 				ConsoleURL:      "https://console.aws.amazon.com/guardduty/",
 				Priority:        PriorityCritical,
 				Timestamp:       time.Now(),
-			})
+			}))
 		} else {
 			// Check if detector is actually enabled
 			// Only the first detector is examined.
@@ -150,7 +154,7 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 						Timestamp: time.Now(),
 					})
 				} else {
-					results = append(results, CheckResult{
+					results = append(results, skipped.failOrError(CheckResult{
 						Control:     "CC3.2",
 						Name:        "Threat Detection Status",
 						Status:      "FAIL",
@@ -159,7 +163,7 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 						Remediation: "Enable the GuardDuty detector",
 						Priority:    PriorityHigh,
 						Timestamp:   time.Now(),
-					})
+					}))
 				}
 			}
 		}
@@ -183,7 +187,7 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 				Timestamp: time.Now(),
 			})
 		} else {
-			results = append(results, CheckResult{
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:     "CC3.2",
 				Name:        "Vulnerability Assessment",
 				Status:      "FAIL",
@@ -192,7 +196,7 @@ func (c *CC3Checks) CheckCC3_2_RiskIdentification(ctx context.Context) []CheckRe
 				Remediation: "Enable Inspector v2 for vulnerability scanning",
 				Priority:    PriorityHigh,
 				Timestamp:   time.Now(),
-			})
+			}))
 		}
 	}
 
@@ -221,7 +225,7 @@ func (c *CC3Checks) CheckCC3_3_FraudRisk(ctx context.Context) []CheckResult {
 				Timestamp: time.Now(),
 			})
 		} else {
-			results = append(results, CheckResult{
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:     "CC3.3",
 				Name:        "Fraud Risk Detection",
 				Status:      "FAIL",
@@ -230,7 +234,7 @@ func (c *CC3Checks) CheckCC3_3_FraudRisk(ctx context.Context) []CheckResult {
 				Remediation: "Enable GuardDuty with IAM finding types",
 				Priority:    PriorityHigh,
 				Timestamp:   time.Now(),
-			})
+			}))
 		}
 	}
 
@@ -292,8 +296,10 @@ func (c *CC4Checks) CheckCC4_1_Evaluations(ctx context.Context) []CheckResult {
 	if c.configClient != nil {
 		recorders, err := c.configClient.DescribeConfigurationRecorders(ctx, &configservice.DescribeConfigurationRecordersInput{})
 
-		if err != nil || recorders == nil || len(recorders.ConfigurationRecorders) == 0 {
-			results = append(results, CheckResult{
+		if err != nil {
+			skipped.add("DescribeConfigurationRecorders", err)
+		} else if recorders == nil || len(recorders.ConfigurationRecorders) == 0 {
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:         "CC4.1",
 				Name:            "Continuous Configuration Monitoring",
 				Status:          "FAIL",
@@ -304,7 +310,7 @@ func (c *CC4Checks) CheckCC4_1_Evaluations(ctx context.Context) []CheckResult {
 				ConsoleURL:      "https://console.aws.amazon.com/config/",
 				Priority:        PriorityHigh,
 				Timestamp:       time.Now(),
-			})
+			}))
 		} else {
 			// Check if recorder is actually running
 			status, err := c.configClient.DescribeConfigurationRecorderStatus(ctx, &configservice.DescribeConfigurationRecorderStatusInput{})
@@ -363,7 +369,7 @@ func (c *CC4Checks) CheckCC4_1_Evaluations(ctx context.Context) []CheckResult {
 				Timestamp: time.Now(),
 			})
 		} else {
-			results = append(results, CheckResult{
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:     "CC4.1",
 				Name:        "Performance Monitoring",
 				Status:      "FAIL",
@@ -372,7 +378,7 @@ func (c *CC4Checks) CheckCC4_1_Evaluations(ctx context.Context) []CheckResult {
 				Remediation: "Set up CloudWatch alarms for critical metrics",
 				Priority:    PriorityMedium,
 				Timestamp:   time.Now(),
-			})
+			}))
 		}
 	}
 
@@ -430,7 +436,7 @@ func (c *CC4Checks) CheckCC4_2_Deficiencies(ctx context.Context) []CheckResult {
 				})
 			}
 		} else {
-			results = append(results, CheckResult{
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:     "CC4.2",
 				Name:        "Automated Compliance Evaluation",
 				Status:      "FAIL",
@@ -439,7 +445,7 @@ func (c *CC4Checks) CheckCC4_2_Deficiencies(ctx context.Context) []CheckResult {
 				Remediation: "Deploy Config Rules for compliance requirements",
 				Priority:    PriorityMedium,
 				Timestamp:   time.Now(),
-			})
+			}))
 		}
 	}
 
@@ -488,8 +494,10 @@ func (c *CC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) []CheckResu
 	if c.backupClient != nil {
 		plans, err := c.backupClient.ListBackupPlans(ctx, &backup.ListBackupPlansInput{})
 
-		if err != nil || plans == nil || len(plans.BackupPlansList) == 0 {
-			results = append(results, CheckResult{
+		if err != nil {
+			skipped.add("ListBackupPlans", err)
+		} else if plans == nil || len(plans.BackupPlansList) == 0 {
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:         "CC5.1",
 				Name:            "Backup and Recovery Controls",
 				Status:          "FAIL",
@@ -500,7 +508,7 @@ func (c *CC5Checks) CheckCC5_1_ControlSelection(ctx context.Context) []CheckResu
 				ConsoleURL:      "https://console.aws.amazon.com/backup/",
 				Priority:        PriorityHigh,
 				Timestamp:       time.Now(),
-			})
+			}))
 		} else {
 			// Check backup vaults
 			vaults, err := c.backupClient.ListBackupVaults(ctx, &backup.ListBackupVaultsInput{})
@@ -535,8 +543,10 @@ func (c *CC5Checks) CheckCC5_2_TechnologyControls(ctx context.Context) []CheckRe
 	if c.kmsClient != nil {
 		keys, err := c.kmsClient.ListKeys(ctx, &kms.ListKeysInput{})
 
-		if err != nil || keys == nil || len(keys.Keys) == 0 {
-			results = append(results, CheckResult{
+		if err != nil {
+			skipped.add("ListKeys", err)
+		} else if keys == nil || len(keys.Keys) == 0 {
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:     "CC5.2",
 				Name:        "Encryption Key Management",
 				Status:      "FAIL",
@@ -545,7 +555,7 @@ func (c *CC5Checks) CheckCC5_2_TechnologyControls(ctx context.Context) []CheckRe
 				Remediation: "Create customer-managed KMS keys for sensitive data",
 				Priority:    PriorityHigh,
 				Timestamp:   time.Now(),
-			})
+			}))
 		} else {
 			// Count customer managed keys
 			customerKeys := 0

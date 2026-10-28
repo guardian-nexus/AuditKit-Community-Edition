@@ -39,7 +39,13 @@ func (c *SystemsChecks) CheckPatchCompliance(ctx context.Context) (CheckResult, 
 	// Check if Systems Manager is being used for patching
 	patches, err := c.ssmClient.DescribePatchBaselines(ctx, &ssm.DescribePatchBaselinesInput{})
 
-	if err != nil || len(patches.BaselineIdentities) == 0 {
+	if err != nil && !isNotFound(err) {
+		return checkError("CC7.1", "Patch Management", nil, err), err
+	}
+	if err != nil {
+		return checkError("CC7.1", "Patch Management", nil, err), err
+	}
+	if len(patches.BaselineIdentities) == 0 {
 		return CheckResult{
 			Control:           "CC7.1",
 			Name:              "Patch Management",
@@ -68,7 +74,13 @@ func (c *SystemsChecks) CheckPatchCompliance(ctx context.Context) (CheckResult, 
 func (c *SystemsChecks) CheckAutoScaling(ctx context.Context) (CheckResult, error) {
 	groups, err := c.asClient.DescribeAutoScalingGroups(ctx, &autoscaling.DescribeAutoScalingGroupsInput{})
 
-	if err != nil || len(groups.AutoScalingGroups) == 0 {
+	if err != nil && !isNotFound(err) {
+		return checkError("A1.1", "Processing Capacity Management", nil, err), err
+	}
+	if err != nil {
+		return checkError("A1.1", "Processing Capacity Management", nil, err), err
+	}
+	if len(groups.AutoScalingGroups) == 0 {
 		return CheckResult{
 			Control:         "A1.1",
 			Name:            "Processing Capacity Management",

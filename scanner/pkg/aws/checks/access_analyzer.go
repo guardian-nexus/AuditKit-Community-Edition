@@ -42,7 +42,7 @@ func (c *AccessAnalyzerChecks) CheckAccessAnalyzerEnabled(ctx context.Context) (
 		return CheckResult{
 			Control:    "CIS-2.18",
 			Name:       "IAM Access Analyzer Enabled",
-			Status:     "FAIL",
+			Status:     StatusError,
 			Evidence:   fmt.Sprintf("Unable to check IAM Access Analyzer: %v", err),
 			Severity:   "HIGH",
 			Priority:   PriorityHigh,

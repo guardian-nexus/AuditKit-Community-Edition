@@ -59,8 +59,8 @@ func (c *AvailabilityConfidentialityChecks) checkRecoveryTesting(ctx context.Con
 
 	instances, err := describeAllDBInstances(ctx, c.rdsClient, &rds.DescribeDBInstancesInput{})
 	if err != nil {
-		base.Status = "INFO"
-		base.Evidence = "SOC2 A1.3: document and retain evidence of recovery plan testing"
+		base.Status = StatusError
+		base.Evidence = fmt.Sprintf("SOC2 A1.3: unable to list backup plans (%v); document and retain evidence of recovery plan testing", err)
 		base.Remediation = "Perform and record a restore test"
 		base.RemediationDetail = "1. Restore a backup into an isolated environment\n2. Record the date, what was restored and the elapsed time\n3. Repeat at the frequency your policy defines"
 		return base
@@ -106,6 +106,9 @@ func (c *AvailabilityConfidentialityChecks) checkRecoveryTesting(ctx context.Con
 // mechanism AWS provides for recording which resources hold confidential data.
 func (c *AvailabilityConfidentialityChecks) checkDataClassification(ctx context.Context) []CheckResult {
 	buckets, err := c.s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
+	if err != nil && !isNotFound(err) {
+		return []CheckResult{checkError("C1.1", "Confidential Data Identification", map[string]string{FrameworkSOC2: "C1.1"}, err)}
+	}
 	if err != nil {
 		return []CheckResult{{
 			Control:           "C1.1",
@@ -204,6 +207,9 @@ func (c *AvailabilityConfidentialityChecks) checkDataClassification(ctx context.
 // Lifecycle rules are how that disposal is actually enforced.
 func (c *AvailabilityConfidentialityChecks) checkDataDisposal(ctx context.Context) []CheckResult {
 	buckets, err := c.s3Client.ListBuckets(ctx, &s3.ListBucketsInput{})
+	if err != nil && !isNotFound(err) {
+		return []CheckResult{checkError("C1.2", "Confidential Data Disposal", map[string]string{FrameworkSOC2: "C1.2"}, err)}
+	}
 	if err != nil {
 		return []CheckResult{{
 			Control:           "C1.2",

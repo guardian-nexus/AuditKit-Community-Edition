@@ -42,6 +42,7 @@ func (c *APIGatewayChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 // CheckAPIGatewayLogging - Ensure API Gateway stages have logging enabled
 func (c *APIGatewayChecks) CheckAPIGatewayLogging(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	// Check REST APIs (v1)
 	restAPIs, err := c.clientV1.GetRestApis(ctx, &apigateway.GetRestApisInput{})
 	if err != nil {
@@ -104,6 +105,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayLogging(ctx context.Context) (CheckRes
 			RestApiId: api.Id,
 		})
 		if err != nil {
+			skipped.add("GetStages", err)
 			continue
 		}
 
@@ -152,7 +154,7 @@ func (c *APIGatewayChecks) CheckAPIGatewayLogging(ctx context.Context) (CheckRes
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:     "AWS-APIGW-02",
 		Name:        "API Gateway Logging Enabled",
 		Status:      "PASS",
@@ -166,7 +168,7 @@ Continue monitoring logs for security events and errors.`, stagesWithLogging),
 		ScreenshotGuide: "API Gateway → APIs → Stages → Screenshot showing all with logging",
 		ConsoleURL:      "https://console.aws.amazon.com/apigateway/home#/apis",
 		Frameworks:      GetFrameworkMappings("API_GATEWAY_LOGGING"),
-	}, nil
+	}), nil
 }
 
 // CheckAPIGatewayAuth - Ensure API Gateway uses authorization

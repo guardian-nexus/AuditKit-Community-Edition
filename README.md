@@ -68,7 +68,7 @@ measured from the checks themselves.
 | **SOC2 Type II** | 38 of 43 | 38 of 43 | 32 of 43 | SaaS customer requirements |
 | **PCI DSS v4.0.1** | 59 | 63 | 50 | Payment card processing |
 | **CMMC Level 1** | 5 of 17 | 4 of 17 | 4 of 17 | DoW contractor compliance (FCI) |
-| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; 7 practices automated on GCP, 1 each on AWS and Azure. Pro adds deeper automation and the evidence package via [AuditKit Pro](https://auditkit.io/) |
+| **CMMC Level 2** | All 110 practices | All 110 practices | All 110 practices | Full Level 2 scope reported with evidence guidance; 6 practices automated on GCP, 1 each on AWS and Azure. Pro adds deeper automation and the evidence package via [AuditKit Pro](https://auditkit.io/) |
 
 71 distinct PCI DSS v4.0.1 requirements are assessed across the three providers.
 

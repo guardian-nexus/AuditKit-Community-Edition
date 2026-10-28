@@ -64,7 +64,7 @@ func (c *EC2Checks) CheckOpenSecurityGroups(ctx context.Context) (CheckResult, e
 		return CheckResult{
 			Control:    "CC6.1",
 			Name:       "Open Security Groups",
-			Status:     "FAIL",
+			Status:     StatusError,
 			Evidence:   "Unable to check security groups",
 			Severity:   "HIGH",
 			Priority:   PriorityHigh,
@@ -631,7 +631,7 @@ func (c *EC2Checks) CheckInstanceIAMRoles(ctx context.Context) (CheckResult, err
 		return CheckResult{
 			Control:    "CIS-2.16",
 			Name:       "EC2 Instance IAM Roles",
-			Status:     "FAIL",
+			Status:     StatusError,
 			Evidence:   fmt.Sprintf("Unable to check EC2 instances: %v", err),
 			Severity:   "MEDIUM",
 			Priority:   PriorityMedium,

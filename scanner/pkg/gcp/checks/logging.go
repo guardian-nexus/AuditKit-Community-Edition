@@ -98,7 +98,7 @@ func (c *LoggingChecks) CheckLogSinks(ctx context.Context) []CheckResult {
 			results = append(results, CheckResult{
 				Control:     "CIS-GCP-2.3",
 				Name:        "[CIS-GCP-2.3] Log Sinks Configured",
-				Status:      "FAIL",
+				Status:      StatusError,
 				Evidence:    fmt.Sprintf("Unable to check log sinks: %v", err),
 				Remediation: "Verify Cloud Logging API is enabled and permissions are correct",
 				Priority:    PriorityHigh,
@@ -180,7 +180,7 @@ func (c *LoggingChecks) CheckLogRetention(ctx context.Context) []CheckResult {
 			results = append(results, CheckResult{
 				Control:     "CIS-GCP-2.4",
 				Name:        "[CIS-GCP-2.4] Log Retention Period",
-				Status:      "FAIL",
+				Status:      StatusError,
 				Evidence:    fmt.Sprintf("Unable to check log retention: %v", err),
 				Remediation: "Verify Cloud Logging API is enabled",
 				Priority:    PriorityMedium,

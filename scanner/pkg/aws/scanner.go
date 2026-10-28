@@ -188,7 +188,7 @@ func NewScannerWithConfig(cfg aws.Config) (*AWSScanner, error) {
 
 func (s *AWSScanner) GetAccountID(ctx context.Context) string {
 	identity, err := s.stsClient.GetCallerIdentity(ctx, &sts.GetCallerIdentityInput{})
-	if err != nil {
+	if err != nil || identity.Account == nil {
 		return "unknown"
 	}
 	return *identity.Account

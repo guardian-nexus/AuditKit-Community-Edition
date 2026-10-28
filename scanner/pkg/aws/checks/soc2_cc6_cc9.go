@@ -74,7 +74,10 @@ func (c *CC6Checks) CheckCC6_1_AccessControls(ctx context.Context) []CheckResult
 
 	// Check security groups for network access control
 	sgs, err := c.ec2Client.DescribeSecurityGroups(ctx, &ec2.DescribeSecurityGroupsInput{})
-	if err != nil || sgs == nil {
+	if err != nil {
+		return append(results, checkError("CC6.1", "Network Access Controls", nil, err))
+	}
+	if sgs == nil {
 		results = append(results, CheckResult{
 			Control:   "CC6.1",
 			Name:      "Network Access Controls",
@@ -216,10 +219,16 @@ func (c *CC6Checks) CheckCC6_3_AccessPoints(ctx context.Context) []CheckResult {
 
 	// Check VPC endpoints (secure access points)
 	vpcs, err := c.ec2Client.DescribeVpcs(ctx, &ec2.DescribeVpcsInput{})
+	if err != nil && !isNotFound(err) {
+		return append(results, checkError("CC6.3", "Secure Access Points", nil, err))
+	}
 	if err != nil {
 		skipped.add("DescribeVpcs", err)
 	}
 	endpoints, err := c.ec2Client.DescribeVpcEndpoints(ctx, &ec2.DescribeVpcEndpointsInput{})
+	if err != nil && !isNotFound(err) {
+		return append(results, checkError("CC6.3", "Secure Access Points", nil, err))
+	}
 	if err != nil {
 		skipped.add("DescribeVpcEndpoints", err)
 	}
@@ -389,11 +398,14 @@ func (c *CC6Checks) CheckCC6_6_UnauthorizedPrevention(ctx context.Context) []Che
 
 	// Check CloudTrail for unauthorized access monitoring
 	trails, err := c.cloudtrailClient.DescribeTrails(ctx, &cloudtrail.DescribeTrailsInput{})
+	if err != nil && !isNotFound(err) {
+		return append(results, checkError("CC6.6", "Unauthorized Access Prevention", nil, err))
+	}
 	if err != nil {
 		skipped.add("DescribeTrails", err)
 	}
 	if trails == nil || len(trails.TrailList) == 0 {
-		results = append(results, CheckResult{
+		results = append(results, skipped.failOrError(CheckResult{
 			Control:     "CC6.6",
 			Name:        "Unauthorized Access Prevention",
 			Status:      "FAIL",
@@ -402,7 +414,7 @@ func (c *CC6Checks) CheckCC6_6_UnauthorizedPrevention(ctx context.Context) []Che
 			Remediation: "Enable CloudTrail for all regions",
 			Priority:    PriorityHigh,
 			Timestamp:   time.Now(),
-		})
+		}))
 	} else {
 		multiRegionTrail := false
 		for _, trail := range trails.TrailList {
@@ -413,7 +425,7 @@ func (c *CC6Checks) CheckCC6_6_UnauthorizedPrevention(ctx context.Context) []Che
 		}
 
 		if !multiRegionTrail {
-			results = append(results, CheckResult{
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:     "CC6.6",
 				Name:        "Unauthorized Access Prevention",
 				Status:      "FAIL",
@@ -422,7 +434,7 @@ func (c *CC6Checks) CheckCC6_6_UnauthorizedPrevention(ctx context.Context) []Che
 				Remediation: "Enable multi-region CloudTrail",
 				Priority:    PriorityMedium,
 				Timestamp:   time.Now(),
-			})
+			}))
 		} else {
 			results = append(results, CheckResult{
 				Control:   "CC6.6",
@@ -443,7 +455,13 @@ func (c *CC6Checks) CheckCC6_7_Authentication(ctx context.Context) []CheckResult
 
 	// Check IAM password policy
 	policy, err := c.iamClient.GetAccountPasswordPolicy(ctx, &iam.GetAccountPasswordPolicyInput{})
-	if err != nil || policy == nil || policy.PasswordPolicy == nil {
+	if err != nil && !isNotFound(err) {
+		return append(results, checkError("CC6.7", "Password Policy Strength", nil, err))
+	}
+	if err != nil {
+		return append(results, checkError("CC6.7", "Password Policy Strength", nil, err))
+	}
+	if policy == nil || policy.PasswordPolicy == nil {
 		results = append(results, CheckResult{
 			Control:     "CC6.7",
 			Name:        "Authentication Requirements",
@@ -455,6 +473,10 @@ func (c *CC6Checks) CheckCC6_7_Authentication(ctx context.Context) []CheckResult
 			Timestamp:   time.Now(),
 		})
 		return results
+	}
+
+	if policy.PasswordPolicy == nil {
+		return append(results, checkError("CC6.7", "Authentication Requirements", nil, fmt.Errorf("GetAccountPasswordPolicy returned no policy")))
 	}
 
 	weakPolicy := false
@@ -653,7 +675,7 @@ func (c *CC7Checks) CheckCC7_1_Monitoring(ctx context.Context) []CheckResult {
 			})
 		}
 	} else {
-		results = append(results, CheckResult{
+		results = append(results, skipped.failOrError(CheckResult{
 			Control:     "CC7.1",
 			Name:        "System Monitoring",
 			Status:      "FAIL",
@@ -662,7 +684,7 @@ func (c *CC7Checks) CheckCC7_1_Monitoring(ctx context.Context) []CheckResult {
 			Remediation: "Enable CloudTrail for comprehensive logging",
 			Priority:    PriorityCritical,
 			Timestamp:   time.Now(),
-		})
+		}))
 	}
 
 	return skipped.finish(results, "CC7.1", "System Monitoring")
@@ -733,7 +755,7 @@ func (c *CC7Checks) CheckCC7_3_SecurityEvents(ctx context.Context) []CheckResult
 				Timestamp: time.Now(),
 			})
 		} else {
-			results = append(results, CheckResult{
+			results = append(results, skipped.failOrError(CheckResult{
 				Control:     "CC7.3",
 				Name:        "Security Event Management - Patching",
 				Status:      "FAIL",
@@ -742,7 +764,7 @@ func (c *CC7Checks) CheckCC7_3_SecurityEvents(ctx context.Context) []CheckResult
 				Remediation: "Configure SSM Patch Manager for automated security patching",
 				Priority:    PriorityMedium,
 				Timestamp:   time.Now(),
-			})
+			}))
 		}
 	}
 

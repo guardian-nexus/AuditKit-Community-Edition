@@ -78,7 +78,7 @@ func (c *IAMChecks) CheckServiceAccountKeys(ctx context.Context) []CheckResult {
 			results = append(results, CheckResult{
 				Control:     "CC6.1",
 				Name:        "Service Account Key Rotation",
-				Status:      "FAIL",
+				Status:      StatusError,
 				Severity:    "HIGH",
 				Evidence:    fmt.Sprintf("Unable to check service account keys: %v", err),
 				Remediation: "Verify IAM API is enabled and credentials have iam.serviceAccounts.list permission",
@@ -200,7 +200,7 @@ func (c *IAMChecks) CheckUserMFA(ctx context.Context) []CheckResult {
 		results = append(results, CheckResult{
 			Control:     "CC6.1",
 			Name:        "User MFA Enforcement",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("Unable to check MFA status: %v", err),
 			Remediation: "Verify Cloud Resource Manager API is enabled",
@@ -216,7 +216,7 @@ func (c *IAMChecks) CheckUserMFA(ctx context.Context) []CheckResult {
 		results = append(results, CheckResult{
 			Control:     "CC6.1",
 			Name:        "User MFA Enforcement",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Severity:    "CRITICAL",
 			Evidence:    fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
 			Remediation: "Verify resourcemanager.projects.getIamPolicy permission",
@@ -663,7 +663,7 @@ func (c *IAMChecks) CheckDefaultServiceAccountDisabled(ctx context.Context) []Ch
 			return []CheckResult{{
 				Control:    "GCP-IAM-03",
 				Name:       "[GCP-IAM-03] Default Service Account Disabled",
-				Status:     "FAIL",
+				Status:     StatusError,
 				Severity:   "CRITICAL",
 				Evidence:   fmt.Sprintf("Unable to list service accounts: %v", err),
 				Priority:   PriorityCritical,
@@ -789,7 +789,7 @@ func (c *IAMChecks) CheckSeparationOfDuties(ctx context.Context) []CheckResult {
 		return []CheckResult{{
 			Control:     "GCP-IAM-02",
 			Name:        "[GCP-IAM-02] Separation of Duties",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Evidence:    fmt.Sprintf("Unable to check IAM policies: %v", err),
 			Remediation: "Verify Cloud Resource Manager API is enabled",
 			Priority:    PriorityHigh,
@@ -803,7 +803,7 @@ func (c *IAMChecks) CheckSeparationOfDuties(ctx context.Context) []CheckResult {
 		return []CheckResult{{
 			Control:     "GCP-IAM-02",
 			Name:        "[GCP-IAM-02] Separation of Duties",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Evidence:    fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
 			Remediation: "Ensure proper permissions to read IAM policies",
 			Priority:    PriorityHigh,
@@ -933,7 +933,7 @@ func (c *IAMChecks) CheckKMSRoleSeparation(ctx context.Context) []CheckResult {
 		return []CheckResult{{
 			Control:     "CIS-GCP-1.12",
 			Name:        "[CIS-GCP-1.12] KMS Role Separation of Duties",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Evidence:    fmt.Sprintf("Unable to check IAM policies: %v", err),
 			Remediation: "Verify Cloud Resource Manager API is enabled",
 			Priority:    PriorityMedium,
@@ -947,7 +947,7 @@ func (c *IAMChecks) CheckKMSRoleSeparation(ctx context.Context) []CheckResult {
 		return []CheckResult{{
 			Control:     "CIS-GCP-1.12",
 			Name:        "[CIS-GCP-1.12] KMS Role Separation of Duties",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Evidence:    fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
 			Remediation: "Ensure proper permissions to read IAM policies",
 			Priority:    PriorityMedium,
@@ -1043,7 +1043,7 @@ func (c *IAMChecks) CheckIAMUserRoles(ctx context.Context) []CheckResult {
 		return []CheckResult{{
 			Control:     "CIS-GCP-1.7",
 			Name:        "[CIS-GCP-1.7] Service Account Roles at Project Level",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("Unable to check IAM policies: %v", err),
 			Remediation: "Verify Cloud Resource Manager API is enabled",
@@ -1058,7 +1058,7 @@ func (c *IAMChecks) CheckIAMUserRoles(ctx context.Context) []CheckResult {
 		return []CheckResult{{
 			Control:     "CIS-GCP-1.7",
 			Name:        "[CIS-GCP-1.7] Service Account Roles at Project Level",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Severity:    "HIGH",
 			Evidence:    fmt.Sprintf("Unable to retrieve IAM policy: %v", err),
 			Remediation: "Ensure proper permissions to read IAM policies",

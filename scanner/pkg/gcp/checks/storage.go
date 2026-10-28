@@ -51,7 +51,7 @@ func (c *StorageChecks) CheckBucketPublicAccess(ctx context.Context) []CheckResu
 			results = append(results, CheckResult{
 				Control:     "CC6.1",
 				Name:        "GCS Bucket Public Access Check",
-				Status:      "FAIL",
+				Status:      StatusError,
 				Evidence:    fmt.Sprintf("Unable to check bucket public access: %v", err),
 				Remediation: "Verify Cloud Storage API is enabled and credentials have storage.buckets.list permission",
 				Priority:    PriorityHigh,
@@ -67,7 +67,7 @@ func (c *StorageChecks) CheckBucketPublicAccess(ctx context.Context) []CheckResu
 			results = append(results, CheckResult{
 				Control:     "CC6.1",
 				Name:        fmt.Sprintf("GCS Bucket Public Access - %s", attrs.Name),
-				Status:      "FAIL",
+				Status:      StatusError,
 				Evidence:    fmt.Sprintf("Unable to check IAM policy for bucket %s: %v", attrs.Name, err),
 				Remediation: "Verify storage.buckets.getIamPolicy permission",
 				Priority:    PriorityHigh,
@@ -151,7 +151,7 @@ func (c *StorageChecks) CheckBucketEncryption(ctx context.Context) []CheckResult
 			results = append(results, CheckResult{
 				Control:     "CC6.7",
 				Name:        "GCS Bucket Encryption Check",
-				Status:      "FAIL",
+				Status:      StatusError,
 				Evidence:    fmt.Sprintf("Unable to check bucket encryption: %v", err),
 				Remediation: "Verify Cloud Storage API is enabled",
 				Priority:    PriorityHigh,
@@ -167,7 +167,7 @@ func (c *StorageChecks) CheckBucketEncryption(ctx context.Context) []CheckResult
 			results = append(results, CheckResult{
 				Control:     "CC6.7",
 				Name:        fmt.Sprintf("GCS Bucket Encryption - %s", attrs.Name),
-				Status:      "FAIL",
+				Status:      StatusError,
 				Evidence:    fmt.Sprintf("Unable to check encryption for bucket %s: %v", attrs.Name, err),
 				Remediation: "Verify storage.buckets.get permission",
 				Priority:    PriorityHigh,
@@ -236,7 +236,7 @@ func (c *StorageChecks) CheckBucketVersioning(ctx context.Context) []CheckResult
 			results = append(results, CheckResult{
 				Control:     "A1.2",
 				Name:        "GCS Bucket Versioning Check",
-				Status:      "FAIL",
+				Status:      StatusError,
 				Evidence:    fmt.Sprintf("Unable to check bucket versioning: %v", err),
 				Severity:    "HIGH",
 				Remediation: "Verify Cloud Storage API is enabled",
@@ -312,7 +312,7 @@ func (c *StorageChecks) CheckBucketLogging(ctx context.Context) []CheckResult {
 			results = append(results, CheckResult{
 				Control:     "CC7.2",
 				Name:        "GCS Bucket Logging Check",
-				Status:      "FAIL",
+				Status:      StatusError,
 				Evidence:    fmt.Sprintf("Unable to check bucket logging: %v", err),
 				Severity:    "HIGH",
 				Remediation: "Verify Cloud Storage API is enabled",
@@ -393,7 +393,7 @@ func (c *StorageChecks) CheckUniformBucketLevelAccess(ctx context.Context) []Che
 			results = append(results, CheckResult{
 				Control:     "CIS-GCP-5.2",
 				Name:        "GCS Uniform Bucket-Level Access",
-				Status:      "FAIL",
+				Status:      StatusError,
 				Evidence:    fmt.Sprintf("Unable to check uniform bucket-level access: %v", err),
 				Remediation: "Verify Cloud Storage API is enabled",
 				Priority:    PriorityHigh,

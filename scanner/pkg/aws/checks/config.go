@@ -40,7 +40,7 @@ func (c *ConfigChecks) CheckConfigEnabled(ctx context.Context) (CheckResult, err
 		return CheckResult{
 			Control:           "CC7.1",
 			Name:              "AWS Config Recording",
-			Status:            "FAIL",
+			Status:            StatusError,
 			Severity:          "HIGH",
 			Evidence:          "Unable to check AWS Config status",
 			Remediation:       "Enable AWS Config to track configuration changes",
@@ -86,7 +86,13 @@ func (c *ConfigChecks) CheckConfigEnabled(ctx context.Context) (CheckResult, err
 // CIS 4.3 - Ensure AWS Config is enabled in all regions
 func (c *ConfigChecks) CheckConfigRecording(ctx context.Context) (CheckResult, error) {
 	recorders, err := c.client.DescribeConfigurationRecorders(ctx, &configservice.DescribeConfigurationRecordersInput{})
-	if err != nil || len(recorders.ConfigurationRecorders) == 0 {
+	if err != nil && !isNotFound(err) {
+		return checkError("CIS-4.3", "AWS Config Recording Status", GetFrameworkMappings("CONFIG_ENABLED"), err), err
+	}
+	if err != nil {
+		return checkError("CIS-4.3", "AWS Config Recording Status", GetFrameworkMappings("CONFIG_ENABLED"), err), err
+	}
+	if len(recorders.ConfigurationRecorders) == 0 {
 		return CheckResult{
 			Control:           "CIS-4.3",
 			Name:              "AWS Config Recording Status",
@@ -161,7 +167,11 @@ func (c *GuardDutyChecks) Run(ctx context.Context) ([]CheckResult, error) {
 	results := []CheckResult{}
 
 	detectors, err := c.client.ListDetectors(ctx, &guardduty.ListDetectorsInput{})
-	if err != nil || len(detectors.DetectorIds) == 0 {
+	if err != nil {
+		// A denied call is not "not enabled".
+		return []CheckResult{checkError("CC7.2", "GuardDuty Threat Detection", nil, err)}, nil
+	}
+	if len(detectors.DetectorIds) == 0 {
 		results = append(results, CheckResult{
 			Control:         "CC7.2",
 			Name:            "GuardDuty Threat Detection",

@@ -66,7 +66,7 @@ func (c *GCPAvailabilityConfidentialityChecks) checkCapacity(ctx context.Context
 
 	agg, err := c.computeService.Autoscalers.AggregatedList(c.projectID).Context(ctx).Do()
 	if err != nil {
-		base.Status = "INFO"
+		base.Status = StatusError
 		base.Evidence = fmt.Sprintf("SOC2 A1.1: unable to read autoscalers (%v), verify capacity management by hand", err)
 		base.Remediation = "Configure autoscalers for capacity-sensitive workloads"
 		base.RemediationDetail = "Attach autoscalers to managed instance groups, or document how capacity is monitored and provisioned instead."
@@ -117,8 +117,9 @@ func (c *GCPAvailabilityConfidentialityChecks) checkRecoveryTesting(ctx context.
 
 	list, err := c.sqlService.Instances.List(c.projectID).Context(ctx).Do()
 	if err != nil {
-		base.Status = "INFO"
-		base.Evidence = "SOC2 A1.3: document and retain evidence of recovery plan testing"
+		// A denied listing read as generic guidance; say the check did not run.
+		base.Status = StatusError
+		base.Evidence = fmt.Sprintf("SOC2 A1.3: unable to list Cloud SQL instances (%v); document and retain evidence of recovery plan testing", err)
 		base.Remediation = "Perform and record a restore test"
 		base.RemediationDetail = "1. Restore a backup into an isolated project\n2. Record the date, what was restored and the elapsed time\n3. Repeat at the frequency your policy defines"
 		return base
@@ -170,7 +171,7 @@ func (c *GCPAvailabilityConfidentialityChecks) checkBucketClassification(ctx con
 				{
 					Control:           "C1.1",
 					Name:              "Confidential Data Identification",
-					Status:            "INFO",
+					Status:            StatusError,
 					Evidence:          fmt.Sprintf("SOC2 C1.1: unable to list buckets (%v). Identify and maintain a record of which resources hold confidential information", err),
 					Remediation:       "Label data-bearing resources with a classification",
 					RemediationDetail: "Apply a classification label to each bucket and keep an inventory of what each holds.",

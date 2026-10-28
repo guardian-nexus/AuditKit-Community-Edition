@@ -39,6 +39,7 @@ func (c *ECSChecks) Run(ctx context.Context) ([]CheckResult, error) {
 
 // Ensure ECS task definitions have logging enabled
 func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	// List task definition families
 	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
 	if err != nil {
@@ -54,7 +55,11 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 			FamilyPrefix: &family,
 			MaxResults:   aws.Int32(1),
 		})
-		if err != nil || len(taskDefs.TaskDefinitionArns) == 0 {
+		if err != nil {
+			skipped.add("ListTaskDefinitions", err)
+			continue
+		}
+		if len(taskDefs.TaskDefinitionArns) == 0 {
 			continue
 		}
 
@@ -63,6 +68,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 			TaskDefinition: &taskDefArn,
 		})
 		if err != nil {
+			skipped.add("DescribeTaskDefinition", err)
 			continue
 		}
 
@@ -114,7 +120,7 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 	}
 
 	if totalTasks == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "AWS-ECS-03",
 			Name:       "ECS Task Definition Logging",
 			Status:     StatusInfo,
@@ -122,10 +128,10 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "CC7.2"},
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-ECS-03",
 		Name:       "ECS Task Definition Logging",
 		Status:     "PASS",
@@ -133,11 +139,12 @@ func (c *ECSChecks) CheckECSTaskDefinitionLogging(ctx context.Context) (CheckRes
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC7.2"},
-	}, nil
+	}), nil
 }
 
 // Ensure ECS uses Secrets Manager for sensitive data
 func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
 	if err != nil {
 		return checkError("AWS-ECS-02", "ECS Secrets Management", map[string]string{"SOC2": "CC6.1", "PCI-DSS": "3.5.1"}, err), err
@@ -151,7 +158,11 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 			FamilyPrefix: &family,
 			MaxResults:   aws.Int32(1),
 		})
-		if err != nil || len(taskDefs.TaskDefinitionArns) == 0 {
+		if err != nil {
+			skipped.add("ListTaskDefinitions", err)
+			continue
+		}
+		if len(taskDefs.TaskDefinitionArns) == 0 {
 			continue
 		}
 
@@ -160,6 +171,7 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 			TaskDefinition: &taskDefArn,
 		})
 		if err != nil {
+			skipped.add("DescribeTaskDefinition", err)
 			continue
 		}
 
@@ -212,7 +224,7 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 	}
 
 	if totalTasks == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "AWS-ECS-02",
 			Name:       "ECS Secrets Management",
 			Status:     StatusInfo,
@@ -220,10 +232,10 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "CC6.1"},
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-ECS-02",
 		Name:       "ECS Secrets Management",
 		Status:     "PASS",
@@ -231,7 +243,7 @@ func (c *ECSChecks) CheckECSSecretsManagement(ctx context.Context) (CheckResult,
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC6.1"},
-	}, nil
+	}), nil
 }
 
 // Ensure ECS Container Insights is enabled
@@ -311,6 +323,7 @@ func (c *ECSChecks) CheckECSContainerInsights(ctx context.Context) (CheckResult,
 
 // Ensure ECS task roles follow least privilege
 func (c *ECSChecks) CheckECSTaskRolePermissions(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	families, err := c.client.ListTaskDefinitionFamilies(ctx, &ecs.ListTaskDefinitionFamiliesInput{})
 	if err != nil {
 		return checkError("AWS-ECS-04", "ECS Task Role Permissions", map[string]string{"SOC2": "CC6.3", "PCI-DSS": "7.2.2"}, err), err
@@ -324,7 +337,11 @@ func (c *ECSChecks) CheckECSTaskRolePermissions(ctx context.Context) (CheckResul
 			FamilyPrefix: &family,
 			MaxResults:   aws.Int32(1),
 		})
-		if err != nil || len(taskDefs.TaskDefinitionArns) == 0 {
+		if err != nil {
+			skipped.add("ListTaskDefinitions", err)
+			continue
+		}
+		if len(taskDefs.TaskDefinitionArns) == 0 {
 			continue
 		}
 
@@ -333,6 +350,7 @@ func (c *ECSChecks) CheckECSTaskRolePermissions(ctx context.Context) (CheckResul
 			TaskDefinition: &taskDefArn,
 		})
 		if err != nil {
+			skipped.add("DescribeTaskDefinition", err)
 			continue
 		}
 
@@ -372,7 +390,7 @@ aws iam put-role-policy --role-name ECSTaskRole --policy-name TaskPolicy --polic
 	}
 
 	if totalTasks == 0 {
-		return CheckResult{
+		return skipped.passOrError(CheckResult{
 			Control:    "AWS-ECS-04",
 			Name:       "ECS Task Role Permissions",
 			Status:     StatusInfo,
@@ -380,10 +398,10 @@ aws iam put-role-policy --role-name ECSTaskRole --policy-name TaskPolicy --polic
 			Priority:   PriorityInfo,
 			Timestamp:  time.Now(),
 			Frameworks: map[string]string{"SOC2": "CC6.3"},
-		}, nil
+		}), nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-ECS-04",
 		Name:       "ECS Task Role Permissions",
 		Status:     "PASS",
@@ -391,5 +409,5 @@ aws iam put-role-policy --role-name ECSTaskRole --policy-name TaskPolicy --polic
 		Priority:   PriorityInfo,
 		Timestamp:  time.Now(),
 		Frameworks: map[string]string{"SOC2": "CC6.3"},
-	}, nil
+	}), nil
 }

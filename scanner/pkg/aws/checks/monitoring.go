@@ -100,6 +100,9 @@ func (c *MonitoringChecks) CheckCloudWatchAlarms(ctx context.Context) (CheckResu
 
 func (c *MonitoringChecks) CheckSNSTopics(ctx context.Context) (CheckResult, error) {
 	topics, err := c.snsClient.ListTopics(ctx, &sns.ListTopicsInput{})
+	if err != nil && !isNotFound(err) {
+		return checkError("CC7.4", "Alert Notifications", nil, err), err
+	}
 	if err != nil {
 		return checkError("CC7.4", "Alert Notifications", nil, err), err
 	}
@@ -139,6 +142,9 @@ func (c *MonitoringChecks) CheckSecurityHubEnabled(ctx context.Context) (CheckRe
 	// Try to get the Security Hub status
 	hub, err := c.shClient.DescribeHub(ctx, &securityhub.DescribeHubInput{})
 
+	if err != nil && !isNotFound(err) {
+		return checkError("CIS-5.16", "AWS Security Hub Enabled", GetFrameworkMappings("SECURITY_HUB"), err), err
+	}
 	if err != nil {
 		// Check if the error is because Security Hub is not enabled
 		if strings.Contains(err.Error(), "not subscribed") ||
@@ -191,7 +197,7 @@ Also consider enabling:
 		return CheckResult{
 			Control:           "CIS-5.16",
 			Name:              "AWS Security Hub Enabled",
-			Status:            "FAIL",
+			Status:            StatusError,
 			Severity:          "MEDIUM",
 			Evidence:          fmt.Sprintf("Unable to check Security Hub status: %v", err),
 			Remediation:       "Verify IAM permissions to check Security Hub status",

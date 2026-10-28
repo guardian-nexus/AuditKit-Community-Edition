@@ -41,7 +41,7 @@ func (c *BigQueryChecks) CheckPublicDatasets(ctx context.Context, bqService *big
 		return []CheckResult{{
 			Control:     "CIS-GCP-7.1",
 			Name:        "[CIS-GCP-7.1] BigQuery Datasets Not Public",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Evidence:    fmt.Sprintf("Unable to check BigQuery datasets: %v", err),
 			Remediation: "Verify BigQuery API is enabled",
 			Priority:    PriorityHigh,
@@ -132,7 +132,7 @@ func (c *BigQueryChecks) CheckDatasetEncryption(ctx context.Context, bqService *
 		return []CheckResult{{
 			Control:     "CIS-GCP-7.3",
 			Name:        "[CIS-GCP-7.3] BigQuery CMEK Encryption",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Evidence:    fmt.Sprintf("Unable to check BigQuery encryption: %v", err),
 			Remediation: "Verify BigQuery API is enabled",
 			Priority:    PriorityMedium,
@@ -222,7 +222,7 @@ func (c *BigQueryChecks) CheckTableCMEKEncryption(ctx context.Context, bqService
 		return []CheckResult{{
 			Control:     "CIS-GCP-7.2",
 			Name:        "[CIS-GCP-7.2] BigQuery Tables CMEK Encryption",
-			Status:      "FAIL",
+			Status:      StatusError,
 			Evidence:    fmt.Sprintf("Unable to check BigQuery tables: %v", err),
 			Remediation: "Verify BigQuery API is enabled",
 			Priority:    PriorityMedium,

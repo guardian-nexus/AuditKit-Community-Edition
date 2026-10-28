@@ -31,6 +31,7 @@ func (c *CloudFormationChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *CloudFormationChecks) CheckStackPolicy(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	stacks, err := c.client.DescribeStacks(ctx, &cloudformation.DescribeStacksInput{})
 	if err != nil {
 		return CheckResult{
@@ -63,7 +64,11 @@ func (c *CloudFormationChecks) CheckStackPolicy(ctx context.Context) (CheckResul
 		policy, err := c.client.GetStackPolicy(ctx, &cloudformation.GetStackPolicyInput{
 			StackName: stack.StackName,
 		})
-		if err != nil || policy.StackPolicyBody == nil {
+		if err != nil {
+			skipped.add("GetStackPolicy", err)
+			continue
+		}
+		if policy.StackPolicyBody == nil {
 			without = append(without, *stack.StackName)
 		} else {
 			with++
@@ -85,7 +90,7 @@ func (c *CloudFormationChecks) CheckStackPolicy(ctx context.Context) (CheckResul
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-CFN-02",
 		Name:       "CloudFormation Stack Policy Configured",
 		Status:     "PASS",
@@ -94,7 +99,7 @@ func (c *CloudFormationChecks) CheckStackPolicy(ctx context.Context) (CheckResul
 		Timestamp:  time.Now(),
 		ConsoleURL: "https://console.aws.amazon.com/cloudformation/home#/stacks",
 		Frameworks: GetFrameworkMappings("CFN_STACK_POLICY"),
-	}, nil
+	}), nil
 }
 
 func (c *CloudFormationChecks) CheckDriftDetection(ctx context.Context) (CheckResult, error) {

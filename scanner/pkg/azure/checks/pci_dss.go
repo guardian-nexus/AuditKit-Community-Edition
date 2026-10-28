@@ -128,7 +128,8 @@ func (c *AzurePCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Ch
 	}
 
 	if nsgCount == 0 {
-		results = append(results, CheckResult{
+		// "No NSGs found" is only true if the listing succeeded.
+		results = append(results, skipped.failOrError(CheckResult{
 			Control:           "PCI-1.4.1",
 			Name:              "[PCI-DSS] Network Segmentation",
 			Status:            "FAIL",
@@ -143,7 +144,7 @@ func (c *AzurePCIChecks) CheckReq1_NetworkSegmentation(ctx context.Context) []Ch
 			Frameworks: map[string]string{
 				"PCI-DSS": "1.4.1",
 			},
-		})
+		}))
 	} else if subnetAssociations < nsgCount {
 		results = append(results, CheckResult{
 			Control:           "PCI-1.3.1",
@@ -959,8 +960,17 @@ func (c *AzurePCIChecks) checkAppCredentials(ctx context.Context) []CheckResult 
 	}
 
 	apps, err := c.graphClient.Applications().Get(ctx, nil)
+	if err == nil && apps == nil {
+		// The SDK returns no error and no result for an empty body; the
+		// code below dereferenced it and crashed the scan.
+		err = errNoGraphData
+	}
 	if err != nil {
-		return manual(fmt.Sprintf("unable to query app registrations (%v)", err))
+		// manual() is INFO, right when Graph is not configured at all; a call
+		// that failed is an ERROR.
+		r := manual(fmt.Sprintf("unable to query app registrations (%v)", err))
+		r[0].Status = StatusError
+		return r
 	}
 
 	withSecrets := []string{}
@@ -1079,7 +1089,7 @@ func (c *AzurePCIChecks) checkDiagnosticRouting(ctx context.Context) []CheckResu
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
-			return fail("INFO", fmt.Sprintf("PCI-DSS Req 10.4.1.1 (mandatory since 31 Mar 2025): unable to read diagnostic settings (%v), verify by hand", err))
+			return fail(StatusError, fmt.Sprintf("PCI-DSS Req 10.4.1.1 (mandatory since 31 Mar 2025): unable to read diagnostic settings (%v), verify by hand", err))
 		}
 		for _, ds := range page.Value {
 			if ds == nil || ds.Properties == nil {

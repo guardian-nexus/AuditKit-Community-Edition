@@ -31,6 +31,7 @@ func (c *ACMChecks) Run(ctx context.Context) ([]CheckResult, error) {
 }
 
 func (c *ACMChecks) CheckCertificateRenewal(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	certs, err := c.client.ListCertificates(ctx, &acm.ListCertificatesInput{})
 	if err != nil {
 		return CheckResult{
@@ -66,6 +67,7 @@ func (c *ACMChecks) CheckCertificateRenewal(ctx context.Context) (CheckResult, e
 			CertificateArn: cert.CertificateArn,
 		})
 		if err != nil {
+			skipped.add("DescribeCertificate", err)
 			continue
 		}
 
@@ -110,7 +112,7 @@ func (c *ACMChecks) CheckCertificateRenewal(ctx context.Context) (CheckResult, e
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-ACM-01",
 		Name:       "ACM Certificate Auto-Renewal",
 		Status:     "PASS",
@@ -119,10 +121,11 @@ func (c *ACMChecks) CheckCertificateRenewal(ctx context.Context) (CheckResult, e
 		Timestamp:  time.Now(),
 		ConsoleURL: "https://console.aws.amazon.com/acm/home#/certificates/list",
 		Frameworks: GetFrameworkMappings("ACM_RENEWAL"),
-	}, nil
+	}), nil
 }
 
 func (c *ACMChecks) CheckCertificateInUse(ctx context.Context) (CheckResult, error) {
+	skipped := unreadable{}
 	certs, err := c.client.ListCertificates(ctx, &acm.ListCertificatesInput{})
 	if err != nil {
 		return CheckResult{
@@ -156,6 +159,7 @@ func (c *ACMChecks) CheckCertificateInUse(ctx context.Context) (CheckResult, err
 			CertificateArn: cert.CertificateArn,
 		})
 		if err != nil {
+			skipped.add("DescribeCertificate", err)
 			continue
 		}
 
@@ -181,7 +185,7 @@ func (c *ACMChecks) CheckCertificateInUse(ctx context.Context) (CheckResult, err
 		}, nil
 	}
 
-	return CheckResult{
+	return skipped.passOrError(CheckResult{
 		Control:    "AWS-ACM-02",
 		Name:       "ACM Certificate In Use",
 		Status:     "PASS",
@@ -190,5 +194,5 @@ func (c *ACMChecks) CheckCertificateInUse(ctx context.Context) (CheckResult, err
 		Timestamp:  time.Now(),
 		ConsoleURL: "https://console.aws.amazon.com/acm/home#/certificates/list",
 		Frameworks: GetFrameworkMappings("ACM_IN_USE"),
-	}, nil
+	}), nil
 }
